@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guida Download Props GLTF Industriali - Safety Frontline</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 40px 20px;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+        header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+        header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+        .content {
+            padding: 40px;
+        }
+        .section {
+            margin-bottom: 50px;
+        }
+        .section h2 {
+            color: #667eea;
+            font-size: 2rem;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #667eea;
+        }
+        .source-card {
+            background: #f8f9fa;
+            border-left: 5px solid #667eea;
+            padding: 25px;
+            margin-bottom: 25px;
+            border-radius: 8px;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .source-card:hover {
+            transform: translateX(5px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.2);
+        }
+        .source-card h3 {
+            color: #333;
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+        }
+        .badge {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+        .badge-recommended {
+            background: #28a745;
+            color: white;
+        }
+        .badge-license {
+            background: #007bff;
+            color: white;
+        }
+        .badge-format {
+            background: #6c757d;
+            color: white;
+        }
+        .model-list {
+            margin-top: 15px;
+        }
+        .model-item {
+            padding: 10px 0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        .model-item:last-child {
+            border-bottom: none;
+        }
+        .model-item strong {
+            color: #667eea;
+        }
+        .cta-button {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 12px 30px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: background 0.3s, transform 0.3s;
+            margin-top: 10px;
+        }
+        .cta-button:hover {
+            background: #764ba2;
+            transform: translateY(-2px);
+        }
+        .steps {
+            background: #fff3cd;
+            border-left: 5px solid #ffc107;
+            padding: 25px;
+            margin: 30px 0;
+            border-radius: 8px;
+        }
+        .steps h3 {
+            color: #856404;
+            margin-bottom: 15px;
+        }
+        .steps ol {
+            margin-left: 20px;
+        }
+        .steps li {
+            margin-bottom: 10px;
+            color: #856404;
+        }
+        .code-block {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+        }
+        .warning {
+            background: #f8d7da;
+            border-left: 5px solid #dc3545;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            color: #721c24;
+        }
+        footer {
+            background: #2d2d2d;
+            color: white;
+            text-align: center;
+            padding: 30px;
+        }
+        footer a {
+            color: #667eea;
+            text-decoration: none;
+        }
+        footer a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🏭 Props GLTF Industriali</h1>
+            <p>Guida completa al download e integrazione di modelli 3D realistici</p>
+        </header>
+
+        <div class="content">
+            <!-- INTRO -->
+            <div class="section">
+                <h2>📦 Perché Props GLTF?</h2>
+                <p>
+                    I Props GLTF aggiungono realismo fotografico agli scenari 3D di Safety Frontline. 
+                    Modelli industriali come <strong>carrelli elevatori</strong>, <strong>scaffalature</strong>, 
+                    <strong>macchinari</strong> e <strong>segnaletica safety</strong> migliorano l'immersione 
+                    e l'autenticità dei contesti lavorativi simulati.
+                </p>
+            </div>
+
+            <!-- KENNEY.NL -->
+            <div class="section">
+                <h2>🌟 Fonti Raccomandate</h2>
+
+                <div class="source-card">
+                    <h3>1. KENNEY.NL</h3>
+                    <span class="badge badge-recommended">⭐ RACCOMANDATO</span>
+                    <span class="badge badge-license">CC0 Public Domain</span>
+                    <span class="badge badge-format">GLB • FBX • OBJ</span>
+                    
+                    <div class="model-list">
+                        <div class="model-item">
+                            <strong>City Kit (Industrial)</strong> - 25 modelli<br>
+                            Include: Factory buildings, chimneys, warehouse structures, storage tanks<br>
+                            <a href="https://kenney.nl/assets/city-kit-industrial" class="cta-button" target="_blank">
+                                Scarica City Kit
+                            </a>
+                        </div>
+                        <div class="model-item">
+                            <strong>Conveyor Kit</strong> - 60 modelli<br>
+                            Include: Conveyor belts, industrial machinery, sorting systems, packaging equipment<br>
+                            <a href="https://kenney.nl/assets/conveyor-kit" class="cta-button" target="_blank">
+                                Scarica Conveyor Kit
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="source-card">
+                    <h3>2. POLY PIZZA</h3>
+                    <span class="badge badge-license">CC-BY • CC0</span>
+                    <span class="badge badge-format">GLTF • FBX • OBJ</span>
+                    
+                    <div class="model-list">
+                        <div class="model-item">
+                            <strong>Traffic Cone</strong> (Quaternius)<br>
+                            Formato: FBX, GLTF • Licenza: CC0<br>
+                            <a href="https://poly.pizza/m/lAx8JytxGD" class="cta-button" target="_blank">
+                                Scarica Traffic Cone
+                            </a>
+                        </div>
+                        <div class="model-item">
+                            <strong>Pallet with Boxes</strong> (Colin McKibben)<br>
+                            Formato: OBJ, GLTF • Licenza: CC-BY (Attribution required)<br>
+                            <a href="https://poly.pizza/m/9TQMjCMu26x" class="cta-button" target="_blank">
+                                Scarica Pallet
+                            </a>
+                        </div>
+                        <div class="model-item">
+                            <strong>Truck</strong> (jeremy)<br>
+                            Formato: OBJ, GLTF • Licenza: CC-BY (Attribution required)<br>
+                            <a href="https://poly.pizza/m/cPVFA5uTr9l" class="cta-button" target="_blank">
+                                Scarica Truck
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="source-card">
+                    <h3>3. QUATERNIUS.COM</h3>
+                    <span class="badge badge-license">CC0 Public Domain</span>
+                    <span class="badge badge-format">FBX • OBJ • Blend</span>
+                    
+                    <p>
+                        Ampia collezione di asset low-poly gratuiti per game development, 
+                        inclusi buildings, vehicles, props industriali.
+                    </p>
+                    <a href="https://quaternius.com/" class="cta-button" target="_blank">
+                        Esplora Quaternius
+                    </a>
+                </div>
+            </div>
+
+            <!-- ISTRUZIONI -->
+            <div class="section">
+                <h2>🔧 Guida Integrazione</h2>
+
+                <div class="steps">
+                    <h3>📥 Passo 1: Download Modelli</h3>
+                    <ol>
+                        <li>Visita una delle fonti raccomandate sopra</li>
+                        <li>Scarica il pack/modello desiderato (ZIP file)</li>
+                        <li>Estrai l'archivio ZIP</li>
+                        <li>Individua i file <strong>.glb</strong> o <strong>.gltf</strong></li>
+                    </ol>
+                </div>
+
+                <div class="steps">
+                    <h3>📂 Passo 2: Posiziona i File</h3>
+                    <ol>
+                        <li>Copia i file .glb/.gltf nella cartella:<br>
+                            <code>/public/models/props/</code>
+                        </li>
+                        <li>Rinomina i file in modo descrittivo, esempio:<br>
+                            <code>kenney-forklift.glb</code><br>
+                            <code>poly-traffic-cone.glb</code><br>
+                            <code>kenney-conveyor-straight.glb</code>
+                        </li>
+                    </ol>
+                </div>
+
+                <div class="steps">
+                    <h3>⚙️ Passo 3: Configura SCENARIO_PROPS</h3>
+                    <ol>
+                        <li>Apri il file: <code>src/types/prop-config.ts</code></li>
+                        <li>Decommenta i Props template già pronti</li>
+                        <li>Oppure aggiungi nuove configurazioni Props:</li>
+                    </ol>
+                </div>
+
+                <div class="code-block">
+{
+  id: 'warehouse_forklift_01',
+  modelPath: '/models/props/kenney-forklift.glb',
+  position: [-12, 0, -8],
+  rotation: [0, Math.PI / 6, 0],
+  scale: 2.0,
+  enableCollisions: true,
+  castShadows: true,
+  receiveShadows: true,
+}
+                </div>
+
+                <div class="steps">
+                    <h3>🎮 Passo 4: Test e Refine</h3>
+                    <ol>
+                        <li>Avvia il gioco 3D e seleziona lo scenario</li>
+                        <li>Verifica console per log <code>[PropLoader]</code></li>
+                        <li>Osserva toast notification con risultato caricamento</li>
+                        <li>Aggiusta position, scale, rotation secondo necessità</li>
+                    </ol>
+                </div>
+            </div>
+
+            <!-- PARAMETRI -->
+            <div class="section">
+                <h2>📖 Parametri PropConfig</h2>
+                <table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
+                    <thead style="background: #667eea; color: white;">
+                        <tr>
+                            <th style="padding: 12px; text-align: left;">Parametro</th>
+                            <th style="padding: 12px; text-align: left;">Tipo</th>
+                            <th style="padding: 12px; text-align: left;">Descrizione</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr style="background: #f8f9fa;">
+                            <td style="padding: 10px;"><code>id</code></td>
+                            <td style="padding: 10px;">string</td>
+                            <td style="padding: 10px;">Identificatore univoco del prop</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 10px;"><code>modelPath</code></td>
+                            <td style="padding: 10px;">string</td>
+                            <td style="padding: 10px;">Percorso al file GLB/GLTF</td>
+                        </tr>
+                        <tr style="background: #f8f9fa;">
+                            <td style="padding: 10px;"><code>position</code></td>
+                            <td style="padding: 10px;">[x, y, z]</td>
+                            <td style="padding: 10px;">Coordinate 3D nel mondo</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 10px;"><code>rotation</code></td>
+                            <td style="padding: 10px;">[x, y, z]</td>
+                            <td style="padding: 10px;">Rotazioni in radianti (opzionale)</td>
+                        </tr>
+                        <tr style="background: #f8f9fa;">
+                            <td style="padding: 10px;"><code>scale</code></td>
+                            <td style="padding: 10px;">number | [x,y,z]</td>
+                            <td style="padding: 10px;">Scala uniforme o per asse</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 10px;"><code>enableCollisions</code></td>
+                            <td style="padding: 10px;">boolean</td>
+                            <td style="padding: 10px;">Abilita collisioni con player</td>
+                        </tr>
+                        <tr style="background: #f8f9fa;">
+                            <td style="padding: 10px;"><code>castShadows</code></td>
+                            <td style="padding: 10px;">boolean</td>
+                            <td style="padding: 10px;">Proietta ombre su superfici</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 10px;"><code>receiveShadows</code></td>
+                            <td style="padding: 10px;">boolean</td>
+                            <td style="padding: 10px;">Riceve ombre da altre mesh</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- WARNING -->
+            <div class="warning">
+                <strong>⚠️ ATTENZIONE - Licenze Creative Commons:</strong><br><br>
+                <ul style="margin-left: 20px; margin-top: 10px;">
+                    <li><strong>CC0 (Public Domain):</strong> Uso libero senza attribuzione richiesta</li>
+                    <li><strong>CC-BY (Attribution):</strong> Richiede credit all'autore originale</li>
+                </ul><br>
+                Per modelli CC-BY, aggiungi crediti nel file README o nella documentazione del progetto.
+            </div>
+
+            <!-- TIPS -->
+            <div class="section">
+                <h2>💡 Best Practices</h2>
+                <ul style="margin-left: 20px; line-height: 2;">
+                    <li>✅ Preferisci modelli <strong>low-poly</strong> (&lt;50k triangoli) per performance ottimali</li>
+                    <li>✅ Usa formato <strong>GLB</strong> (più compatto di GLTF + textures separate)</li>
+                    <li>✅ Dimensione file sotto <strong>5MB</strong> per caricamento rapido</li>
+                    <li>✅ Texture max <strong>2048x2048px</strong> per Props (non serve 4K)</li>
+                    <li>✅ Testa collisioni per evitare player stuck</li>
+                    <li>✅ Usa scale uniforme quando possibile (es: <code>scale: 2.0</code> invece di <code>[2, 2, 2]</code>)</li>
+                </ul>
+            </div>
+        </div>
+
+        <footer>
+            <p><strong>Safety Frontline</strong> - Piattaforma di Formazione Safety 3D</p>
+            <p style="margin-top: 10px; font-size: 0.9rem;">
+                Documentazione Props GLTF System • 
+                <a href="https://github.com/Safety-Frontline" target="_blank">GitHub</a>
+            </p>
+        </footer>
+    </div>
+</body>
+</html>
