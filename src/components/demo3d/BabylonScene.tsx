@@ -3339,121 +3339,216 @@ function addWorkerAvatars(
 ) {
   console.log(`[Avatars] Adding worker avatars for ${type}`);
 
+  // === PBR SKIN TONES ===
+  const SKIN_TONES = [
+    new BABYLON.Color3(0.92, 0.76, 0.60), // caucasico chiaro
+    new BABYLON.Color3(0.80, 0.62, 0.46), // mediterraneo
+    new BABYLON.Color3(0.60, 0.40, 0.26), // olivastro
+    new BABYLON.Color3(0.42, 0.28, 0.18), // scuro
+  ];
+
+  // Helper: crea materiale PBR realistico
+  const makePBRMat = (matName: string, albedo: BABYLON.Color3, roughness = 0.75, metallic = 0.0, emissive?: BABYLON.Color3) => {
+    const mat = new BABYLON.PBRMetallicRoughnessMaterial(matName, scene);
+    mat.baseColor = albedo;
+    mat.roughness = roughness;
+    mat.metallic = metallic;
+    if (emissive) mat.emissiveColor = emissive;
+    return mat;
+  };
+
+  // Helper: sfera appiattita per testa realistica
+  const makeHead = (meshName: string, pos: BABYLON.Vector3, skinColor: BABYLON.Color3) => {
+    const head = BABYLON.MeshBuilder.CreateSphere(meshName, { diameter: 0.26, segments: 10 }, scene);
+    head.position = pos.clone();
+    head.scaling = new BABYLON.Vector3(0.96, 1.08, 0.96);
+    head.material = makePBRMat(`${meshName}_mat`, skinColor, 0.88, 0.0);
+    return head;
+  };
+
+  // Helper: tronco umanoide (torso con spalle)
+  const makeTorso = (meshName: string, pos: BABYLON.Vector3, uniformColor: BABYLON.Color3, roughness = 0.8) => {
+    const torso = BABYLON.MeshBuilder.CreateBox(meshName, { width: 0.40, height: 0.52, depth: 0.22 }, scene);
+    torso.position = pos.clone();
+    torso.material = makePBRMat(`${meshName}_mat`, uniformColor, roughness, 0.0);
+    return torso;
+  };
+
+  // Helper: pelvis
+  const makePelvis = (meshName: string, pos: BABYLON.Vector3, pantsColor: BABYLON.Color3) => {
+    const pelvis = BABYLON.MeshBuilder.CreateBox(meshName, { width: 0.34, height: 0.20, depth: 0.20 }, scene);
+    pelvis.position = pos.clone();
+    pelvis.material = makePBRMat(`${meshName}_mat`, pantsColor, 0.85, 0.0);
+    return pelvis;
+  };
+
+  // Helper: braccio (upper + forearm come box sottili)
+  const makeArm = (meshName: string, pos: BABYLON.Vector3, color: BABYLON.Color3, side: number) => {
+    const upper = BABYLON.MeshBuilder.CreateBox(`${meshName}_u`, { width: 0.12, height: 0.28, depth: 0.11 }, scene);
+    upper.position = pos.clone().addInPlace(new BABYLON.Vector3(side * 0.26, 0, 0));
+    upper.material = makePBRMat(`${meshName}_u_mat`, color, 0.82);
+    const fore = BABYLON.MeshBuilder.CreateBox(`${meshName}_f`, { width: 0.10, height: 0.26, depth: 0.10 }, scene);
+    fore.position = pos.clone().addInPlace(new BABYLON.Vector3(side * 0.26, -0.27, 0));
+    fore.material = makePBRMat(`${meshName}_f_mat`, color.scale(0.88), 0.85);
+    return { upper, fore };
+  };
+
+  // Helper: gamba (coscia + stinco)
+  const makeLeg = (meshName: string, pos: BABYLON.Vector3, pantsColor: BABYLON.Color3, side: number) => {
+    const thigh = BABYLON.MeshBuilder.CreateBox(`${meshName}_t`, { width: 0.14, height: 0.30, depth: 0.14 }, scene);
+    thigh.position = pos.clone().addInPlace(new BABYLON.Vector3(side * 0.10, -0.15, 0));
+    thigh.material = makePBRMat(`${meshName}_t_mat`, pantsColor, 0.85);
+    const shin = BABYLON.MeshBuilder.CreateBox(`${meshName}_s`, { width: 0.12, height: 0.28, depth: 0.12 }, scene);
+    shin.position = pos.clone().addInPlace(new BABYLON.Vector3(side * 0.10, -0.44, 0));
+    shin.material = makePBRMat(`${meshName}_s_mat`, pantsColor.scale(0.90), 0.87);
+    return { thigh, shin };
+  };
+
+  // Helper: casco con visiera
+  const makeHelmet = (meshName: string, headPos: BABYLON.Vector3, helmetColor: BABYLON.Color3) => {
+    const cap = BABYLON.MeshBuilder.CreateSphere(`${meshName}_cap`, { diameter: 0.30, segments: 8 }, scene);
+    cap.position = headPos.clone().addInPlace(new BABYLON.Vector3(0, 0.04, 0));
+    cap.scaling = new BABYLON.Vector3(1.05, 0.78, 1.05);
+    cap.material = makePBRMat(`${meshName}_cap_mat`, helmetColor, 0.25, 0.05);
+    // Tesa anteriore
+    const brim = BABYLON.MeshBuilder.CreateBox(`${meshName}_brim`, { width: 0.32, height: 0.03, depth: 0.12 }, scene);
+    brim.position = headPos.clone().addInPlace(new BABYLON.Vector3(0, -0.04, 0.16));
+    brim.material = makePBRMat(`${meshName}_brim_mat`, helmetColor, 0.30, 0.05);
+    return { cap, brim };
+  };
+
+  // Helper: capelli (piatto sulla sommità)
+  const makeHair = (meshName: string, headPos: BABYLON.Vector3, hairColor: BABYLON.Color3) => {
+    const hair = BABYLON.MeshBuilder.CreateSphere(`${meshName}_hair`, { diameter: 0.27, segments: 8 }, scene);
+    hair.position = headPos.clone().addInPlace(new BABYLON.Vector3(0, 0.06, 0));
+    hair.scaling = new BABYLON.Vector3(0.98, 0.55, 0.98);
+    hair.material = makePBRMat(`${meshName}_hair_mat`, hairColor, 0.9, 0.0);
+    return hair;
+  };
+
+  // Helper: scarpe
+  const makeShoe = (meshName: string, pos: BABYLON.Vector3, side: number) => {
+    const shoe = BABYLON.MeshBuilder.CreateBox(`${meshName}_shoe_${side}`, { width: 0.12, height: 0.07, depth: 0.22 }, scene);
+    shoe.position = pos.clone().addInPlace(new BABYLON.Vector3(side * 0.10, -0.60, 0.04));
+    shoe.material = makePBRMat(`${meshName}_shoe_${side}_mat`, new BABYLON.Color3(0.12, 0.10, 0.09), 0.70, 0.1);
+    return shoe;
+  };
+
+  // Colori capelli casuali realistici
+  const HAIR_COLORS = [
+    new BABYLON.Color3(0.12, 0.08, 0.05), // bruno scuro
+    new BABYLON.Color3(0.25, 0.18, 0.10), // castano
+    new BABYLON.Color3(0.08, 0.07, 0.06), // nero
+    new BABYLON.Color3(0.65, 0.52, 0.32), // biondo scuro
+  ];
+
   const createWorker = (
     name: string,
     position: BABYLON.Vector3,
-    bodyColor: BABYLON.Color3,
+    helmetColor: BABYLON.Color3,
     uniformColor: BABYLON.Color3,
     hasHelmet: boolean,
     rotation: number = 0,
     safetyRole?: string
   ) => {
-    // Body (torso)
-    const body = BABYLON.MeshBuilder.CreateCylinder(
-      `${name}_body`,
-      { height: 0.8, diameterTop: 0.35, diameterBottom: 0.4 },
-      scene
-    );
-    body.position = position.clone().addInPlace(new BABYLON.Vector3(0, 0.9, 0));
-    body.checkCollisions = false; // Workers don't block player
-    if (safetyRole) {
-      body.metadata = { safetyRole };
-      body.isPickable = true;
-    }
-    
-    const bodyMat = new BABYLON.StandardMaterial(`${name}_bodyMat`, scene);
-    bodyMat.diffuseColor = uniformColor;
-    body.material = bodyMat;
-    
-    if (shadowGenerator) shadowGenerator.addShadowCaster(body);
+    const skinTone = SKIN_TONES[Math.floor(Math.random() * SKIN_TONES.length)];
+    const hairColor = HAIR_COLORS[Math.floor(Math.random() * HAIR_COLORS.length)];
+    const pantsColor = new BABYLON.Color3(0.18, 0.18, 0.26);
 
-    // Head
-    const head = BABYLON.MeshBuilder.CreateSphere(
-      `${name}_head`,
-      { diameter: 0.25 },
-      scene
-    );
-    head.position = body.position.clone().addInPlace(new BABYLON.Vector3(0, 0.55, 0));
-    if (safetyRole) {
-      head.metadata = { safetyRole };
-      head.isPickable = true;
-    }
-    
-    const headMat = new BABYLON.StandardMaterial(`${name}_headMat`, scene);
-    headMat.diffuseColor = new BABYLON.Color3(0.9, 0.75, 0.6); // Skin tone
-    head.material = headMat;
-    
-    if (shadowGenerator) shadowGenerator.addShadowCaster(head);
+    // ROOT transform node for easy rotation
+    const root = new BABYLON.TransformNode(`${name}_root`, scene);
+    root.position = position.clone();
+    if (rotation !== 0) root.rotation.y = rotation;
 
-    // Safety helmet (if needed)
+    // Altezza base: piedi a y=0 → testa a ~1.78
+    const baseY = 0;
+
+    // Pelvis pivot
+    const pelvisPos = new BABYLON.Vector3(0, baseY + 0.82, 0);
+    const pelvis = makePelvis(`${name}_pelvis`, pelvisPos, pantsColor);
+    pelvis.parent = root;
+
+    // Torso
+    const torsoPos = new BABYLON.Vector3(0, baseY + 1.17, 0);
+    const torso = makeTorso(`${name}_torso`, torsoPos, uniformColor);
+    torso.parent = root;
+
+    // Spalle più larghein alto
+    const shoulderL = BABYLON.MeshBuilder.CreateBox(`${name}_shL`, { width: 0.12, height: 0.12, depth: 0.20 }, scene);
+    shoulderL.position = new BABYLON.Vector3(-0.26, baseY + 1.36, 0);
+    shoulderL.material = makePBRMat(`${name}_shL_mat`, uniformColor, 0.80);
+    shoulderL.parent = root;
+
+    const shoulderR = BABYLON.MeshBuilder.CreateBox(`${name}_shR`, { width: 0.12, height: 0.12, depth: 0.20 }, scene);
+    shoulderR.position = new BABYLON.Vector3(0.26, baseY + 1.36, 0);
+    shoulderR.material = makePBRMat(`${name}_shR_mat`, uniformColor, 0.80);
+    shoulderR.parent = root;
+
+    // Collo
+    const neck = BABYLON.MeshBuilder.CreateCylinder(`${name}_neck`, { height: 0.10, diameter: 0.12, tessellation: 8 }, scene);
+    neck.position = new BABYLON.Vector3(0, baseY + 1.50, 0);
+    neck.material = makePBRMat(`${name}_neck_mat`, skinTone, 0.88);
+    neck.parent = root;
+
+    // Testa
+    const headPos = new BABYLON.Vector3(0, baseY + 1.66, 0);
+    const head = makeHead(`${name}_head`, headPos, skinTone);
+    head.parent = root;
+
+    // Capelli o casco
     if (hasHelmet) {
-      const helmet = BABYLON.MeshBuilder.CreateSphere(
-        `${name}_helmet`,
-        { diameter: 0.28 },
-        scene
-      );
-      helmet.position = head.position.clone().addInPlace(new BABYLON.Vector3(0, 0.02, 0));
-      helmet.scaling.y = 0.9; // Flatten slightly
-      
-      const helmetMat = new BABYLON.StandardMaterial(`${name}_helmetMat`, scene);
-      helmetMat.diffuseColor = bodyColor; // Match body color
-      helmetMat.specularPower = 32;
-      helmet.material = helmetMat;
-      
-      if (shadowGenerator) shadowGenerator.addShadowCaster(helmet);
-      if (safetyRole) { helmet.metadata = { safetyRole }; helmet.isPickable = true; }
+      const { cap, brim } = makeHelmet(`${name}_helmet`, headPos, helmetColor);
+      cap.parent = root; brim.parent = root;
+      if (shadowGenerator) { shadowGenerator.addShadowCaster(cap); shadowGenerator.addShadowCaster(brim); }
+      if (safetyRole) { cap.metadata = { safetyRole }; cap.isPickable = true; }
+    } else {
+      const hair = makeHair(`${name}_hair`, headPos, hairColor);
+      hair.parent = root;
+      if (shadowGenerator) shadowGenerator.addShadowCaster(hair);
     }
 
-    // Arms
-    for (let arm = 0; arm < 2; arm++) {
-      const armMesh = BABYLON.MeshBuilder.CreateCylinder(
-        `${name}_arm_${arm}`,
-        { height: 0.6, diameter: 0.12 },
-        scene
-      );
-      const xOffset = arm === 0 ? -0.28 : 0.28;
-      armMesh.position = body.position.clone().addInPlace(new BABYLON.Vector3(xOffset, -0.1, 0));
-      armMesh.rotation.z = arm === 0 ? 0.2 : -0.2;
-      
-      const armMat = new BABYLON.StandardMaterial(`${name}_armMat_${arm}`, scene);
-      armMat.diffuseColor = uniformColor;
-      armMesh.material = armMat;
-      
-      if (shadowGenerator) shadowGenerator.addShadowCaster(armMesh);
-      if (safetyRole) { armMesh.metadata = { safetyRole }; armMesh.isPickable = true; }
+    // Braccia sinistra e destra
+    const armLPos = new BABYLON.Vector3(0, baseY + 1.22, 0);
+    const { upper: armLU, fore: armLF } = makeArm(`${name}_armL`, armLPos, uniformColor, -1);
+    armLU.parent = root; armLF.parent = root;
+
+    const { upper: armRU, fore: armRF } = makeArm(`${name}_armR`, armLPos, uniformColor, 1);
+    armRU.parent = root; armRF.parent = root;
+
+    // Gambe
+    const legRootPos = new BABYLON.Vector3(0, baseY + 0.72, 0);
+    const { thigh: thighL, shin: shinL } = makeLeg(`${name}_legL`, legRootPos, pantsColor, -1);
+    thighL.parent = root; shinL.parent = root;
+
+    const { thigh: thighR, shin: shinR } = makeLeg(`${name}_legR`, legRootPos, pantsColor, 1);
+    thighR.parent = root; shinR.parent = root;
+
+    // Scarpe
+    const shoeL = makeShoe(`${name}_shoes`, legRootPos, -1);
+    const shoeR = makeShoe(`${name}_shoes_r`, legRootPos, 1);
+    shoeL.parent = root; shoeR.parent = root;
+
+    // Shadow casting per tutti i mesh principali
+    if (shadowGenerator) {
+      [torso, pelvis, head, armLU, armLF, armRU, armRF, thighL, shinL, thighR, shinR].forEach(m => shadowGenerator.addShadowCaster(m));
     }
 
-    // Legs
-    for (let leg = 0; leg < 2; leg++) {
-      const legMesh = BABYLON.MeshBuilder.CreateCylinder(
-        `${name}_leg_${leg}`,
-        { height: 0.7, diameter: 0.14 },
-        scene
-      );
-      const xOffset = leg === 0 ? -0.12 : 0.12;
-      legMesh.position = position.clone().addInPlace(new BABYLON.Vector3(xOffset, 0.35, 0));
-      
-      const legMat = new BABYLON.StandardMaterial(`${name}_legMat_${leg}`, scene);
-      legMat.diffuseColor = new BABYLON.Color3(0.2, 0.2, 0.3); // Dark pants
-      legMesh.material = legMat;
-      
-      if (shadowGenerator) shadowGenerator.addShadowCaster(legMesh);
-      if (safetyRole) { legMesh.metadata = { safetyRole }; legMesh.isPickable = true; }
-    }
-
-    // Rotate entire worker
-    if (rotation !== 0) {
-      [body, head].forEach(mesh => {
-        const pivot = position.clone();
-        const offset = mesh.position.subtract(pivot);
-        const rotated = BABYLON.Vector3.TransformCoordinates(
-          offset,
-          BABYLON.Matrix.RotationY(rotation)
-        );
-        mesh.position = pivot.add(rotated);
-        mesh.rotation.y = rotation;
+    // Clickable metadata su tutti
+    if (safetyRole) {
+      [torso, head, pelvis, armLU, armRU].forEach(m => {
+        m.metadata = { safetyRole };
+        m.isPickable = true;
       });
     }
+
+    // Idle breathing animation
+    scene.registerBeforeRender(() => {
+      const t = performance.now() * 0.001;
+      const breathScale = 1.0 + Math.sin(t * 1.6) * 0.012;
+      torso.scaling.x = breathScale;
+      torso.scaling.z = breathScale;
+      head.position.y = (baseY + 1.66) + Math.sin(t * 1.6) * 0.004 + root.position.y - position.y;
+    });
   };
 
   // Helper to create role label billboard above a worker
@@ -3492,13 +3587,21 @@ function addWorkerAvatars(
   const SAFETY_ROLES = ['RSPP', 'RLS', 'Medico', 'Preposto', 'Dirigente', 'Addetto PS'];
 
   // === SHARED WALKING WORKER SYSTEM ===
-  interface WalkingWorkerData {
-    body: BABYLON.Mesh;
+  interface WalkingNPCParts {
+    root: BABYLON.TransformNode;
     head: BABYLON.Mesh;
-    headCover: BABYLON.Mesh;
-    arms: BABYLON.Mesh[];
-    legs: BABYLON.Mesh[];
-    overlay: BABYLON.Mesh | null;
+    torso: BABYLON.Mesh;
+    pelvis: BABYLON.Mesh;
+    armLU: BABYLON.Mesh; armLF: BABYLON.Mesh;
+    armRU: BABYLON.Mesh; armRF: BABYLON.Mesh;
+    thighL: BABYLON.Mesh; shinL: BABYLON.Mesh;
+    thighR: BABYLON.Mesh; shinR: BABYLON.Mesh;
+    shoeL: BABYLON.Mesh; shoeR: BABYLON.Mesh;
+    headCoverMesh?: BABYLON.Mesh;
+    vestMesh?: BABYLON.Mesh;
+  }
+  interface WalkingWorkerData {
+    parts: WalkingNPCParts;
     waypoints: BABYLON.Vector3[];
     currentWP: number;
     speed: number;
@@ -3506,6 +3609,7 @@ function addWorkerAvatars(
     scenarioType: string;
     lastVoiceTime: number;
     voiceCooldown: number;
+    phase: number; // random phase offset for de-sync
   }
 
   const walkingWorkers: WalkingWorkerData[] = [];
@@ -3558,7 +3662,7 @@ function addWorkerAvatars(
   const speechBubbles = new Map<string, { plane: BABYLON.Mesh; mat: BABYLON.StandardMaterial; timer: number }>();
 
   const showSpeechBubble = (worker: WalkingWorkerData, text: string) => {
-    const bubbleId = worker.body.name;
+    const bubbleId = worker.parts.root.name;
 
     // Remove existing bubble
     const existing = speechBubbles.get(bubbleId);
@@ -3603,7 +3707,8 @@ function addWorkerAvatars(
     dt.update();
 
     const plane = BABYLON.MeshBuilder.CreatePlane(`speechPlane_${bubbleId}`, { width: 2.5, height: 0.65 }, scene);
-    plane.position = worker.head.position.clone().addInPlace(new BABYLON.Vector3(0, 0.8, 0));
+    const headWorldPos = worker.parts.root.position.clone().addInPlace(new BABYLON.Vector3(0, 1.66, 0));
+    plane.position = headWorldPos.addInPlace(new BABYLON.Vector3(0, 0.8, 0));
     plane.billboardMode = BABYLON.Mesh.BILLBOARDMODE_ALL;
     plane.isPickable = false; plane.renderingGroupId = 3;
 
@@ -3633,112 +3738,156 @@ function addWorkerAvatars(
     id: string,
     waypoints: BABYLON.Vector3[],
     headCoverColor: BABYLON.Color3,
-    bodyColor: BABYLON.Color3,
-    overlayColor: BABYLON.Color3 | null,
+    uniformColor: BABYLON.Color3,
+    vestColor: BABYLON.Color3 | null,
     pantsColor: BABYLON.Color3,
     speed: number,
     hasHelmet: boolean,
     addReflectiveStripes: boolean
   ) => {
     const startPos = waypoints[0].clone();
+    const skinTone = SKIN_TONES[Math.floor(Math.random() * SKIN_TONES.length)];
+    const hairColor = HAIR_COLORS[Math.floor(Math.random() * HAIR_COLORS.length)];
 
-    // Body
-    const body = BABYLON.MeshBuilder.CreateCylinder(`walk_${id}_body`, { height: 0.8, diameterTop: 0.35, diameterBottom: 0.4 }, scene);
-    body.position = startPos.clone().addInPlace(new BABYLON.Vector3(0, 0.9, 0));
-    body.checkCollisions = false;
-    body.isPickable = false;
-    const bodyMat = new BABYLON.StandardMaterial(`walk_${id}_bodyMat`, scene);
-    bodyMat.diffuseColor = bodyColor;
-    body.material = bodyMat;
-    if (shadowGenerator) shadowGenerator.addShadowCaster(body);
+    // Root transform node (moves the whole NPC as a unit)
+    const root = new BABYLON.TransformNode(`walk_${id}_root`, scene);
+    root.position = startPos.clone();
 
-    // Overlay (hi-vis vest, lab coat, jacket)
-    let overlay: BABYLON.Mesh | null = null;
-    if (overlayColor) {
-      overlay = BABYLON.MeshBuilder.CreateCylinder(`walk_${id}_overlay`, { height: 0.55, diameterTop: 0.4, diameterBottom: 0.44 }, scene);
-      overlay.position = body.position.clone().addInPlace(new BABYLON.Vector3(0, 0.05, 0));
-      overlay.checkCollisions = false;
-      overlay.isPickable = false;
-      const overlayMat = new BABYLON.StandardMaterial(`walk_${id}_overlayMat`, scene);
-      overlayMat.diffuseColor = overlayColor;
-      overlayMat.emissiveColor = overlayColor.scale(0.1);
-      overlay.material = overlayMat;
+    const baseY = startPos.y;
 
-      // Reflective stripes
+    // Pelvis
+    const pelvis = makePelvis(`walk_${id}_pelvis`, new BABYLON.Vector3(0, 0.82, 0), pantsColor);
+    pelvis.parent = root; pelvis.checkCollisions = false; pelvis.isPickable = false;
+
+    // Torso (with optional vest overlay)
+    const torsoColor = vestColor || uniformColor;
+    const torso = makeTorso(`walk_${id}_torso`, new BABYLON.Vector3(0, 1.17, 0), uniformColor);
+    torso.parent = root; torso.checkCollisions = false; torso.isPickable = false;
+    if (shadowGenerator) shadowGenerator.addShadowCaster(torso);
+
+    // Hi-vis vest layer on top of torso
+    let vestMesh: BABYLON.Mesh | undefined;
+    if (vestColor) {
+      vestMesh = BABYLON.MeshBuilder.CreateBox(`walk_${id}_vest`, { width: 0.42, height: 0.50, depth: 0.24 }, scene);
+      vestMesh.position = new BABYLON.Vector3(0, 1.17, 0);
+      vestMesh.parent = root;
+      vestMesh.checkCollisions = false; vestMesh.isPickable = false;
+      const vestMat = makePBRMat(`walk_${id}_vest_mat`, vestColor, 0.70, 0.0, vestColor.scale(0.08));
+      vestMesh.material = vestMat;
+      if (shadowGenerator) shadowGenerator.addShadowCaster(vestMesh);
+
+      // Reflective stripes on vest
       if (addReflectiveStripes) {
         for (let s = 0; s < 2; s++) {
-          const stripe = BABYLON.MeshBuilder.CreateTorus(`walk_${id}_stripe_${s}`, { diameter: 0.42, thickness: 0.025, tessellation: 16 }, scene);
-          stripe.checkCollisions = false;
-          stripe.isPickable = false;
-          const stripeMat = new BABYLON.StandardMaterial(`walk_${id}_stripeMat_${s}`, scene);
-          stripeMat.diffuseColor = new BABYLON.Color3(0.9, 0.9, 0.9);
-          stripeMat.emissiveColor = new BABYLON.Color3(0.5, 0.5, 0.5);
-          stripeMat.specularPower = 128;
-          stripe.material = stripeMat;
-          stripe.parent = overlay;
-          stripe.position = new BABYLON.Vector3(0, -0.12 + s * 0.24, 0);
+          const stripe = BABYLON.MeshBuilder.CreateBox(`walk_${id}_stripe_${s}`, { width: 0.44, height: 0.028, depth: 0.25 }, scene);
+          stripe.parent = vestMesh;
+          stripe.position = new BABYLON.Vector3(0, -0.10 + s * 0.20, 0);
+          stripe.checkCollisions = false; stripe.isPickable = false;
+          const sMat = makePBRMat(`walk_${id}_sm_${s}`, new BABYLON.Color3(0.92, 0.92, 0.85), 0.18, 0.15, new BABYLON.Color3(0.4, 0.4, 0.35));
+          stripe.material = sMat;
         }
       }
     }
 
-    // Head
-    const head = BABYLON.MeshBuilder.CreateSphere(`walk_${id}_head`, { diameter: 0.25 }, scene);
-    head.position = body.position.clone().addInPlace(new BABYLON.Vector3(0, 0.55, 0));
-    head.checkCollisions = false;
-    head.isPickable = false;
-    const headMat = new BABYLON.StandardMaterial(`walk_${id}_headMat`, scene);
-    headMat.diffuseColor = new BABYLON.Color3(0.85, 0.7, 0.55);
-    head.material = headMat;
+    // Shoulders
+    const shL = BABYLON.MeshBuilder.CreateBox(`walk_${id}_shL`, { width: 0.12, height: 0.12, depth: 0.20 }, scene);
+    shL.position = new BABYLON.Vector3(-0.26, 1.36, 0); shL.parent = root;
+    shL.material = makePBRMat(`walk_${id}_shL_mat`, torsoColor, 0.80);
+    const shR = BABYLON.MeshBuilder.CreateBox(`walk_${id}_shR`, { width: 0.12, height: 0.12, depth: 0.20 }, scene);
+    shR.position = new BABYLON.Vector3(0.26, 1.36, 0); shR.parent = root;
+    shR.material = makePBRMat(`walk_${id}_shR_mat`, torsoColor, 0.80);
+
+    // Collo
+    const neck = BABYLON.MeshBuilder.CreateCylinder(`walk_${id}_neck`, { height: 0.10, diameter: 0.12, tessellation: 8 }, scene);
+    neck.position = new BABYLON.Vector3(0, 1.50, 0); neck.parent = root;
+    neck.material = makePBRMat(`walk_${id}_neck_mat`, skinTone, 0.88);
+
+    // Testa
+    const head = BABYLON.MeshBuilder.CreateSphere(`walk_${id}_head`, { diameter: 0.26, segments: 10 }, scene);
+    head.position = new BABYLON.Vector3(0, 1.66, 0); head.parent = root;
+    head.scaling = new BABYLON.Vector3(0.96, 1.08, 0.96);
+    head.material = makePBRMat(`walk_${id}_head_mat`, skinTone, 0.88);
+    head.checkCollisions = false; head.isPickable = false;
     if (shadowGenerator) shadowGenerator.addShadowCaster(head);
 
-    // Head cover (helmet or hair)
-    const headCover = BABYLON.MeshBuilder.CreateSphere(`walk_${id}_hcover`, { diameter: hasHelmet ? 0.3 : 0.26 }, scene);
-    headCover.position = head.position.clone().addInPlace(new BABYLON.Vector3(0, hasHelmet ? 0.04 : 0.06, 0));
-    headCover.scaling.y = hasHelmet ? 0.85 : 0.5;
-    headCover.checkCollisions = false;
-    headCover.isPickable = false;
-    const hcMat = new BABYLON.StandardMaterial(`walk_${id}_hcMat`, scene);
-    hcMat.diffuseColor = headCoverColor;
-    if (hasHelmet) hcMat.specularPower = 48;
-    headCover.material = hcMat;
-    if (shadowGenerator) shadowGenerator.addShadowCaster(headCover);
-
-    // Arms
-    const arms: BABYLON.Mesh[] = [];
-    for (let a = 0; a < 2; a++) {
-      const arm = BABYLON.MeshBuilder.CreateCylinder(`walk_${id}_arm_${a}`, { height: 0.6, diameter: 0.12 }, scene);
-      const xOff = a === 0 ? -0.28 : 0.28;
-      arm.position = body.position.clone().addInPlace(new BABYLON.Vector3(xOff, -0.1, 0));
-      arm.checkCollisions = false;
-      arm.isPickable = false;
-      const armMat = new BABYLON.StandardMaterial(`walk_${id}_armMat_${a}`, scene);
-      armMat.diffuseColor = overlayColor || bodyColor;
-      arm.material = armMat;
-      if (shadowGenerator) shadowGenerator.addShadowCaster(arm);
-      arms.push(arm);
+    // Casco o capelli
+    let headCoverMesh: BABYLON.Mesh | undefined;
+    if (hasHelmet) {
+      const cap = BABYLON.MeshBuilder.CreateSphere(`walk_${id}_helmetcap`, { diameter: 0.30, segments: 8 }, scene);
+      cap.position = new BABYLON.Vector3(0, 1.70, 0); cap.parent = root;
+      cap.scaling = new BABYLON.Vector3(1.05, 0.78, 1.05);
+      cap.material = makePBRMat(`walk_${id}_helmetcap_mat`, headCoverColor, 0.25, 0.05);
+      cap.checkCollisions = false; cap.isPickable = false;
+      const brim = BABYLON.MeshBuilder.CreateBox(`walk_${id}_helmBrim`, { width: 0.32, height: 0.03, depth: 0.12 }, scene);
+      brim.position = new BABYLON.Vector3(0, 1.62, 0.16); brim.parent = root;
+      brim.material = makePBRMat(`walk_${id}_helmBrim_mat`, headCoverColor, 0.30, 0.05);
+      brim.checkCollisions = false; brim.isPickable = false;
+      headCoverMesh = cap;
+      if (shadowGenerator) { shadowGenerator.addShadowCaster(cap); shadowGenerator.addShadowCaster(brim); }
+    } else {
+      const hair = BABYLON.MeshBuilder.CreateSphere(`walk_${id}_hair`, { diameter: 0.27, segments: 8 }, scene);
+      hair.position = new BABYLON.Vector3(0, 1.72, 0); hair.parent = root;
+      hair.scaling = new BABYLON.Vector3(0.98, 0.55, 0.98);
+      hair.material = makePBRMat(`walk_${id}_hair_mat`, hairColor, 0.9);
+      hair.checkCollisions = false; hair.isPickable = false;
+      headCoverMesh = hair;
+      if (shadowGenerator) shadowGenerator.addShadowCaster(hair);
     }
 
-    // Legs
-    const legs: BABYLON.Mesh[] = [];
-    for (let l = 0; l < 2; l++) {
-      const leg = BABYLON.MeshBuilder.CreateCylinder(`walk_${id}_leg_${l}`, { height: 0.7, diameter: 0.14 }, scene);
-      const xOff = l === 0 ? -0.12 : 0.12;
-      leg.position = startPos.clone().addInPlace(new BABYLON.Vector3(xOff, 0.35, 0));
-      leg.checkCollisions = false;
-      leg.isPickable = false;
-      const legMat = new BABYLON.StandardMaterial(`walk_${id}_legMat_${l}`, scene);
-      legMat.diffuseColor = pantsColor;
-      leg.material = legMat;
-      if (shadowGenerator) shadowGenerator.addShadowCaster(leg);
-      legs.push(leg);
-    }
+    // Braccia — usate come pivot per swing animazione
+    const armLU = BABYLON.MeshBuilder.CreateBox(`walk_${id}_armLU`, { width: 0.12, height: 0.28, depth: 0.11 }, scene);
+    armLU.position = new BABYLON.Vector3(-0.26, 1.22, 0); armLU.parent = root;
+    armLU.material = makePBRMat(`walk_${id}_armLU_mat`, torsoColor, 0.82);
+    const armLF = BABYLON.MeshBuilder.CreateBox(`walk_${id}_armLF`, { width: 0.10, height: 0.26, depth: 0.10 }, scene);
+    armLF.position = new BABYLON.Vector3(-0.26, 0.95, 0); armLF.parent = root;
+    armLF.material = makePBRMat(`walk_${id}_armLF_mat`, skinTone, 0.85);
+    const armRU = BABYLON.MeshBuilder.CreateBox(`walk_${id}_armRU`, { width: 0.12, height: 0.28, depth: 0.11 }, scene);
+    armRU.position = new BABYLON.Vector3(0.26, 1.22, 0); armRU.parent = root;
+    armRU.material = makePBRMat(`walk_${id}_armRU_mat`, torsoColor, 0.82);
+    const armRF = BABYLON.MeshBuilder.CreateBox(`walk_${id}_armRF`, { width: 0.10, height: 0.26, depth: 0.10 }, scene);
+    armRF.position = new BABYLON.Vector3(0.26, 0.95, 0); armRF.parent = root;
+    armRF.material = makePBRMat(`walk_${id}_armRF_mat`, skinTone, 0.85);
+    [armLU, armLF, armRU, armRF].forEach(m => { m.checkCollisions = false; m.isPickable = false; });
+    if (shadowGenerator) { shadowGenerator.addShadowCaster(armLU); shadowGenerator.addShadowCaster(armRU); }
+
+    // Gambe
+    const thighL = BABYLON.MeshBuilder.CreateBox(`walk_${id}_thighL`, { width: 0.14, height: 0.30, depth: 0.14 }, scene);
+    thighL.position = new BABYLON.Vector3(-0.10, 0.57, 0); thighL.parent = root;
+    thighL.material = makePBRMat(`walk_${id}_thighL_mat`, pantsColor, 0.85);
+    const shinL = BABYLON.MeshBuilder.CreateBox(`walk_${id}_shinL`, { width: 0.12, height: 0.28, depth: 0.12 }, scene);
+    shinL.position = new BABYLON.Vector3(-0.10, 0.28, 0); shinL.parent = root;
+    shinL.material = makePBRMat(`walk_${id}_shinL_mat`, pantsColor.scale(0.88), 0.87);
+    const thighR = BABYLON.MeshBuilder.CreateBox(`walk_${id}_thighR`, { width: 0.14, height: 0.30, depth: 0.14 }, scene);
+    thighR.position = new BABYLON.Vector3(0.10, 0.57, 0); thighR.parent = root;
+    thighR.material = makePBRMat(`walk_${id}_thighR_mat`, pantsColor, 0.85);
+    const shinR = BABYLON.MeshBuilder.CreateBox(`walk_${id}_shinR`, { width: 0.12, height: 0.28, depth: 0.12 }, scene);
+    shinR.position = new BABYLON.Vector3(0.10, 0.28, 0); shinR.parent = root;
+    shinR.material = makePBRMat(`walk_${id}_shinR_mat`, pantsColor.scale(0.88), 0.87);
+    [thighL, shinL, thighR, shinR].forEach(m => { m.checkCollisions = false; m.isPickable = false; });
+    if (shadowGenerator) { shadowGenerator.addShadowCaster(thighL); shadowGenerator.addShadowCaster(thighR); }
+
+    // Scarpe
+    const shoeL = BABYLON.MeshBuilder.CreateBox(`walk_${id}_shoeL`, { width: 0.12, height: 0.07, depth: 0.22 }, scene);
+    shoeL.position = new BABYLON.Vector3(-0.10, 0.04, 0.04); shoeL.parent = root;
+    shoeL.material = makePBRMat(`walk_${id}_shoeL_mat`, new BABYLON.Color3(0.12, 0.10, 0.09), 0.70, 0.1);
+    shoeL.checkCollisions = false; shoeL.isPickable = false;
+    const shoeR = BABYLON.MeshBuilder.CreateBox(`walk_${id}_shoeR`, { width: 0.12, height: 0.07, depth: 0.22 }, scene);
+    shoeR.position = new BABYLON.Vector3(0.10, 0.04, 0.04); shoeR.parent = root;
+    shoeR.material = makePBRMat(`walk_${id}_shoeR_mat`, new BABYLON.Color3(0.12, 0.10, 0.09), 0.70, 0.1);
+    shoeR.checkCollisions = false; shoeR.isPickable = false;
+
+    const parts: WalkingNPCParts = {
+      root, head, torso, pelvis, armLU, armLF, armRU, armRF,
+      thighL, shinL, thighR, shinR, shoeL, shoeR, headCoverMesh, vestMesh
+    };
 
     walkingWorkers.push({
-      body, head, headCover, arms, legs, overlay,
-      waypoints, currentWP: 0, speed, baseY: startPos.y,
+      parts,
+      waypoints, currentWP: 0, speed, baseY,
       scenarioType: type,
       lastVoiceTime: 0,
-      voiceCooldown: 15 + Math.random() * 20, // 15-35s between voice lines
+      voiceCooldown: 15 + Math.random() * 20,
+      phase: Math.random() * Math.PI * 2,
     });
   };
 
@@ -3959,7 +4108,7 @@ function addWorkerAvatars(
       const t = performance.now() * 0.001;
       const frameDt = scene.getEngine().getDeltaTime() * 0.001;
 
-      // Update speech bubbles (fade + follow)
+      // Update speech bubbles (fade + follow root)
       speechBubbles.forEach((bubble, id) => {
         bubble.timer -= frameDt;
         if (bubble.timer <= 0.5) {
@@ -3969,19 +4118,21 @@ function addWorkerAvatars(
           bubble.plane.dispose();
           speechBubbles.delete(id);
         } else {
-          const wd = walkingWorkers.find(w => w.body.name === id);
+          const wd = walkingWorkers.find(w => w.parts.root.name === id);
           if (wd) {
-            bubble.plane.position.x = wd.head.position.x;
-            bubble.plane.position.z = wd.head.position.z;
-            bubble.plane.position.y = wd.head.position.y + 0.8;
+            const rp = wd.parts.root.position;
+            bubble.plane.position.x = rp.x;
+            bubble.plane.position.z = rp.z;
+            bubble.plane.position.y = rp.y + 2.5; // above head
           }
         }
       });
 
       walkingWorkers.forEach((w) => {
+        const { root, head, torso, pelvis, armLU, armLF, armRU, armRF, thighL, shinL, thighR, shinR, shoeL, shoeR, headCoverMesh, vestMesh } = w.parts;
         const target = w.waypoints[w.currentWP];
-        const bodyBase = new BABYLON.Vector3(w.body.position.x, w.baseY, w.body.position.z);
-        const dir = target.subtract(bodyBase);
+        const rootPos = root.position;
+        const dir = target.subtract(new BABYLON.Vector3(rootPos.x, w.baseY, rootPos.z));
         const dist = dir.length();
 
         if (dist < 0.3) {
@@ -3991,61 +4142,64 @@ function addWorkerAvatars(
 
         const moveDir = dir.normalize().scale(w.speed);
         const facingAngle = Math.atan2(moveDir.x, moveDir.z);
-        const dx = moveDir.x;
-        const dz = moveDir.z;
 
-        w.body.position.x += dx;
-        w.body.position.z += dz;
-        w.body.rotation.y = facingAngle;
-        w.body.position.y = w.baseY + 0.9 + Math.abs(Math.sin(t * 6)) * 0.03;
+        // Move root node — all children follow automatically
+        root.position.x += moveDir.x;
+        root.position.z += moveDir.z;
+        root.rotation.y = facingAngle;
 
-        if (w.overlay) {
-          w.overlay.position.x = w.body.position.x;
-          w.overlay.position.z = w.body.position.z;
-          w.overlay.position.y = w.body.position.y + 0.05;
-          w.overlay.rotation.y = facingAngle;
-        }
+        // Bob verticale del corpo (foot-fall rhythm)
+        const phase = w.phase;
+        const walkCycle = t * 5.5 + phase;
+        const vertBob = Math.abs(Math.sin(walkCycle)) * 0.028;
+        root.position.y = w.baseY + vertBob;
 
-        w.head.position.x = w.body.position.x;
-        w.head.position.z = w.body.position.z;
-        w.head.position.y = w.body.position.y + 0.55;
-        w.head.rotation.y = facingAngle;
+        // === ANIMAZIONE BRACCIA — swing opposto ===
+        const armSwingAmp = 0.48;
+        const armSwingL = Math.sin(walkCycle) * armSwingAmp;
+        const armSwingR = -armSwingL;
+        // Upper arm — ruota attorno all'asse X (avanti/indietro)
+        armLU.rotation.x = armSwingL;
+        armRU.rotation.x = armSwingR;
+        // Forearm leggera piega al gomito
+        armLF.rotation.x = armSwingL * 0.35 + 0.15;
+        armRF.rotation.x = armSwingR * 0.35 + 0.15;
+        // Traslazione verticale forearm segue upper
+        armLF.position.y = 0.95 + Math.sin(walkCycle) * 0.06;
+        armRF.position.y = 0.95 - Math.sin(walkCycle) * 0.06;
 
-        w.headCover.position.x = w.head.position.x;
-        w.headCover.position.z = w.head.position.z;
-        w.headCover.position.y = w.head.position.y + 0.04;
+        // === ANIMAZIONE GAMBE — alternata ===
+        const legSwingAmp = 0.42;
+        const legSwingL = Math.sin(walkCycle) * legSwingAmp;
+        const legSwingR = -legSwingL;
+        thighL.rotation.x = legSwingL;
+        thighR.rotation.x = legSwingR;
+        // Stinco: piega il ginocchio nella fase di recupero
+        const kneeFlexL = Math.max(0, -Math.sin(walkCycle)) * 0.4;
+        const kneeFlexR = Math.max(0, Math.sin(walkCycle)) * 0.4;
+        shinL.rotation.x = legSwingL * 0.5 + kneeFlexL;
+        shinR.rotation.x = legSwingR * 0.5 + kneeFlexR;
+        // Aggiusta posizione stinco basata sulla coscia
+        shinL.position.y = 0.28 + legSwingL * 0.06;
+        shinR.position.y = 0.28 + legSwingR * 0.06;
+        // Scarpe seguono
+        shoeL.position.y = 0.04 + legSwingL * 0.04;
+        shoeR.position.y = 0.04 + legSwingR * 0.04;
 
-        const armSwing = Math.sin(t * 6) * 0.5;
-        w.arms.forEach((arm, a) => {
-          const side = a === 0 ? -1 : 1;
-          const swing = a === 0 ? armSwing : -armSwing;
-          const cosA = Math.cos(facingAngle);
-          const sinA = Math.sin(facingAngle);
-          arm.position.x = w.body.position.x + side * 0.28 * cosA;
-          arm.position.z = w.body.position.z + side * 0.28 * sinA;
-          arm.position.y = w.body.position.y - 0.1;
-          arm.rotation.x = swing;
-          arm.rotation.y = facingAngle;
-        });
+        // === LEGGERO SWAY LATERALE BUSTO (più naturale) ===
+        const swayAmp = 0.018;
+        torso.rotation.z = Math.sin(walkCycle * 0.5) * swayAmp;
+        pelvis.rotation.z = -Math.sin(walkCycle * 0.5) * swayAmp * 1.5;
 
-        const legSwing = Math.sin(t * 6) * 0.45;
-        w.legs.forEach((leg, l) => {
-          const side = l === 0 ? -1 : 1;
-          const swing = l === 0 ? legSwing : -legSwing;
-          const cosA = Math.cos(facingAngle);
-          const sinA = Math.sin(facingAngle);
-          leg.position.x = w.body.position.x + side * 0.12 * cosA;
-          leg.position.z = w.body.position.z + side * 0.12 * sinA;
-          leg.position.y = w.baseY + 0.35;
-          leg.rotation.x = swing;
-          leg.rotation.y = facingAngle;
-        });
+        // === OSCILLAZIONE TESTA (look ahead) ===
+        const headNod = Math.sin(walkCycle * 2) * 0.008;
+        head.position.y = 1.66 + headNod + vertBob * 0.3;
 
         // === PROXIMITY VOICE INTERACTION ===
         if (cam) {
           const distToPlayer = BABYLON.Vector3.Distance(
             new BABYLON.Vector3(cam.position.x, 0, cam.position.z),
-            new BABYLON.Vector3(w.body.position.x, 0, w.body.position.z)
+            new BABYLON.Vector3(root.position.x, 0, root.position.z)
           );
 
           if (distToPlayer < VOICE_PROXIMITY && t - w.lastVoiceTime > w.voiceCooldown) {
@@ -4059,7 +4213,7 @@ function addWorkerAvatars(
       });
     });
 
-    console.log(`[NPC] Created ${walkingWorkers.length} animated walking workers for ${type}`);
+    console.log(`[NPC] Created ${walkingWorkers.length} humanoid animated workers for ${type}`);
   }
 
   console.log(`[Avatars] Worker avatars added for ${type}`);
