@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import * as BABYLON from '@babylonjs/core';
-import '@babylonjs/loaders';
+import '@babylonjs/loaders/glTF';
 import { Scenario3D } from '@/data/scenarios3d';
 import { toast } from 'sonner';
 import type { ExtinguisherType } from './ExtinguisherSelection';
@@ -3362,23 +3362,24 @@ function addWorkerAvatars(
     rotation: number = 0,
     safetyRole?: string
   ) => {
+    console.log(`[NPC] Creating stationary worker ${name} at`, position.toString());
     // Load GLB avatar asynchronously
     BABYLON.SceneLoader.ImportMeshAsync('', '/models/avatars/', 'worker-01.glb', scene).then((result) => {
+      console.log(`[NPC] ✓ GLB loaded for ${name}: ${result.meshes.length} meshes, ${result.animationGroups?.length || 0} animations`);
       const root = result.meshes[0] as BABYLON.Mesh;
       root.name = `${name}_root`;
       root.position = position.clone();
       root.rotation.y = rotation;
-      root.scaling.setAll(1.0); // Adjust scale if needed
+      root.scaling.setAll(1.0);
 
       // Play idle animation if available
       if (result.animationGroups && result.animationGroups.length > 0) {
-        // Try to find an idle animation, otherwise use the first one
+        console.log(`[NPC] Animations for ${name}:`, result.animationGroups.map(ag => ag.name));
         const idleAnim = result.animationGroups.find(ag => 
           ag.name.toLowerCase().includes('idle') || ag.name.toLowerCase().includes('stand')
         ) || result.animationGroups[0];
-        // Stop all others
         result.animationGroups.forEach(ag => ag.stop());
-        idleAnim.start(true); // loop
+        idleAnim.start(true);
       }
 
       // Setup shadows and pickable for safety roles
@@ -3392,8 +3393,10 @@ function addWorkerAvatars(
           }
         }
       });
+      toast.success(`NPC ${name} caricato`);
     }).catch(err => {
-      console.error(`[NPC] Failed to load GLB avatar for ${name}:`, err);
+      console.error(`[NPC] ✗ Failed to load GLB avatar for ${name}:`, err);
+      toast.error(`Errore caricamento NPC ${name}: ${err.message || err}`);
     });
   };
 
@@ -3626,9 +3629,10 @@ function addWorkerAvatars(
         walkAnim.speedRatio = speed * 60;
       }
 
-      console.log(`[NPC] GLB walking worker '${id}' loaded with ${result.meshes.length} meshes, ${result.animationGroups?.length || 0} animations`);
+      toast.success(`Walking NPC '${id}' caricato`);
     }).catch(err => {
-      console.error(`[NPC] Failed to load GLB for walking worker ${id}:`, err);
+      console.error(`[NPC] ✗ Failed to load GLB for walking worker ${id}:`, err);
+      toast.error(`Errore NPC walking ${id}: ${err.message || err}`);
     });
   };
 
