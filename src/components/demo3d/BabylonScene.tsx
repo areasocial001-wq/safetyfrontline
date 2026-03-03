@@ -107,15 +107,20 @@ export const BabylonScene = ({
     // Create scene - Industrial cinematic style (saturated, dramatic, professional)
     const scene = new BABYLON.Scene(engine);
     sceneRef.current = scene;
-    scene.clearColor = new BABYLON.Color4(0.15, 0.17, 0.2, 1); // Dark industrial gray-blue background
+    const isOffice = scenario.type === 'office';
+    scene.clearColor = isOffice
+      ? new BABYLON.Color4(0.85, 0.87, 0.9, 1) // Light gray-blue for office
+      : new BABYLON.Color4(0.15, 0.17, 0.2, 1); // Dark industrial gray-blue background
     scene.gravity = new BABYLON.Vector3(0, -9.81 / 60, 0); // Gravity applied per frame
     scene.collisionsEnabled = true;
 
-    // Subtle fog for depth
+    // Subtle fog for depth (lighter for office)
     scene.fogEnabled = true;
     scene.fogMode = BABYLON.Scene.FOGMODE_EXP2;
-    scene.fogDensity = 0.008;
-    scene.fogColor = new BABYLON.Color3(0.15, 0.17, 0.2);
+    scene.fogDensity = isOffice ? 0.002 : 0.008;
+    scene.fogColor = isOffice
+      ? new BABYLON.Color3(0.85, 0.87, 0.9)
+      : new BABYLON.Color3(0.15, 0.17, 0.2);
 
     // Create camera (First Person)
     const camera = new BABYLON.UniversalCamera(
@@ -145,9 +150,13 @@ export const BabylonScene = ({
       new BABYLON.Vector3(0, 1, 0),
       scene
     );
-    ambientLight.intensity = 0.3; // Low ambient for dramatic shadows
-    ambientLight.diffuse = new BABYLON.Color3(0.6, 0.65, 0.7);
-    ambientLight.groundColor = new BABYLON.Color3(0.2, 0.2, 0.25);
+    ambientLight.intensity = isOffice ? 0.8 : 0.3; // Brighter for office
+    ambientLight.diffuse = isOffice
+      ? new BABYLON.Color3(1, 0.98, 0.95)
+      : new BABYLON.Color3(0.6, 0.65, 0.7);
+    ambientLight.groundColor = isOffice
+      ? new BABYLON.Color3(0.6, 0.58, 0.55)
+      : new BABYLON.Color3(0.2, 0.2, 0.25);
 
     const directionalLight = new BABYLON.DirectionalLight(
       'directionalLight',
@@ -3270,7 +3279,7 @@ function addEnvironmentalProps(
       );
       ceilingLight.position = new BABYLON.Vector3(
         -10 + (i % 3) * 10,
-        6.9,
+        3.0, // Just below office ceiling (wallH = 3.2)
         -6 + Math.floor(i / 3) * 6
       );
       
@@ -3287,8 +3296,8 @@ function addEnvironmentalProps(
           ceilingLight.position.clone().addInPlace(new BABYLON.Vector3(0, -0.5, 0)),
           scene
         );
-        clLight.intensity = 1.0; // Strong office lighting
-        clLight.range = 16;
+        clLight.intensity = 1.5; // Strong office lighting
+        clLight.range = 12;
         clLight.diffuse = new BABYLON.Color3(1, 0.95, 0.85);
         clLight.specular = new BABYLON.Color3(0.95, 0.92, 0.85);
       }
