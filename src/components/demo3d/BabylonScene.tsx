@@ -3363,7 +3363,7 @@ function addWorkerAvatars(
     safetyRole?: string
   ) => {
     // Load GLB avatar asynchronously
-    BABYLON.SceneLoader.ImportMeshAsync('', '', GLB_AVATAR_PATH, scene).then((result) => {
+    BABYLON.SceneLoader.ImportMeshAsync('', '/models/avatars/', 'worker-01.glb', scene).then((result) => {
       const root = result.meshes[0] as BABYLON.Mesh;
       root.name = `${name}_root`;
       root.position = position.clone();
@@ -3600,7 +3600,7 @@ function addWorkerAvatars(
     walkingWorkers.push(workerData);
 
     // Load GLB avatar asynchronously and parent to root
-    BABYLON.SceneLoader.ImportMeshAsync('', '', GLB_AVATAR_PATH, scene).then((result) => {
+    BABYLON.SceneLoader.ImportMeshAsync('', '/models/avatars/', 'worker-01.glb', scene).then((result) => {
       const meshRoot = result.meshes[0];
       meshRoot.parent = root;
       meshRoot.position = BABYLON.Vector3.Zero();
