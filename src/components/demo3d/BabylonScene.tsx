@@ -3342,6 +3342,30 @@ function addWorkerAvatars(
   // GLB avatar path for all NPCs
   const GLB_AVATAR_PATH = '/models/avatars/worker-01.glb';
 
+  // Helper: simplify PBR materials to StandardMaterial to avoid shader uniform block overflow on low-end GPUs
+  const simplifyMaterials = (meshes: BABYLON.AbstractMesh[]) => {
+    meshes.forEach(mesh => {
+      if (!mesh.material) return;
+      const mat = mesh.material;
+      // Convert PBRMaterial or PBRMetallicRoughnessMaterial to StandardMaterial
+      if (mat instanceof BABYLON.PBRMaterial || mat instanceof BABYLON.PBRMetallicRoughnessMaterial) {
+        const stdMat = new BABYLON.StandardMaterial(mat.name + '_std', scene);
+        if (mat instanceof BABYLON.PBRMaterial) {
+          stdMat.diffuseColor = mat.albedoColor || new BABYLON.Color3(0.8, 0.8, 0.8);
+          if (mat.albedoTexture) stdMat.diffuseTexture = mat.albedoTexture;
+          stdMat.emissiveColor = mat.emissiveColor || BABYLON.Color3.Black();
+        } else {
+          stdMat.diffuseColor = mat.baseColor || new BABYLON.Color3(0.8, 0.8, 0.8);
+          if (mat.baseTexture) stdMat.diffuseTexture = mat.baseTexture;
+          stdMat.emissiveColor = mat.emissiveColor || BABYLON.Color3.Black();
+        }
+        stdMat.specularColor = new BABYLON.Color3(0.2, 0.2, 0.2);
+        stdMat.backFaceCulling = true;
+        mesh.material = stdMat;
+      }
+    });
+  };
+
   // Helper: crea materiale PBR realistico (still used for role labels)
   const makePBRMat = (matName: string, albedo: BABYLON.Color3, roughness = 0.75, metallic = 0.0, emissive?: BABYLON.Color3) => {
     const mat = new BABYLON.PBRMetallicRoughnessMaterial(matName, scene);
@@ -3381,6 +3405,9 @@ function addWorkerAvatars(
         result.animationGroups.forEach(ag => ag.stop());
         idleAnim.start(true);
       }
+
+      // Simplify PBR materials to avoid shader errors on low-end GPUs
+      simplifyMaterials(result.meshes);
 
       // Setup shadows and pickable for safety roles
       result.meshes.forEach(mesh => {
@@ -3608,6 +3635,9 @@ function addWorkerAvatars(
       meshRoot.parent = root;
       meshRoot.position = BABYLON.Vector3.Zero();
       meshRoot.scaling.setAll(1.0);
+
+      // Simplify PBR materials to avoid shader errors on low-end GPUs
+      simplifyMaterials(result.meshes);
 
       // Setup shadows
       result.meshes.forEach(mesh => {
