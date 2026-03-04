@@ -174,11 +174,11 @@ export const BabylonScene = ({
       dirDiffuse: BABYLON.Color3;
     }> = {
       office: {
-        ambientIntensity: 0.55,
-        ambientDiffuse: new BABYLON.Color3(0.95, 0.92, 0.88),   // Warm white, less blown out
-        ambientGround: new BABYLON.Color3(0.45, 0.40, 0.38),
-        dirIntensity: 0.8,
-        dirDiffuse: new BABYLON.Color3(0.95, 0.90, 0.85),
+        ambientIntensity: 0.4,
+        ambientDiffuse: new BABYLON.Color3(0.90, 0.88, 0.84),
+        ambientGround: new BABYLON.Color3(0.35, 0.32, 0.30),
+        dirIntensity: 0.5,
+        dirDiffuse: new BABYLON.Color3(0.92, 0.88, 0.82),
       },
       warehouse: {
         ambientIntensity: 0.25,
@@ -255,12 +255,12 @@ export const BabylonScene = ({
         glowIntensity: number;
       }> = {
         office: {
-          bloomEnabled: true, bloomThreshold: 0.85, bloomWeight: 0.2, bloomKernel: 48, bloomScale: 0.3,
-          chromaticAberration: 2,
-          contrast: 1.05, exposure: 0.95,
+          bloomEnabled: true, bloomThreshold: 0.9, bloomWeight: 0.1, bloomKernel: 32, bloomScale: 0.2,
+          chromaticAberration: 1,
+          contrast: 1.0, exposure: 0.85,
           vignetteEnabled: false, vignetteWeight: 0, vignetteFov: 0,
-          saturation: 5, globalExposure: 0.0,
-          glowIntensity: 0.3,
+          saturation: 5, globalExposure: -0.05,
+          glowIntensity: 0.15,
         },
         warehouse: {
           bloomEnabled: true, bloomThreshold: 0.8, bloomWeight: 0.3, bloomKernel: 48, bloomScale: 0.4,
@@ -3375,23 +3375,23 @@ function addEnvironmentalProps(
       backrest.material = brMat;
     }
 
-    // Modern recessed ceiling lights (9x grid)
-    for (let i = 0; i < 9; i++) {
+    // Modern recessed ceiling lights (6x grid — reduced from 9 to prevent washout)
+    for (let i = 0; i < 6; i++) {
       const ceilingLight = BABYLON.MeshBuilder.CreateCylinder(
         `ceilLight_${i}`,
-        { height: 0.2, diameter: 0.6 },
+        { height: 0.15, diameter: 0.5 },
         scene
       );
       ceilingLight.position = new BABYLON.Vector3(
-        -10 + (i % 3) * 10,
-        3.0, // Just below office ceiling (wallH = 3.2)
-        -6 + Math.floor(i / 3) * 6
+        -8 + (i % 3) * 8,
+        3.0,
+        -5 + Math.floor(i / 3) * 10
       );
       
       const clMat = new BABYLON.StandardMaterial(`clMat_${i}`, scene);
-      clMat.emissiveColor = new BABYLON.Color3(1, 0.95, 0.85); // Warm white office lighting
-      clMat.diffuseColor = new BABYLON.Color3(0.98, 0.95, 0.9);
-      clMat.specularColor = new BABYLON.Color3(0.8, 0.8, 0.8);
+      clMat.emissiveColor = new BABYLON.Color3(0.6, 0.58, 0.52); // Toned down warm white
+      clMat.diffuseColor = new BABYLON.Color3(0.9, 0.88, 0.83);
+      clMat.specularColor = new BABYLON.Color3(0.3, 0.3, 0.3);
       clMat.specularPower = 64;
       ceilingLight.material = clMat;
 
@@ -3401,10 +3401,10 @@ function addEnvironmentalProps(
           ceilingLight.position.clone().addInPlace(new BABYLON.Vector3(0, -0.5, 0)),
           scene
         );
-        clLight.intensity = 1.5; // Strong office lighting
-        clLight.range = 12;
+        clLight.intensity = 0.6; // Much lower to prevent washout
+        clLight.range = 8;
         clLight.diffuse = new BABYLON.Color3(1, 0.95, 0.85);
-        clLight.specular = new BABYLON.Color3(0.95, 0.92, 0.85);
+        clLight.specular = new BABYLON.Color3(0.4, 0.38, 0.35);
       }
     }
     
@@ -4068,6 +4068,14 @@ function addWorkerAvatars(
         walkAnim.start(true);
         // Adjust speed ratio to match movement speed
         walkAnim.speedRatio = speed * 60;
+
+        // Force-lock meshRoot position to zero every frame
+        // This prevents any residual animation from overriding waypoint movement
+        scene.registerBeforeRender(() => {
+          if (meshRoot && !meshRoot.isDisposed()) {
+            meshRoot.position.setAll(0);
+          }
+        });
       }
 
       toast.success(`Walking NPC '${id}' caricato`);
@@ -5042,14 +5050,14 @@ function createRealisticOffice(
   breakTable.material = btMat;
   if (shadowGenerator) shadowGenerator.addShadowCaster(breakTable);
 
-  // === WINDOWS (on north wall — fake depth with emissive blue) ===
+  // === WINDOWS (on north wall — fake depth with subtle sky tint) ===
   for (let w = 0; w < 4; w++) {
     const windowFrame = BABYLON.MeshBuilder.CreateBox(`windowFrame_${w}`, { width: 2.5, height: 1.8, depth: 0.1 }, scene);
     windowFrame.position = new BABYLON.Vector3(-10 + w * 6.5, 2, -11.8);
     const winMat = new BABYLON.StandardMaterial(`winMat_${w}`, scene);
-    winMat.diffuseColor = new BABYLON.Color3(0.6, 0.75, 0.9);
-    winMat.emissiveColor = new BABYLON.Color3(0.25, 0.35, 0.5); // Sky blue glow
-    winMat.specularColor = new BABYLON.Color3(0.7, 0.7, 0.7);
+    winMat.diffuseColor = new BABYLON.Color3(0.55, 0.68, 0.82);
+    winMat.emissiveColor = new BABYLON.Color3(0.12, 0.18, 0.28); // Much dimmer sky glow
+    winMat.specularColor = new BABYLON.Color3(0.5, 0.5, 0.5);
     winMat.specularPower = 128;
     winMat.alpha = 0.85;
     windowFrame.material = winMat;
@@ -5060,6 +5068,25 @@ function createRealisticOffice(
     fMat.diffuseColor = new BABYLON.Color3(0.7, 0.7, 0.72);
     fMat.specularColor = new BABYLON.Color3(0.3, 0.3, 0.3);
     frameBorder.material = fMat;
+  }
+
+  // === WINDOWS on EAST wall ===
+  for (let w = 0; w < 3; w++) {
+    const ewFrame = BABYLON.MeshBuilder.CreateBox(`eastWindow_${w}`, { width: 1.8, height: 1.5, depth: 0.1 }, scene);
+    ewFrame.position = new BABYLON.Vector3(14.8, 2, -8 + w * 6);
+    ewFrame.rotation.y = Math.PI / 2;
+    const ewMat = new BABYLON.StandardMaterial(`ewMat_${w}`, scene);
+    ewMat.diffuseColor = new BABYLON.Color3(0.55, 0.68, 0.82);
+    ewMat.emissiveColor = new BABYLON.Color3(0.10, 0.15, 0.22);
+    ewMat.specularColor = new BABYLON.Color3(0.5, 0.5, 0.5);
+    ewMat.alpha = 0.85;
+    ewFrame.material = ewMat;
+    const ewBorder = BABYLON.MeshBuilder.CreateBox(`eastBorder_${w}`, { width: 2, height: 1.7, depth: 0.05 }, scene);
+    ewBorder.position = new BABYLON.Vector3(14.85, 2, -8 + w * 6);
+    ewBorder.rotation.y = Math.PI / 2;
+    const ebMat = new BABYLON.StandardMaterial(`ebMat_${w}`, scene);
+    ebMat.diffuseColor = new BABYLON.Color3(0.7, 0.7, 0.72);
+    ewBorder.material = ebMat;
   }
 
   // === RECEPTION DESK (near south wall) ===
@@ -5153,7 +5180,114 @@ function createRealisticOffice(
   clock.material = clockMat;
   if (shadowGenerator) shadowGenerator.addShadowCaster(clock);
 
-  console.log('[Office] Realistic office environment created with meeting room, reception, break area, windows');
+  // === WALL POSTERS / FRAMED ART ===
+  const posterData = [
+    { pos: new BABYLON.Vector3(-14.7, 2, -7), rot: Math.PI / 2, color: new BABYLON.Color3(0.15, 0.35, 0.6), w: 1.2, h: 0.8 },
+    { pos: new BABYLON.Vector3(-14.7, 2, 0), rot: Math.PI / 2, color: new BABYLON.Color3(0.6, 0.25, 0.15), w: 0.9, h: 1.2 },
+    { pos: new BABYLON.Vector3(-14.7, 2, 5), rot: Math.PI / 2, color: new BABYLON.Color3(0.2, 0.5, 0.3), w: 1.0, h: 0.7 },
+    { pos: new BABYLON.Vector3(5, 2.2, 11.7), rot: Math.PI, color: new BABYLON.Color3(0.5, 0.3, 0.1), w: 1.5, h: 1.0 },
+    { pos: new BABYLON.Vector3(-6, 2.2, 11.7), rot: Math.PI, color: new BABYLON.Color3(0.2, 0.25, 0.5), w: 1.0, h: 0.7 },
+    { pos: new BABYLON.Vector3(8, 2.2, -11.7), rot: 0, color: new BABYLON.Color3(0.55, 0.2, 0.2), w: 0.8, h: 1.1 },
+  ];
+  posterData.forEach((p, i) => {
+    // Frame
+    const frame = BABYLON.MeshBuilder.CreateBox(`posterFrame_${i}`, { width: p.w + 0.1, height: p.h + 0.1, depth: 0.04 }, scene);
+    frame.position = p.pos.clone();
+    frame.rotation.y = p.rot;
+    const frameMat = new BABYLON.StandardMaterial(`posterFrameMat_${i}`, scene);
+    frameMat.diffuseColor = new BABYLON.Color3(0.2, 0.2, 0.22);
+    frameMat.specularColor = new BABYLON.Color3(0.3, 0.3, 0.3);
+    frame.material = frameMat;
+    // Poster surface
+    const poster = BABYLON.MeshBuilder.CreateBox(`poster_${i}`, { width: p.w, height: p.h, depth: 0.02 }, scene);
+    poster.position = p.pos.clone();
+    poster.rotation.y = p.rot;
+    // Offset slightly in front of frame
+    const fwd = new BABYLON.Vector3(Math.sin(p.rot) * 0.03, 0, Math.cos(p.rot) * 0.03);
+    poster.position.addInPlace(fwd);
+    const pMat = new BABYLON.StandardMaterial(`posterMat_${i}`, scene);
+    pMat.diffuseColor = p.color;
+    pMat.emissiveColor = p.color.scale(0.08);
+    pMat.specularColor = new BABYLON.Color3(0.1, 0.1, 0.1);
+    poster.material = pMat;
+  });
+
+  // === BOOKSHELF (along west wall, near filing cabinets) ===
+  const shelfY = [0.5, 1.0, 1.5, 2.0];
+  const shelfX = -14.2;
+  const shelfZ = 2;
+  // Vertical sides
+  for (let s = 0; s < 2; s++) {
+    const side = BABYLON.MeshBuilder.CreateBox(`shelfSide_${s}`, { width: 0.04, height: 2.2, depth: 0.35 }, scene);
+    side.position = new BABYLON.Vector3(shelfX, 1.1, shelfZ + (s === 0 ? -0.6 : 0.6));
+    const sideMat = new BABYLON.StandardMaterial(`shelfSideMat_${s}`, scene);
+    sideMat.diffuseColor = new BABYLON.Color3(0.4, 0.3, 0.2);
+    side.material = sideMat;
+    if (shadowGenerator) shadowGenerator.addShadowCaster(side);
+  }
+  // Shelves + books
+  shelfY.forEach((y, si) => {
+    const shelf = BABYLON.MeshBuilder.CreateBox(`shelf_${si}`, { width: 0.35, height: 0.03, depth: 1.2 }, scene);
+    shelf.position = new BABYLON.Vector3(shelfX, y, shelfZ);
+    const shMat = new BABYLON.StandardMaterial(`shMat_${si}`, scene);
+    shMat.diffuseColor = new BABYLON.Color3(0.4, 0.3, 0.2);
+    shelf.material = shMat;
+    // Books on each shelf
+    const bookCount = 3 + Math.floor(Math.random() * 4);
+    for (let b = 0; b < bookCount; b++) {
+      const bh = 0.15 + Math.random() * 0.12;
+      const bw = 0.03 + Math.random() * 0.03;
+      const book = BABYLON.MeshBuilder.CreateBox(`book_${si}_${b}`, { width: 0.2, height: bh, depth: bw }, scene);
+      book.position = new BABYLON.Vector3(shelfX + 0.05, y + bh / 2 + 0.02, shelfZ - 0.45 + b * 0.18);
+      const bkMat = new BABYLON.StandardMaterial(`bkMat_${si}_${b}`, scene);
+      const hue = Math.random();
+      bkMat.diffuseColor = new BABYLON.Color3(
+        0.2 + hue * 0.6,
+        0.15 + (1 - hue) * 0.4,
+        0.2 + Math.random() * 0.4
+      );
+      book.material = bkMat;
+    }
+  });
+
+  // === COAT RACK near entrance ===
+  const coatPole = BABYLON.MeshBuilder.CreateCylinder('coatRack', { height: 1.7, diameter: 0.06 }, scene);
+  coatPole.position = new BABYLON.Vector3(13, 0.85, 10.5);
+  const coatMat = new BABYLON.StandardMaterial('coatRackMat', scene);
+  coatMat.diffuseColor = new BABYLON.Color3(0.3, 0.3, 0.32);
+  coatMat.specularColor = new BABYLON.Color3(0.5, 0.5, 0.5);
+  coatPole.material = coatMat;
+  if (shadowGenerator) shadowGenerator.addShadowCaster(coatPole);
+  // Base
+  const coatBase = BABYLON.MeshBuilder.CreateCylinder('coatBase', { height: 0.05, diameter: 0.5 }, scene);
+  coatBase.position = new BABYLON.Vector3(13, 0.025, 10.5);
+  coatBase.material = coatMat;
+  // Arms
+  for (let a = 0; a < 4; a++) {
+    const arm = BABYLON.MeshBuilder.CreateCylinder(`coatArm_${a}`, { height: 0.2, diameter: 0.025 }, scene);
+    arm.position = new BABYLON.Vector3(13, 1.65, 10.5);
+    arm.rotation.z = Math.PI / 2;
+    arm.rotation.y = (a / 4) * Math.PI * 2;
+    arm.material = coatMat;
+  }
+
+  // === TRASH BINS ===
+  const binPositions = [
+    new BABYLON.Vector3(-5, 0, 6),
+    new BABYLON.Vector3(4, 0, -2),
+    new BABYLON.Vector3(12, 0, 4),
+  ];
+  binPositions.forEach((pos, i) => {
+    const bin = BABYLON.MeshBuilder.CreateCylinder(`trashBin_${i}`, {
+      height: 0.5, diameterTop: 0.3, diameterBottom: 0.25, tessellation: 12
+    }, scene);
+    bin.position = pos.clone().addInPlace(new BABYLON.Vector3(0, 0.25, 0));
+    const binMat = new BABYLON.StandardMaterial(`binMat_${i}`, scene);
+    binMat.diffuseColor = new BABYLON.Color3(0.35, 0.35, 0.38);
+    bin.material = binMat;
+  });
+
+  console.log('[Office] Realistic office environment created with meeting room, reception, break area, windows, posters, bookshelf');
 }
 
 function createWarehouseObjects(scene: BABYLON.Scene) {
