@@ -234,8 +234,8 @@ export const BabylonScene = ({
       shadowGenerator.darkness = 0.6; // Strong visible shadows
     }
 
-    // === 🎬 CINEMATIC INDUSTRIAL STYLE - Saturated, Dramatic, Professional ===
-    console.log('[BabylonScene] 🎬 Industrial cinematic: Saturated colors, dramatic lighting, strong shadows');
+    // === 🎬 SCENARIO-SPECIFIC POST-PROCESSING ===
+    console.log(`[BabylonScene] 🎬 Post-processing preset: ${scenario.type}`);
     
     if (quality !== 'low') {
       const pipeline = new BABYLON.DefaultRenderingPipeline(
@@ -245,39 +245,89 @@ export const BabylonScene = ({
         [camera]
       );
 
-      // Dramatic bloom for lights and glowing elements
-      pipeline.bloomEnabled = true;
-      pipeline.bloomThreshold = 0.7;
-      pipeline.bloomWeight = 0.4;
-      pipeline.bloomKernel = 64;
-      pipeline.bloomScale = 0.5;
+      // Scenario-specific post-processing presets
+      const ppPresets: Record<string, {
+        bloomEnabled: boolean; bloomThreshold: number; bloomWeight: number; bloomKernel: number; bloomScale: number;
+        chromaticAberration: number;
+        contrast: number; exposure: number;
+        vignetteEnabled: boolean; vignetteWeight: number; vignetteFov: number;
+        saturation: number; globalExposure: number;
+        glowIntensity: number;
+      }> = {
+        office: {
+          bloomEnabled: true, bloomThreshold: 0.6, bloomWeight: 0.6, bloomKernel: 96, bloomScale: 0.6,
+          chromaticAberration: 3,
+          contrast: 1.15, exposure: 1.25,
+          vignetteEnabled: false, vignetteWeight: 0, vignetteFov: 0,
+          saturation: 10, globalExposure: 0.1,
+          glowIntensity: 0.8,
+        },
+        warehouse: {
+          bloomEnabled: true, bloomThreshold: 0.8, bloomWeight: 0.3, bloomKernel: 48, bloomScale: 0.4,
+          chromaticAberration: 6,
+          contrast: 1.4, exposure: 1.0,
+          vignetteEnabled: true, vignetteWeight: 1.2, vignetteFov: 0.9,
+          saturation: 15, globalExposure: 0.15,
+          glowIntensity: 1.2,
+        },
+        construction: {
+          bloomEnabled: true, bloomThreshold: 0.65, bloomWeight: 0.35, bloomKernel: 64, bloomScale: 0.5,
+          chromaticAberration: 10,
+          contrast: 1.5, exposure: 1.05,
+          vignetteEnabled: true, vignetteWeight: 2.5, vignetteFov: 0.7,
+          saturation: 25, globalExposure: 0.25,
+          glowIntensity: 1.0,
+        },
+        laboratory: {
+          bloomEnabled: true, bloomThreshold: 0.5, bloomWeight: 0.55, bloomKernel: 80, bloomScale: 0.6,
+          chromaticAberration: 5,
+          contrast: 1.3, exposure: 1.15,
+          vignetteEnabled: true, vignetteWeight: 1.8, vignetteFov: 0.75,
+          saturation: 30, globalExposure: 0.2,
+          glowIntensity: 2.0,
+        },
+      };
+      const pp = ppPresets[scenario.type] || ppPresets.warehouse;
 
-      // Subtle chromatic aberration for cinematic feel
+      // Bloom — strong for office (bright windows), moderate for others
+      pipeline.bloomEnabled = pp.bloomEnabled;
+      pipeline.bloomThreshold = pp.bloomThreshold;
+      pipeline.bloomWeight = pp.bloomWeight;
+      pipeline.bloomKernel = pp.bloomKernel;
+      pipeline.bloomScale = pp.bloomScale;
+
+      // Chromatic aberration
       pipeline.chromaticAberrationEnabled = true;
-      pipeline.chromaticAberration.aberrationAmount = 8;
+      pipeline.chromaticAberration.aberrationAmount = pp.chromaticAberration;
 
-      // Image processing for industrial atmosphere
+      // Image processing
       pipeline.imageProcessingEnabled = true;
       const imageProcessing = pipeline.imageProcessing;
-      imageProcessing.contrast = 1.35; // Higher contrast
-      imageProcessing.exposure = 1.1;
+      imageProcessing.contrast = pp.contrast;
+      imageProcessing.exposure = pp.exposure;
       imageProcessing.toneMappingEnabled = true;
       imageProcessing.toneMappingType = BABYLON.ImageProcessingConfiguration.TONEMAPPING_ACES;
 
-      // Vignette for depth
-      imageProcessing.vignetteEnabled = true;
-      imageProcessing.vignetteWeight = 1.5;
-      imageProcessing.vignetteCameraFov = 0.8;
+      // Vignette — heavy on construction (dramatic), none on office (bright)
+      imageProcessing.vignetteEnabled = pp.vignetteEnabled;
+      if (pp.vignetteEnabled) {
+        imageProcessing.vignetteWeight = pp.vignetteWeight;
+        imageProcessing.vignetteCameraFov = pp.vignetteFov;
+      }
 
-      // Color grading for industrial saturated look
+      // Color grading
       imageProcessing.colorCurvesEnabled = true;
       const colorCurves = new BABYLON.ColorCurves();
-      colorCurves.globalSaturation = 20; // Saturated colors
-      colorCurves.globalExposure = 0.2;
+      colorCurves.globalSaturation = pp.saturation;
+      colorCurves.globalExposure = pp.globalExposure;
       imageProcessing.colorCurves = colorCurves;
       
-      // FXAA for smooth edges
+      // FXAA
       pipeline.fxaaEnabled = true;
+
+      // Glow layer — strong for laboratory (fire glow), subtle for office
+      const glowLayer = new BABYLON.GlowLayer('scenarioGlow', scene);
+      glowLayer.intensity = pp.glowIntensity;
     }
 
     // Create ground - industrial concrete gray
@@ -3407,6 +3457,7 @@ function addWorkerAvatars(
   const GLB_AVATAR_PATH = '/models/avatars/worker-01.glb';
 
   // Helper: simplify PBR materials to StandardMaterial to avoid shader uniform block overflow on low-end GPUs
+  // Also brightens NPC avatars with emissive fill light so they're never too dark
   const simplifyMaterials = (meshes: BABYLON.AbstractMesh[]) => {
     meshes.forEach(mesh => {
       if (!mesh.material) return;
@@ -3414,18 +3465,41 @@ function addWorkerAvatars(
       // Convert PBRMaterial or PBRMetallicRoughnessMaterial to StandardMaterial
       if (mat instanceof BABYLON.PBRMaterial || mat instanceof BABYLON.PBRMetallicRoughnessMaterial) {
         const stdMat = new BABYLON.StandardMaterial(mat.name + '_std', scene);
+        let baseColor = new BABYLON.Color3(0.8, 0.8, 0.8);
         if (mat instanceof BABYLON.PBRMaterial) {
-          stdMat.diffuseColor = mat.albedoColor || new BABYLON.Color3(0.8, 0.8, 0.8);
+          baseColor = mat.albedoColor || baseColor;
           if (mat.albedoTexture) stdMat.diffuseTexture = mat.albedoTexture;
-          stdMat.emissiveColor = mat.emissiveColor || BABYLON.Color3.Black();
         } else {
-          stdMat.diffuseColor = mat.baseColor || new BABYLON.Color3(0.8, 0.8, 0.8);
+          baseColor = mat.baseColor || baseColor;
           if (mat.baseTexture) stdMat.diffuseTexture = mat.baseTexture;
-          stdMat.emissiveColor = mat.emissiveColor || BABYLON.Color3.Black();
         }
-        stdMat.specularColor = new BABYLON.Color3(0.2, 0.2, 0.2);
+        // Brighten diffuse by 30% (clamped to 1)
+        stdMat.diffuseColor = new BABYLON.Color3(
+          Math.min(baseColor.r * 1.3, 1),
+          Math.min(baseColor.g * 1.3, 1),
+          Math.min(baseColor.b * 1.3, 1)
+        );
+        // Add subtle emissive fill so NPCs are visible even in dark scenarios
+        stdMat.emissiveColor = new BABYLON.Color3(
+          baseColor.r * 0.15,
+          baseColor.g * 0.15,
+          baseColor.b * 0.15
+        );
+        stdMat.specularColor = new BABYLON.Color3(0.25, 0.25, 0.25);
+        stdMat.specularPower = 16;
         stdMat.backFaceCulling = true;
         mesh.material = stdMat;
+      }
+      // Also brighten existing StandardMaterials on NPCs
+      if (mesh.material instanceof BABYLON.StandardMaterial) {
+        const stdMat = mesh.material as BABYLON.StandardMaterial;
+        if (stdMat.emissiveColor.equals(BABYLON.Color3.Black())) {
+          stdMat.emissiveColor = new BABYLON.Color3(
+            stdMat.diffuseColor.r * 0.12,
+            stdMat.diffuseColor.g * 0.12,
+            stdMat.diffuseColor.b * 0.12
+          );
+        }
       }
     });
   };
