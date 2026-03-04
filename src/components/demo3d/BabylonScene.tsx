@@ -25,6 +25,7 @@ import { createFirstPersonExtinguisher, shootExtinguisherSpray } from './scene-m
 import { addEnvironmentalProps } from './scene-modules/environment-props';
 import { addWorkerAvatars } from './scene-modules/worker-avatars';
 import { addSafetySignage } from './scene-modules/safety-signage';
+import { LODSystem } from './scene-modules/lod-system';
 
 interface BabylonSceneProps {
   scenario: Scenario3D;
@@ -66,6 +67,7 @@ export const BabylonScene = ({
   const soundtrackRef = useRef<AtmosphericSoundtrack | null>(null);
   const ambientAudioRef = useRef<AmbientAudioPlayer | null>(null);
   const npcSoundSystemRef = useRef<NPCAmbientSoundSystem | null>(null);
+  const lodSystemRef = useRef<LODSystem | null>(null);
   const lookedAtMeshRef = useRef<{
     mesh: BABYLON.AbstractMesh;
     originalScale: BABYLON.Vector3;
@@ -155,7 +157,15 @@ export const BabylonScene = ({
         .catch(err => console.error('[BabylonScene] ✗ GLTF props failed:', err));
     }
 
-    // 9. Create risk markers
+    // 9. Initialize LOD system after a short delay to catch all loaded meshes
+    const lodSystem = new LODSystem(scene, quality);
+    lodSystemRef.current = lodSystem;
+    setTimeout(() => {
+      const count = lodSystem.registerSceneMeshes();
+      console.log(`[BabylonScene] LOD system active: ${count} meshes managed`);
+    }, 2000);
+
+    // 10. Create risk markers
     const riskGlow = new BABYLON.GlowLayer('riskGlow', scene);
     riskGlow.intensity = 1.5;
 
@@ -363,19 +373,26 @@ export const BabylonScene = ({
     // 12. Dynamic occlusion
     const updateDynamicOcclusion = () => {
       if (!camera) return;
-      scene.meshes.forEach(mesh => {
-        if (mesh.name.startsWith('rack_') || mesh.name.startsWith('looseBox_')) {
-          const dist = BABYLON.Vector3.Distance(camera.position, mesh.position);
-          mesh.setEnabled(dist < 60);
-        }
-      });
+      // Legacy occlusion now handled by LOD system
+      if (!lodSystemRef.current) {
+        scene.meshes.forEach(mesh => {
+          if (mesh.name.startsWith('rack_') || mesh.name.startsWith('looseBox_')) {
+            const dist = BABYLON.Vector3.Distance(camera.position, mesh.position);
+            mesh.setEnabled(dist < 60);
+          }
+        });
+      }
     };
 
-    // 13. Render loop
+    // 14. Render loop
     let posUpdateCounter = 0;
     engine.runRenderLoop(() => {
       updateDynamicOcclusion();
       detectLookedAtProp();
+      // LOD update
+      if (lodSystemRef.current && camera) {
+        lodSystemRef.current.update(camera.position);
+      }
       posUpdateCounter++;
       if (posUpdateCounter >= 5 && camera && onPositionUpdate) {
         posUpdateCounter = 0;
@@ -407,6 +424,7 @@ export const BabylonScene = ({
       if (soundtrackRef.current) { soundtrackRef.current.stop(); soundtrackRef.current = null; }
       if (ambientAudioRef.current) { ambientAudioRef.current.stop(); ambientAudioRef.current = null; }
       if (npcSoundSystemRef.current) { npcSoundSystemRef.current.dispose(); npcSoundSystemRef.current = null; }
+      if (lodSystemRef.current) { lodSystemRef.current.dispose(); lodSystemRef.current = null; }
       const narrator = getVoiceNarrator();
       narrator.stop();
       fireAmbientContexts.forEach(ctx => { try { ctx.close(); } catch (e) {} });
