@@ -174,11 +174,11 @@ export const BabylonScene = ({
       dirDiffuse: BABYLON.Color3;
     }> = {
       office: {
-        ambientIntensity: 0.9,
-        ambientDiffuse: new BABYLON.Color3(1.0, 0.97, 0.92),   // Warm white
-        ambientGround: new BABYLON.Color3(0.65, 0.60, 0.55),
-        dirIntensity: 1.6,
-        dirDiffuse: new BABYLON.Color3(1.0, 0.96, 0.90),
+        ambientIntensity: 0.55,
+        ambientDiffuse: new BABYLON.Color3(0.95, 0.92, 0.88),   // Warm white, less blown out
+        ambientGround: new BABYLON.Color3(0.45, 0.40, 0.38),
+        dirIntensity: 0.8,
+        dirDiffuse: new BABYLON.Color3(0.95, 0.90, 0.85),
       },
       warehouse: {
         ambientIntensity: 0.25,
@@ -255,12 +255,12 @@ export const BabylonScene = ({
         glowIntensity: number;
       }> = {
         office: {
-          bloomEnabled: true, bloomThreshold: 0.6, bloomWeight: 0.6, bloomKernel: 96, bloomScale: 0.6,
-          chromaticAberration: 3,
-          contrast: 1.15, exposure: 1.25,
+          bloomEnabled: true, bloomThreshold: 0.85, bloomWeight: 0.2, bloomKernel: 48, bloomScale: 0.3,
+          chromaticAberration: 2,
+          contrast: 1.05, exposure: 0.95,
           vignetteEnabled: false, vignetteWeight: 0, vignetteFov: 0,
-          saturation: 10, globalExposure: 0.1,
-          glowIntensity: 0.8,
+          saturation: 5, globalExposure: 0.0,
+          glowIntensity: 0.3,
         },
         warehouse: {
           bloomEnabled: true, bloomThreshold: 0.8, bloomWeight: 0.3, bloomKernel: 48, bloomScale: 0.4,
@@ -4030,6 +4030,25 @@ function addWorkerAvatars(
           ag.name.toLowerCase().includes('walk') || ag.name.toLowerCase().includes('run')
         ) || result.animationGroups[0];
         result.animationGroups.forEach(ag => ag.stop());
+
+        // Strip root motion: remove position animations from the root mesh
+        // so our manual position updates aren't overridden by the baked animation
+        walkAnim.targetedAnimations.forEach(ta => {
+          if (ta.target === meshRoot || ta.target === result.meshes[0]) {
+            const anim = ta.animation;
+            const prop = anim.targetProperty?.toLowerCase() || '';
+            if (prop.includes('position')) {
+              // Zero out position keyframes to prevent root motion
+              const keys = anim.getKeys();
+              const firstVal = keys[0]?.value;
+              if (firstVal) {
+                keys.forEach(k => { k.value = firstVal; });
+                anim.setKeys(keys);
+              }
+            }
+          }
+        });
+
         walkAnim.start(true);
         // Adjust speed ratio to match movement speed
         walkAnim.speedRatio = speed * 60;
