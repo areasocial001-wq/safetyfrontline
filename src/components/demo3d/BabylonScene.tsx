@@ -3453,15 +3453,75 @@ function addWorkerAvatars(
 ) {
   console.log(`[Avatars] Adding worker avatars for ${type}`);
 
-  // GLB avatar path for all NPCs
-  const GLB_AVATAR_PATH = '/models/avatars/worker-01.glb';
+  // === NPC VARIATION SYSTEM ===
+  // Predefined skin tone palette (realistic range)
+  const SKIN_TONES = [
+    new BABYLON.Color3(0.96, 0.84, 0.72), // Light
+    new BABYLON.Color3(0.87, 0.72, 0.58), // Medium-light
+    new BABYLON.Color3(0.76, 0.60, 0.44), // Medium
+    new BABYLON.Color3(0.62, 0.45, 0.32), // Medium-dark
+    new BABYLON.Color3(0.45, 0.32, 0.22), // Dark
+    new BABYLON.Color3(0.35, 0.24, 0.16), // Very dark
+  ];
 
-  // Helper: simplify PBR materials to StandardMaterial to avoid shader uniform block overflow on low-end GPUs
+  // Clothing color palettes per category
+  const SHIRT_COLORS = [
+    new BABYLON.Color3(0.15, 0.25, 0.55), // Navy blue
+    new BABYLON.Color3(0.55, 0.12, 0.12), // Dark red
+    new BABYLON.Color3(0.18, 0.42, 0.22), // Forest green
+    new BABYLON.Color3(0.35, 0.35, 0.40), // Charcoal
+    new BABYLON.Color3(0.50, 0.35, 0.15), // Brown
+    new BABYLON.Color3(0.10, 0.35, 0.50), // Teal
+    new BABYLON.Color3(0.60, 0.45, 0.10), // Mustard
+    new BABYLON.Color3(0.40, 0.15, 0.40), // Purple
+  ];
+
+  const PANTS_COLORS = [
+    new BABYLON.Color3(0.12, 0.12, 0.18), // Dark navy
+    new BABYLON.Color3(0.20, 0.20, 0.25), // Dark grey
+    new BABYLON.Color3(0.30, 0.25, 0.15), // Khaki dark
+    new BABYLON.Color3(0.15, 0.15, 0.15), // Near black
+    new BABYLON.Color3(0.25, 0.18, 0.12), // Dark brown
+  ];
+
+  // Seeded random for consistent NPC appearance
+  const seededRandom = (seed: number) => {
+    const x = Math.sin(seed * 9301 + 49297) * 49297;
+    return x - Math.floor(x);
+  };
+
+  // Generate unique variation for each NPC based on index
+  const getNPCVariation = (npcIndex: number) => {
+    const s1 = seededRandom(npcIndex * 7 + 13);
+    const s2 = seededRandom(npcIndex * 11 + 29);
+    const s3 = seededRandom(npcIndex * 17 + 41);
+    const s4 = seededRandom(npcIndex * 23 + 53);
+    return {
+      skinTone: SKIN_TONES[Math.floor(s1 * SKIN_TONES.length)],
+      shirtColor: SHIRT_COLORS[Math.floor(s2 * SHIRT_COLORS.length)],
+      pantsColor: PANTS_COLORS[Math.floor(s3 * PANTS_COLORS.length)],
+      scale: 0.90 + s4 * 0.20, // 0.90 to 1.10 height variation
+    };
+  };
+
+  // Global NPC counter for unique variations
+  let npcVariationCounter = 0;
+
+  // Helper: simplify PBR materials to StandardMaterial with color variation
   // Also brightens NPC avatars with emissive fill light so they're never too dark
-  const simplifyMaterials = (meshes: BABYLON.AbstractMesh[]) => {
+  const simplifyMaterials = (meshes: BABYLON.AbstractMesh[], variation?: ReturnType<typeof getNPCVariation>) => {
     meshes.forEach(mesh => {
       if (!mesh.material) return;
       const mat = mesh.material;
+      const meshNameLower = mesh.name.toLowerCase();
+      const matNameLower = mat.name.toLowerCase();
+
+      // Detect mesh category for color variation
+      const isSkin = matNameLower.includes('skin') || matNameLower.includes('body') || matNameLower.includes('head') || matNameLower.includes('face') || matNameLower.includes('hand') || matNameLower.includes('arm');
+      const isShirt = matNameLower.includes('shirt') || matNameLower.includes('top') || matNameLower.includes('torso') || matNameLower.includes('jacket') || matNameLower.includes('vest');
+      const isPants = matNameLower.includes('pants') || matNameLower.includes('bottom') || matNameLower.includes('leg') || matNameLower.includes('trouser');
+      const isHair = matNameLower.includes('hair') || matNameLower.includes('beard');
+
       // Convert PBRMaterial or PBRMetallicRoughnessMaterial to StandardMaterial
       if (mat instanceof BABYLON.PBRMaterial || mat instanceof BABYLON.PBRMetallicRoughnessMaterial) {
         const stdMat = new BABYLON.StandardMaterial(mat.name + '_std', scene);
@@ -3473,6 +3533,19 @@ function addWorkerAvatars(
           baseColor = mat.baseColor || baseColor;
           if (mat.baseTexture) stdMat.diffuseTexture = mat.baseTexture;
         }
+
+        // Apply variation tint based on mesh category
+        if (variation) {
+          if (isSkin) baseColor = variation.skinTone;
+          else if (isShirt) baseColor = variation.shirtColor;
+          else if (isPants) baseColor = variation.pantsColor;
+          else if (isHair) {
+            // Random hair darkness
+            const darkness = 0.1 + seededRandom(npcVariationCounter * 31) * 0.5;
+            baseColor = new BABYLON.Color3(darkness * 0.9, darkness * 0.7, darkness * 0.5);
+          }
+        }
+
         // Brighten diffuse by 30% (clamped to 1)
         stdMat.diffuseColor = new BABYLON.Color3(
           Math.min(baseColor.r * 1.3, 1),
@@ -3493,6 +3566,14 @@ function addWorkerAvatars(
       // Also brighten existing StandardMaterials on NPCs
       if (mesh.material instanceof BABYLON.StandardMaterial) {
         const stdMat = mesh.material as BABYLON.StandardMaterial;
+
+        // Apply variation to existing StandardMaterials too
+        if (variation) {
+          if (isSkin) stdMat.diffuseColor = variation.skinTone;
+          else if (isShirt) stdMat.diffuseColor = variation.shirtColor;
+          else if (isPants) stdMat.diffuseColor = variation.pantsColor;
+        }
+
         if (stdMat.emissiveColor.equals(BABYLON.Color3.Black())) {
           stdMat.emissiveColor = new BABYLON.Color3(
             stdMat.diffuseColor.r * 0.12,
@@ -3524,7 +3605,8 @@ function addWorkerAvatars(
     rotation: number = 0,
     safetyRole?: string
   ) => {
-    console.log(`[NPC] Creating stationary worker ${name} at`, position.toString());
+    const variation = getNPCVariation(npcVariationCounter++);
+    console.log(`[NPC] Creating stationary worker ${name} at`, position.toString(), `scale=${variation.scale.toFixed(2)}`);
     // Load GLB avatar asynchronously
     BABYLON.SceneLoader.ImportMeshAsync('', '/models/avatars/', 'worker-01.glb', scene).then((result) => {
       console.log(`[NPC] ✓ GLB loaded for ${name}: ${result.meshes.length} meshes, ${result.animationGroups?.length || 0} animations`);
@@ -3532,7 +3614,7 @@ function addWorkerAvatars(
       root.name = `${name}_root`;
       root.position = position.clone();
       root.rotation.y = rotation;
-      root.scaling.setAll(1.0);
+      root.scaling.setAll(variation.scale);
 
       // Play idle animation if available
       if (result.animationGroups && result.animationGroups.length > 0) {
@@ -3544,8 +3626,8 @@ function addWorkerAvatars(
         idleAnim.start(true);
       }
 
-      // Simplify PBR materials to avoid shader errors on low-end GPUs
-      simplifyMaterials(result.meshes);
+      // Simplify PBR materials with unique color variation
+      simplifyMaterials(result.meshes, variation);
 
       // Setup shadows and pickable for safety roles
       result.meshes.forEach(mesh => {
@@ -3750,6 +3832,7 @@ function addWorkerAvatars(
     _hasHelmet: boolean,
     _addReflectiveStripes: boolean
   ) => {
+    const variation = getNPCVariation(npcVariationCounter++);
     const startPos = waypoints[0].clone();
     const baseY = startPos.y;
 
@@ -3772,10 +3855,10 @@ function addWorkerAvatars(
       const meshRoot = result.meshes[0];
       meshRoot.parent = root;
       meshRoot.position = BABYLON.Vector3.Zero();
-      meshRoot.scaling.setAll(1.0);
+      meshRoot.scaling.setAll(variation.scale);
 
-      // Simplify PBR materials to avoid shader errors on low-end GPUs
-      simplifyMaterials(result.meshes);
+      // Simplify PBR materials with unique color variation
+      simplifyMaterials(result.meshes, variation);
 
       // Setup shadows
       result.meshes.forEach(mesh => {
