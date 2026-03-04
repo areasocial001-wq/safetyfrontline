@@ -3596,6 +3596,156 @@ function addWorkerAvatars(
   };
 
 
+  // === STATIONARY NPC IDLE BEHAVIOR TYPES ===
+  type IdleBehavior = 'idle' | 'lookAround' | 'gesture' | 'phone' | 'writing' | 'stretching';
+  const IDLE_BEHAVIORS: IdleBehavior[] = ['idle', 'lookAround', 'gesture', 'phone', 'writing', 'stretching'];
+
+  // Apply procedural idle animation on top of the base idle clip
+  const applyIdleBehavior = (root: BABYLON.Mesh | BABYLON.TransformNode, behavior: IdleBehavior, npcSeed: number) => {
+    const fps = 30;
+    const phaseOffset = seededRandom(npcSeed * 47) * Math.PI * 2;
+
+    switch (behavior) {
+      case 'lookAround': {
+        // Slowly turn head/body left and right
+        const rotAnim = new BABYLON.Animation(`lookAround_${root.name}`, 'rotation.y', fps,
+          BABYLON.Animation.ANIMATIONTYPE_FLOAT, BABYLON.Animation.ANIMATIONLOOPMODE_CYCLE);
+        const baseY = root.rotation.y;
+        const amplitude = 0.35 + seededRandom(npcSeed * 59) * 0.25;
+        const period = 120 + Math.floor(seededRandom(npcSeed * 61) * 80);
+        rotAnim.setKeys([
+          { frame: 0, value: baseY - amplitude },
+          { frame: period * 0.25, value: baseY },
+          { frame: period * 0.5, value: baseY + amplitude },
+          { frame: period * 0.75, value: baseY },
+          { frame: period, value: baseY - amplitude },
+        ]);
+        rotAnim.setEasingFunction(new BABYLON.SineEase());
+        scene.beginDirectAnimation(root, [rotAnim], 0, period, true);
+        break;
+      }
+      case 'gesture': {
+        // Subtle body sway + vertical bob (gesticulating effect)
+        const swayAnim = new BABYLON.Animation(`gesture_sway_${root.name}`, 'rotation.y', fps,
+          BABYLON.Animation.ANIMATIONTYPE_FLOAT, BABYLON.Animation.ANIMATIONLOOPMODE_CYCLE);
+        const baseRot = root.rotation.y;
+        const period = 80 + Math.floor(seededRandom(npcSeed * 67) * 60);
+        swayAnim.setKeys([
+          { frame: 0, value: baseRot - 0.15 },
+          { frame: period * 0.2, value: baseRot + 0.2 },
+          { frame: period * 0.4, value: baseRot - 0.1 },
+          { frame: period * 0.6, value: baseRot + 0.25 },
+          { frame: period * 0.8, value: baseRot - 0.05 },
+          { frame: period, value: baseRot - 0.15 },
+        ]);
+        const bobAnim = new BABYLON.Animation(`gesture_bob_${root.name}`, 'position.y', fps,
+          BABYLON.Animation.ANIMATIONTYPE_FLOAT, BABYLON.Animation.ANIMATIONLOOPMODE_CYCLE);
+        const baseP = root.position.y;
+        bobAnim.setKeys([
+          { frame: 0, value: baseP },
+          { frame: period * 0.15, value: baseP + 0.04 },
+          { frame: period * 0.35, value: baseP - 0.02 },
+          { frame: period * 0.55, value: baseP + 0.05 },
+          { frame: period * 0.75, value: baseP - 0.01 },
+          { frame: period, value: baseP },
+        ]);
+        scene.beginDirectAnimation(root, [swayAnim, bobAnim], 0, period, true);
+        break;
+      }
+      case 'phone': {
+        // Lean forward slightly (looking down at phone) with subtle micro-movements
+        const leanAnim = new BABYLON.Animation(`phone_lean_${root.name}`, 'rotation.x', fps,
+          BABYLON.Animation.ANIMATIONTYPE_FLOAT, BABYLON.Animation.ANIMATIONLOOPMODE_CYCLE);
+        const period = 150 + Math.floor(seededRandom(npcSeed * 73) * 50);
+        leanAnim.setKeys([
+          { frame: 0, value: 0.08 },
+          { frame: period * 0.3, value: 0.12 },
+          { frame: period * 0.5, value: 0.06 },
+          { frame: period * 0.7, value: 0.10 },
+          { frame: period, value: 0.08 },
+        ]);
+        const microSway = new BABYLON.Animation(`phone_sway_${root.name}`, 'rotation.y', fps,
+          BABYLON.Animation.ANIMATIONTYPE_FLOAT, BABYLON.Animation.ANIMATIONLOOPMODE_CYCLE);
+        const baseY2 = root.rotation.y;
+        microSway.setKeys([
+          { frame: 0, value: baseY2 },
+          { frame: period * 0.5, value: baseY2 + 0.05 },
+          { frame: period, value: baseY2 },
+        ]);
+        scene.beginDirectAnimation(root, [leanAnim, microSway], 0, period, true);
+        break;
+      }
+      case 'writing': {
+        // Subtle forward lean + periodic small body shifts (typing/writing)
+        const writeAnim = new BABYLON.Animation(`write_lean_${root.name}`, 'rotation.x', fps,
+          BABYLON.Animation.ANIMATIONTYPE_FLOAT, BABYLON.Animation.ANIMATIONLOOPMODE_CYCLE);
+        const period = 90 + Math.floor(seededRandom(npcSeed * 79) * 40);
+        writeAnim.setKeys([
+          { frame: 0, value: 0.05 },
+          { frame: period * 0.4, value: 0.09 },
+          { frame: period * 0.6, value: 0.04 },
+          { frame: period, value: 0.05 },
+        ]);
+        const shiftAnim = new BABYLON.Animation(`write_shift_${root.name}`, 'position.x', fps,
+          BABYLON.Animation.ANIMATIONTYPE_FLOAT, BABYLON.Animation.ANIMATIONLOOPMODE_CYCLE);
+        const baseX = root.position.x;
+        shiftAnim.setKeys([
+          { frame: 0, value: baseX },
+          { frame: period * 0.25, value: baseX + 0.03 },
+          { frame: period * 0.5, value: baseX - 0.02 },
+          { frame: period * 0.75, value: baseX + 0.01 },
+          { frame: period, value: baseX },
+        ]);
+        scene.beginDirectAnimation(root, [writeAnim, shiftAnim], 0, period, true);
+        break;
+      }
+      case 'stretching': {
+        // Periodic vertical stretch + slight backward lean
+        const stretchAnim = new BABYLON.Animation(`stretch_y_${root.name}`, 'scaling.y', fps,
+          BABYLON.Animation.ANIMATIONTYPE_FLOAT, BABYLON.Animation.ANIMATIONLOOPMODE_CYCLE);
+        const baseScale = root.scaling.y;
+        const period = 200 + Math.floor(seededRandom(npcSeed * 83) * 80);
+        stretchAnim.setKeys([
+          { frame: 0, value: baseScale },
+          { frame: period * 0.1, value: baseScale },
+          { frame: period * 0.2, value: baseScale * 1.03 },
+          { frame: period * 0.3, value: baseScale * 1.04 },
+          { frame: period * 0.4, value: baseScale * 1.02 },
+          { frame: period * 0.5, value: baseScale },
+          { frame: period, value: baseScale },
+        ]);
+        const leanBack = new BABYLON.Animation(`stretch_lean_${root.name}`, 'rotation.x', fps,
+          BABYLON.Animation.ANIMATIONTYPE_FLOAT, BABYLON.Animation.ANIMATIONLOOPMODE_CYCLE);
+        leanBack.setKeys([
+          { frame: 0, value: 0 },
+          { frame: period * 0.15, value: 0 },
+          { frame: period * 0.25, value: -0.08 },
+          { frame: period * 0.35, value: -0.06 },
+          { frame: period * 0.45, value: 0 },
+          { frame: period, value: 0 },
+        ]);
+        scene.beginDirectAnimation(root, [stretchAnim, leanBack], 0, period, true);
+        break;
+      }
+      case 'idle':
+      default: {
+        // Subtle breathing bob
+        const breathAnim = new BABYLON.Animation(`breath_${root.name}`, 'position.y', fps,
+          BABYLON.Animation.ANIMATIONTYPE_FLOAT, BABYLON.Animation.ANIMATIONLOOPMODE_CYCLE);
+        const baseP2 = root.position.y;
+        const period = 100 + Math.floor(seededRandom(npcSeed * 89) * 40);
+        breathAnim.setKeys([
+          { frame: 0, value: baseP2 },
+          { frame: period * 0.5, value: baseP2 + 0.015 },
+          { frame: period, value: baseP2 },
+        ]);
+        breathAnim.setEasingFunction(new BABYLON.SineEase());
+        scene.beginDirectAnimation(root, [breathAnim], 0, period, true);
+        break;
+      }
+    }
+  };
+
   const createWorker = (
     name: string,
     position: BABYLON.Vector3,
@@ -3605,8 +3755,11 @@ function addWorkerAvatars(
     rotation: number = 0,
     safetyRole?: string
   ) => {
+    const currentNpcIndex = npcVariationCounter;
     const variation = getNPCVariation(npcVariationCounter++);
-    console.log(`[NPC] Creating stationary worker ${name} at`, position.toString(), `scale=${variation.scale.toFixed(2)}`);
+    // Assign a behavior based on NPC index for variety
+    const behavior = IDLE_BEHAVIORS[currentNpcIndex % IDLE_BEHAVIORS.length];
+    console.log(`[NPC] Creating stationary worker ${name} behavior=${behavior} at`, position.toString());
     // Load GLB avatar asynchronously
     BABYLON.SceneLoader.ImportMeshAsync('', '/models/avatars/', 'worker-01.glb', scene).then((result) => {
       console.log(`[NPC] ✓ GLB loaded for ${name}: ${result.meshes.length} meshes, ${result.animationGroups?.length || 0} animations`);
@@ -3616,15 +3769,17 @@ function addWorkerAvatars(
       root.rotation.y = rotation;
       root.scaling.setAll(variation.scale);
 
-      // Play idle animation if available
+      // Play base idle animation if available
       if (result.animationGroups && result.animationGroups.length > 0) {
-        console.log(`[NPC] Animations for ${name}:`, result.animationGroups.map(ag => ag.name));
         const idleAnim = result.animationGroups.find(ag => 
           ag.name.toLowerCase().includes('idle') || ag.name.toLowerCase().includes('stand')
         ) || result.animationGroups[0];
         result.animationGroups.forEach(ag => ag.stop());
         idleAnim.start(true);
       }
+
+      // Layer procedural idle behavior on top
+      applyIdleBehavior(root, behavior, currentNpcIndex);
 
       // Simplify PBR materials with unique color variation
       simplifyMaterials(result.meshes, variation);
