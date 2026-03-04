@@ -15,6 +15,7 @@ import type { AudioSettings } from '@/hooks/useGraphicsSettings';
 import { loadGLTFProps } from '@/lib/babylon-prop-loader';
 import { loadProceduralProps } from '@/lib/babylon-procedural-props';
 import { SCENARIO_PROPS, SCENARIO_PROCEDURAL_PROPS } from '@/types/prop-config';
+import { NPCAmbientSoundSystem } from '@/lib/npc-ambient-sounds';
 
 interface BabylonSceneProps {
   scenario: Scenario3D;
@@ -55,6 +56,7 @@ export const BabylonScene = ({
   const cameraRef = useRef<BABYLON.UniversalCamera | null>(null);
   const soundtrackRef = useRef<AtmosphericSoundtrack | null>(null);
   const ambientAudioRef = useRef<AmbientAudioPlayer | null>(null);
+  const npcSoundSystemRef = useRef<NPCAmbientSoundSystem | null>(null);
   const lookedAtMeshRef = useRef<{
     mesh: BABYLON.AbstractMesh;
     originalScale: BABYLON.Vector3;
@@ -380,8 +382,16 @@ export const BabylonScene = ({
     // Load GLTF environment with optimizations
     loadEnvironmentOptimized(scene, scenario.type, quality, shadowGenerator);
 
+    // Initialize NPC ambient sound system
+    const npcSounds = new NPCAmbientSoundSystem();
+    npcSounds.init(() => {
+      const cam = cameraRef.current;
+      return cam ? { x: cam.position.x, y: cam.position.y, z: cam.position.z } : { x: 0, y: 0, z: 0 };
+    });
+    npcSoundSystemRef.current = npcSounds;
+
     // === ADD ENVIRONMENTAL PROPS ===
-    addEnvironmentalProps(scene, scenario.type, quality, shadowGenerator, risksFoundIds, onFirePropagationChange, ambientAudioRef, onSprinklerStatusChange, cameraRef);
+    addEnvironmentalProps(scene, scenario.type, quality, shadowGenerator, risksFoundIds, onFirePropagationChange, ambientAudioRef, onSprinklerStatusChange, cameraRef, npcSoundSystemRef);
 
     // === LOAD PROCEDURAL PROPS (Low-Poly Industrial Objects) ===
     const proceduralProps = SCENARIO_PROCEDURAL_PROPS[scenario.type] || [];
@@ -1520,6 +1530,12 @@ export const BabylonScene = ({
         ambientAudioRef.current = null;
       }
       
+      // Stop NPC ambient sounds
+      if (npcSoundSystemRef.current) {
+        npcSoundSystemRef.current.dispose();
+        npcSoundSystemRef.current = null;
+      }
+      
       // Stop narrator
       const narrator = getVoiceNarrator();
       narrator.stop();
@@ -1848,7 +1864,8 @@ function addEnvironmentalProps(
   onFirePropagationChange?: (level: number) => void,
   ambientAudioRef?: React.MutableRefObject<AmbientAudioPlayer | null>,
   onSprinklerStatusChange?: (active: boolean) => void,
-  cameraRef?: React.RefObject<BABYLON.UniversalCamera | null>
+  cameraRef?: React.RefObject<BABYLON.UniversalCamera | null>,
+  npcSoundSystemRef?: React.MutableRefObject<NPCAmbientSoundSystem | null>
 ) {
   console.log(`[Props] Adding environmental details for ${type}`);
 
@@ -3440,7 +3457,7 @@ function addEnvironmentalProps(
   addSafetySignage(scene, type, quality, shadowGenerator);
 
   // === ADD WORKER AVATARS for realism ===
-  addWorkerAvatars(scene, type, shadowGenerator);
+  addWorkerAvatars(scene, type, shadowGenerator, npcSoundSystemRef?.current);
 
   console.log(`[Props] Environmental props added for ${type}`);
 }
@@ -3449,7 +3466,8 @@ function addEnvironmentalProps(
 function addWorkerAvatars(
   scene: BABYLON.Scene,
   type: string,
-  shadowGenerator: BABYLON.ShadowGenerator | null
+  shadowGenerator: BABYLON.ShadowGenerator | null,
+  npcSoundSystem?: NPCAmbientSoundSystem | null
 ) {
   console.log(`[Avatars] Adding worker avatars for ${type}`);
 
@@ -3807,6 +3825,16 @@ function addWorkerAvatars(
           }
         }
       });
+      // Add ambient sound based on behavior
+      if (npcSoundSystem) {
+        const soundId = `npc_${name}`;
+        const getPos = () => ({ x: root.position.x, y: root.position.y, z: root.position.z });
+        if (behavior === 'writing') {
+          npcSoundSystem.addTypingSound(soundId, getPos);
+        } else {
+          npcSoundSystem.addBreathingSound(soundId, getPos);
+        }
+      }
       toast.success(`NPC ${name} caricato`);
     }).catch(err => {
       console.error(`[NPC] ✗ Failed to load GLB avatar for ${name}:`, err);
@@ -4078,6 +4106,15 @@ function addWorkerAvatars(
         });
       }
 
+      // Add footstep spatial audio
+      if (npcSoundSystem) {
+        const stepMs = Math.round(1000 / (speed * 60 * 0.8));
+        npcSoundSystem.addFootstepSound(
+          `walk_${id}`,
+          () => ({ x: root.position.x, y: root.position.y, z: root.position.z }),
+          Math.max(300, Math.min(800, stepMs))
+        );
+      }
       toast.success(`Walking NPC '${id}' caricato`);
     }).catch(err => {
       console.error(`[NPC] ✗ Failed to load GLB for walking worker ${id}:`, err);
