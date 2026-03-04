@@ -2059,6 +2059,208 @@ function addEnvironmentalProps(
       sign.material = signMat;
     });
 
+    // === PROCEDURAL FORKLIFT (parked in aisle between racks) ===
+    const fkX = 0, fkZ = -9; // center aisle
+    const fkYellowMat = new BABYLON.StandardMaterial('fk_yellow', scene);
+    fkYellowMat.diffuseColor = new BABYLON.Color3(0.95, 0.78, 0.1);
+    fkYellowMat.specularColor = new BABYLON.Color3(0.4, 0.4, 0.3);
+    fkYellowMat.specularPower = 32;
+    const fkBlackMat = new BABYLON.StandardMaterial('fk_black', scene);
+    fkBlackMat.diffuseColor = new BABYLON.Color3(0.12, 0.12, 0.14);
+    fkBlackMat.specularColor = new BABYLON.Color3(0.3, 0.3, 0.3);
+    const fkGreyMat = new BABYLON.StandardMaterial('fk_grey', scene);
+    fkGreyMat.diffuseColor = new BABYLON.Color3(0.35, 0.35, 0.38);
+    fkGreyMat.specularColor = new BABYLON.Color3(0.5, 0.5, 0.5);
+
+    // Body / chassis
+    const fkBody = BABYLON.MeshBuilder.CreateBox('fk_body', { width: 1.6, height: 0.8, depth: 2.8 }, scene);
+    fkBody.position = new BABYLON.Vector3(fkX, 0.55, fkZ);
+    fkBody.material = fkYellowMat;
+    fkBody.checkCollisions = true;
+    if (shadowGenerator) shadowGenerator.addShadowCaster(fkBody);
+
+    // Engine hood (rear)
+    const fkHood = BABYLON.MeshBuilder.CreateBox('fk_hood', { width: 1.4, height: 0.5, depth: 1.0 }, scene);
+    fkHood.position = new BABYLON.Vector3(fkX, 1.2, fkZ - 0.9);
+    fkHood.material = fkYellowMat;
+    if (shadowGenerator) shadowGenerator.addShadowCaster(fkHood);
+
+    // Counterweight (rear block)
+    const fkCounter = BABYLON.MeshBuilder.CreateBox('fk_counter', { width: 1.5, height: 0.6, depth: 0.4 }, scene);
+    fkCounter.position = new BABYLON.Vector3(fkX, 0.45, fkZ - 1.6);
+    fkCounter.material = fkBlackMat;
+
+    // Mast (vertical frame for forks)
+    for (let m = 0; m < 2; m++) {
+      const mastSide = m === 0 ? -0.55 : 0.55;
+      const mast = BABYLON.MeshBuilder.CreateBox(`fk_mast_${m}`, { width: 0.08, height: 2.8, depth: 0.08 }, scene);
+      mast.position = new BABYLON.Vector3(fkX + mastSide, 1.55, fkZ + 1.35);
+      mast.material = fkGreyMat;
+      if (shadowGenerator) shadowGenerator.addShadowCaster(mast);
+    }
+    // Mast crossbar
+    const mastBar = BABYLON.MeshBuilder.CreateBox('fk_mastbar', { width: 1.18, height: 0.06, depth: 0.06 }, scene);
+    mastBar.position = new BABYLON.Vector3(fkX, 2.9, fkZ + 1.35);
+    mastBar.material = fkGreyMat;
+
+    // Fork carriage (horizontal slider)
+    const fkCarriage = BABYLON.MeshBuilder.CreateBox('fk_carriage', { width: 1.0, height: 0.15, depth: 0.1 }, scene);
+    fkCarriage.position = new BABYLON.Vector3(fkX, 0.4, fkZ + 1.35);
+    fkCarriage.material = fkGreyMat;
+
+    // Forks (2 prongs)
+    for (let f = 0; f < 2; f++) {
+      const forkX = fkX + (f === 0 ? -0.3 : 0.3);
+      const fork = BABYLON.MeshBuilder.CreateBox(`fk_fork_${f}`, { width: 0.12, height: 0.05, depth: 1.2 }, scene);
+      fork.position = new BABYLON.Vector3(forkX, 0.18, fkZ + 1.95);
+      fork.material = fkGreyMat;
+      if (shadowGenerator) shadowGenerator.addShadowCaster(fork);
+    }
+
+    // Overhead guard / roll cage
+    const roofMat = new BABYLON.StandardMaterial('fk_roof', scene);
+    roofMat.diffuseColor = new BABYLON.Color3(0.3, 0.3, 0.32);
+    roofMat.specularColor = new BABYLON.Color3(0.5, 0.5, 0.5);
+    const fkRoof = BABYLON.MeshBuilder.CreateBox('fk_roof', { width: 1.5, height: 0.06, depth: 1.4 }, scene);
+    fkRoof.position = new BABYLON.Vector3(fkX, 2.3, fkZ - 0.1);
+    fkRoof.material = roofMat;
+    // Roof pillars (4)
+    for (let rp = 0; rp < 4; rp++) {
+      const rpx = (rp % 2 === 0 ? -0.65 : 0.65);
+      const rpz = (rp < 2 ? 0.55 : -0.7);
+      const pillar = BABYLON.MeshBuilder.CreateBox(`fk_pillar_${rp}`, { width: 0.06, height: 1.3, depth: 0.06 }, scene);
+      pillar.position = new BABYLON.Vector3(fkX + rpx, 1.65, fkZ + rpz);
+      pillar.material = fkGreyMat;
+    }
+
+    // Seat
+    const fkSeat = BABYLON.MeshBuilder.CreateBox('fk_seat', { width: 0.6, height: 0.15, depth: 0.5 }, scene);
+    fkSeat.position = new BABYLON.Vector3(fkX, 1.0, fkZ - 0.2);
+    const seatMat = new BABYLON.StandardMaterial('fk_seatMat', scene);
+    seatMat.diffuseColor = new BABYLON.Color3(0.15, 0.15, 0.18);
+    fkSeat.material = seatMat;
+    // Seat backrest
+    const fkSeatBack = BABYLON.MeshBuilder.CreateBox('fk_seatBack', { width: 0.6, height: 0.4, depth: 0.08 }, scene);
+    fkSeatBack.position = new BABYLON.Vector3(fkX, 1.3, fkZ - 0.45);
+    fkSeatBack.material = seatMat;
+
+    // Steering wheel
+    const fkWheel = BABYLON.MeshBuilder.CreateTorus('fk_steering', { diameter: 0.3, thickness: 0.025, tessellation: 24 }, scene);
+    fkWheel.position = new BABYLON.Vector3(fkX, 1.3, fkZ + 0.15);
+    fkWheel.rotation.x = Math.PI * 0.35;
+    fkWheel.material = fkBlackMat;
+
+    // Wheels (4)
+    for (let wh = 0; wh < 4; wh++) {
+      const wx = (wh % 2 === 0 ? -0.85 : 0.85);
+      const wz = (wh < 2 ? 0.8 : -0.9);
+      const wheel = BABYLON.MeshBuilder.CreateCylinder(`fk_wheel_${wh}`, { height: 0.2, diameter: 0.45 }, scene);
+      wheel.position = new BABYLON.Vector3(fkX + wx, 0.22, fkZ + wz);
+      wheel.rotation.z = Math.PI / 2;
+      wheel.material = fkBlackMat;
+      if (shadowGenerator) shadowGenerator.addShadowCaster(wheel);
+    }
+
+    // Flashing beacon light on top
+    const fkBeacon = BABYLON.MeshBuilder.CreateCylinder('fk_beacon', { height: 0.15, diameter: 0.18 }, scene);
+    fkBeacon.position = new BABYLON.Vector3(fkX, 2.4, fkZ - 0.1);
+    const beaconMat = new BABYLON.StandardMaterial('fk_beaconMat', scene);
+    beaconMat.diffuseColor = new BABYLON.Color3(1, 0.5, 0);
+    beaconMat.emissiveColor = new BABYLON.Color3(0.6, 0.3, 0);
+    fkBeacon.material = beaconMat;
+
+    // === DANGER SIGNAGE around forklift ===
+    // "ATTENZIONE MULETTO" sign on a post
+    const signPost = BABYLON.MeshBuilder.CreateBox('fk_signPost', { width: 0.06, height: 2.2, depth: 0.06 }, scene);
+    signPost.position = new BABYLON.Vector3(fkX + 2.2, 1.1, fkZ);
+    signPost.material = fkGreyMat;
+
+    const dangerSign = BABYLON.MeshBuilder.CreatePlane('fk_dangerSign', { width: 0.8, height: 0.6 }, scene);
+    dangerSign.position = new BABYLON.Vector3(fkX + 2.2, 2.0, fkZ);
+    dangerSign.rotation.y = -Math.PI / 2;
+    const dsMat = new BABYLON.StandardMaterial('fk_dsMat', scene);
+    const dsTex = new BABYLON.DynamicTexture('fk_dsTex', { width: 256, height: 192 }, scene, false);
+    const dsCtx = dsTex.getContext() as unknown as CanvasRenderingContext2D;
+    dsCtx.fillStyle = '#FFD700';
+    dsCtx.fillRect(0, 0, 256, 192);
+    dsCtx.fillStyle = '#000000';
+    dsCtx.fillRect(6, 6, 244, 180);
+    dsCtx.fillStyle = '#FFD700';
+    dsCtx.fillRect(12, 12, 232, 168);
+    dsCtx.fillStyle = '#000000';
+    dsCtx.font = 'bold 28px Arial';
+    dsCtx.textAlign = 'center';
+    dsCtx.fillText('⚠ ATTENZIONE', 128, 70);
+    dsCtx.font = 'bold 24px Arial';
+    dsCtx.fillText('MULETTO IN SOSTA', 128, 110);
+    dsCtx.font = '16px Arial';
+    dsCtx.fillText('Mantenere la distanza', 128, 145);
+    dsTex.update();
+    dsMat.diffuseTexture = dsTex;
+    dsMat.emissiveTexture = dsTex;
+    dsMat.disableLighting = true;
+    dangerSign.material = dsMat;
+
+    // === ORANGE TRAFFIC CONES (6 around forklift) ===
+    const coneOrangeMat = new BABYLON.StandardMaterial('coneMat_orange', scene);
+    coneOrangeMat.diffuseColor = new BABYLON.Color3(1, 0.45, 0.05);
+    coneOrangeMat.emissiveColor = new BABYLON.Color3(0.15, 0.06, 0);
+    coneOrangeMat.specularColor = new BABYLON.Color3(0.3, 0.3, 0.3);
+    const coneWhiteMat = new BABYLON.StandardMaterial('coneMat_white', scene);
+    coneWhiteMat.diffuseColor = new BABYLON.Color3(0.95, 0.95, 0.95);
+    coneWhiteMat.specularColor = new BABYLON.Color3(0.5, 0.5, 0.5);
+
+    const conePositions = [
+      { x: fkX - 1.8, z: fkZ + 2.0 },
+      { x: fkX + 1.8, z: fkZ + 2.0 },
+      { x: fkX - 1.8, z: fkZ - 2.0 },
+      { x: fkX + 1.8, z: fkZ - 2.0 },
+      { x: fkX - 1.8, z: fkZ },
+      { x: fkX + 1.8, z: fkZ },
+    ];
+    conePositions.forEach((cp, ci) => {
+      // Cone body
+      const cone = BABYLON.MeshBuilder.CreateCylinder(`trafficCone_${ci}`, {
+        height: 0.5, diameterTop: 0.04, diameterBottom: 0.25, tessellation: 12
+      }, scene);
+      cone.position = new BABYLON.Vector3(cp.x, 0.25, cp.z);
+      cone.material = coneOrangeMat;
+      if (shadowGenerator) shadowGenerator.addShadowCaster(cone);
+      // Reflective white stripe
+      const stripe = BABYLON.MeshBuilder.CreateCylinder(`coneStripe_${ci}`, {
+        height: 0.06, diameterTop: 0.12, diameterBottom: 0.15, tessellation: 12
+      }, scene);
+      stripe.position = new BABYLON.Vector3(cp.x, 0.32, cp.z);
+      stripe.material = coneWhiteMat;
+      // Base plate
+      const base = BABYLON.MeshBuilder.CreateBox(`coneBase_${ci}`, { width: 0.3, height: 0.03, depth: 0.3 }, scene);
+      base.position = new BABYLON.Vector3(cp.x, 0.015, cp.z);
+      base.material = fkBlackMat;
+    });
+
+    // Yellow/black hazard stripe on floor around forklift
+    const hazardStripe = BABYLON.MeshBuilder.CreateGround('fk_hazardZone', { width: 5, height: 6 }, scene);
+    hazardStripe.position = new BABYLON.Vector3(fkX, 0.005, fkZ);
+    const hzMat = new BABYLON.StandardMaterial('fk_hzMat', scene);
+    const hzTex = new BABYLON.DynamicTexture('fk_hzTex', { width: 256, height: 256 }, scene, false);
+    const hzCtx = hzTex.getContext() as unknown as CanvasRenderingContext2D;
+    // Draw yellow/black diagonal stripes
+    hzCtx.fillStyle = '#333333';
+    hzCtx.fillRect(0, 0, 256, 256);
+    hzCtx.strokeStyle = '#FFD700';
+    hzCtx.lineWidth = 18;
+    for (let s = -10; s < 20; s++) {
+      hzCtx.beginPath();
+      hzCtx.moveTo(s * 30, 0);
+      hzCtx.lineTo(s * 30 + 256, 256);
+      hzCtx.stroke();
+    }
+    hzTex.update();
+    hzMat.diffuseTexture = hzTex;
+    hzMat.specularColor = new BABYLON.Color3(0.1, 0.1, 0.1);
+    hzMat.alpha = 0.7;
+    hazardStripe.material = hzMat;
+
   } else if (type === 'construction' || type === 'factory') {
     // === REALISTIC CONSTRUCTION SITE ===
     const yellowMat = new BABYLON.StandardMaterial('constr_yellow', scene);
