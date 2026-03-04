@@ -50,34 +50,42 @@ export async function loadEnvironmentOptimized(
           optimizedMeshes++;
         }
 
-        const material = mesh.material;
-        if (material instanceof BABYLON.StandardMaterial || material instanceof BABYLON.PBRMaterial) {
-          const optimizeTexture = (texture: BABYLON.BaseTexture | null) => {
-            if (texture && texture instanceof BABYLON.Texture) {
-              texture.updateSamplingMode(BABYLON.Texture.TRILINEAR_SAMPLINGMODE);
-              texture.anisotropicFilteringLevel = quality === 'low' ? 1 : quality === 'medium' ? 2 : 4;
+        // Convert PBR → StandardMaterial to avoid GL_MAX_VERTEX_UNIFORM_BUFFERS overflow
+        if (mesh.material instanceof BABYLON.PBRMaterial) {
+          const pbrMat = mesh.material as BABYLON.PBRMaterial;
+          const baseColor = pbrMat.albedoColor || new BABYLON.Color3(0.6, 0.6, 0.6);
+          const stdMat = new BABYLON.StandardMaterial(`${mesh.material.name}_std`, scene);
+          stdMat.diffuseColor = baseColor;
+          stdMat.specularColor = new BABYLON.Color3(0.2, 0.2, 0.2);
+          stdMat.specularPower = 16;
+          stdMat.emissiveColor = baseColor.scale(0.08);
+          stdMat.backFaceCulling = true;
+
+          // Transfer diffuse texture if available
+          if (pbrMat.albedoTexture) {
+            stdMat.diffuseTexture = pbrMat.albedoTexture;
+            if (stdMat.diffuseTexture instanceof BABYLON.Texture) {
+              stdMat.diffuseTexture.updateSamplingMode(BABYLON.Texture.TRILINEAR_SAMPLINGMODE);
+              stdMat.diffuseTexture.anisotropicFilteringLevel = quality === 'low' ? 1 : quality === 'medium' ? 2 : 4;
               texturesOptimized++;
             }
-          };
-
-          if (material instanceof BABYLON.StandardMaterial) {
-            optimizeTexture(material.diffuseTexture);
-            optimizeTexture(material.specularTexture);
-            optimizeTexture(material.bumpTexture);
-            if (quality === 'low') {
-              material.specularPower = 0;
-            }
-          } else if (material instanceof BABYLON.PBRMaterial) {
-            optimizeTexture(material.albedoTexture);
-            optimizeTexture(material.metallicTexture);
-            optimizeTexture(material.bumpTexture);
-            optimizeTexture(material.reflectivityTexture);
-            if (quality === 'low' || quality === 'medium') {
-              material.useRoughnessFromMetallicTextureAlpha = false;
-              material.useRoughnessFromMetallicTextureGreen = true;
-            }
           }
-          material.freeze();
+          if (pbrMat.bumpTexture && quality !== 'low') {
+            stdMat.bumpTexture = pbrMat.bumpTexture;
+          }
+          stdMat.freeze();
+          mesh.material = stdMat;
+        } else if (mesh.material instanceof BABYLON.StandardMaterial) {
+          const stdMat = mesh.material as BABYLON.StandardMaterial;
+          if (stdMat.diffuseTexture instanceof BABYLON.Texture) {
+            stdMat.diffuseTexture.updateSamplingMode(BABYLON.Texture.TRILINEAR_SAMPLINGMODE);
+            stdMat.diffuseTexture.anisotropicFilteringLevel = quality === 'low' ? 1 : quality === 'medium' ? 2 : 4;
+            texturesOptimized++;
+          }
+          if (quality === 'low') {
+            stdMat.specularPower = 0;
+          }
+          stdMat.freeze();
         }
       });
 

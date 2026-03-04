@@ -60,6 +60,11 @@ export function createScene(
   const atmo = atmospherePresets[scenario.type] || atmospherePresets.warehouse;
   scene.clearColor = atmo.clearColor;
 
+  // Limit simultaneous lights to prevent GL_MAX_VERTEX_UNIFORM_BUFFERS overflow
+  // WebGL has a hard limit of ~12 uniform blocks; each light uses 1-2 blocks
+  // HemisphericLight(1) + DirectionalLight(1) + max 2 PointLights = 4 lights total
+  // We enforce this by only creating 2 supplementary PointLights in environment-props
+
   // Subtle fog for depth
   scene.fogEnabled = true;
   scene.fogMode = BABYLON.Scene.FOGMODE_EXP2;
@@ -112,18 +117,18 @@ function setupLighting(scene: BABYLON.Scene, scenarioType: string, quality: stri
     dirDiffuse: BABYLON.Color3;
   }> = {
     office: {
-      ambientIntensity: 0.4,
-      ambientDiffuse: new BABYLON.Color3(0.90, 0.88, 0.84),
-      ambientGround: new BABYLON.Color3(0.35, 0.32, 0.30),
-      dirIntensity: 0.5,
-      dirDiffuse: new BABYLON.Color3(0.92, 0.88, 0.82),
+      ambientIntensity: 0.65,
+      ambientDiffuse: new BABYLON.Color3(0.95, 0.92, 0.88),
+      ambientGround: new BABYLON.Color3(0.45, 0.42, 0.38),
+      dirIntensity: 0.6,
+      dirDiffuse: new BABYLON.Color3(0.95, 0.90, 0.85),
     },
     warehouse: {
-      ambientIntensity: 0.35,
-      ambientDiffuse: new BABYLON.Color3(0.6, 0.65, 0.75),
-      ambientGround: new BABYLON.Color3(0.2, 0.22, 0.28),
-      dirIntensity: 0.8,
-      dirDiffuse: new BABYLON.Color3(0.8, 0.85, 0.95),
+      ambientIntensity: 0.55,
+      ambientDiffuse: new BABYLON.Color3(0.65, 0.7, 0.8),
+      ambientGround: new BABYLON.Color3(0.25, 0.27, 0.32),
+      dirIntensity: 0.9,
+      dirDiffuse: new BABYLON.Color3(0.85, 0.88, 0.95),
     },
     construction: {
       ambientIntensity: 0.35,
@@ -159,9 +164,12 @@ function setupShadows(scene: BABYLON.Scene, quality: string): BABYLON.ShadowGene
   const dirLight = scene.getLightByName('directionalLight') as BABYLON.DirectionalLight;
   if (!dirLight) return null;
 
-  const shadowGenerator = new BABYLON.ShadowGenerator(2048, dirLight);
+  const mapSize = quality === 'ultra' ? 2048 : 1024;
+  const shadowGenerator = new BABYLON.ShadowGenerator(mapSize, dirLight);
   shadowGenerator.usePercentageCloserFiltering = true;
-  shadowGenerator.filteringQuality = BABYLON.ShadowGenerator.QUALITY_HIGH;
+  shadowGenerator.filteringQuality = quality === 'ultra'
+    ? BABYLON.ShadowGenerator.QUALITY_HIGH
+    : BABYLON.ShadowGenerator.QUALITY_MEDIUM;
   shadowGenerator.darkness = 0.6;
   return shadowGenerator;
 }
@@ -240,10 +248,8 @@ function setupPostProcessing(scene: BABYLON.Scene, camera: BABYLON.UniversalCame
   colorCurves.globalExposure = pp.globalExposure;
   imageProcessing.colorCurves = colorCurves;
 
-  pipeline.fxaaEnabled = true;
-
-  const glowLayer = new BABYLON.GlowLayer('scenarioGlow', scene);
-  glowLayer.intensity = pp.glowIntensity;
+  // NOTE: GlowLayer removed from here — single glow layer is created in BabylonScene.tsx
+  // Having multiple GlowLayers contributes to GL_MAX_VERTEX_UNIFORM_BUFFERS overflow
 }
 
 function createGround(scene: BABYLON.Scene) {

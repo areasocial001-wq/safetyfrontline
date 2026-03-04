@@ -69,10 +69,11 @@ function addWarehouseProps(
     lampMat.emissiveColor = new BABYLON.Color3(0.6, 0.55, 0.45);
     lamp.material = lampMat;
 
-    if (quality !== 'low') {
+    // Only add 2 actual PointLights to avoid WebGL uniform buffer overflow
+    if (quality !== 'low' && (i === 1 || i === 6)) {
       const pointLight = new BABYLON.PointLight(`whPointLight_${i}`, new BABYLON.Vector3(lx, 6.0, lz), scene);
-      pointLight.intensity = 0.5;
-      pointLight.range = 14;
+      pointLight.intensity = 0.8;
+      pointLight.range = 20;
       pointLight.diffuse = new BABYLON.Color3(0.95, 0.9, 0.8);
       pointLight.specular = new BABYLON.Color3(0.4, 0.35, 0.3);
     }
@@ -636,10 +637,11 @@ function addOfficeProps(
     panelMat.emissiveColor = new BABYLON.Color3(0.65, 0.6, 0.55);
     panel.material = panelMat;
 
-    if (quality !== 'low') {
+    // Only 2 actual PointLights to stay within WebGL uniform buffer limits
+    if (quality !== 'low' && (i === 1 || i === 4)) {
       const pl = new BABYLON.PointLight(`officeLight_${i}`, new BABYLON.Vector3(lx, 2.8, lz), scene);
-      pl.intensity = 0.6;
-      pl.range = 10;
+      pl.intensity = 0.9;
+      pl.range = 14;
       pl.diffuse = new BABYLON.Color3(1, 0.95, 0.9);
     }
   }
