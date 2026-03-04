@@ -2261,6 +2261,120 @@ function addEnvironmentalProps(
     hzMat.alpha = 0.7;
     hazardStripe.material = hzMat;
 
+    // === MOVING FORKLIFT (animated along aisle) ===
+    const mfRoot = new BABYLON.TransformNode('movingForklift_root', scene);
+    const mfWaypoints = [
+      new BABYLON.Vector3(10, 0, -16),
+      new BABYLON.Vector3(10, 0, 14),
+      new BABYLON.Vector3(14, 0, 14),
+      new BABYLON.Vector3(14, 0, -16),
+    ];
+    let mfWP = 0;
+    const mfSpeed = 0.035;
+    mfRoot.position = mfWaypoints[0].clone();
+
+    // Reuse materials
+    const mfYellow = fkYellowMat.clone('mf_yellow');
+    const mfBlack = fkBlackMat.clone('mf_black');
+    const mfGrey = fkGreyMat.clone('mf_grey');
+
+    // Body
+    const mfBody = BABYLON.MeshBuilder.CreateBox('mf_body', { width: 1.6, height: 0.8, depth: 2.8 }, scene);
+    mfBody.position.y = 0.55; mfBody.parent = mfRoot; mfBody.material = mfYellow; mfBody.checkCollisions = true;
+    if (shadowGenerator) shadowGenerator.addShadowCaster(mfBody);
+
+    // Hood
+    const mfHood = BABYLON.MeshBuilder.CreateBox('mf_hood', { width: 1.4, height: 0.5, depth: 1.0 }, scene);
+    mfHood.position.set(0, 1.2, -0.9); mfHood.parent = mfRoot; mfHood.material = mfYellow;
+
+    // Counterweight
+    const mfCW = BABYLON.MeshBuilder.CreateBox('mf_cw', { width: 1.5, height: 0.6, depth: 0.4 }, scene);
+    mfCW.position.set(0, 0.45, -1.6); mfCW.parent = mfRoot; mfCW.material = mfBlack;
+
+    // Masts
+    for (let m = 0; m < 2; m++) {
+      const mx = m === 0 ? -0.55 : 0.55;
+      const mast = BABYLON.MeshBuilder.CreateBox(`mf_mast_${m}`, { width: 0.08, height: 2.8, depth: 0.08 }, scene);
+      mast.position.set(mx, 1.55, 1.35); mast.parent = mfRoot; mast.material = mfGrey;
+    }
+    const mfMBar = BABYLON.MeshBuilder.CreateBox('mf_mbar', { width: 1.18, height: 0.06, depth: 0.06 }, scene);
+    mfMBar.position.set(0, 2.9, 1.35); mfMBar.parent = mfRoot; mfMBar.material = mfGrey;
+
+    // Forks
+    for (let f = 0; f < 2; f++) {
+      const fork = BABYLON.MeshBuilder.CreateBox(`mf_fork_${f}`, { width: 0.12, height: 0.05, depth: 1.2 }, scene);
+      fork.position.set(f === 0 ? -0.3 : 0.3, 0.18, 1.95); fork.parent = mfRoot; fork.material = mfGrey;
+    }
+
+    // Roof
+    const mfRoof = BABYLON.MeshBuilder.CreateBox('mf_roof', { width: 1.5, height: 0.06, depth: 1.4 }, scene);
+    mfRoof.position.set(0, 2.3, -0.1); mfRoof.parent = mfRoot; mfRoof.material = mfGrey;
+    for (let rp = 0; rp < 4; rp++) {
+      const pillar = BABYLON.MeshBuilder.CreateBox(`mf_pil_${rp}`, { width: 0.06, height: 1.3, depth: 0.06 }, scene);
+      pillar.position.set(rp % 2 === 0 ? -0.65 : 0.65, 1.65, rp < 2 ? 0.55 : -0.7);
+      pillar.parent = mfRoot; pillar.material = mfGrey;
+    }
+
+    // Seat
+    const mfSeat = BABYLON.MeshBuilder.CreateBox('mf_seat', { width: 0.6, height: 0.15, depth: 0.5 }, scene);
+    mfSeat.position.set(0, 1.0, -0.2); mfSeat.parent = mfRoot; mfSeat.material = mfBlack;
+
+    // Wheels
+    for (let wh = 0; wh < 4; wh++) {
+      const wheel = BABYLON.MeshBuilder.CreateCylinder(`mf_wh_${wh}`, { height: 0.2, diameter: 0.45 }, scene);
+      wheel.position.set(wh % 2 === 0 ? -0.85 : 0.85, 0.22, wh < 2 ? 0.8 : -0.9);
+      wheel.rotation.z = Math.PI / 2;
+      wheel.parent = mfRoot; wheel.material = mfBlack;
+    }
+
+    // === FLASHING BEACON LIGHTS (2x, animated) ===
+    const mfBeacon1 = BABYLON.MeshBuilder.CreateCylinder('mf_beacon1', { height: 0.15, diameter: 0.18 }, scene);
+    mfBeacon1.position.set(-0.4, 2.4, -0.1); mfBeacon1.parent = mfRoot;
+    const mfBeaconMat1 = new BABYLON.StandardMaterial('mf_beaconMat1', scene);
+    mfBeaconMat1.diffuseColor = new BABYLON.Color3(1, 0.5, 0);
+    mfBeaconMat1.emissiveColor = new BABYLON.Color3(0.8, 0.4, 0);
+    mfBeacon1.material = mfBeaconMat1;
+
+    const mfBeacon2 = BABYLON.MeshBuilder.CreateCylinder('mf_beacon2', { height: 0.15, diameter: 0.18 }, scene);
+    mfBeacon2.position.set(0.4, 2.4, -0.1); mfBeacon2.parent = mfRoot;
+    const mfBeaconMat2 = new BABYLON.StandardMaterial('mf_beaconMat2', scene);
+    mfBeaconMat2.diffuseColor = new BABYLON.Color3(1, 0.5, 0);
+    mfBeaconMat2.emissiveColor = new BABYLON.Color3(0.8, 0.4, 0);
+    mfBeacon2.material = mfBeaconMat2;
+
+    // Flashing point light under beacon
+    const mfFlashLight = new BABYLON.PointLight('mf_flashLight', new BABYLON.Vector3(0, 2.5, -0.1), scene);
+    mfFlashLight.parent = mfRoot;
+    mfFlashLight.diffuse = new BABYLON.Color3(1, 0.6, 0);
+    mfFlashLight.intensity = 0;
+    mfFlashLight.range = 8;
+
+    // Animate movement + beacon in render loop
+    scene.registerBeforeRender(() => {
+      if (mfRoot.isDisposed()) return;
+
+      // Movement along waypoints
+      const target = mfWaypoints[mfWP];
+      const dir = target.subtract(mfRoot.position);
+      dir.y = 0;
+      const dist = dir.length();
+      if (dist < 0.5) {
+        mfWP = (mfWP + 1) % mfWaypoints.length;
+      } else {
+        const move = dir.normalize().scale(mfSpeed);
+        mfRoot.position.addInPlace(move);
+        mfRoot.rotation.y = Math.atan2(move.x, move.z);
+      }
+
+      // Alternating beacon flash
+      const t = performance.now() * 0.004;
+      const flash1 = Math.sin(t) > 0.3 ? 1.0 : 0.1;
+      const flash2 = Math.sin(t + Math.PI) > 0.3 ? 1.0 : 0.1;
+      mfBeaconMat1.emissiveColor = new BABYLON.Color3(flash1 * 1.0, flash1 * 0.5, 0);
+      mfBeaconMat2.emissiveColor = new BABYLON.Color3(flash2 * 1.0, flash2 * 0.5, 0);
+      mfFlashLight.intensity = (flash1 + flash2) * 0.3;
+    });
+
   } else if (type === 'construction' || type === 'factory') {
     // === REALISTIC CONSTRUCTION SITE ===
     const yellowMat = new BABYLON.StandardMaterial('constr_yellow', scene);
