@@ -107,20 +107,41 @@ export const BabylonScene = ({
     // Create scene - Industrial cinematic style (saturated, dramatic, professional)
     const scene = new BABYLON.Scene(engine);
     sceneRef.current = scene;
-    const isOffice = scenario.type === 'office';
-    scene.clearColor = isOffice
-      ? new BABYLON.Color4(0.85, 0.87, 0.9, 1) // Light gray-blue for office
-      : new BABYLON.Color4(0.15, 0.17, 0.2, 1); // Dark industrial gray-blue background
-    scene.gravity = new BABYLON.Vector3(0, -9.81 / 60, 0); // Gravity applied per frame
-    scene.collisionsEnabled = true;
+    // Scenario-specific atmosphere presets
+    const atmospherePresets: Record<string, {
+      clearColor: BABYLON.Color4;
+      fogDensity: number;
+      fogColor: BABYLON.Color3;
+    }> = {
+      office: {
+        clearColor: new BABYLON.Color4(0.88, 0.90, 0.93, 1), // Warm bright
+        fogDensity: 0.002,
+        fogColor: new BABYLON.Color3(0.88, 0.90, 0.93),
+      },
+      warehouse: {
+        clearColor: new BABYLON.Color4(0.12, 0.15, 0.22, 1), // Cold industrial blue
+        fogDensity: 0.006,
+        fogColor: new BABYLON.Color3(0.12, 0.15, 0.22),
+      },
+      construction: {
+        clearColor: new BABYLON.Color4(0.18, 0.12, 0.08, 1), // Dramatic warm orange
+        fogDensity: 0.010,
+        fogColor: new BABYLON.Color3(0.18, 0.12, 0.08),
+      },
+      laboratory: {
+        clearColor: new BABYLON.Color4(0.14, 0.10, 0.08, 1), // Smoky dark
+        fogDensity: 0.012,
+        fogColor: new BABYLON.Color3(0.14, 0.10, 0.08),
+      },
+    };
+    const atmo = atmospherePresets[scenario.type] || atmospherePresets.warehouse;
+    scene.clearColor = atmo.clearColor;
 
-    // Subtle fog for depth (lighter for office)
+    // Subtle fog for depth
     scene.fogEnabled = true;
     scene.fogMode = BABYLON.Scene.FOGMODE_EXP2;
-    scene.fogDensity = isOffice ? 0.002 : 0.008;
-    scene.fogColor = isOffice
-      ? new BABYLON.Color3(0.85, 0.87, 0.9)
-      : new BABYLON.Color3(0.15, 0.17, 0.2);
+    scene.fogDensity = atmo.fogDensity;
+    scene.fogColor = atmo.fogColor;
 
     // Create camera (First Person)
     const camera = new BABYLON.UniversalCamera(
@@ -144,19 +165,53 @@ export const BabylonScene = ({
     camera.applyGravity = true;
     camera.minZ = 0.1; // Near clipping plane
 
-    // Cinematic dramatic lighting for industrial atmosphere
+    // Scenario-specific lighting presets
+    const lightingPresets: Record<string, {
+      ambientIntensity: number;
+      ambientDiffuse: BABYLON.Color3;
+      ambientGround: BABYLON.Color3;
+      dirIntensity: number;
+      dirDiffuse: BABYLON.Color3;
+    }> = {
+      office: {
+        ambientIntensity: 0.9,
+        ambientDiffuse: new BABYLON.Color3(1.0, 0.97, 0.92),   // Warm white
+        ambientGround: new BABYLON.Color3(0.65, 0.60, 0.55),
+        dirIntensity: 1.6,
+        dirDiffuse: new BABYLON.Color3(1.0, 0.96, 0.90),
+      },
+      warehouse: {
+        ambientIntensity: 0.25,
+        ambientDiffuse: new BABYLON.Color3(0.55, 0.65, 0.80),  // Cold blue-white
+        ambientGround: new BABYLON.Color3(0.15, 0.18, 0.25),
+        dirIntensity: 1.4,
+        dirDiffuse: new BABYLON.Color3(0.75, 0.85, 1.0),       // Cold industrial
+      },
+      construction: {
+        ambientIntensity: 0.35,
+        ambientDiffuse: new BABYLON.Color3(1.0, 0.75, 0.45),   // Dramatic orange
+        ambientGround: new BABYLON.Color3(0.3, 0.15, 0.05),
+        dirIntensity: 2.2,
+        dirDiffuse: new BABYLON.Color3(1.0, 0.70, 0.35),       // Sunset orange
+      },
+      laboratory: {
+        ambientIntensity: 0.3,
+        ambientDiffuse: new BABYLON.Color3(1.0, 0.6, 0.3),     // Fire-warm
+        ambientGround: new BABYLON.Color3(0.25, 0.1, 0.05),
+        dirIntensity: 1.5,
+        dirDiffuse: new BABYLON.Color3(1.0, 0.65, 0.3),
+      },
+    };
+    const lp = lightingPresets[scenario.type] || lightingPresets.warehouse;
+
     const ambientLight = new BABYLON.HemisphericLight(
       'ambientLight',
       new BABYLON.Vector3(0, 1, 0),
       scene
     );
-    ambientLight.intensity = isOffice ? 0.8 : 0.3; // Brighter for office
-    ambientLight.diffuse = isOffice
-      ? new BABYLON.Color3(1, 0.98, 0.95)
-      : new BABYLON.Color3(0.6, 0.65, 0.7);
-    ambientLight.groundColor = isOffice
-      ? new BABYLON.Color3(0.6, 0.58, 0.55)
-      : new BABYLON.Color3(0.2, 0.2, 0.25);
+    ambientLight.intensity = lp.ambientIntensity;
+    ambientLight.diffuse = lp.ambientDiffuse;
+    ambientLight.groundColor = lp.ambientGround;
 
     const directionalLight = new BABYLON.DirectionalLight(
       'directionalLight',
@@ -164,8 +219,8 @@ export const BabylonScene = ({
       scene
     );
     directionalLight.position = new BABYLON.Vector3(20, 50, 20);
-    directionalLight.intensity = 1.8; // Strong directional light
-    directionalLight.diffuse = new BABYLON.Color3(1, 0.98, 0.95); // Warm white
+    directionalLight.intensity = lp.dirIntensity;
+    directionalLight.diffuse = lp.dirDiffuse;
 
     // Cinematic sharp shadows for dramatic effect
     let shadowGenerator: BABYLON.ShadowGenerator | null = null;
