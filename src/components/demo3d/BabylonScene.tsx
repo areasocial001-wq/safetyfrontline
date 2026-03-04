@@ -336,7 +336,7 @@ export const BabylonScene = ({
 
       if (hit && hit.pickedMesh && hit.distance <= LOOK_DISTANCE) {
         const meshName = hit.pickedMesh.name;
-        let info = { name: 'Oggetto', type: 'Generico', condition: 'good' as const, icon: Package2 as LucideIcon };
+        let info = { name: 'Oggetto', type: 'Generico', condition: 'good' as 'good' | 'warning' | 'damaged', icon: Package2 as LucideIcon };
         if (meshName.includes('pallet') || meshName.includes('filing') || meshName.includes('storage'))
           info = { name: 'Pallet / Scaffale', type: 'Archiviazione', condition: 'good', icon: Archive };
         else if (meshName.includes('barrel') || meshName.includes('waste') || meshName.includes('recycling'))
@@ -519,16 +519,14 @@ export const BabylonScene = ({
         <SubtitlesOverlay
           text={currentSubtitle.text}
           severity={currentSubtitle.severity}
-          onDismiss={() => setCurrentSubtitle(null)}
+          onComplete={() => setCurrentSubtitle(null)}
         />
       )}
 
       {activeNPCRole && (
         <NPCDialogOverlay
           role={activeNPCRole}
-          scenarioType={scenario.type}
-          onClose={() => setActiveNPCRole(null)}
-          onStartQuiz={() => {
+          onClose={() => {
             setQuizRole(activeNPCRole);
             setActiveNPCRole(null);
           }}
@@ -538,7 +536,6 @@ export const BabylonScene = ({
       {quizRole && (
         <NPCRoleQuiz
           role={quizRole}
-          scenarioType={scenario.type}
           onClose={() => setQuizRole(null)}
         />
       )}
