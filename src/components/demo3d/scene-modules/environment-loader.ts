@@ -17,6 +17,7 @@ export async function loadEnvironmentOptimized(
   } else if (type === 'factory') {
     modelPath = '/models/factory.glb';
   }
+  // office and construction use procedural geometry — no GLTF model
 
   if (modelPath) {
     const startTime = performance.now();
@@ -42,8 +43,7 @@ export async function loadEnvironmentOptimized(
         if (mesh instanceof BABYLON.Mesh && mesh.geometry) {
           const vertices = mesh.getTotalVertices();
           totalTriangles += vertices / 3;
-          mesh.freezeWorldMatrix();
-          mesh.doNotSyncBoundingInfo = true;
+          // NOTE: do NOT freeze world matrix here — must wait until root scaling is applied
           if (quality !== 'low') {
             mesh.createNormals(false);
           }
@@ -81,10 +81,20 @@ export async function loadEnvironmentOptimized(
         }
       });
 
+      // Apply root scaling FIRST, then freeze child world matrices
       if (result.meshes[0]) {
         const rootMesh = result.meshes[0];
         rootMesh.scaling = new BABYLON.Vector3(2, 2, 2);
         rootMesh.position = new BABYLON.Vector3(0, 0, 0);
+        // Force world matrix computation for all children before freezing
+        rootMesh.computeWorldMatrix(true);
+        result.meshes.forEach(mesh => {
+          if (mesh.name !== '__root__' && mesh instanceof BABYLON.Mesh) {
+            mesh.computeWorldMatrix(true);
+            mesh.freezeWorldMatrix();
+            mesh.doNotSyncBoundingInfo = true;
+          }
+        });
       }
 
       const loadTime = performance.now() - startTime;
@@ -121,41 +131,110 @@ function createProceduralEnvironment(
 ) {
   if (type === 'office') {
     createRealisticOffice(scene, quality, shadowGenerator);
+  } else if (type === 'construction') {
+    createConstructionSite(scene, quality, shadowGenerator);
   } else {
-    const wallHeight = 4;
-    const roomSize = 20;
-    const wallPositions = [
-      { pos: new BABYLON.Vector3(0, wallHeight / 2, roomSize / 2), rot: 0 },
-      { pos: new BABYLON.Vector3(0, wallHeight / 2, -roomSize / 2), rot: 0 },
-      { pos: new BABYLON.Vector3(roomSize / 2, wallHeight / 2, 0), rot: Math.PI / 2 },
-      { pos: new BABYLON.Vector3(-roomSize / 2, wallHeight / 2, 0), rot: Math.PI / 2 },
-    ];
-    wallPositions.forEach((data, i) => {
-      const wall = BABYLON.MeshBuilder.CreateBox(`wall${i}`, { width: roomSize, height: wallHeight, depth: 0.5 }, scene);
-      wall.position = data.pos;
-      wall.rotation.y = data.rot;
-      wall.checkCollisions = true;
-      const mat = new BABYLON.StandardMaterial(`wallMat${i}`, scene);
-      mat.diffuseColor = type === 'warehouse'
-        ? new BABYLON.Color3(0.5, 0.52, 0.55)
-        : type === 'factory'
-        ? new BABYLON.Color3(0.55, 0.5, 0.45)
-        : new BABYLON.Color3(0.65, 0.68, 0.7);
-      mat.specularColor = new BABYLON.Color3(0.2, 0.2, 0.2);
-      mat.specularPower = 16;
-      wall.material = mat;
-    });
-    const ceil = BABYLON.MeshBuilder.CreatePlane('ceiling', { width: roomSize, height: roomSize }, scene);
-    ceil.position.y = wallHeight;
-    ceil.rotation.x = Math.PI / 2;
-    const ceilingMat = new BABYLON.StandardMaterial('ceilingMat', scene);
-    ceilingMat.diffuseColor = new BABYLON.Color3(0.25, 0.27, 0.3);
-    ceilingMat.emissiveColor = new BABYLON.Color3(0.02, 0.02, 0.03);
-    ceilingMat.specularColor = new BABYLON.Color3(0.1, 0.1, 0.1);
-    ceil.material = ceilingMat;
-    if (type === 'warehouse') createWarehouseObjects(scene);
-    else if (type === 'factory') createFactoryObjects(scene);
+    createGenericRoom(scene, type, quality, shadowGenerator);
   }
+}
+
+function createConstructionSite(
+  scene: BABYLON.Scene,
+  quality: string,
+  shadowGenerator: BABYLON.ShadowGenerator | null
+) {
+  // Open-air construction site with ground and perimeter fencing
+  const siteSize = 30;
+
+  // Dirt/gravel ground
+  const siteFloor = BABYLON.MeshBuilder.CreateGround('constructionFloor', { width: siteSize, height: siteSize }, scene);
+  siteFloor.position.y = 0.01;
+  const floorMat = new BABYLON.StandardMaterial('constrFloorMat', scene);
+  floorMat.diffuseColor = new BABYLON.Color3(0.55, 0.45, 0.32);
+  floorMat.specularColor = new BABYLON.Color3(0.1, 0.1, 0.08);
+  siteFloor.material = floorMat;
+  siteFloor.receiveShadows = true;
+
+  // Perimeter fencing (mesh-style walls)
+  const fenceMat = new BABYLON.StandardMaterial('fenceMat', scene);
+  fenceMat.diffuseColor = new BABYLON.Color3(0.55, 0.55, 0.58);
+  fenceMat.specularColor = new BABYLON.Color3(0.4, 0.4, 0.4);
+  fenceMat.alpha = 0.85;
+
+  const halfSize = siteSize / 2;
+  const fenceH = 2.5;
+  const fenceConfigs = [
+    { x: 0, z: -halfSize, w: siteSize, d: 0.1 },
+    { x: 0, z: halfSize, w: siteSize, d: 0.1 },
+    { x: -halfSize, z: 0, w: 0.1, d: siteSize },
+    { x: halfSize, z: 0, w: 0.1, d: siteSize },
+  ];
+  fenceConfigs.forEach((fc, i) => {
+    const fence = BABYLON.MeshBuilder.CreateBox(`fence_${i}`, { width: fc.w, height: fenceH, depth: fc.d }, scene);
+    fence.position = new BABYLON.Vector3(fc.x, fenceH / 2, fc.z);
+    fence.material = fenceMat;
+    fence.checkCollisions = true;
+    if (shadowGenerator) shadowGenerator.addShadowCaster(fence);
+  });
+
+  // Concrete foundation blocks
+  const concreteMat = new BABYLON.StandardMaterial('constrConcrete', scene);
+  concreteMat.diffuseColor = new BABYLON.Color3(0.65, 0.63, 0.6);
+  concreteMat.specularColor = new BABYLON.Color3(0.15, 0.15, 0.15);
+
+  const foundations = [
+    { x: -6, z: -4, w: 8, h: 0.5, d: 6 },
+    { x: 6, z: 5, w: 5, h: 0.3, d: 8 },
+  ];
+  foundations.forEach((f, i) => {
+    const block = BABYLON.MeshBuilder.CreateBox(`foundation_${i}`, { width: f.w, height: f.h, depth: f.d }, scene);
+    block.position = new BABYLON.Vector3(f.x, f.h / 2, f.z);
+    block.material = concreteMat;
+    block.checkCollisions = true;
+    block.receiveShadows = true;
+    if (shadowGenerator) shadowGenerator.addShadowCaster(block);
+  });
+
+  console.log('[Construction] Procedural construction site created');
+}
+
+function createGenericRoom(
+  scene: BABYLON.Scene,
+  type: string,
+  quality: string,
+  shadowGenerator: BABYLON.ShadowGenerator | null
+) {
+  const wallHeight = 4;
+  const roomSize = 20;
+  const wallPositions = [
+    { pos: new BABYLON.Vector3(0, wallHeight / 2, roomSize / 2), rot: 0 },
+    { pos: new BABYLON.Vector3(0, wallHeight / 2, -roomSize / 2), rot: 0 },
+    { pos: new BABYLON.Vector3(roomSize / 2, wallHeight / 2, 0), rot: Math.PI / 2 },
+    { pos: new BABYLON.Vector3(-roomSize / 2, wallHeight / 2, 0), rot: Math.PI / 2 },
+  ];
+  wallPositions.forEach((data, i) => {
+    const wall = BABYLON.MeshBuilder.CreateBox(`wall${i}`, { width: roomSize, height: wallHeight, depth: 0.5 }, scene);
+    wall.position = data.pos;
+    wall.rotation.y = data.rot;
+    wall.checkCollisions = true;
+    const mat = new BABYLON.StandardMaterial(`wallMat${i}`, scene);
+    mat.diffuseColor = type === 'warehouse'
+      ? new BABYLON.Color3(0.5, 0.52, 0.55)
+      : new BABYLON.Color3(0.65, 0.68, 0.7);
+    mat.specularColor = new BABYLON.Color3(0.2, 0.2, 0.2);
+    mat.specularPower = 16;
+    wall.material = mat;
+    if (shadowGenerator) shadowGenerator.addShadowCaster(wall);
+  });
+  const ceil = BABYLON.MeshBuilder.CreatePlane('ceiling', { width: roomSize, height: roomSize }, scene);
+  ceil.position.y = wallHeight;
+  ceil.rotation.x = Math.PI / 2;
+  const ceilingMat = new BABYLON.StandardMaterial('ceilingMat', scene);
+  ceilingMat.diffuseColor = new BABYLON.Color3(0.25, 0.27, 0.3);
+  ceilingMat.emissiveColor = new BABYLON.Color3(0.02, 0.02, 0.03);
+  ceilingMat.specularColor = new BABYLON.Color3(0.1, 0.1, 0.1);
+  ceil.material = ceilingMat;
+  if (type === 'warehouse') createWarehouseObjects(scene);
 }
 
 function createWarehouseObjects(scene: BABYLON.Scene) {
@@ -170,19 +249,6 @@ function createWarehouseObjects(scene: BABYLON.Scene) {
   }
 }
 
-function createFactoryObjects(scene: BABYLON.Scene) {
-  for (let i = 0; i < 6; i++) {
-    const cylinder = BABYLON.MeshBuilder.CreateCylinder(`pipe${i}`, { height: 2, diameter: 0.3 }, scene);
-    cylinder.position = new BABYLON.Vector3((Math.random() - 0.5) * 15, 1, (Math.random() - 0.5) * 15);
-    cylinder.rotation.z = Math.PI / 2;
-    cylinder.checkCollisions = true;
-    const mat = new BABYLON.StandardMaterial(`pipeMat${i}`, scene);
-    mat.diffuseColor = new BABYLON.Color3(0.45, 0.48, 0.52);
-    mat.specularColor = new BABYLON.Color3(0.6, 0.6, 0.65);
-    mat.specularPower = 64;
-    cylinder.material = mat;
-  }
-}
 
 function createRealisticOffice(
   scene: BABYLON.Scene,
