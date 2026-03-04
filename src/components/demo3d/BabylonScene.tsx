@@ -3504,6 +3504,17 @@ function addWorkerAvatars(
     };
   };
 
+  // Pool of NPC avatar models — rotated for visual variety
+  const NPC_MODELS = [
+    'worker-01.glb',
+    'avatar-02.glb',
+    'avatar-03.glb',
+    'avatar-04.glb',
+    'avatar-05.glb',
+    'avatar-06.glb',
+    'avatar-07.glb',
+  ];
+
   // Global NPC counter for unique variations
   let npcVariationCounter = 0;
 
@@ -3759,9 +3770,10 @@ function addWorkerAvatars(
     const variation = getNPCVariation(npcVariationCounter++);
     // Assign a behavior based on NPC index for variety
     const behavior = IDLE_BEHAVIORS[currentNpcIndex % IDLE_BEHAVIORS.length];
-    console.log(`[NPC] Creating stationary worker ${name} behavior=${behavior} at`, position.toString());
+    const modelFile = NPC_MODELS[currentNpcIndex % NPC_MODELS.length];
+    console.log(`[NPC] Creating stationary worker ${name} model=${modelFile} behavior=${behavior} at`, position.toString());
     // Load GLB avatar asynchronously
-    BABYLON.SceneLoader.ImportMeshAsync('', '/models/avatars/', 'worker-01.glb', scene).then((result) => {
+    BABYLON.SceneLoader.ImportMeshAsync('', '/models/avatars/', modelFile, scene).then((result) => {
       console.log(`[NPC] ✓ GLB loaded for ${name}: ${result.meshes.length} meshes, ${result.animationGroups?.length || 0} animations`);
       const root = result.meshes[0] as BABYLON.Mesh;
       root.name = `${name}_root`;
@@ -4005,8 +4017,10 @@ function addWorkerAvatars(
     };
     walkingWorkers.push(workerData);
 
-    // Load GLB avatar asynchronously and parent to root
-    BABYLON.SceneLoader.ImportMeshAsync('', '/models/avatars/', 'worker-01.glb', scene).then((result) => {
+    // Load GLB avatar asynchronously — pick model from pool
+    const walkModelFile = NPC_MODELS[(npcVariationCounter - 1) % NPC_MODELS.length];
+    console.log(`[NPC] Walking worker ${id} model=${walkModelFile}`);
+    BABYLON.SceneLoader.ImportMeshAsync('', '/models/avatars/', walkModelFile, scene).then((result) => {
       const meshRoot = result.meshes[0];
       meshRoot.parent = root;
       meshRoot.position = BABYLON.Vector3.Zero();
@@ -4031,21 +4045,23 @@ function addWorkerAvatars(
         ) || result.animationGroups[0];
         result.animationGroups.forEach(ag => ag.stop());
 
-        // Strip root motion: remove position animations from the root mesh
-        // so our manual position updates aren't overridden by the baked animation
+        // Strip ALL root motion: zero position animations on root mesh AND
+        // any top-level transform nodes so our waypoint system controls movement
         walkAnim.targetedAnimations.forEach(ta => {
-          if (ta.target === meshRoot || ta.target === result.meshes[0]) {
-            const anim = ta.animation;
-            const prop = anim.targetProperty?.toLowerCase() || '';
-            if (prop.includes('position')) {
-              // Zero out position keyframes to prevent root motion
-              const keys = anim.getKeys();
-              const firstVal = keys[0]?.value;
-              if (firstVal) {
-                keys.forEach(k => { k.value = firstVal; });
-                anim.setKeys(keys);
-              }
+          const anim = ta.animation;
+          const prop = anim.targetProperty?.toLowerCase() || '';
+          const targetName = (ta.target?.name || '').toLowerCase();
+          const isRootTarget = ta.target === meshRoot || ta.target === result.meshes[0]
+            || targetName.includes('armature') || targetName.includes('root')
+            || targetName === '' || targetName.includes('hips');
+          if (isRootTarget && prop.includes('position')) {
+            const keys = anim.getKeys();
+            const zeroVal = keys[0]?.value;
+            if (zeroVal) {
+              keys.forEach(k => { k.value = zeroVal; });
+              anim.setKeys(keys);
             }
+            console.log(`[NPC] Stripped root motion on ${id}: target=${targetName}, prop=${prop}`);
           }
         });
 
