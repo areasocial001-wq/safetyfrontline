@@ -5052,10 +5052,73 @@ function createRealisticOffice(
   wb.material = wbMat;
   if (shadowGenerator) shadowGenerator.addShadowCaster(wb);
 
-  // === BREAK AREA (left-back corner) ===
-  // Vending machine
+  // === ENHANCED BREAK AREA (left-back corner) ===
+  const baCX = -12, baCZ = 9; // break area center
+
+  // --- Coffee machine (detailed) ---
+  const coffeeBase = BABYLON.MeshBuilder.CreateBox('coffeeBase', { width: 0.5, height: 0.65, depth: 0.45 }, scene);
+  coffeeBase.position = new BABYLON.Vector3(baCX - 2.5, 0.325, baCZ + 1);
+  const coffeeMat = new BABYLON.StandardMaterial('coffeeMat', scene);
+  coffeeMat.diffuseColor = new BABYLON.Color3(0.12, 0.12, 0.14);
+  coffeeMat.specularColor = new BABYLON.Color3(0.6, 0.6, 0.6);
+  coffeeMat.specularPower = 64;
+  coffeeBase.material = coffeeMat;
+  coffeeBase.checkCollisions = true;
+  if (shadowGenerator) shadowGenerator.addShadowCaster(coffeeBase);
+  // Coffee machine top hopper
+  const coffeeTop = BABYLON.MeshBuilder.CreateBox('coffeeTop', { width: 0.35, height: 0.25, depth: 0.3 }, scene);
+  coffeeTop.position = new BABYLON.Vector3(baCX - 2.5, 0.78, baCZ + 1);
+  const coffeeTopMat = new BABYLON.StandardMaterial('coffeeTopMat', scene);
+  coffeeTopMat.diffuseColor = new BABYLON.Color3(0.15, 0.15, 0.18);
+  coffeeTopMat.emissiveColor = new BABYLON.Color3(0.02, 0.02, 0.03);
+  coffeeTop.material = coffeeTopMat;
+  // Coffee drip tray
+  const dripTray = BABYLON.MeshBuilder.CreateBox('dripTray', { width: 0.3, height: 0.02, depth: 0.2 }, scene);
+  dripTray.position = new BABYLON.Vector3(baCX - 2.5, 0.05, baCZ + 1.15);
+  const dripMat = new BABYLON.StandardMaterial('dripMat', scene);
+  dripMat.diffuseColor = new BABYLON.Color3(0.3, 0.3, 0.32);
+  dripTray.material = dripMat;
+  // Coffee cup
+  const cup = BABYLON.MeshBuilder.CreateCylinder('coffeeCup', { height: 0.1, diameterTop: 0.07, diameterBottom: 0.05 }, scene);
+  cup.position = new BABYLON.Vector3(baCX - 2.5, 0.1, baCZ + 1.15);
+  const cupMat = new BABYLON.StandardMaterial('cupMat', scene);
+  cupMat.diffuseColor = new BABYLON.Color3(0.95, 0.95, 0.95);
+  cup.material = cupMat;
+  // Coffee machine counter
+  const coffeeCounter = BABYLON.MeshBuilder.CreateBox('coffeeCounter', { width: 1.6, height: 0.05, depth: 0.55 }, scene);
+  coffeeCounter.position = new BABYLON.Vector3(baCX - 2.5, 0.88, baCZ + 1);
+  const ccMat = new BABYLON.StandardMaterial('ccMat', scene);
+  ccMat.diffuseColor = new BABYLON.Color3(0.4, 0.35, 0.3);
+  ccMat.specularColor = new BABYLON.Color3(0.3, 0.3, 0.3);
+  coffeeCounter.material = ccMat;
+
+  // --- Refrigerator ---
+  const fridgeBody = BABYLON.MeshBuilder.CreateBox('fridgeBody', { width: 0.7, height: 1.75, depth: 0.65 }, scene);
+  fridgeBody.position = new BABYLON.Vector3(baCX - 2.5, 0.875, baCZ - 0.5);
+  const fridgeMat = new BABYLON.StandardMaterial('fridgeMat', scene);
+  fridgeMat.diffuseColor = new BABYLON.Color3(0.88, 0.9, 0.92);
+  fridgeMat.specularColor = new BABYLON.Color3(0.7, 0.7, 0.7);
+  fridgeMat.specularPower = 128;
+  fridgeBody.material = fridgeMat;
+  fridgeBody.checkCollisions = true;
+  if (shadowGenerator) shadowGenerator.addShadowCaster(fridgeBody);
+  // Fridge handle
+  const fridgeHandle = BABYLON.MeshBuilder.CreateBox('fridgeHandle', { width: 0.04, height: 0.35, depth: 0.04 }, scene);
+  fridgeHandle.position = new BABYLON.Vector3(baCX - 2.15, 1.1, baCZ - 0.5);
+  const handleMat = new BABYLON.StandardMaterial('handleMat', scene);
+  handleMat.diffuseColor = new BABYLON.Color3(0.6, 0.6, 0.62);
+  handleMat.specularColor = new BABYLON.Color3(0.8, 0.8, 0.8);
+  fridgeHandle.material = handleMat;
+  // Fridge freezer line
+  const fridgeLine = BABYLON.MeshBuilder.CreateBox('fridgeLine', { width: 0.72, height: 0.015, depth: 0.66 }, scene);
+  fridgeLine.position = new BABYLON.Vector3(baCX - 2.5, 1.4, baCZ - 0.5);
+  const flMat = new BABYLON.StandardMaterial('flMat', scene);
+  flMat.diffuseColor = new BABYLON.Color3(0.5, 0.5, 0.52);
+  fridgeLine.material = flMat;
+
+  // --- Vending machine ---
   const vending = BABYLON.MeshBuilder.CreateBox('vendingMachine', { width: 0.8, height: 1.8, depth: 0.7 }, scene);
-  vending.position = new BABYLON.Vector3(-14, 0.9, 8);
+  vending.position = new BABYLON.Vector3(baCX - 2.5, 0.9, baCZ + 2.5);
   const vendMat = new BABYLON.StandardMaterial('vendMat', scene);
   vendMat.diffuseColor = new BABYLON.Color3(0.2, 0.2, 0.25);
   vendMat.emissiveColor = new BABYLON.Color3(0.05, 0.1, 0.15);
@@ -5063,29 +5126,110 @@ function createRealisticOffice(
   vending.material = vendMat;
   vending.checkCollisions = true;
   if (shadowGenerator) shadowGenerator.addShadowCaster(vending);
-  // Water cooler
+  // Vending glass front
+  const vendGlass = BABYLON.MeshBuilder.CreateBox('vendGlass', { width: 0.6, height: 1.2, depth: 0.02 }, scene);
+  vendGlass.position = new BABYLON.Vector3(baCX - 2.15, 1.0, baCZ + 2.5);
+  const vgMat = new BABYLON.StandardMaterial('vgMat', scene);
+  vgMat.diffuseColor = new BABYLON.Color3(0.45, 0.55, 0.65);
+  vgMat.alpha = 0.5;
+  vgMat.specularColor = new BABYLON.Color3(0.8, 0.8, 0.8);
+  vendGlass.material = vgMat;
+
+  // --- Water cooler ---
   const cooler = BABYLON.MeshBuilder.CreateCylinder('waterCooler', { height: 1.1, diameter: 0.35 }, scene);
-  cooler.position = new BABYLON.Vector3(-12.5, 0.55, 8);
+  cooler.position = new BABYLON.Vector3(baCX - 1, 0.55, baCZ + 2.5);
   const coolerMat = new BABYLON.StandardMaterial('coolerMat', scene);
   coolerMat.diffuseColor = new BABYLON.Color3(0.85, 0.88, 0.92);
   coolerMat.specularColor = new BABYLON.Color3(0.5, 0.5, 0.5);
   cooler.material = coolerMat;
   if (shadowGenerator) shadowGenerator.addShadowCaster(cooler);
-  // Water bottle on top
   const bottle = BABYLON.MeshBuilder.CreateCylinder('waterBottle', { height: 0.5, diameter: 0.25 }, scene);
-  bottle.position = new BABYLON.Vector3(-12.5, 1.35, 8);
+  bottle.position = new BABYLON.Vector3(baCX - 1, 1.35, baCZ + 2.5);
   const bottleMat = new BABYLON.StandardMaterial('bottleMat', scene);
   bottleMat.diffuseColor = new BABYLON.Color3(0.6, 0.75, 0.9);
   bottleMat.alpha = 0.6;
   bottle.material = bottleMat;
-  // Small break table
-  const breakTable = BABYLON.MeshBuilder.CreateCylinder('breakTable', { height: 0.06, diameter: 1.2 }, scene);
-  breakTable.position = new BABYLON.Vector3(-11, 0.72, 10);
+
+  // --- Round break table ---
+  const breakTableLeg = BABYLON.MeshBuilder.CreateCylinder('breakTableLeg', { height: 0.7, diameter: 0.08 }, scene);
+  breakTableLeg.position = new BABYLON.Vector3(baCX, 0.35, baCZ);
+  const legMat = new BABYLON.StandardMaterial('breakLegMat', scene);
+  legMat.diffuseColor = new BABYLON.Color3(0.55, 0.55, 0.58);
+  legMat.specularColor = new BABYLON.Color3(0.6, 0.6, 0.6);
+  breakTableLeg.material = legMat;
+  const breakTable = BABYLON.MeshBuilder.CreateCylinder('breakTable', { height: 0.05, diameter: 1.0 }, scene);
+  breakTable.position = new BABYLON.Vector3(baCX, 0.73, baCZ);
   const btMat = new BABYLON.StandardMaterial('btMat', scene);
   btMat.diffuseColor = new BABYLON.Color3(0.95, 0.95, 0.95);
   btMat.specularColor = new BABYLON.Color3(0.5, 0.5, 0.5);
   breakTable.material = btMat;
   if (shadowGenerator) shadowGenerator.addShadowCaster(breakTable);
+
+  // --- Lounge chairs (4 around the table) ---
+  const chairPositions = [
+    [baCX + 0.7, baCZ],
+    [baCX - 0.7, baCZ],
+    [baCX, baCZ + 0.7],
+    [baCX, baCZ - 0.7],
+  ];
+  const chairColors = [
+    new BABYLON.Color3(0.25, 0.45, 0.65),  // blue
+    new BABYLON.Color3(0.55, 0.3, 0.2),     // brown
+    new BABYLON.Color3(0.25, 0.5, 0.35),    // green
+    new BABYLON.Color3(0.5, 0.35, 0.5),     // mauve
+  ];
+  chairPositions.forEach(([cx, cz], ci) => {
+    // Seat (rounded cushion)
+    const seat = BABYLON.MeshBuilder.CreateBox(`loungeSeat_${ci}`, { width: 0.5, height: 0.12, depth: 0.5 }, scene);
+    seat.position = new BABYLON.Vector3(cx, 0.42, cz);
+    const sMat = new BABYLON.StandardMaterial(`lsMat_${ci}`, scene);
+    sMat.diffuseColor = chairColors[ci];
+    sMat.specularColor = new BABYLON.Color3(0.15, 0.15, 0.15);
+    seat.material = sMat;
+    seat.checkCollisions = true;
+    if (shadowGenerator) shadowGenerator.addShadowCaster(seat);
+    // Backrest
+    const angleToCenter = Math.atan2(baCZ - cz, baCX - cx);
+    const back = BABYLON.MeshBuilder.CreateBox(`loungeBack_${ci}`, { width: 0.5, height: 0.4, depth: 0.06 }, scene);
+    back.position = new BABYLON.Vector3(
+      cx - Math.cos(angleToCenter) * 0.25,
+      0.65,
+      cz - Math.sin(angleToCenter) * 0.25
+    );
+    back.rotation.y = angleToCenter + Math.PI;
+    back.material = sMat;
+    // 4 legs
+    for (let li = 0; li < 4; li++) {
+      const lx = (li % 2 === 0 ? -0.18 : 0.18);
+      const lz = (li < 2 ? -0.18 : 0.18);
+      const leg = BABYLON.MeshBuilder.CreateCylinder(`chairLeg_${ci}_${li}`, { height: 0.36, diameter: 0.035 }, scene);
+      leg.position = new BABYLON.Vector3(cx + lx, 0.18, cz + lz);
+      leg.material = legMat;
+    }
+  });
+
+  // --- Magazines / items on break table ---
+  const mag = BABYLON.MeshBuilder.CreateBox('magazine', { width: 0.2, height: 0.01, depth: 0.28 }, scene);
+  mag.position = new BABYLON.Vector3(baCX + 0.1, 0.76, baCZ - 0.1);
+  mag.rotation.y = 0.3;
+  const magMat = new BABYLON.StandardMaterial('magMat', scene);
+  magMat.diffuseColor = new BABYLON.Color3(0.85, 0.2, 0.2);
+  mag.material = magMat;
+
+  const mug = BABYLON.MeshBuilder.CreateCylinder('breakMug', { height: 0.09, diameterTop: 0.06, diameterBottom: 0.05 }, scene);
+  mug.position = new BABYLON.Vector3(baCX - 0.15, 0.8, baCZ + 0.15);
+  const mugMat = new BABYLON.StandardMaterial('mugMat', scene);
+  mugMat.diffuseColor = new BABYLON.Color3(0.3, 0.6, 0.4);
+  mug.material = mugMat;
+
+  // --- Small rug under the table ---
+  const rug = BABYLON.MeshBuilder.CreateDisc('breakRug', { radius: 0.9, tessellation: 32 }, scene);
+  rug.position = new BABYLON.Vector3(baCX, 0.01, baCZ);
+  rug.rotation.x = Math.PI / 2;
+  const rugMat = new BABYLON.StandardMaterial('rugMat', scene);
+  rugMat.diffuseColor = new BABYLON.Color3(0.6, 0.5, 0.35);
+  rugMat.specularColor = BABYLON.Color3.Black();
+  rug.material = rugMat;
 
   // === WINDOWS (on north wall — fake depth with subtle sky tint) ===
   for (let w = 0; w < 4; w++) {
