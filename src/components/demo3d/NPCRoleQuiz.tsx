@@ -3,10 +3,13 @@ import { CheckCircle2, XCircle, Star } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 
+type ScenarioType = 'office' | 'warehouse' | 'construction' | 'laboratory';
+
 interface QuizQuestion {
   question: string;
   options: string[];
   correctIndex: number;
+  scenarios?: ScenarioType[]; // if set, question only shows for these scenarios
 }
 
 const ROLE_QUESTIONS: Record<string, QuizQuestion[]> = {
@@ -86,21 +89,26 @@ const ROLE_QUESTIONS: Record<string, QuizQuestion[]> = {
 
 interface NPCRoleQuizProps {
   role: string;
+  scenarioType?: ScenarioType;
   onClose: (bonusPoints: number) => void;
 }
 
-export const NPCRoleQuiz = ({ role, onClose }: NPCRoleQuizProps) => {
+export const NPCRoleQuiz = ({ role, scenarioType, onClose }: NPCRoleQuizProps) => {
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
   const [hasAnswered, setHasAnswered] = useState(false);
   const [question, setQuestion] = useState<QuizQuestion | null>(null);
 
   useEffect(() => {
-    const questions = ROLE_QUESTIONS[role];
-    if (questions && questions.length > 0) {
-      const randomQ = questions[Math.floor(Math.random() * questions.length)];
-      setQuestion(randomQ);
+    let questions = ROLE_QUESTIONS[role];
+    if (!questions || questions.length === 0) return;
+    // Filter by scenario if specified
+    if (scenarioType) {
+      const filtered = questions.filter(q => !q.scenarios || q.scenarios.includes(scenarioType));
+      if (filtered.length > 0) questions = filtered;
     }
-  }, [role]);
+    const randomQ = questions[Math.floor(Math.random() * questions.length)];
+    setQuestion(randomQ);
+  }, [role, scenarioType]);
 
   if (!question) return null;
 
