@@ -183,11 +183,11 @@ export const BabylonScene = ({
         dirDiffuse: new BABYLON.Color3(0.92, 0.88, 0.82),
       },
       warehouse: {
-        ambientIntensity: 0.25,
-        ambientDiffuse: new BABYLON.Color3(0.55, 0.65, 0.80),  // Cold blue-white
-        ambientGround: new BABYLON.Color3(0.15, 0.18, 0.25),
-        dirIntensity: 1.4,
-        dirDiffuse: new BABYLON.Color3(0.75, 0.85, 1.0),       // Cold industrial
+        ambientIntensity: 0.35,
+        ambientDiffuse: new BABYLON.Color3(0.6, 0.65, 0.75),
+        ambientGround: new BABYLON.Color3(0.2, 0.22, 0.28),
+        dirIntensity: 0.8,
+        dirDiffuse: new BABYLON.Color3(0.8, 0.85, 0.95),
       },
       construction: {
         ambientIntensity: 0.35,
@@ -265,12 +265,12 @@ export const BabylonScene = ({
           glowIntensity: 0.15,
         },
         warehouse: {
-          bloomEnabled: true, bloomThreshold: 0.8, bloomWeight: 0.3, bloomKernel: 48, bloomScale: 0.4,
-          chromaticAberration: 6,
-          contrast: 1.4, exposure: 1.0,
-          vignetteEnabled: true, vignetteWeight: 1.2, vignetteFov: 0.9,
-          saturation: 15, globalExposure: 0.15,
-          glowIntensity: 1.2,
+          bloomEnabled: true, bloomThreshold: 0.85, bloomWeight: 0.15, bloomKernel: 32, bloomScale: 0.3,
+          chromaticAberration: 4,
+          contrast: 1.3, exposure: 0.95,
+          vignetteEnabled: true, vignetteWeight: 1.0, vignetteFov: 0.9,
+          saturation: 10, globalExposure: 0.1,
+          glowIntensity: 0.3,
         },
         construction: {
           bloomEnabled: true, bloomThreshold: 0.65, bloomWeight: 0.35, bloomKernel: 64, bloomScale: 0.5,
@@ -1870,50 +1870,48 @@ function addEnvironmentalProps(
   console.log(`[Props] Adding environmental details for ${type}`);
 
   if (type === 'warehouse') {
-    // Dense industrial lighting array (12x suspended lights)
-    for (let i = 0; i < 12; i++) {
-      const light = BABYLON.MeshBuilder.CreateCylinder(
+    // Industrial lighting array (8 fixtures, no visible light cones)
+    for (let i = 0; i < 8; i++) {
+      const col = i % 4;
+      const row = Math.floor(i / 4);
+      const lx = -14 + col * 9;
+      const lz = -10 + row * 14;
+
+      // Ceiling fixture housing
+      const fixture = BABYLON.MeshBuilder.CreateBox(
         `industrialLight_${i}`,
-        { height: 2, diameter: 0.6 },
+        { width: 1.2, height: 0.15, depth: 0.4 },
         scene
       );
-      light.position = new BABYLON.Vector3(
-        -18 + (i % 4) * 12,
-        6.5,
-        -12 + Math.floor(i / 4) * 12
-      );
-      light.rotation.x = Math.PI / 2;
-      
-      const mat = new BABYLON.StandardMaterial(`lightMat_${i}`, scene);
-      mat.emissiveColor = new BABYLON.Color3(1, 0.9, 0.7); // Warm industrial light
-      mat.diffuseColor = new BABYLON.Color3(0.3, 0.3, 0.35);
-      mat.specularColor = new BABYLON.Color3(0.8, 0.8, 0.8);
-      mat.specularPower = 64;
-      light.material = mat;
+      fixture.position = new BABYLON.Vector3(lx, 6.4, lz);
+      const fixMat = new BABYLON.StandardMaterial(`lightFixMat_${i}`, scene);
+      fixMat.diffuseColor = new BABYLON.Color3(0.4, 0.4, 0.42);
+      fixMat.specularColor = new BABYLON.Color3(0.3, 0.3, 0.3);
+      fixture.material = fixMat;
 
-      // Dramatic point light from each fixture
+      // Glowing lamp strip under fixture
+      const lamp = BABYLON.MeshBuilder.CreateBox(
+        `lightLamp_${i}`,
+        { width: 1.0, height: 0.04, depth: 0.25 },
+        scene
+      );
+      lamp.position = new BABYLON.Vector3(lx, 6.3, lz);
+      const lampMat = new BABYLON.StandardMaterial(`lampMat_${i}`, scene);
+      lampMat.diffuseColor = new BABYLON.Color3(0.95, 0.92, 0.85);
+      lampMat.emissiveColor = new BABYLON.Color3(0.6, 0.55, 0.45);
+      lamp.material = lampMat;
+
+      // Soft point light (no cones, no dramatic shafts)
       if (quality !== 'low') {
         const pointLight = new BABYLON.PointLight(
-          `pointLight_${i}`,
-          light.position.clone().addInPlace(new BABYLON.Vector3(0, -0.5, 0)),
+          `whPointLight_${i}`,
+          new BABYLON.Vector3(lx, 6.0, lz),
           scene
         );
-        pointLight.intensity = 1.2; // Stronger lighting
-        pointLight.range = 22;
-        pointLight.diffuse = new BABYLON.Color3(1, 0.9, 0.7);
-        pointLight.specular = new BABYLON.Color3(0.9, 0.8, 0.6);
-        
-        // Dramatic light cones (visible light shafts)
-        const cone = BABYLON.MeshBuilder.CreateCylinder(
-          `lightCone_${i}`,
-          { height: 5, diameterTop: 0.6, diameterBottom: 4, tessellation: 16 },
-          scene
-        );
-        cone.position = light.position.clone().addInPlace(new BABYLON.Vector3(0, -2.5, 0));
-        const coneMat = new BABYLON.StandardMaterial(`coneMat_${i}`, scene);
-        coneMat.alpha = 0.25;
-        coneMat.emissiveColor = new BABYLON.Color3(1, 0.9, 0.7);
-        cone.material = coneMat;
+        pointLight.intensity = 0.5;
+        pointLight.range = 14;
+        pointLight.diffuse = new BABYLON.Color3(0.95, 0.9, 0.8);
+        pointLight.specular = new BABYLON.Color3(0.4, 0.35, 0.3);
       }
     }
 
@@ -4073,15 +4071,16 @@ function addWorkerAvatars(
         ) || result.animationGroups[0];
         result.animationGroups.forEach(ag => ag.stop());
 
-        // Strip ALL root motion: zero position animations on root mesh AND
-        // any top-level transform nodes so our waypoint system controls movement
+        // Strip ALL root motion: zero out position AND rotation keyframes on 
+        // root/armature/hips nodes so our waypoint system controls movement entirely
         walkAnim.targetedAnimations.forEach(ta => {
           const anim = ta.animation;
           const prop = anim.targetProperty?.toLowerCase() || '';
           const targetName = (ta.target?.name || '').toLowerCase();
           const isRootTarget = ta.target === meshRoot || ta.target === result.meshes[0]
             || targetName.includes('armature') || targetName.includes('root')
-            || targetName === '' || targetName.includes('hips');
+            || targetName === '';
+          // Lock position on root nodes (prevents XZ drift)
           if (isRootTarget && prop.includes('position')) {
             const keys = anim.getKeys();
             const zeroVal = keys[0]?.value;
@@ -4091,6 +4090,20 @@ function addWorkerAvatars(
             }
             console.log(`[NPC] Stripped root motion on ${id}: target=${targetName}, prop=${prop}`);
           }
+          // Lock hips Y-position to first frame value (prevents vertical bouncing)
+          if (targetName.includes('hips') && prop.includes('position')) {
+            const keys = anim.getKeys();
+            const firstVal = keys[0]?.value;
+            if (firstVal) {
+              keys.forEach(k => {
+                if (k.value && typeof k.value.y !== 'undefined') {
+                  k.value = firstVal.clone ? firstVal.clone() : { ...firstVal };
+                }
+              });
+              anim.setKeys(keys);
+            }
+            console.log(`[NPC] Locked hips position on ${id}: target=${targetName}`);
+          }
         });
 
         walkAnim.start(true);
@@ -4098,10 +4111,12 @@ function addWorkerAvatars(
         walkAnim.speedRatio = speed * 60;
 
         // Force-lock meshRoot position to zero every frame
-        // This prevents any residual animation from overriding waypoint movement
         scene.registerBeforeRender(() => {
           if (meshRoot && !meshRoot.isDisposed()) {
-            meshRoot.position.setAll(0);
+            meshRoot.position.x = 0;
+            meshRoot.position.z = 0;
+            // Keep Y at 0 as well to prevent vertical drift
+            meshRoot.position.y = 0;
           }
         });
       }
