@@ -526,6 +526,7 @@ export const BabylonScene = ({
       {activeNPCRole && (
         <NPCDialogOverlay
           role={activeNPCRole}
+          scenarioType={scenario.type}
           onClose={() => {
             setQuizRole(activeNPCRole);
             setActiveNPCRole(null);
@@ -536,6 +537,7 @@ export const BabylonScene = ({
       {quizRole && (
         <NPCRoleQuiz
           role={quizRole}
+          scenarioType={scenario.type}
           onClose={() => setQuizRole(null)}
         />
       )}

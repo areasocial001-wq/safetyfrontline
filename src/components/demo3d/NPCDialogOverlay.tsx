@@ -96,12 +96,22 @@ const SAFETY_ROLES: Record<string, SafetyRoleInfo> = {
   },
 };
 
+export type ScenarioType = 'office' | 'warehouse' | 'construction' | 'laboratory';
+
+const SCENARIO_LABELS: Record<ScenarioType, string> = {
+  office: '🏢 Ufficio',
+  warehouse: '🏭 Magazzino',
+  construction: '🏗️ Cantiere',
+  laboratory: '🔬 Laboratorio',
+};
+
 interface NPCDialogOverlayProps {
   role: string | null;
+  scenarioType?: ScenarioType;
   onClose: () => void;
 }
 
-export const NPCDialogOverlay = ({ role, onClose }: NPCDialogOverlayProps) => {
+export const NPCDialogOverlay = ({ role, scenarioType, onClose }: NPCDialogOverlayProps) => {
   if (!role) return null;
 
   const info = SAFETY_ROLES[role];
@@ -152,11 +162,16 @@ export const NPCDialogOverlay = ({ role, onClose }: NPCDialogOverlayProps) => {
           </ul>
         </div>
 
-        {/* Legal reference */}
-        <div className="pt-3 border-t border-border">
+        {/* Legal reference + scenario context */}
+        <div className="pt-3 border-t border-border space-y-1">
           <p className="text-xs text-muted-foreground">
             📖 Riferimento normativo: <span className="font-medium text-foreground/70">{info.legalRef}</span>
           </p>
+          {scenarioType && (
+            <p className="text-xs text-muted-foreground">
+              📍 Contesto: <span className="font-medium text-foreground/70">{SCENARIO_LABELS[scenarioType]}</span>
+            </p>
+          )}
         </div>
 
         {/* Close hint */}
