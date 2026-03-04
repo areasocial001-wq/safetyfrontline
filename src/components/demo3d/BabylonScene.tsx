@@ -1869,6 +1869,12 @@ function addEnvironmentalProps(
 ) {
   console.log(`[Props] Adding environmental details for ${type}`);
 
+  // Deterministic random for consistent prop placement
+  const seededRandom = (seed: number) => {
+    const x = Math.sin(seed * 9301 + 49297) * 49297;
+    return x - Math.floor(x);
+  };
+
   if (type === 'warehouse') {
     // Industrial lighting array (8 fixtures, no visible light cones)
     for (let i = 0; i < 8; i++) {
@@ -1915,52 +1921,143 @@ function addEnvironmentalProps(
       }
     }
 
-    // Safety signs and barriers
-    for (let i = 0; i < 12; i++) {
-      const sign = BABYLON.MeshBuilder.CreatePlane(
-        `sign_${i}`,
-        { size: 1 },
-        scene
-      );
-      sign.position = new BABYLON.Vector3(
-        Math.random() * 40 - 20,
-        2 + Math.random(),
-        Math.random() * 40 - 20
-      );
-      sign.rotation.y = Math.random() * Math.PI * 2;
-      
-      const signMat = new BABYLON.StandardMaterial(`signMat_${i}`, scene);
-      signMat.diffuseColor = i % 2 === 0 
-        ? new BABYLON.Color3(1, 0.8, 0) // Yellow warning
-        : new BABYLON.Color3(1, 0, 0); // Red danger
-      signMat.emissiveColor = signMat.diffuseColor.scale(0.3);
+    // === METAL SHELVING RACKS with pallets and stacked boxes ===
+    const shelfMat = new BABYLON.StandardMaterial('shelfMetal', scene);
+    shelfMat.diffuseColor = new BABYLON.Color3(0.5, 0.52, 0.55);
+    shelfMat.specularColor = new BABYLON.Color3(0.6, 0.6, 0.6);
+    shelfMat.specularPower = 64;
+
+    const rackConfigs = [
+      { x: -16, z: -14, rot: 0 }, { x: -16, z: -4, rot: 0 }, { x: -16, z: 6, rot: 0 },
+      { x: -8, z: -14, rot: 0 },  { x: -8, z: -4, rot: 0 },  { x: -8, z: 6, rot: 0 },
+      { x: 4, z: -14, rot: 0 },   { x: 4, z: -4, rot: 0 },   { x: 4, z: 6, rot: 0 },
+      { x: 14, z: -14, rot: 0 },  { x: 14, z: 6, rot: 0 },
+    ];
+
+    const boxColors = [
+      new BABYLON.Color3(0.7, 0.5, 0.3),   // cardboard
+      new BABYLON.Color3(0.75, 0.55, 0.35), // light cardboard
+      new BABYLON.Color3(0.3, 0.45, 0.65),  // blue crate
+      new BABYLON.Color3(0.6, 0.25, 0.2),   // red crate
+      new BABYLON.Color3(0.35, 0.55, 0.3),  // green crate
+      new BABYLON.Color3(0.85, 0.82, 0.7),  // pale box
+      new BABYLON.Color3(0.55, 0.55, 0.55), // grey bin
+    ];
+
+    const labelColors = [
+      new BABYLON.Color3(1, 0.3, 0.2),    // red label
+      new BABYLON.Color3(0.2, 0.5, 0.9),  // blue label
+      new BABYLON.Color3(0.1, 0.7, 0.3),  // green label
+      new BABYLON.Color3(1, 0.75, 0.1),   // yellow label
+      new BABYLON.Color3(0.9, 0.9, 0.9),  // white label
+    ];
+
+    rackConfigs.forEach((rc, ri) => {
+      const rackW = 3.5, rackH = 4.5, rackD = 1.2;
+      const shelfCount = 4; // 4 shelf levels
+
+      // Vertical uprights (4 posts)
+      for (let p = 0; p < 4; p++) {
+        const px = (p % 2 === 0 ? -1 : 1) * (rackW / 2 - 0.05);
+        const pz = (p < 2 ? -1 : 1) * (rackD / 2 - 0.05);
+        const post = BABYLON.MeshBuilder.CreateBox(`rack_post_${ri}_${p}`, { width: 0.08, height: rackH, depth: 0.08 }, scene);
+        post.position = new BABYLON.Vector3(rc.x + px, rackH / 2, rc.z + pz);
+        post.material = shelfMat;
+        post.checkCollisions = true;
+        if (shadowGenerator) shadowGenerator.addShadowCaster(post);
+      }
+
+      // Horizontal shelves + items on each level
+      for (let s = 0; s < shelfCount; s++) {
+        const shelfY = 0.5 + s * 1.1;
+        const shelf = BABYLON.MeshBuilder.CreateBox(`rack_shelf_${ri}_${s}`, { width: rackW, height: 0.04, depth: rackD }, scene);
+        shelf.position = new BABYLON.Vector3(rc.x, shelfY, rc.z);
+        shelf.material = shelfMat;
+        shelf.receiveShadows = true;
+        if (shadowGenerator) shadowGenerator.addShadowCaster(shelf);
+
+        // Add 2-4 boxes/items per shelf
+        const itemCount = 2 + Math.floor(seededRandom(ri * 100 + s * 17) * 3);
+        for (let b = 0; b < itemCount; b++) {
+          const bw = 0.4 + seededRandom(ri * 200 + s * 30 + b * 7) * 0.6;
+          const bh = 0.3 + seededRandom(ri * 300 + s * 40 + b * 11) * 0.5;
+          const bd = 0.35 + seededRandom(ri * 400 + s * 50 + b * 13) * 0.4;
+          const bx = -rackW / 2 + 0.3 + b * (rackW / itemCount);
+          const colorIdx = Math.floor(seededRandom(ri * 500 + s * 60 + b * 19) * boxColors.length);
+
+          const box = BABYLON.MeshBuilder.CreateBox(`rackBox_${ri}_${s}_${b}`, { width: bw, height: bh, depth: bd }, scene);
+          box.position = new BABYLON.Vector3(rc.x + bx, shelfY + 0.02 + bh / 2, rc.z);
+          const bMat = new BABYLON.StandardMaterial(`rackBoxMat_${ri}_${s}_${b}`, scene);
+          bMat.diffuseColor = boxColors[colorIdx];
+          bMat.specularColor = new BABYLON.Color3(0.15, 0.15, 0.15);
+          box.material = bMat;
+          if (shadowGenerator) shadowGenerator.addShadowCaster(box);
+
+          // Add shipping label on some boxes
+          if (seededRandom(ri * 600 + s * 70 + b * 23) > 0.4) {
+            const label = BABYLON.MeshBuilder.CreatePlane(`rackLabel_${ri}_${s}_${b}`, { width: bw * 0.5, height: bh * 0.4 }, scene);
+            label.position = new BABYLON.Vector3(rc.x + bx, shelfY + 0.02 + bh / 2, rc.z + bd / 2 + 0.01);
+            const lMat = new BABYLON.StandardMaterial(`rackLabelMat_${ri}_${s}_${b}`, scene);
+            const lci = Math.floor(seededRandom(ri * 700 + s * 80 + b * 29) * labelColors.length);
+            lMat.diffuseColor = labelColors[lci];
+            lMat.emissiveColor = labelColors[lci].scale(0.15);
+            label.material = lMat;
+          }
+        }
+      }
+
+      // Pallet at ground level under each rack
+      const pallet = BABYLON.MeshBuilder.CreateBox(`pallet_${ri}`, { width: rackW - 0.2, height: 0.12, depth: rackD - 0.1 }, scene);
+      pallet.position = new BABYLON.Vector3(rc.x, 0.06, rc.z);
+      const palletMat = new BABYLON.StandardMaterial(`palletMat_${ri}`, scene);
+      palletMat.diffuseColor = new BABYLON.Color3(0.6, 0.48, 0.3);
+      palletMat.specularColor = new BABYLON.Color3(0.1, 0.1, 0.1);
+      pallet.material = palletMat;
+      if (shadowGenerator) shadowGenerator.addShadowCaster(pallet);
+    });
+
+    // Some loose cargo boxes on the floor (between racks)
+    const loosePositions = [
+      { x: -12, z: 0 }, { x: -4, z: -9 }, { x: 0, z: 10 }, { x: 8, z: 0 },
+      { x: -12, z: 14 }, { x: 10, z: -10 }, { x: 16, z: 0 },
+    ];
+    loosePositions.forEach((lp, li) => {
+      const stackH = 1 + Math.floor(seededRandom(li * 111) * 3);
+      for (let s = 0; s < stackH; s++) {
+        const bw = 0.6 + seededRandom(li * 222 + s) * 0.6;
+        const bh = 0.4 + seededRandom(li * 333 + s) * 0.3;
+        const bd = 0.5 + seededRandom(li * 444 + s) * 0.5;
+        const box = BABYLON.MeshBuilder.CreateBox(`looseBox_${li}_${s}`, { width: bw, height: bh, depth: bd }, scene);
+        const stackY = s === 0 ? bh / 2 : 0;
+        box.position = new BABYLON.Vector3(lp.x, bh / 2 + s * 0.45, lp.z);
+        box.rotation.y = seededRandom(li * 555 + s) * 0.4 - 0.2;
+        const bMat = new BABYLON.StandardMaterial(`looseBoxMat_${li}_${s}`, scene);
+        const ci = Math.floor(seededRandom(li * 666 + s) * boxColors.length);
+        bMat.diffuseColor = boxColors[ci];
+        bMat.specularColor = new BABYLON.Color3(0.1, 0.1, 0.1);
+        box.material = bMat;
+        if (shadowGenerator) shadowGenerator.addShadowCaster(box);
+      }
+    });
+
+    // Safety signs on walls (not randomly floating)
+    const signWallPositions = [
+      { x: -19.5, z: -10, ry: Math.PI / 2 }, { x: -19.5, z: 5, ry: Math.PI / 2 },
+      { x: 19.5, z: -10, ry: -Math.PI / 2 }, { x: 19.5, z: 5, ry: -Math.PI / 2 },
+      { x: -10, z: -19.5, ry: 0 }, { x: 5, z: -19.5, ry: 0 },
+      { x: -10, z: 19.5, ry: Math.PI }, { x: 5, z: 19.5, ry: Math.PI },
+    ];
+    signWallPositions.forEach((sp, si) => {
+      const sign = BABYLON.MeshBuilder.CreatePlane(`wallSign_${si}`, { width: 0.8, height: 0.8 }, scene);
+      sign.position = new BABYLON.Vector3(sp.x, 2.5, sp.z);
+      sign.rotation.y = sp.ry;
+      const signMat = new BABYLON.StandardMaterial(`wallSignMat_${si}`, scene);
+      signMat.diffuseColor = si % 2 === 0
+        ? new BABYLON.Color3(1, 0.8, 0)
+        : new BABYLON.Color3(1, 0, 0);
+      signMat.emissiveColor = signMat.diffuseColor.scale(0.2);
       sign.material = signMat;
-
-      if (shadowGenerator) shadowGenerator.addShadowCaster(sign);
-    }
-
-    // Pallets and cargo boxes
-    for (let i = 0; i < 25; i++) {
-      const box = BABYLON.MeshBuilder.CreateBox(
-        `cargo_${i}`,
-        { width: 1 + Math.random(), height: 0.8 + Math.random() * 0.5, depth: 1 + Math.random() },
-        scene
-      );
-      box.position = new BABYLON.Vector3(
-        Math.random() * 35 - 17.5,
-        0.4,
-        Math.random() * 35 - 17.5
-      );
-      box.rotation.y = Math.random() * Math.PI;
-      box.checkCollisions = false; // Small props — no collision to avoid trapping player
-      
-      const boxMat = new BABYLON.StandardMaterial(`cargoMat_${i}`, scene);
-      boxMat.diffuseColor = new BABYLON.Color3(0.65 + Math.random() * 0.1, 0.45 + Math.random() * 0.1, 0.25 + Math.random() * 0.1); // Vivid cardboard brown
-      boxMat.specularColor = new BABYLON.Color3(0.2, 0.2, 0.2);
-      box.material = boxMat;
-      
-      if (shadowGenerator) shadowGenerator.addShadowCaster(box);
-    }
+    });
 
   } else if (type === 'construction' || type === 'factory') {
     // === REALISTIC CONSTRUCTION SITE ===
@@ -3836,7 +3933,31 @@ function addWorkerAvatars(
       toast.success(`NPC ${name} caricato`);
     }).catch(err => {
       console.error(`[NPC] ✗ Failed to load GLB avatar for ${name}:`, err);
-      toast.error(`Errore caricamento NPC ${name}: ${err.message || err}`);
+      // FALLBACK: create a procedural capsule NPC so role signs always have a figure underneath
+      console.log(`[NPC] Creating procedural fallback for ${name}`);
+      const body = BABYLON.MeshBuilder.CreateCapsule(`${name}_fallback`, { height: 1.7, radius: 0.25 }, scene);
+      body.position = position.clone();
+      body.position.y = 0.85;
+      const fbMat = new BABYLON.StandardMaterial(`${name}_fbMat`, scene);
+      fbMat.diffuseColor = uniformColor.clone();
+      fbMat.emissiveColor = uniformColor.scale(0.15);
+      fbMat.specularColor = new BABYLON.Color3(0.2, 0.2, 0.2);
+      body.material = fbMat;
+      body.checkCollisions = true;
+      if (safetyRole) {
+        body.metadata = { safetyRole };
+        body.isPickable = true;
+      }
+      if (shadowGenerator) shadowGenerator.addShadowCaster(body);
+      // Head
+      const head = BABYLON.MeshBuilder.CreateSphere(`${name}_head`, { diameter: 0.3 }, scene);
+      head.position = position.clone();
+      head.position.y = 1.85;
+      const headMat = new BABYLON.StandardMaterial(`${name}_headMat`, scene);
+      headMat.diffuseColor = new BABYLON.Color3(0.85, 0.72, 0.58);
+      headMat.emissiveColor = new BABYLON.Color3(0.12, 0.1, 0.08);
+      head.material = headMat;
+      toast.warning(`NPC ${name} (fallback procedurale)`);
     });
   };
 
@@ -4133,7 +4254,22 @@ function addWorkerAvatars(
       toast.success(`Walking NPC '${id}' caricato`);
     }).catch(err => {
       console.error(`[NPC] ✗ Failed to load GLB for walking worker ${id}:`, err);
-      toast.error(`Errore NPC walking ${id}: ${err.message || err}`);
+      // FALLBACK: create a procedural walking capsule
+      const body = BABYLON.MeshBuilder.CreateCapsule(`walk_${id}_fallback`, { height: 1.7, radius: 0.25 }, scene);
+      body.parent = root;
+      body.position.y = 0.85;
+      const fbMat = new BABYLON.StandardMaterial(`walk_${id}_fbMat`, scene);
+      fbMat.diffuseColor = _vestColor || _uniformColor;
+      fbMat.emissiveColor = (fbMat.diffuseColor as BABYLON.Color3).scale(0.15);
+      body.material = fbMat;
+      const head = BABYLON.MeshBuilder.CreateSphere(`walk_${id}_head`, { diameter: 0.3 }, scene);
+      head.parent = root;
+      head.position.y = 1.85;
+      const headMat = new BABYLON.StandardMaterial(`walk_${id}_headMat`, scene);
+      headMat.diffuseColor = new BABYLON.Color3(0.85, 0.72, 0.58);
+      headMat.emissiveColor = new BABYLON.Color3(0.12, 0.1, 0.08);
+      head.material = headMat;
+      toast.warning(`Walking NPC '${id}' (fallback)`);
     });
   };
 
@@ -5067,8 +5203,8 @@ function createRealisticOffice(
   wb.material = wbMat;
   if (shadowGenerator) shadowGenerator.addShadowCaster(wb);
 
-  // === ENHANCED BREAK AREA (left-back corner) ===
-  const baCX = -12, baCZ = 9; // break area center
+  // === ENHANCED BREAK AREA (left side, clearly visible) ===
+  const baCX = -10, baCZ = 5; // break area center — moved toward center for visibility
 
   // --- Coffee machine (detailed) ---
   const coffeeBase = BABYLON.MeshBuilder.CreateBox('coffeeBase', { width: 0.5, height: 0.65, depth: 0.45 }, scene);
