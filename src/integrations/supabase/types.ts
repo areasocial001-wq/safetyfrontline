@@ -603,6 +603,7 @@ export type Database = {
           min_duration_minutes: number
           module_order: number
           passing_score: number
+          sector: Database["public"]["Enums"]["risk_sector"] | null
           style: string
           subtitle: string | null
           title: string
@@ -615,6 +616,7 @@ export type Database = {
           min_duration_minutes?: number
           module_order: number
           passing_score?: number
+          sector?: Database["public"]["Enums"]["risk_sector"] | null
           style?: string
           subtitle?: string | null
           title: string
@@ -627,6 +629,7 @@ export type Database = {
           min_duration_minutes?: number
           module_order?: number
           passing_score?: number
+          sector?: Database["public"]["Enums"]["risk_sector"] | null
           style?: string
           subtitle?: string | null
           title?: string
@@ -811,6 +814,36 @@ export type Database = {
         }
         Relationships: []
       }
+      user_risk_sectors: {
+        Row: {
+          assigned_by: string | null
+          created_at: string
+          id: string
+          is_self_assigned: boolean
+          sector: Database["public"]["Enums"]["risk_sector"]
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          assigned_by?: string | null
+          created_at?: string
+          id?: string
+          is_self_assigned?: boolean
+          sector: Database["public"]["Enums"]["risk_sector"]
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          assigned_by?: string | null
+          created_at?: string
+          id?: string
+          is_self_assigned?: boolean
+          sector?: Database["public"]["Enums"]["risk_sector"]
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string
@@ -913,6 +946,7 @@ export type Database = {
     }
     Enums: {
       demo_scenario: "office" | "warehouse" | "general"
+      risk_sector: "basso" | "medio" | "alto"
       user_role: "admin" | "company_client" | "employee"
     }
     CompositeTypes: {
@@ -1042,6 +1076,7 @@ export const Constants = {
   public: {
     Enums: {
       demo_scenario: ["office", "warehouse", "general"],
+      risk_sector: ["basso", "medio", "alto"],
       user_role: ["admin", "company_client", "employee"],
     },
   },
