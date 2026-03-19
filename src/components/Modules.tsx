@@ -65,6 +65,12 @@ export const Modules = () => {
       { icon: Truck, title: "Movimentazione Meccanica", subtitle: "Carrelli, Gru e Mezzi", description: "Conduzione sicura di carrelli elevatori, gru, piattaforme aeree. Segnaletica.", color: "accent" },
       { icon: Heart, title: "Primo Soccorso Avanzato", subtitle: "Emergenze Industriali", description: "Gestione emergenze in ambienti ad alto rischio, triage, decontaminazione e DAE.", color: "muted" },
     ],
+    ruolo: [
+      { icon: Briefcase, title: "Lavoratori Specifica", subtitle: "Formazione per Settore", description: "Corso specifico per mansione: analisi rischi settoriali, DPI per ruolo, procedure di emergenza e aggiornamento quinquennale.", color: "primary" },
+      { icon: Crown, title: "RSPP Datore di Lavoro", subtitle: "Art. 34 D.Lgs 81/08", description: "Il DL come RSPP: responsabilità, DVR, gestione rischi, ciclo PDCA, near miss reporting. 16-48 ore per livello di rischio.", color: "destructive" },
+      { icon: Users, title: "RLS", subtitle: "Rappresentante Lavoratori", description: "Corso 32 ore: elezione, attribuzioni art. 50, consultazione preventiva, accesso DVR, ricorso alle autorità competenti.", color: "accent" },
+      { icon: Eye, title: "Corso Preposto", subtitle: "Vigilanza e Intervento", description: "Obblighi aggiornati alla L. 215/2021: vigilanza, intervento diretto, interruzione attività, aggiornamento biennale.", color: "secondary" },
+    ],
     cybersecurity: [
       { icon: Mail, title: "Phishing & Social Engineering", subtitle: "Riconoscere le Trappole", description: "Identificare email fraudolente, spear phishing, vishing e tecniche di manipolazione. Scenari interattivi realistici.", color: "destructive" },
       { icon: KeyRound, title: "Password & Autenticazione", subtitle: "Credenziali Sicure", description: "Creare password robuste, usare password manager e autenticazione a due fattori (2FA). Best practice quotidiane.", color: "primary" },
