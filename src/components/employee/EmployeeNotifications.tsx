@@ -162,7 +162,7 @@ export const EmployeeNotifications = () => {
                 <p className="text-xs text-muted-foreground mt-0.5 line-clamp-2">{notif.message}</p>
                 <p className="text-[10px] text-muted-foreground/60 mt-1">{formatDate(notif.created_at)}</p>
               </div>
-              {notif.type === 'sector_assignment' && (
+              {['sector_assignment', 'module_completed', 'deadline_reminder', 'all_modules_completed'].includes(notif.type) && (
                 <Link to="/formazione" onClick={e => e.stopPropagation()}>
                   <ChevronRight className="w-4 h-4 text-muted-foreground" />
                 </Link>

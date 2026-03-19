@@ -213,8 +213,17 @@ const TrainingModule = () => {
       });
       toast({ title: '🎉 Modulo Completato!', description: `Hai guadagnato ${sessionXp} XP` });
 
-      // Notify company admin via email (fire-and-forget)
+      // In-app congratulation notification + admin email (fire-and-forget)
       if (user) {
+        const moduleTitle = ({ giuridico_normativo: 'Giuridico e Normativo', gestione_organizzazione: 'Gestione ed Organizzazione', valutazione_rischi: 'Valutazione dei Rischi', dpi_protezione: 'DPI e Protezione' } as Record<string, string>)[moduleId] || moduleId;
+        supabase.from('employee_notifications').insert({
+          user_id: user.id,
+          type: 'module_completed',
+          title: `🎉 Modulo completato: ${moduleTitle}`,
+          message: `Complimenti! Hai completato il modulo "${moduleTitle}" e guadagnato ${sessionXp} XP.`,
+          metadata: { module_id: moduleId, xp_earned: sessionXp, score: bossTestScore, max_score: bossTestMaxScore },
+        }).then(({ error }) => { if (error) console.error('Notification insert error:', error); });
+
         const mp = getModuleProgress(moduleId);
         supabase.functions.invoke('notify-module-completion', {
           body: {
