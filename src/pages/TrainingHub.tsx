@@ -102,7 +102,7 @@ const TRAINING_PATHS: TrainingPath[] = [
     icon: Eye,
     hours: '8h',
     color: 'secondary',
-    moduleIds: ['preposto_ruolo_obblighi'],
+    moduleIds: ['preposto_ruolo_obblighi', 'preposto_valutazione_dpi', 'preposto_emergenze'],
   },
   {
     id: 'cybersecurity',

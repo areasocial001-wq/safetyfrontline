@@ -877,8 +877,15 @@ import { rischioAltoContents } from './training-content-alto';
 import { cybersecurityContent } from './training-content-cybersecurity';
 import { lavoratoriSpecificaContents } from './training-content-lavoratori-specifica';
 import { rsppDatoreContents } from './training-content-rspp-datore';
+import { moduloRSPP2Content } from './training-content-rspp-datore-m2';
+import { moduloRSPP3Content } from './training-content-rspp-datore-m3';
+import { moduloRSPP4Content } from './training-content-rspp-datore-m4';
 import { rlsContents } from './training-content-rls';
+import { moduloRLS2Content } from './training-content-rls-m2';
+import { moduloRLS3Content } from './training-content-rls-m3';
 import { prepostoContents } from './training-content-preposto';
+import { moduloP2Content } from './training-content-preposto-m2';
+import { moduloP3Content } from './training-content-preposto-m3';
 
 export const allModulesContent: ModuleContent[] = [
   modulo1Content,
@@ -891,8 +898,15 @@ export const allModulesContent: ModuleContent[] = [
   cybersecurityContent,
   ...lavoratoriSpecificaContents,
   ...rsppDatoreContents,
+  moduloRSPP2Content,
+  moduloRSPP3Content,
+  moduloRSPP4Content,
   ...rlsContents,
+  moduloRLS2Content,
+  moduloRLS3Content,
   ...prepostoContents,
+  moduloP2Content,
+  moduloP3Content,
 ];
 
 export const getModuleContent = (moduleId: string): ModuleContent | undefined => {
