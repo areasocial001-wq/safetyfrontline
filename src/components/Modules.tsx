@@ -190,7 +190,7 @@ export const Modules = () => {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-12 mb-8">
             {[
               { value: "25+", label: "Moduli Formativi", icon: GraduationCap },
-              { value: "3", label: "Simulazioni 3D", icon: Gamepad2 },
+              { value: "4", label: "Simulazioni 3D", icon: Gamepad2 },
               { value: "3", label: "Settori di Rischio", icon: Shield },
               { value: "∞", label: "Personalizzazioni", icon: Settings },
             ].map((stat, i) => (
