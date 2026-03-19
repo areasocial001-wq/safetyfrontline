@@ -75,6 +75,7 @@ export const Modules = () => {
       { icon: Package, title: "Safety Run", subtitle: "Rischi Generali 3D", description: "Percorso in prima persona con cadute, inciampi, ordine & pulizia e valutazione rischi in tempo reale.", color: "primary" },
       { icon: Building2, title: "Office Hazard Quest", subtitle: "Uffici & VDT", description: "Simulazione 3D per PMI del terziario: postura, videoterminale, pause, micro-ergonomia.", color: "secondary", image: officeModule },
       { icon: Warehouse, title: "Magazzino 2.5D", subtitle: "Carrelli & Movimentazione", description: "Muletti, movimentazione manuale, segnaletica, interazione pedoni/mezzi in ambiente 3D.", color: "accent", image: warehouseModule },
+      { icon: Lock, title: "Cyber Security Office", subtitle: "Rischi Informatici 3D", description: "Identifica post-it con password, schermi non bloccati, email di phishing e chiavette USB sospette in un ufficio 3D.", color: "destructive" },
     ],
     piattaforma: [
       { icon: Bell, title: "Notifiche Smart", subtitle: "In-App & Email", description: "Notifiche automatiche per completamento moduli, scadenze, assegnazione settori e promemoria giornalieri.", color: "primary" },
