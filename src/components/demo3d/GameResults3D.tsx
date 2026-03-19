@@ -17,8 +17,9 @@ import {
   Wind,
   FlaskConical,
   Zap,
-  Package
-import { ShieldAlert } from "lucide-react";
+  Package,
+  ShieldAlert
+} from "lucide-react";
 import { Link } from "react-router-dom";
 import { Scenario3D } from "@/data/scenarios3d";
 import type { ExtinguisherType } from "./ExtinguisherSelection";
