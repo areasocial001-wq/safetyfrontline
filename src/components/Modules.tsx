@@ -26,7 +26,7 @@ export const Modules = () => {
     { key: 'basso', label: 'Rischio Basso', icon: Building2, badge: '4 moduli' },
     { key: 'medio', label: 'Rischio Medio', icon: Cog, badge: '8 moduli' },
     { key: 'alto', label: 'Rischio Alto', icon: AlertTriangle, badge: '8 moduli' },
-    { key: 'ruolo', label: 'Corsi di Ruolo', icon: Crown, badge: '4 corsi' },
+    { key: 'ruolo', label: 'Corsi di Ruolo', icon: Crown, badge: '3 corsi' },
     { key: 'cybersecurity', label: 'Cybersecurity', icon: Lock, badge: 'nuovo' },
     { key: 'simulazioni', label: 'Simulazioni 3D', icon: Gamepad2, badge: '4 scenari' },
     { key: 'piattaforma', label: 'Piattaforma', icon: Settings },
