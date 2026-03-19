@@ -51,6 +51,7 @@ const App = () => (
           <Route path="/formazione" element={<TrainingHub />} />
           <Route path="/formazione/:moduleId" element={<TrainingModule />} />
           <Route path="/admin/training-analytics" element={<TrainingAnalytics />} />
+          <Route path="/guida" element={<GuidePage />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

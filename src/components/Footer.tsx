@@ -42,6 +42,7 @@ export const Footer = () => {
             <div>
               <h4 className="font-semibold mb-4">Link Veloci</h4>
               <ul className="space-y-2 text-sm opacity-80">
+                <li><a href="/guida" className="hover:text-primary transition-colors">📖 Guida Completa</a></li>
                 <li><a href="/scheda-tecnica" className="hover:text-primary transition-colors">📄 Scheda Tecnica</a></li>
                 <li><a href="#moduli" className="hover:text-primary transition-colors">I Moduli</a></li>
                 <li><a href="#come-funziona" className="hover:text-primary transition-colors">Come Funziona</a></li>
