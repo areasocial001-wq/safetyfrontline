@@ -38,6 +38,13 @@ export function addEnvironmentalProps(
   } else if (type === 'office') {
     addOfficeProps(scene, quality, shadowGenerator);
   }
+
+  // Add cybersecurity-specific props if scenario ID matches
+  // The scenario ID is encoded in scene metadata
+  const cyberMeta = scene.metadata?.scenarioId;
+  if (cyberMeta === 'cybersecurity') {
+    addCybersecurityProps(scene, quality, shadowGenerator);
+  }
 }
 
 // ============================================================
