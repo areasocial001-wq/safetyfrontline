@@ -54,6 +54,7 @@ interface GameResults3DProps {
   collisions: number;
   sprinklerBonusPoints: number;
   sprinklerRisksFound: number;
+  cyberQuizStats?: CyberQuizStats;
   firePerformance?: FirePerformanceData;
   onRestart: () => void;
   onChangeScenario: () => void;
