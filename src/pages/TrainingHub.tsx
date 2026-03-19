@@ -82,7 +82,7 @@ const TRAINING_PATHS: TrainingPath[] = [
     icon: Crown,
     hours: '16-48h',
     color: 'destructive',
-    moduleIds: ['rspp_dl_giuridico'],
+    moduleIds: ['rspp_dl_giuridico', 'rspp_dl_gestione_rischi', 'rspp_dl_tecnico', 'rspp_dl_relazionale'],
   },
   {
     id: 'rls',
