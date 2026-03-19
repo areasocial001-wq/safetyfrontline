@@ -26,6 +26,7 @@ import { ModuleCompletionHistory } from '@/components/company/ModuleCompletionHi
 import { CompletionsByModuleChart } from '@/components/company/CompletionsByModuleChart';
 import { ScoreTrendChart } from '@/components/company/ScoreTrendChart';
 import { DashboardPDFExport } from '@/components/company/DashboardPDFExport';
+import { EmployeeSectorAssignment } from '@/components/company/EmployeeSectorAssignment';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
