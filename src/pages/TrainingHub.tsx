@@ -109,7 +109,7 @@ const TRAINING_PATHS: TrainingPath[] = [
     icon: ShieldAlert,
     hours: '4h',
     color: 'primary',
-    moduleIds: ['cybersecurity_awareness'],
+    moduleIds: ['cybersecurity-awareness'],
   },
 ];
 
