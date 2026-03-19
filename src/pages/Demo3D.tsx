@@ -1183,6 +1183,11 @@ const Demo3D = () => {
               collisions={collisionSystem.current?.getCollisionCount() || 0}
               sprinklerBonusPoints={sprinklerBonusPointsRef.current}
               sprinklerRisksFound={sprinklerRisksFoundRef.current}
+              cyberQuizStats={selectedScenario.id === 'cybersecurity' && cyberQuizTotal > 0 ? {
+                correct: cyberQuizCorrect,
+                total: cyberQuizTotal,
+                bonusPoints: cyberQuizCorrect * 75,
+              } : undefined}
               firePerformance={selectedScenario.type === 'laboratory' && selectedExtinguisher ? {
                 extinguisherType: selectedExtinguisher,
                 firesExtinguished,
