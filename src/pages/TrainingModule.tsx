@@ -224,6 +224,21 @@ const TrainingModule = () => {
           metadata: { module_id: moduleId, xp_earned: sessionXp, score: bossTestScore, max_score: bossTestMaxScore },
         }).then(({ error }) => { if (error) console.error('Notification insert error:', error); });
 
+        // Check if ALL modules are now completed → send congratulations
+        supabase.from('training_progress').select('module_id', { count: 'exact', head: true })
+          .eq('user_id', user.id).eq('status', 'completed')
+          .then(({ count }) => {
+            if (count && count >= 4) {
+              supabase.from('employee_notifications').insert({
+                user_id: user.id,
+                type: 'all_modules_completed',
+                title: '🏆 Formazione completata!',
+                message: 'Hai completato tutti i moduli formativi. Sei idoneo per ricevere l\'attestato di formazione.',
+                metadata: { total_modules: count },
+              });
+            }
+          });
+
         const mp = getModuleProgress(moduleId);
         supabase.functions.invoke('notify-module-completion', {
           body: {
