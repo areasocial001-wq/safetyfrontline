@@ -874,6 +874,7 @@ _Esempi: imbracature anticaduta, respiratori, tute NBC, DPI per lavori in tensio
 import { rischioBassContents } from './training-content-basso';
 import { rischioMedioContents } from './training-content-medio';
 import { rischioAltoContents } from './training-content-alto';
+import { cybersecurityContent } from './training-content-cybersecurity';
 
 export const allModulesContent: ModuleContent[] = [
   modulo1Content,
@@ -883,6 +884,7 @@ export const allModulesContent: ModuleContent[] = [
   ...rischioBassContents,
   ...rischioMedioContents,
   ...rischioAltoContents,
+  cybersecurityContent,
 ];
 
 export const getModuleContent = (moduleId: string): ModuleContent | undefined => {
