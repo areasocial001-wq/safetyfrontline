@@ -15,7 +15,7 @@ import officeModule from "@/assets/office-module.jpg";
 import warehouseModule from "@/assets/warehouse-module.jpg";
 import { QuoteRequestDialog } from "@/components/QuoteRequestDialog";
 
-type TabKey = 'generale' | 'basso' | 'medio' | 'alto' | 'cybersecurity' | 'simulazioni' | 'piattaforma';
+type TabKey = 'generale' | 'basso' | 'medio' | 'alto' | 'ruolo' | 'cybersecurity' | 'simulazioni' | 'piattaforma';
 
 export const Modules = () => {
   const [quoteDialogOpen, setQuoteDialogOpen] = useState(false);
