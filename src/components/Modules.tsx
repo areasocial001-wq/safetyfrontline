@@ -8,13 +8,14 @@ import {
   Cog, FlaskConical, Volume2, Truck, Flame, Heart,
   Box, ArrowUp, Bug, AlertTriangle,
   Bell, Bot, Trophy, Users, FileCheck, Gamepad2,
-  GraduationCap, Target, Lock, ShieldAlert, Wifi, KeyRound, Mail
+  GraduationCap, Target, Lock, ShieldAlert, Wifi, KeyRound, Mail,
+  Briefcase, Crown, Eye
 } from "lucide-react";
 import officeModule from "@/assets/office-module.jpg";
 import warehouseModule from "@/assets/warehouse-module.jpg";
 import { QuoteRequestDialog } from "@/components/QuoteRequestDialog";
 
-type TabKey = 'generale' | 'basso' | 'medio' | 'alto' | 'cybersecurity' | 'simulazioni' | 'piattaforma';
+type TabKey = 'generale' | 'basso' | 'medio' | 'alto' | 'ruolo' | 'cybersecurity' | 'simulazioni' | 'piattaforma';
 
 export const Modules = () => {
   const [quoteDialogOpen, setQuoteDialogOpen] = useState(false);
@@ -25,6 +26,7 @@ export const Modules = () => {
     { key: 'basso', label: 'Rischio Basso', icon: Building2, badge: '4 moduli' },
     { key: 'medio', label: 'Rischio Medio', icon: Cog, badge: '8 moduli' },
     { key: 'alto', label: 'Rischio Alto', icon: AlertTriangle, badge: '8 moduli' },
+    { key: 'ruolo', label: 'Corsi di Ruolo', icon: Crown, badge: '4 corsi' },
     { key: 'cybersecurity', label: 'Cybersecurity', icon: Lock, badge: 'nuovo' },
     { key: 'simulazioni', label: 'Simulazioni 3D', icon: Gamepad2, badge: '4 scenari' },
     { key: 'piattaforma', label: 'Piattaforma', icon: Settings },
@@ -62,6 +64,12 @@ export const Modules = () => {
       { icon: ArrowUp, title: "Lavori in Quota Avanzato", subtitle: "Ponteggi e Funi", description: "Montaggio/smontaggio ponteggi, lavori su fune, sistemi anticaduta avanzati (PiMUS).", color: "primary" },
       { icon: Truck, title: "Movimentazione Meccanica", subtitle: "Carrelli, Gru e Mezzi", description: "Conduzione sicura di carrelli elevatori, gru, piattaforme aeree. Segnaletica.", color: "accent" },
       { icon: Heart, title: "Primo Soccorso Avanzato", subtitle: "Emergenze Industriali", description: "Gestione emergenze in ambienti ad alto rischio, triage, decontaminazione e DAE.", color: "muted" },
+    ],
+    ruolo: [
+      { icon: Briefcase, title: "Lavoratori Specifica", subtitle: "Formazione per Settore", description: "Corso specifico per mansione: analisi rischi settoriali, DPI per ruolo, procedure di emergenza e aggiornamento quinquennale.", color: "primary" },
+      { icon: Crown, title: "RSPP Datore di Lavoro", subtitle: "Art. 34 D.Lgs 81/08", description: "Il DL come RSPP: responsabilità, DVR, gestione rischi, ciclo PDCA, near miss reporting. 16-48 ore per livello di rischio.", color: "destructive" },
+      { icon: Users, title: "RLS", subtitle: "Rappresentante Lavoratori", description: "Corso 32 ore: elezione, attribuzioni art. 50, consultazione preventiva, accesso DVR, ricorso alle autorità competenti.", color: "accent" },
+      { icon: Eye, title: "Corso Preposto", subtitle: "Vigilanza e Intervento", description: "Obblighi aggiornati alla L. 215/2021: vigilanza, intervento diretto, interruzione attività, aggiornamento biennale.", color: "secondary" },
     ],
     cybersecurity: [
       { icon: Mail, title: "Phishing & Social Engineering", subtitle: "Riconoscere le Trappole", description: "Identificare email fraudolente, spear phishing, vishing e tecniche di manipolazione. Scenari interattivi realistici.", color: "destructive" },
@@ -121,7 +129,7 @@ export const Modules = () => {
               I Moduli del Sistema <span className="text-primary">Safety Frontline</span>
             </h2>
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-              24 moduli formativi, 3 simulazioni 3D e una piattaforma completa per la formazione sulla sicurezza nelle PMI italiane.
+              29 moduli formativi, 4 simulazioni 3D e una piattaforma completa per la formazione sulla sicurezza nelle PMI italiane.
             </p>
           </div>
 
@@ -189,7 +197,7 @@ export const Modules = () => {
           {/* Summary Stats */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-12 mb-8">
             {[
-              { value: "25+", label: "Moduli Formativi", icon: GraduationCap },
+              { value: "29+", label: "Moduli Formativi", icon: GraduationCap },
               { value: "4", label: "Simulazioni 3D", icon: Gamepad2 },
               { value: "3", label: "Settori di Rischio", icon: Shield },
               { value: "∞", label: "Personalizzazioni", icon: Settings },

@@ -875,6 +875,10 @@ import { rischioBassContents } from './training-content-basso';
 import { rischioMedioContents } from './training-content-medio';
 import { rischioAltoContents } from './training-content-alto';
 import { cybersecurityContent } from './training-content-cybersecurity';
+import { lavoratoriSpecificaContents } from './training-content-lavoratori-specifica';
+import { rsppDatoreContents } from './training-content-rspp-datore';
+import { rlsContents } from './training-content-rls';
+import { prepostoContents } from './training-content-preposto';
 
 export const allModulesContent: ModuleContent[] = [
   modulo1Content,
@@ -885,6 +889,10 @@ export const allModulesContent: ModuleContent[] = [
   ...rischioMedioContents,
   ...rischioAltoContents,
   cybersecurityContent,
+  ...lavoratoriSpecificaContents,
+  ...rsppDatoreContents,
+  ...rlsContents,
+  ...prepostoContents,
 ];
 
 export const getModuleContent = (moduleId: string): ModuleContent | undefined => {
