@@ -95,6 +95,9 @@ export const EmployeeNotifications = () => {
   const getIcon = (type: string) => {
     switch (type) {
       case 'sector_assignment': return <Shield className="w-4 h-4 text-primary" />;
+      case 'module_completed': return <Trophy className="w-4 h-4 text-yellow-500" />;
+      case 'deadline_reminder': return <Clock className="w-4 h-4 text-destructive" />;
+      case 'all_modules_completed': return <Award className="w-4 h-4 text-emerald-500" />;
       default: return <Bell className="w-4 h-4 text-muted-foreground" />;
     }
   };
