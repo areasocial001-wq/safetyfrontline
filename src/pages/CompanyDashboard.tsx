@@ -263,6 +263,7 @@ const CompanyDashboard = () => {
           <div className="grid lg:grid-cols-3 gap-6">
             {/* Left Column - Employees + Chart */}
             <div className="lg:col-span-2 space-y-6">
+              <EmployeeSectorAssignment companyId={company.id} />
               <EmployeesTable companyId={company.id} />
               <CompletionsByModuleChart companyId={company.id} />
               <ScoreTrendChart companyId={company.id} />
