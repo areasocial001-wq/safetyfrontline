@@ -63,6 +63,14 @@ export const Modules = () => {
       { icon: Truck, title: "Movimentazione Meccanica", subtitle: "Carrelli, Gru e Mezzi", description: "Conduzione sicura di carrelli elevatori, gru, piattaforme aeree. Segnaletica.", color: "accent" },
       { icon: Heart, title: "Primo Soccorso Avanzato", subtitle: "Emergenze Industriali", description: "Gestione emergenze in ambienti ad alto rischio, triage, decontaminazione e DAE.", color: "muted" },
     ],
+    cybersecurity: [
+      { icon: Mail, title: "Phishing & Social Engineering", subtitle: "Riconoscere le Trappole", description: "Identificare email fraudolente, spear phishing, vishing e tecniche di manipolazione. Scenari interattivi realistici.", color: "destructive" },
+      { icon: KeyRound, title: "Password & Autenticazione", subtitle: "Credenziali Sicure", description: "Creare password robuste, usare password manager e autenticazione a due fattori (2FA). Best practice quotidiane.", color: "primary" },
+      { icon: ShieldAlert, title: "Ransomware & Malware", subtitle: "Difesa e Reazione", description: "Come si viene infettati, prevenzione, procedure di emergenza. Numeri e impatto economico sulle PMI italiane.", color: "accent" },
+      { icon: Wifi, title: "Protezione Dati & GDPR", subtitle: "Smart Working Sicuro", description: "Classificazione dati, clean desk policy, VPN, WiFi pubbliche. Obblighi GDPR e sanzioni per le aziende.", color: "secondary" },
+      { icon: Shield, title: "Incident Response", subtitle: "Reagire agli Attacchi", description: "Catena di segnalazione, cosa fare (e non fare) in caso di incidente. Scenari con dialoghi NPC realistici.", color: "muted" },
+      { icon: Trophy, title: "Boss Test Finale", subtitle: "Verifica Cybersecurity", description: "6 domande avanzate su scenari reali: CEO Fraud, baiting, data breach. Punteggio minimo 70% per il certificato.", color: "primary" },
+    ],
     simulazioni: [
       { icon: Package, title: "Safety Run", subtitle: "Rischi Generali 3D", description: "Percorso in prima persona con cadute, inciampi, ordine & pulizia e valutazione rischi in tempo reale.", color: "primary" },
       { icon: Building2, title: "Office Hazard Quest", subtitle: "Uffici & VDT", description: "Simulazione 3D per PMI del terziario: postura, videoterminale, pause, micro-ergonomia.", color: "secondary", image: officeModule },
