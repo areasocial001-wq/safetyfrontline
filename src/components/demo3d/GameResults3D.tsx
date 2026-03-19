@@ -37,6 +37,12 @@ export interface FirePerformanceData {
   }[];
 }
 
+export interface CyberQuizStats {
+  correct: number;
+  total: number;
+  bonusPoints: number;
+}
+
 interface GameResults3DProps {
   scenario: Scenario3D;
   score: number;
