@@ -44,6 +44,9 @@ const SECTION_COUNTS: Record<string, number> = {
   ra_rischi_meccanici_avanzati: 4, ra_rischio_chimico: 3, ra_rischio_biologico: 3, ra_amianto: 2,
   ra_spazi_confinati: 3, ra_lavori_quota: 3, ra_movimentazione_avanzata: 3, ra_atmosfere_esplosive: 2,
   ra_rumore_vibrazioni: 2, ra_radiazioni: 2, ra_emergenze_complesse: 3, ra_cantiere: 3,
+  rspp_dl_giuridico: 7, rspp_dl_gestione_rischi: 6, rspp_dl_tecnico: 5, rspp_dl_relazionale: 5,
+  rls_ruolo_compiti: 6, rls_rischi_valutazione: 5, rls_comunicazione: 5,
+  preposto_ruolo_obblighi: 7, preposto_valutazione_dpi: 6, preposto_emergenze: 6,
 };
 
 // Training path definitions - all independent
