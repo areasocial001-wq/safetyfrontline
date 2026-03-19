@@ -1306,6 +1306,7 @@ const Demo3D = () => {
             riskId={cyberQuizRiskId}
             riskLabel={cyberQuizRiskLabel}
             onClose={(bonusPoints, isCorrect) => {
+              setCyberQuizTotal(prev => prev + 1);
               if (bonusPoints > 0) {
                 setScore(s => s + bonusPoints);
                 setCyberQuizCorrect(prev => prev + 1);
