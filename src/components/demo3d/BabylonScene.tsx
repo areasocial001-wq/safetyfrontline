@@ -116,6 +116,9 @@ export const BabylonScene = ({
     cameraRef.current = ctx.camera;
     const { engine, scene, camera, shadowGenerator } = ctx;
 
+    // Store scenario ID in scene metadata for conditional props
+    scene.metadata = { ...scene.metadata, scenarioId: scenario.id };
+
     // 2. First-person extinguisher (laboratory only)
     if (scenario.type === 'laboratory' && extinguisherType) {
       createFirstPersonExtinguisher(scene, camera, extinguisherType);

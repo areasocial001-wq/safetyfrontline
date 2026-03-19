@@ -38,6 +38,13 @@ export function addEnvironmentalProps(
   } else if (type === 'office') {
     addOfficeProps(scene, quality, shadowGenerator);
   }
+
+  // Add cybersecurity-specific props if scenario ID matches
+  // The scenario ID is encoded in scene metadata
+  const cyberMeta = scene.metadata?.scenarioId;
+  if (cyberMeta === 'cybersecurity') {
+    addCybersecurityProps(scene, quality, shadowGenerator);
+  }
 }
 
 // ============================================================
@@ -1003,4 +1010,154 @@ function addOfficeProps(
   rug.material = rugMat;
 
   console.log('[Office] Full office furnishing complete — desks, chairs, monitors, bookshelves, windows, break area');
+}
+
+// ============================================================
+// CYBERSECURITY OFFICE PROPS — Visual cyber risk indicators
+// ============================================================
+export function addCybersecurityProps(
+  scene: BABYLON.Scene,
+  quality: string,
+  shadowGenerator: BABYLON.ShadowGenerator | null
+) {
+  // --- Post-it notes with "passwords" on desks ---
+  const postItPositions = [
+    { x: -7, z: -4.5, color: new BABYLON.Color3(1, 0.95, 0.3) },   // yellow post-it desk 0
+    { x: 7, z: 5.5, color: new BABYLON.Color3(1, 0.6, 0.8) },      // pink post-it desk 5
+  ];
+
+  postItPositions.forEach((p, i) => {
+    const postIt = BABYLON.MeshBuilder.CreatePlane(`cyber_postit_${i}`, { width: 0.12, height: 0.12 }, scene);
+    postIt.position = new BABYLON.Vector3(p.x + 0.6, 0.79, p.z);
+    postIt.rotation.x = Math.PI / 2;
+    postIt.rotation.y = seededRandom(i * 37) * 0.5 - 0.25;
+    const postItMat = new BABYLON.StandardMaterial(`cyber_postitMat_${i}`, scene);
+    postItMat.diffuseColor = p.color;
+    postItMat.emissiveColor = p.color.scale(0.15);
+    postItMat.specularColor = BABYLON.Color3.Black();
+    postIt.material = postItMat;
+  });
+
+  // --- Unlocked screen glow (emissive screens showing "desktop") ---
+  const unlockedScreenPositions = [
+    { x: 0, z: -5 },    // desk 1 - unlocked
+    { x: 7, z: 5 },     // desk 5 - showing weak password
+  ];
+
+  unlockedScreenPositions.forEach((p, i) => {
+    // Bright screen overlay to show it's "active/unlocked"
+    const screenGlow = BABYLON.MeshBuilder.CreatePlane(`cyber_screenGlow_${i}`, { width: 0.85, height: 0.5 }, scene);
+    screenGlow.position = new BABYLON.Vector3(p.x, 1.25, p.z - 0.33);
+    const glowMat = new BABYLON.StandardMaterial(`cyber_screenGlowMat_${i}`, scene);
+    glowMat.diffuseColor = new BABYLON.Color3(0.2, 0.5, 0.9);
+    glowMat.emissiveColor = new BABYLON.Color3(0.3, 0.6, 1.0);
+    glowMat.alpha = 0.7;
+    glowMat.specularColor = BABYLON.Color3.Black();
+    screenGlow.material = glowMat;
+  });
+
+  // --- Phishing email screen (red-tinted warning screen) ---
+  const phishScreen = BABYLON.MeshBuilder.CreatePlane('cyber_phishScreen', { width: 0.85, height: 0.5 }, scene);
+  phishScreen.position = new BABYLON.Vector3(7, 1.25, -5 - 0.33);
+  const phishMat = new BABYLON.StandardMaterial('cyber_phishMat', scene);
+  phishMat.diffuseColor = new BABYLON.Color3(0.9, 0.15, 0.1);
+  phishMat.emissiveColor = new BABYLON.Color3(0.8, 0.1, 0.05);
+  phishMat.alpha = 0.6;
+  phishMat.specularColor = BABYLON.Color3.Black();
+  phishScreen.material = phishMat;
+
+  // --- USB stick on desk ---
+  const usbBody = BABYLON.MeshBuilder.CreateBox('cyber_usb_body', { width: 0.06, height: 0.015, depth: 0.025 }, scene);
+  usbBody.position = new BABYLON.Vector3(-7 + 0.3, 0.785, 5 + 0.3);
+  const usbMat = new BABYLON.StandardMaterial('cyber_usbMat', scene);
+  usbMat.diffuseColor = new BABYLON.Color3(0.15, 0.15, 0.15);
+  usbBody.material = usbMat;
+
+  const usbConnector = BABYLON.MeshBuilder.CreateBox('cyber_usb_conn', { width: 0.025, height: 0.008, depth: 0.015 }, scene);
+  usbConnector.position = new BABYLON.Vector3(-7 + 0.26, 0.785, 5 + 0.3);
+  const usbConnMat = new BABYLON.StandardMaterial('cyber_usbConnMat', scene);
+  usbConnMat.diffuseColor = new BABYLON.Color3(0.7, 0.7, 0.7);
+  usbConnMat.specularColor = new BABYLON.Color3(0.9, 0.9, 0.9);
+  usbConnector.material = usbConnMat;
+
+  // --- Confidential documents scattered on desk ---
+  const docPositions = [
+    { x: 0, z: 5 },
+  ];
+  docPositions.forEach((dp, i) => {
+    for (let d = 0; d < 3; d++) {
+      const doc = BABYLON.MeshBuilder.CreatePlane(`cyber_doc_${i}_${d}`, { width: 0.21, height: 0.29 }, scene);
+      doc.position = new BABYLON.Vector3(
+        dp.x - 0.5 + d * 0.25,
+        0.79 + d * 0.002,
+        dp.z + 0.2
+      );
+      doc.rotation.x = Math.PI / 2;
+      doc.rotation.y = seededRandom(d * 53 + i) * 0.3 - 0.15;
+      const docMat = new BABYLON.StandardMaterial(`cyber_docMat_${i}_${d}`, scene);
+      docMat.diffuseColor = new BABYLON.Color3(0.95, 0.95, 0.92);
+      docMat.specularColor = BABYLON.Color3.Black();
+      doc.material = docMat;
+    }
+    // Red "CONFIDENZIALE" stamp overlay
+    const stamp = BABYLON.MeshBuilder.CreatePlane(`cyber_stamp_${i}`, { width: 0.15, height: 0.04 }, scene);
+    stamp.position = new BABYLON.Vector3(dp.x - 0.25, 0.80, dp.z + 0.2);
+    stamp.rotation.x = Math.PI / 2;
+    stamp.rotation.z = -0.15;
+    const stampMat = new BABYLON.StandardMaterial(`cyber_stampMat_${i}`, scene);
+    stampMat.diffuseColor = new BABYLON.Color3(0.9, 0.1, 0.1);
+    stampMat.emissiveColor = new BABYLON.Color3(0.3, 0, 0);
+    stampMat.alpha = 0.8;
+    stamp.material = stampMat;
+  });
+
+  // --- Smartphone with hotspot (glowing phone on side table) ---
+  const phone = BABYLON.MeshBuilder.CreateBox('cyber_phone', { width: 0.04, height: 0.008, depth: 0.08 }, scene);
+  phone.position = new BABYLON.Vector3(10, 0.79, -9);
+  const phoneMat = new BABYLON.StandardMaterial('cyber_phoneMat', scene);
+  phoneMat.diffuseColor = new BABYLON.Color3(0.1, 0.1, 0.12);
+  phoneMat.specularColor = new BABYLON.Color3(0.6, 0.6, 0.6);
+  phone.material = phoneMat;
+
+  // Phone screen glow (WiFi indicator)
+  const phoneScreen = BABYLON.MeshBuilder.CreatePlane('cyber_phoneScreen', { width: 0.035, height: 0.06 }, scene);
+  phoneScreen.position = new BABYLON.Vector3(10, 0.795, -9);
+  phoneScreen.rotation.x = Math.PI / 2;
+  const phoneScreenMat = new BABYLON.StandardMaterial('cyber_phoneScreenMat', scene);
+  phoneScreenMat.diffuseColor = new BABYLON.Color3(0.1, 0.8, 0.3);
+  phoneScreenMat.emissiveColor = new BABYLON.Color3(0.05, 0.4, 0.15);
+  phoneScreen.material = phoneScreenMat;
+
+  // --- Printed documents at printer area ---
+  const printerX = -13;
+  const printerZ = -6;
+  for (let p = 0; p < 4; p++) {
+    const printDoc = BABYLON.MeshBuilder.CreatePlane(`cyber_print_${p}`, { width: 0.21, height: 0.29 }, scene);
+    printDoc.position = new BABYLON.Vector3(
+      printerX + seededRandom(p * 71) * 0.3 - 0.15,
+      0.79 + p * 0.002,
+      printerZ + seededRandom(p * 43) * 0.2
+    );
+    printDoc.rotation.x = Math.PI / 2;
+    printDoc.rotation.y = seededRandom(p * 29) * 0.5;
+    const printMat = new BABYLON.StandardMaterial(`cyber_printMat_${p}`, scene);
+    printMat.diffuseColor = new BABYLON.Color3(0.95, 0.95, 0.92);
+    printMat.specularColor = BABYLON.Color3.Black();
+    printDoc.material = printMat;
+  }
+
+  // --- Pulsing warning light for phishing screen ---
+  if (quality !== 'low') {
+    const warnLight = new BABYLON.PointLight('cyber_warnLight', new BABYLON.Vector3(7, 1.5, -5.5), scene);
+    warnLight.diffuse = new BABYLON.Color3(1, 0.2, 0.1);
+    warnLight.intensity = 0.3;
+    warnLight.range = 3;
+
+    // Animate pulsing
+    scene.registerBeforeRender(() => {
+      warnLight.intensity = 0.15 + Math.sin(performance.now() * 0.003) * 0.15;
+    });
+  }
+
+  console.log('[Cybersecurity] Cyber risk visual props added — post-its, unlocked screens, phishing, USB, docs');
 }
