@@ -8,7 +8,7 @@ import {
   Cog, FlaskConical, Volume2, Truck, Flame, Heart,
   Box, ArrowUp, Bug, AlertTriangle,
   Bell, Bot, Trophy, Users, FileCheck, Gamepad2,
-  GraduationCap, Target
+  GraduationCap, Target, Lock, ShieldAlert, Wifi, KeyRound, Mail
 } from "lucide-react";
 import officeModule from "@/assets/office-module.jpg";
 import warehouseModule from "@/assets/warehouse-module.jpg";
