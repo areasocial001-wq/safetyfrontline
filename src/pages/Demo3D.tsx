@@ -55,6 +55,7 @@ import { FireVictoryOverlay } from "@/components/demo3d/FireVictoryOverlay";
 import { FireClassTutorial } from "@/components/demo3d/FireClassTutorial";
 import { FireClassQuiz } from "@/components/demo3d/FireClassQuiz";
 import { ExtinguisherTypeHUD } from "@/components/demo3d/ExtinguisherTypeHUD";
+import { CyberRiskQuiz } from "@/components/demo3d/CyberRiskQuiz";
 import type { FirePerformanceData } from "@/components/demo3d/GameResults3D";
 import { 
   loadUserAchievements, 
@@ -156,6 +157,9 @@ const Demo3D = () => {
   const [totalSpraysUsed, setTotalSpraysUsed] = useState(0);
   const [quizBonusPoints, setQuizBonusPoints] = useState(0);
   const [quizCorrectAnswers, setQuizCorrectAnswers] = useState(0);
+  const [cyberQuizRiskId, setCyberQuizRiskId] = useState<string | null>(null);
+  const [cyberQuizRiskLabel, setCyberQuizRiskLabel] = useState('');
+  const [cyberQuizCorrect, setCyberQuizCorrect] = useState(0);
   const prevChargeRef = useRef(100);
   // Picture-in-Picture replay (two replays for split-screen comparison)
   const [pipReplay1, setPipReplay1] = useState<GameReplay | null>(null);
@@ -580,6 +584,12 @@ const Demo3D = () => {
           setManualRisksFound(prev => prev + 1);
         } else {
           setProceduralRisksFound(prev => prev + 1);
+        }
+
+        // Trigger contextual cyber quiz for cybersecurity scenario
+        if (selectedScenario?.id === 'cybersecurity' && risk) {
+          setCyberQuizRiskId(riskId);
+          setCyberQuizRiskLabel(risk.label);
         }
       }
 
@@ -1289,6 +1299,23 @@ const Demo3D = () => {
                 </div>
               </div>
             )}
+        {/* Cybersecurity Contextual Quiz Overlay */}
+        {cyberQuizRiskId && (
+          <CyberRiskQuiz
+            riskId={cyberQuizRiskId}
+            riskLabel={cyberQuizRiskLabel}
+            onClose={(bonusPoints, isCorrect) => {
+              if (bonusPoints > 0) {
+                setScore(s => s + bonusPoints);
+                setCyberQuizCorrect(prev => prev + 1);
+                setQuizCorrectAnswers(prev => prev + 1);
+                setQuizBonusPoints(prev => prev + bonusPoints);
+              }
+              setCyberQuizRiskId(null);
+              setCyberQuizRiskLabel('');
+            }}
+          />
+        )}
 
 
             <BabylonScene
