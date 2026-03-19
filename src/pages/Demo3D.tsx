@@ -585,6 +585,12 @@ const Demo3D = () => {
         } else {
           setProceduralRisksFound(prev => prev + 1);
         }
+
+        // Trigger contextual cyber quiz for cybersecurity scenario
+        if (selectedScenario?.id === 'cybersecurity' && risk) {
+          setCyberQuizRiskId(riskId);
+          setCyberQuizRiskLabel(risk.label);
+        }
       }
 
       // Check achievements after each risk found
