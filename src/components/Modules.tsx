@@ -38,6 +38,7 @@ export const Modules = () => {
       { icon: AlertCircle, title: "Rischi e Prevenzione", subtitle: "Valutazione dei Rischi", description: "Identificazione dei pericoli, valutazione dei rischi, misure di prevenzione e protezione.", color: "secondary" },
       { icon: Flame, title: "Emergenze", subtitle: "Procedure di Evacuazione", description: "Piano di emergenza, vie di fuga, punti di raccolta, primo soccorso base e antincendio.", color: "destructive" },
       { icon: FileCheck, title: "Test Finale", subtitle: "Verifica Apprendimento", description: "Boss test con domande avanzate, punteggio minimo 70%, certificato digitale con QR code.", color: "accent" },
+      { icon: Briefcase, title: "Lavoratori Specifica", subtitle: "Formazione per Settore", description: "Corso specifico per mansione: analisi rischi settoriali, DPI per ruolo, procedure di emergenza e aggiornamento quinquennale.", color: "muted" },
     ],
     basso: [
       { icon: Monitor, title: "Videoterminali e Postura", subtitle: "Rischi da VDT e Ergonomia", description: "Utilizzo corretto del videoterminale, pause, postura e illuminazione per prevenire disturbi.", color: "primary" },
