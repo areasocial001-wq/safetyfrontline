@@ -79,7 +79,7 @@ const TRAINING_PATHS: TrainingPath[] = [
     icon: Crown,
     hours: '16-48h',
     color: 'destructive',
-    moduleIds: ['rspp_modulo_giuridico', 'rspp_gestione_tecnico', 'rspp_rischi_specifici'],
+    moduleIds: ['rspp_dl_giuridico'],
   },
   {
     id: 'rls',
@@ -89,7 +89,7 @@ const TRAINING_PATHS: TrainingPath[] = [
     icon: Users,
     hours: '32h',
     color: 'accent',
-    moduleIds: ['rls_ruolo_attribuzioni', 'rls_comunicazione', 'rls_rischi_specifici'],
+    moduleIds: ['rls_ruolo_compiti'],
   },
   {
     id: 'preposto',
@@ -99,7 +99,7 @@ const TRAINING_PATHS: TrainingPath[] = [
     icon: Eye,
     hours: '8h',
     color: 'secondary',
-    moduleIds: ['preposto_ruolo_obblighi', 'preposto_valutazione_rischi', 'preposto_comunicazione_gestione'],
+    moduleIds: ['preposto_ruolo_obblighi'],
   },
   {
     id: 'cybersecurity',
@@ -109,7 +109,7 @@ const TRAINING_PATHS: TrainingPath[] = [
     icon: ShieldAlert,
     hours: '4h',
     color: 'primary',
-    moduleIds: ['cybersecurity_awareness'],
+    moduleIds: ['cybersecurity-awareness'],
   },
 ];
 
