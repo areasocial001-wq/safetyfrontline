@@ -85,6 +85,7 @@ export const GameResults3D = ({
   collisions,
   sprinklerBonusPoints,
   sprinklerRisksFound,
+  cyberQuizStats,
   firePerformance,
   onRestart,
   onChangeScenario,
