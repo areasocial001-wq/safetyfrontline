@@ -175,8 +175,9 @@ const EmployeeDashboard = () => {
               <RecentSessions userId={user!.id} />
             </div>
 
-            {/* Right Column - Certificates */}
-            <div>
+            {/* Right Column - Notifications + Certificates */}
+            <div className="space-y-6">
+              <EmployeeNotifications />
               <Certificates userId={user!.id} />
             </div>
           </div>
