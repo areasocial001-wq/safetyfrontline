@@ -89,7 +89,7 @@ const TRAINING_PATHS: TrainingPath[] = [
     icon: Users,
     hours: '32h',
     color: 'accent',
-    moduleIds: ['rls_ruolo_attribuzioni', 'rls_comunicazione', 'rls_rischi_specifici'],
+    moduleIds: ['rls_ruolo_compiti'],
   },
   {
     id: 'preposto',
