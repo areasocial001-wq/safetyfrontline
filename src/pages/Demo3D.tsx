@@ -55,6 +55,7 @@ import { FireVictoryOverlay } from "@/components/demo3d/FireVictoryOverlay";
 import { FireClassTutorial } from "@/components/demo3d/FireClassTutorial";
 import { FireClassQuiz } from "@/components/demo3d/FireClassQuiz";
 import { ExtinguisherTypeHUD } from "@/components/demo3d/ExtinguisherTypeHUD";
+import { CyberRiskQuiz } from "@/components/demo3d/CyberRiskQuiz";
 import type { FirePerformanceData } from "@/components/demo3d/GameResults3D";
 import { 
   loadUserAchievements, 
