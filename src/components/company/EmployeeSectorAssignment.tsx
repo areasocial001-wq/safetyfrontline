@@ -104,6 +104,14 @@ export const EmployeeSectorAssignment = ({ companyId }: Props) => {
         e.user_id === userId ? { ...e, sector, is_self_assigned: false } : e
       ));
       toast.success(`Settore ${SECTOR_INFO[sector].label} assegnato`);
+
+      // Fire-and-forget: notify employee via email
+      supabase.functions.invoke('notify-sector-assignment', {
+        body: { employeeUserId: userId, sector },
+      }).then(({ error: notifErr }) => {
+        if (notifErr) console.error('Notification error:', notifErr);
+        else console.log('Employee notified of sector assignment');
+      });
     } catch (err) {
       console.error(err);
       toast.error('Errore nell\'assegnazione del settore');
