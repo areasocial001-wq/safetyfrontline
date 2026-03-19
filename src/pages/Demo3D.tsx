@@ -1299,6 +1299,23 @@ const Demo3D = () => {
                 </div>
               </div>
             )}
+        {/* Cybersecurity Contextual Quiz Overlay */}
+        {cyberQuizRiskId && (
+          <CyberRiskQuiz
+            riskId={cyberQuizRiskId}
+            riskLabel={cyberQuizRiskLabel}
+            onClose={(bonusPoints, isCorrect) => {
+              if (bonusPoints > 0) {
+                setScore(s => s + bonusPoints);
+                setCyberQuizCorrect(prev => prev + 1);
+                setQuizCorrectAnswers(prev => prev + 1);
+                setQuizBonusPoints(prev => prev + bonusPoints);
+              }
+              setCyberQuizRiskId(null);
+              setCyberQuizRiskLabel('');
+            }}
+          />
+        )}
 
 
             <BabylonScene
