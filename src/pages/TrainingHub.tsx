@@ -4,13 +4,13 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { 
   Scale, Users, Search, Shield, Lock, Play, CheckCircle, 
   Trophy, Star, Clock, ArrowLeft, Zap, Award, Swords, Download,
   Building2, Factory, HardHat, Monitor, Brain, Thermometer,
   Cog, Package, Volume2, FlaskConical, ArrowDown, Flame, Heart,
-  AlertTriangle, Box, ArrowUp, Truck, Bomb, Bug, Radiation, Siren
+  AlertTriangle, Box, ArrowUp, Truck, Bomb, Bug, Radiation, Siren,
+  GraduationCap, Crown, Eye, KeyRound, ShieldAlert
 } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useTrainingProgress } from '@/hooks/useTrainingProgress';
@@ -18,7 +18,6 @@ import { useRiskSector, SECTOR_INFO, RiskSector } from '@/hooks/useRiskSector';
 import { getLevelFromXp, getNextLevel } from '@/data/training-content';
 import { MultiplayerChallenges } from '@/components/training/MultiplayerChallenges';
 import { SectorSelector } from '@/components/training/SectorSelector';
-import { generateTrainingCertificatePDF } from '@/lib/training-certificate';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 
@@ -26,6 +25,7 @@ const ALL_ICONS: Record<string, any> = {
   Scale, Users, Search, Shield, Monitor, Brain, Thermometer, Zap,
   Cog, Package, Volume2, FlaskConical, ArrowDown, Flame, Heart,
   AlertTriangle, Box, ArrowUp, Truck, Bomb, Bug, Radiation, Siren, HardHat,
+  GraduationCap, Crown, Eye, KeyRound, ShieldAlert,
 };
 
 const GENERAL_MODULES = ['giuridico_normativo', 'gestione_organizzazione', 'valutazione_rischi', 'dpi_protezione'];
@@ -46,27 +46,88 @@ const SECTION_COUNTS: Record<string, number> = {
   ra_rumore_vibrazioni: 2, ra_radiazioni: 2, ra_emergenze_complesse: 3, ra_cantiere: 3,
 };
 
+// Training path definitions - all independent
+interface TrainingPath {
+  id: string;
+  title: string;
+  subtitle: string;
+  description: string;
+  icon: any;
+  hours: string;
+  color: string;
+  moduleIds: string[];
+  requiresSector?: boolean;
+}
+
+const TRAINING_PATHS: TrainingPath[] = [
+  {
+    id: 'lavoratori',
+    title: 'Formazione Lavoratori',
+    subtitle: 'Generale + Specifica',
+    description: 'Formazione obbligatoria Art. 37 D.Lgs 81/08. Parte generale (4h) + parte specifica per settore di rischio.',
+    icon: GraduationCap,
+    hours: '4h + 4-12h',
+    color: 'primary',
+    moduleIds: GENERAL_MODULES,
+    requiresSector: true,
+  },
+  {
+    id: 'rspp',
+    title: 'RSPP Datore di Lavoro',
+    subtitle: 'Art. 34 D.Lgs 81/08',
+    description: 'Il DL come RSPP: responsabilità, DVR, gestione rischi, ciclo PDCA, near miss reporting. 16-48 ore.',
+    icon: Crown,
+    hours: '16-48h',
+    color: 'destructive',
+    moduleIds: ['rspp_modulo_giuridico', 'rspp_gestione_tecnico', 'rspp_rischi_specifici'],
+  },
+  {
+    id: 'rls',
+    title: 'RLS',
+    subtitle: 'Rappresentante Lavoratori',
+    description: 'Corso 32 ore: elezione, attribuzioni art. 50, consultazione preventiva, accesso DVR.',
+    icon: Users,
+    hours: '32h',
+    color: 'accent',
+    moduleIds: ['rls_ruolo_attribuzioni', 'rls_comunicazione', 'rls_rischi_specifici'],
+  },
+  {
+    id: 'preposto',
+    title: 'Corso Preposto',
+    subtitle: 'L. 215/2021',
+    description: 'Vigilanza, intervento diretto, interruzione attività pericolose. Aggiornamento biennale obbligatorio.',
+    icon: Eye,
+    hours: '8h',
+    color: 'secondary',
+    moduleIds: ['preposto_ruolo_obblighi', 'preposto_valutazione_rischi', 'preposto_comunicazione_gestione'],
+  },
+  {
+    id: 'cybersecurity',
+    title: 'Cyber Security',
+    subtitle: 'Sicurezza Informatica Aziendale',
+    description: 'Phishing, ransomware, password, GDPR, incident response. Simulazioni 3D interattive.',
+    icon: ShieldAlert,
+    hours: '4h',
+    color: 'primary',
+    moduleIds: ['cybersecurity_awareness'],
+  },
+];
+
 const TrainingHub = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { progress, userXp, loading: progressLoading, getModuleProgress } = useTrainingProgress();
   const { userSector, loading: sectorLoading, selectSector } = useRiskSector();
-  const [modules, setModules] = useState<any[]>([]);
-  const [sectorModules, setSectorModules] = useState<any[]>([]);
-  const [activeTab, setActiveTab] = useState('generale');
+  const [allModules, setAllModules] = useState<any[]>([]);
+  const [expandedPath, setExpandedPath] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchModules = async () => {
       const { data } = await supabase.from('training_modules').select('*').order('module_order');
-      if (data) {
-        setModules(data.filter(m => !m.sector));
-        if (userSector) {
-          setSectorModules(data.filter(m => m.sector === userSector.sector));
-        }
-      }
+      if (data) setAllModules(data);
     };
     fetchModules();
-  }, [userSector]);
+  }, []);
 
   const getModuleStatus = (moduleId: string, index: number, moduleList: string[]): 'locked' | 'available' | 'in_progress' | 'completed' => {
     const mp = getModuleProgress(moduleId);
@@ -81,9 +142,17 @@ const TrainingHub = () => {
   const currentLevel = getLevelFromXp(userXp.total_xp);
   const nextLevel = getNextLevel(userXp.total_xp);
   const xpProgress = nextLevel ? ((userXp.total_xp - currentLevel.minXp) / (nextLevel.minXp - currentLevel.minXp)) * 100 : 100;
-  const completedGeneral = progress.filter(p => GENERAL_MODULES.includes(p.module_id) && p.status === 'completed').length;
-  const allGeneralCompleted = completedGeneral === 4;
+  const totalCompleted = progress.filter(p => p.status === 'completed').length;
   const totalTimeMinutes = Math.round(progress.reduce((sum, p) => sum + p.time_spent_seconds, 0) / 60);
+
+  const getPathProgress = (path: TrainingPath) => {
+    let moduleIds = path.moduleIds;
+    if (path.requiresSector && userSector) {
+      moduleIds = [...moduleIds, ...SECTOR_MODULES[userSector.sector]];
+    }
+    const completed = moduleIds.filter(id => getModuleProgress(id)?.status === 'completed').length;
+    return { completed, total: moduleIds.length };
+  };
 
   if (!user) {
     return (
@@ -159,6 +228,97 @@ const TrainingHub = () => {
     );
   };
 
+  const renderPathCard = (path: TrainingPath) => {
+    const Icon = path.icon;
+    const pathProgress = getPathProgress(path);
+    const isExpanded = expandedPath === path.id;
+    const progressPercent = pathProgress.total > 0 ? (pathProgress.completed / pathProgress.total) * 100 : 0;
+    const isComplete = pathProgress.completed === pathProgress.total && pathProgress.total > 0;
+
+    return (
+      <div key={path.id} className="space-y-4">
+        <Card 
+          className={`cursor-pointer transition-all duration-300 hover:shadow-lg hover:-translate-y-1 ${isExpanded ? 'ring-2 ring-primary/50' : ''} ${isComplete ? 'border-accent/50' : ''}`}
+          onClick={() => setExpandedPath(isExpanded ? null : path.id)}
+        >
+          <CardContent className="p-6">
+            <div className="flex items-start gap-4">
+              <div className={`p-4 rounded-2xl bg-${path.color}/10 shrink-0`}>
+                <Icon className={`w-8 h-8 text-${path.color}`} />
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 mb-1">
+                  <h3 className="text-xl font-bold">{path.title}</h3>
+                  {isComplete && <CheckCircle className="w-5 h-5 text-accent shrink-0" />}
+                </div>
+                <p className="text-sm font-medium text-muted-foreground">{path.subtitle}</p>
+                <p className="text-sm text-muted-foreground mt-2">{path.description}</p>
+                <div className="flex items-center gap-3 mt-3">
+                  <Badge variant="outline"><Clock className="w-3 h-3 mr-1" />{path.hours}</Badge>
+                  <Badge variant="secondary">{pathProgress.completed}/{pathProgress.total} moduli</Badge>
+                </div>
+                {pathProgress.total > 0 && (
+                  <div className="mt-3">
+                    <Progress value={progressPercent} className="h-2" />
+                  </div>
+                )}
+              </div>
+              <div className="shrink-0">
+                <Button variant={isExpanded ? 'default' : 'outline'} size="sm">
+                  {isExpanded ? 'Chiudi' : 'Apri'}
+                </Button>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Expanded modules */}
+        {isExpanded && (
+          <div className="pl-4 border-l-2 border-primary/20 space-y-4">
+            {path.id === 'lavoratori' && (
+              <>
+                {/* General modules */}
+                <h4 className="text-lg font-semibold flex items-center gap-2 mb-2">
+                  <Scale className="w-5 h-5 text-primary" /> Parte Generale (4h)
+                </h4>
+                <div className="grid md:grid-cols-2 gap-4">
+                  {allModules.filter(m => GENERAL_MODULES.includes(m.id)).map((mod, i) => renderModuleCard(mod, i, GENERAL_MODULES))}
+                </div>
+
+                {/* Sector selection + specific modules */}
+                <h4 className="text-lg font-semibold flex items-center gap-2 mt-6 mb-2">
+                  <Shield className="w-5 h-5 text-primary" /> Parte Specifica
+                </h4>
+                {!userSector ? (
+                  <SectorSelector onSelect={async (sector) => {
+                    const err = await selectSector(sector);
+                    if (!err) toast({ title: '✅ Settore selezionato', description: `Formazione Specifica: ${SECTOR_INFO[sector].label}` });
+                  }} />
+                ) : (
+                  <>
+                    <div className="mb-4">
+                      <Badge className="text-sm px-4 py-1">{SECTOR_INFO[userSector.sector].label} • {SECTOR_INFO[userSector.sector].hours} ore</Badge>
+                      <p className="text-xs text-muted-foreground mt-1">{SECTOR_INFO[userSector.sector].description}</p>
+                    </div>
+                    <div className="grid md:grid-cols-2 gap-4">
+                      {allModules.filter(m => SECTOR_MODULES[userSector.sector].includes(m.id)).map((mod, i) => renderModuleCard(mod, i, SECTOR_MODULES[userSector.sector]))}
+                    </div>
+                  </>
+                )}
+              </>
+            )}
+
+            {path.id !== 'lavoratori' && (
+              <div className="grid md:grid-cols-2 gap-4">
+                {allModules.filter(m => path.moduleIds.includes(m.id)).map((mod, i) => renderModuleCard(mod, i, path.moduleIds))}
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    );
+  };
+
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
@@ -169,8 +329,8 @@ const TrainingHub = () => {
           </Button>
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             <div>
-              <h1 className="text-3xl font-bold">Formazione Lavoratori</h1>
-              <p className="text-muted-foreground mt-1">Generale (4h) + Specifica ({userSector ? SECTOR_INFO[userSector.sector].hours : '4-12'}h) • Accordo Stato-Regioni 2025</p>
+              <h1 className="text-3xl font-bold">Piano Formativo</h1>
+              <p className="text-muted-foreground mt-1">Tutti i percorsi sono indipendenti • Accordo Stato-Regioni 2025</p>
             </div>
             <Card className="min-w-[280px]">
               <CardContent className="p-4">
@@ -189,7 +349,7 @@ const TrainingHub = () => {
           <div className="grid grid-cols-3 gap-4 mt-6">
             <div className="flex items-center gap-2">
               <CheckCircle className="w-5 h-5 text-accent" />
-              <div><p className="text-lg font-bold">{completedGeneral}/4</p><p className="text-xs text-muted-foreground">Moduli generali</p></div>
+              <div><p className="text-lg font-bold">{totalCompleted}</p><p className="text-xs text-muted-foreground">Moduli completati</p></div>
             </div>
             <div className="flex items-center gap-2">
               <Clock className="w-5 h-5 text-secondary" />
@@ -203,67 +363,11 @@ const TrainingHub = () => {
         </div>
       </div>
 
-      {/* Content with Tabs */}
+      {/* Training Paths */}
       <div className="container mx-auto px-4 py-8">
-        <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full max-w-lg mx-auto grid-cols-2 mb-8">
-            <TabsTrigger value="generale" className="flex items-center gap-2">
-              <Scale className="w-4 h-4" /> Formazione Generale
-            </TabsTrigger>
-            <TabsTrigger value="specifica" className="flex items-center gap-2" disabled={!allGeneralCompleted && !userSector}>
-              <Shield className="w-4 h-4" /> Formazione Specifica
-              {!allGeneralCompleted && <Lock className="w-3 h-3" />}
-            </TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="generale">
-            <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
-              {modules.map((mod, i) => renderModuleCard(mod, i, GENERAL_MODULES))}
-            </div>
-
-            {allGeneralCompleted && !userSector && (
-              <div className="max-w-4xl mx-auto mt-8">
-                <Card className="border-primary/30 bg-gradient-to-r from-primary/5 to-accent/5">
-                  <CardContent className="p-8 text-center">
-                    <Trophy className="w-12 h-12 text-primary mx-auto mb-4" />
-                    <h2 className="text-2xl font-bold mb-2">🎉 Formazione Generale Completata!</h2>
-                    <p className="text-muted-foreground mb-4">Ora seleziona il tuo settore di rischio per proseguire con la Formazione Specifica.</p>
-                    <Button onClick={() => setActiveTab('specifica')}>
-                      <Shield className="w-4 h-4 mr-2" /> Vai alla Formazione Specifica
-                    </Button>
-                  </CardContent>
-                </Card>
-              </div>
-            )}
-          </TabsContent>
-
-          <TabsContent value="specifica">
-            {!allGeneralCompleted ? (
-              <Card className="max-w-md mx-auto">
-                <CardContent className="p-8 text-center">
-                  <Lock className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-                  <h3 className="text-lg font-bold mb-2">Formazione Generale Richiesta</h3>
-                  <p className="text-muted-foreground">Completa tutti i 4 moduli della Formazione Generale per accedere alla Specifica.</p>
-                </CardContent>
-              </Card>
-            ) : !userSector ? (
-              <SectorSelector onSelect={async (sector) => {
-                const err = await selectSector(sector);
-                if (!err) toast({ title: '✅ Settore selezionato', description: `Formazione Specifica: ${SECTOR_INFO[sector].label}` });
-              }} />
-            ) : (
-              <>
-                <div className="text-center mb-6">
-                  <Badge className="text-sm px-4 py-1">{SECTOR_INFO[userSector.sector].label} • {SECTOR_INFO[userSector.sector].hours} ore</Badge>
-                  <p className="text-xs text-muted-foreground mt-2">{SECTOR_INFO[userSector.sector].description}</p>
-                </div>
-                <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
-                  {sectorModules.map((mod, i) => renderModuleCard(mod, i, SECTOR_MODULES[userSector.sector]))}
-                </div>
-              </>
-            )}
-          </TabsContent>
-        </Tabs>
+        <div className="max-w-4xl mx-auto space-y-6">
+          {TRAINING_PATHS.map(path => renderPathCard(path))}
+        </div>
 
         {/* Multiplayer */}
         <div className="max-w-4xl mx-auto mt-8">
