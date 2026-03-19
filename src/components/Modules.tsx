@@ -22,11 +22,11 @@ export const Modules = () => {
   const [activeTab, setActiveTab] = useState<TabKey>('generale');
 
   const tabs: { key: TabKey; label: string; icon: typeof Shield; badge?: string }[] = [
-    { key: 'generale', label: 'Formazione Generale', icon: GraduationCap, badge: '4 moduli' },
+    { key: 'generale', label: 'Formazione Generale', icon: GraduationCap, badge: '5 moduli' },
     { key: 'basso', label: 'Rischio Basso', icon: Building2, badge: '4 moduli' },
     { key: 'medio', label: 'Rischio Medio', icon: Cog, badge: '8 moduli' },
     { key: 'alto', label: 'Rischio Alto', icon: AlertTriangle, badge: '8 moduli' },
-    { key: 'ruolo', label: 'Corsi di Ruolo', icon: Crown, badge: '4 corsi' },
+    { key: 'ruolo', label: 'Corsi di Ruolo', icon: Crown, badge: '3 corsi' },
     { key: 'cybersecurity', label: 'Cybersecurity', icon: Lock, badge: 'nuovo' },
     { key: 'simulazioni', label: 'Simulazioni 3D', icon: Gamepad2, badge: '4 scenari' },
     { key: 'piattaforma', label: 'Piattaforma', icon: Settings },
@@ -38,6 +38,7 @@ export const Modules = () => {
       { icon: AlertCircle, title: "Rischi e Prevenzione", subtitle: "Valutazione dei Rischi", description: "Identificazione dei pericoli, valutazione dei rischi, misure di prevenzione e protezione.", color: "secondary" },
       { icon: Flame, title: "Emergenze", subtitle: "Procedure di Evacuazione", description: "Piano di emergenza, vie di fuga, punti di raccolta, primo soccorso base e antincendio.", color: "destructive" },
       { icon: FileCheck, title: "Test Finale", subtitle: "Verifica Apprendimento", description: "Boss test con domande avanzate, punteggio minimo 70%, certificato digitale con QR code.", color: "accent" },
+      { icon: Briefcase, title: "Lavoratori Specifica", subtitle: "Formazione per Settore", description: "Corso specifico per mansione: analisi rischi settoriali, DPI per ruolo, procedure di emergenza e aggiornamento quinquennale.", color: "muted" },
     ],
     basso: [
       { icon: Monitor, title: "Videoterminali e Postura", subtitle: "Rischi da VDT e Ergonomia", description: "Utilizzo corretto del videoterminale, pause, postura e illuminazione per prevenire disturbi.", color: "primary" },
@@ -66,7 +67,6 @@ export const Modules = () => {
       { icon: Heart, title: "Primo Soccorso Avanzato", subtitle: "Emergenze Industriali", description: "Gestione emergenze in ambienti ad alto rischio, triage, decontaminazione e DAE.", color: "muted" },
     ],
     ruolo: [
-      { icon: Briefcase, title: "Lavoratori Specifica", subtitle: "Formazione per Settore", description: "Corso specifico per mansione: analisi rischi settoriali, DPI per ruolo, procedure di emergenza e aggiornamento quinquennale.", color: "primary" },
       { icon: Crown, title: "RSPP Datore di Lavoro", subtitle: "Art. 34 D.Lgs 81/08", description: "Il DL come RSPP: responsabilità, DVR, gestione rischi, ciclo PDCA, near miss reporting. 16-48 ore per livello di rischio.", color: "destructive" },
       { icon: Users, title: "RLS", subtitle: "Rappresentante Lavoratori", description: "Corso 32 ore: elezione, attribuzioni art. 50, consultazione preventiva, accesso DVR, ricorso alle autorità competenti.", color: "accent" },
       { icon: Eye, title: "Corso Preposto", subtitle: "Vigilanza e Intervento", description: "Obblighi aggiornati alla L. 215/2021: vigilanza, intervento diretto, interruzione attività, aggiornamento biennale.", color: "secondary" },
