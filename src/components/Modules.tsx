@@ -188,7 +188,7 @@ export const Modules = () => {
           {/* Summary Stats */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-12 mb-8">
             {[
-              { value: "24+", label: "Moduli Formativi", icon: GraduationCap },
+              { value: "25+", label: "Moduli Formativi", icon: GraduationCap },
               { value: "3", label: "Simulazioni 3D", icon: Gamepad2 },
               { value: "3", label: "Settori di Rischio", icon: Shield },
               { value: "∞", label: "Personalizzazioni", icon: Settings },
