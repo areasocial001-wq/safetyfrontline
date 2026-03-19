@@ -129,7 +129,7 @@ export const Modules = () => {
               I Moduli del Sistema <span className="text-primary">Safety Frontline</span>
             </h2>
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-              24 moduli formativi, 3 simulazioni 3D e una piattaforma completa per la formazione sulla sicurezza nelle PMI italiane.
+              29 moduli formativi, 4 simulazioni 3D e una piattaforma completa per la formazione sulla sicurezza nelle PMI italiane.
             </p>
           </div>
 
