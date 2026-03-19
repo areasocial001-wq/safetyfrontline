@@ -160,6 +160,7 @@ const Demo3D = () => {
   const [cyberQuizRiskId, setCyberQuizRiskId] = useState<string | null>(null);
   const [cyberQuizRiskLabel, setCyberQuizRiskLabel] = useState('');
   const [cyberQuizCorrect, setCyberQuizCorrect] = useState(0);
+  const [cyberQuizTotal, setCyberQuizTotal] = useState(0);
   const prevChargeRef = useRef(100);
   // Picture-in-Picture replay (two replays for split-screen comparison)
   const [pipReplay1, setPipReplay1] = useState<GameReplay | null>(null);
@@ -1182,6 +1183,11 @@ const Demo3D = () => {
               collisions={collisionSystem.current?.getCollisionCount() || 0}
               sprinklerBonusPoints={sprinklerBonusPointsRef.current}
               sprinklerRisksFound={sprinklerRisksFoundRef.current}
+              cyberQuizStats={selectedScenario.id === 'cybersecurity' && cyberQuizTotal > 0 ? {
+                correct: cyberQuizCorrect,
+                total: cyberQuizTotal,
+                bonusPoints: cyberQuizCorrect * 75,
+              } : undefined}
               firePerformance={selectedScenario.type === 'laboratory' && selectedExtinguisher ? {
                 extinguisherType: selectedExtinguisher,
                 firesExtinguished,
@@ -1305,6 +1311,7 @@ const Demo3D = () => {
             riskId={cyberQuizRiskId}
             riskLabel={cyberQuizRiskLabel}
             onClose={(bonusPoints, isCorrect) => {
+              setCyberQuizTotal(prev => prev + 1);
               if (bonusPoints > 0) {
                 setScore(s => s + bonusPoints);
                 setCyberQuizCorrect(prev => prev + 1);

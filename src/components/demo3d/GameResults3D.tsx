@@ -17,7 +17,8 @@ import {
   Wind,
   FlaskConical,
   Zap,
-  Package
+  Package,
+  ShieldAlert
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Scenario3D } from "@/data/scenarios3d";
@@ -37,6 +38,12 @@ export interface FirePerformanceData {
   }[];
 }
 
+export interface CyberQuizStats {
+  correct: number;
+  total: number;
+  bonusPoints: number;
+}
+
 interface GameResults3DProps {
   scenario: Scenario3D;
   score: number;
@@ -48,6 +55,7 @@ interface GameResults3DProps {
   collisions: number;
   sprinklerBonusPoints: number;
   sprinklerRisksFound: number;
+  cyberQuizStats?: CyberQuizStats;
   firePerformance?: FirePerformanceData;
   onRestart: () => void;
   onChangeScenario: () => void;
@@ -78,6 +86,7 @@ export const GameResults3D = ({
   collisions,
   sprinklerBonusPoints,
   sprinklerRisksFound,
+  cyberQuizStats,
   firePerformance,
   onRestart,
   onChangeScenario,
@@ -365,6 +374,60 @@ export const GameResults3D = ({
               </div>
             );
           })()}
+        </Card>
+      )}
+
+      {/* 🛡️ Cybersecurity Quiz Recap */}
+      {cyberQuizStats && cyberQuizStats.total > 0 && (
+        <Card className="p-6 border-2 border-violet-300 bg-violet-50 dark:bg-violet-950/10">
+          <div className="flex items-center gap-2 mb-4">
+            <ShieldAlert className="w-5 h-5 text-violet-600" />
+            <h4 className="text-lg font-black text-violet-700">Riepilogo Quiz Cybersecurity</h4>
+          </div>
+
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-3">
+              <div className="text-4xl font-black text-violet-600">
+                {cyberQuizStats.correct}/{cyberQuizStats.total}
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-violet-600">Risposte Corrette</p>
+                <p className="text-xs text-muted-foreground">Quiz contestuali completati</p>
+              </div>
+            </div>
+            <Badge
+              variant="outline"
+              className="text-2xl font-black px-4 py-2 border-2 border-violet-600 text-violet-600"
+            >
+              {Math.round((cyberQuizStats.correct / cyberQuizStats.total) * 100)}%
+            </Badge>
+          </div>
+
+          <div className="h-3 bg-violet-200 rounded-full overflow-hidden mb-3">
+            <div
+              className="h-full bg-violet-600 transition-all duration-500"
+              style={{ width: `${(cyberQuizStats.correct / cyberQuizStats.total) * 100}%` }}
+            />
+          </div>
+
+          <div className="flex items-center justify-between text-sm">
+            <span className="text-muted-foreground">
+              Bonus ottenuto: <span className="font-bold text-violet-600">+{cyberQuizStats.bonusPoints} punti</span>
+            </span>
+            <span className={`font-semibold ${
+              cyberQuizStats.correct === cyberQuizStats.total
+                ? 'text-green-600'
+                : cyberQuizStats.correct >= cyberQuizStats.total * 0.7
+                  ? 'text-violet-600'
+                  : 'text-amber-600'
+            }`}>
+              {cyberQuizStats.correct === cyberQuizStats.total
+                ? '🌟 Perfetto!'
+                : cyberQuizStats.correct >= cyberQuizStats.total * 0.7
+                  ? '✅ Buona preparazione'
+                  : '⚠️ Da approfondire'}
+            </span>
+          </div>
         </Card>
       )}
 
