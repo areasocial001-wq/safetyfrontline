@@ -21,6 +21,7 @@ import TechnicalSheet from "./pages/TechnicalSheet";
 import TrainingHub from "./pages/TrainingHub";
 import TrainingModule from "./pages/TrainingModule";
 import TrainingAnalytics from "./pages/TrainingAnalytics";
+import GuidePage from "./pages/GuidePage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
