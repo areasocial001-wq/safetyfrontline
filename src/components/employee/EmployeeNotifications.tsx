@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Bell, Shield, Check, ChevronRight } from 'lucide-react';
+import { Bell, Shield, Check, ChevronRight, Trophy, Clock, Award } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { Link } from 'react-router-dom';
@@ -95,6 +95,9 @@ export const EmployeeNotifications = () => {
   const getIcon = (type: string) => {
     switch (type) {
       case 'sector_assignment': return <Shield className="w-4 h-4 text-primary" />;
+      case 'module_completed': return <Trophy className="w-4 h-4 text-yellow-500" />;
+      case 'deadline_reminder': return <Clock className="w-4 h-4 text-destructive" />;
+      case 'all_modules_completed': return <Award className="w-4 h-4 text-emerald-500" />;
       default: return <Bell className="w-4 h-4 text-muted-foreground" />;
     }
   };
@@ -159,7 +162,7 @@ export const EmployeeNotifications = () => {
                 <p className="text-xs text-muted-foreground mt-0.5 line-clamp-2">{notif.message}</p>
                 <p className="text-[10px] text-muted-foreground/60 mt-1">{formatDate(notif.created_at)}</p>
               </div>
-              {notif.type === 'sector_assignment' && (
+              {['sector_assignment', 'module_completed', 'deadline_reminder', 'all_modules_completed'].includes(notif.type) && (
                 <Link to="/formazione" onClick={e => e.stopPropagation()}>
                   <ChevronRight className="w-4 h-4 text-muted-foreground" />
                 </Link>
