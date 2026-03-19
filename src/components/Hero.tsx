@@ -443,7 +443,7 @@ export const Hero = () => {
             <NavLink to="/formazione">
               <Button variant="hero" size="xl" className="group shadow-[0_0_30px_rgba(255,103,31,0.3)] hover:shadow-[0_0_40px_rgba(255,103,31,0.5)] transition-all">
                 <GraduationCap className="w-5 h-5 group-hover:scale-110 transition-transform" />
-                Formazione Generale Lavoratori
+                Piano Formativo
                 <Play className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </Button>
             </NavLink>
@@ -451,6 +451,11 @@ export const Hero = () => {
               <Button variant="safe" size="xl" className="group shadow-lg hover:shadow-xl transition-all">
                 <Gamepad2 className="w-5 h-5 group-hover:rotate-12 transition-transform" />
                 Prova il Gioco 3D
+              </Button>
+            </NavLink>
+            <NavLink to="/guida">
+              <Button variant="outline" size="xl" className="group shadow-lg hover:shadow-xl transition-all">
+                📖 Guida Completa
               </Button>
             </NavLink>
             <Button variant="professional" size="xl" onClick={() => setQuoteDialogOpen(true)} className="shadow-lg hover:shadow-xl transition-shadow">
