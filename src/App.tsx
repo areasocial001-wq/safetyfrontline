@@ -21,6 +21,7 @@ import TechnicalSheet from "./pages/TechnicalSheet";
 import TrainingHub from "./pages/TrainingHub";
 import TrainingModule from "./pages/TrainingModule";
 import TrainingAnalytics from "./pages/TrainingAnalytics";
+import GuidePage from "./pages/GuidePage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -50,6 +51,7 @@ const App = () => (
           <Route path="/formazione" element={<TrainingHub />} />
           <Route path="/formazione/:moduleId" element={<TrainingModule />} />
           <Route path="/admin/training-analytics" element={<TrainingAnalytics />} />
+          <Route path="/guida" element={<GuidePage />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
