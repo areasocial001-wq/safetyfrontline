@@ -16,6 +16,7 @@ const Index = () => {
       <ProblemSolution />
       <HowItWorks />
       <Modules />
+      <GamificationEvidence />
       <Compliance />
       <Pricing />
       <Footer />
