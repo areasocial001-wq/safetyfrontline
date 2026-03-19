@@ -8,13 +8,13 @@ import {
   Cog, FlaskConical, Volume2, Truck, Flame, Heart,
   Box, ArrowUp, Bug, AlertTriangle,
   Bell, Bot, Trophy, Users, FileCheck, Gamepad2,
-  GraduationCap, Target
+  GraduationCap, Target, Lock, ShieldAlert, Wifi, KeyRound, Mail
 } from "lucide-react";
 import officeModule from "@/assets/office-module.jpg";
 import warehouseModule from "@/assets/warehouse-module.jpg";
 import { QuoteRequestDialog } from "@/components/QuoteRequestDialog";
 
-type TabKey = 'generale' | 'basso' | 'medio' | 'alto' | 'simulazioni' | 'piattaforma';
+type TabKey = 'generale' | 'basso' | 'medio' | 'alto' | 'cybersecurity' | 'simulazioni' | 'piattaforma';
 
 export const Modules = () => {
   const [quoteDialogOpen, setQuoteDialogOpen] = useState(false);
@@ -25,6 +25,7 @@ export const Modules = () => {
     { key: 'basso', label: 'Rischio Basso', icon: Building2, badge: '4 moduli' },
     { key: 'medio', label: 'Rischio Medio', icon: Cog, badge: '8 moduli' },
     { key: 'alto', label: 'Rischio Alto', icon: AlertTriangle, badge: '8 moduli' },
+    { key: 'cybersecurity', label: 'Cybersecurity', icon: Lock, badge: 'nuovo' },
     { key: 'simulazioni', label: 'Simulazioni 3D', icon: Gamepad2, badge: '3 scenari' },
     { key: 'piattaforma', label: 'Piattaforma', icon: Settings },
   ];
@@ -61,6 +62,14 @@ export const Modules = () => {
       { icon: ArrowUp, title: "Lavori in Quota Avanzato", subtitle: "Ponteggi e Funi", description: "Montaggio/smontaggio ponteggi, lavori su fune, sistemi anticaduta avanzati (PiMUS).", color: "primary" },
       { icon: Truck, title: "Movimentazione Meccanica", subtitle: "Carrelli, Gru e Mezzi", description: "Conduzione sicura di carrelli elevatori, gru, piattaforme aeree. Segnaletica.", color: "accent" },
       { icon: Heart, title: "Primo Soccorso Avanzato", subtitle: "Emergenze Industriali", description: "Gestione emergenze in ambienti ad alto rischio, triage, decontaminazione e DAE.", color: "muted" },
+    ],
+    cybersecurity: [
+      { icon: Mail, title: "Phishing & Social Engineering", subtitle: "Riconoscere le Trappole", description: "Identificare email fraudolente, spear phishing, vishing e tecniche di manipolazione. Scenari interattivi realistici.", color: "destructive" },
+      { icon: KeyRound, title: "Password & Autenticazione", subtitle: "Credenziali Sicure", description: "Creare password robuste, usare password manager e autenticazione a due fattori (2FA). Best practice quotidiane.", color: "primary" },
+      { icon: ShieldAlert, title: "Ransomware & Malware", subtitle: "Difesa e Reazione", description: "Come si viene infettati, prevenzione, procedure di emergenza. Numeri e impatto economico sulle PMI italiane.", color: "accent" },
+      { icon: Wifi, title: "Protezione Dati & GDPR", subtitle: "Smart Working Sicuro", description: "Classificazione dati, clean desk policy, VPN, WiFi pubbliche. Obblighi GDPR e sanzioni per le aziende.", color: "secondary" },
+      { icon: Shield, title: "Incident Response", subtitle: "Reagire agli Attacchi", description: "Catena di segnalazione, cosa fare (e non fare) in caso di incidente. Scenari con dialoghi NPC realistici.", color: "muted" },
+      { icon: Trophy, title: "Boss Test Finale", subtitle: "Verifica Cybersecurity", description: "6 domande avanzate su scenari reali: CEO Fraud, baiting, data breach. Punteggio minimo 70% per il certificato.", color: "primary" },
     ],
     simulazioni: [
       { icon: Package, title: "Safety Run", subtitle: "Rischi Generali 3D", description: "Percorso in prima persona con cadute, inciampi, ordine & pulizia e valutazione rischi in tempo reale.", color: "primary" },
@@ -179,7 +188,7 @@ export const Modules = () => {
           {/* Summary Stats */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-12 mb-8">
             {[
-              { value: "24+", label: "Moduli Formativi", icon: GraduationCap },
+              { value: "25+", label: "Moduli Formativi", icon: GraduationCap },
               { value: "3", label: "Simulazioni 3D", icon: Gamepad2 },
               { value: "3", label: "Settori di Rischio", icon: Shield },
               { value: "∞", label: "Personalizzazioni", icon: Settings },
