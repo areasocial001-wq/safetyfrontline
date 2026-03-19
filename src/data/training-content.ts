@@ -871,11 +871,18 @@ _Esempi: imbracature anticaduta, respiratori, tute NBC, DPI per lavori in tensio
   ],
 };
 
+import { rischioBassContents } from './training-content-basso';
+import { rischioMedioContents } from './training-content-medio';
+import { rischioAltoContents } from './training-content-alto';
+
 export const allModulesContent: ModuleContent[] = [
   modulo1Content,
   modulo2Content,
   modulo3Content,
   modulo4Content,
+  ...rischioBassContents,
+  ...rischioMedioContents,
+  ...rischioAltoContents,
 ];
 
 export const getModuleContent = (moduleId: string): ModuleContent | undefined => {

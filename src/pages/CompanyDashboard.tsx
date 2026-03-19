@@ -26,6 +26,7 @@ import { ModuleCompletionHistory } from '@/components/company/ModuleCompletionHi
 import { CompletionsByModuleChart } from '@/components/company/CompletionsByModuleChart';
 import { ScoreTrendChart } from '@/components/company/ScoreTrendChart';
 import { DashboardPDFExport } from '@/components/company/DashboardPDFExport';
+import { EmployeeSectorAssignment } from '@/components/company/EmployeeSectorAssignment';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
@@ -262,6 +263,7 @@ const CompanyDashboard = () => {
           <div className="grid lg:grid-cols-3 gap-6">
             {/* Left Column - Employees + Chart */}
             <div className="lg:col-span-2 space-y-6">
+              <EmployeeSectorAssignment companyId={company.id} />
               <EmployeesTable companyId={company.id} />
               <CompletionsByModuleChart companyId={company.id} />
               <ScoreTrendChart companyId={company.id} />
