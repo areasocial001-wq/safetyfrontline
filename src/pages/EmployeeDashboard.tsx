@@ -16,6 +16,7 @@ import { ProgressStats } from '@/components/employee/ProgressStats';
 import { ModulesProgress } from '@/components/employee/ModulesProgress';
 import { RecentSessions } from '@/components/employee/RecentSessions';
 import { Certificates } from '@/components/employee/Certificates';
+import { EmployeeNotifications } from '@/components/employee/EmployeeNotifications';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
