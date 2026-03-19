@@ -100,17 +100,27 @@ export const EmployeeSectorAssignment = ({ companyId }: Props) => {
 
       if (error) throw error;
 
+      const empName = employees.find(e => e.user_id === userId)?.full_name || 'Dipendente';
+
       setEmployees(prev => prev.map(e =>
         e.user_id === userId ? { ...e, sector, is_self_assigned: false } : e
       ));
       toast.success(`Settore ${SECTOR_INFO[sector].label} assegnato`);
+
+      // Insert in-app notification for the employee
+      supabase.from('employee_notifications').insert({
+        user_id: userId,
+        type: 'sector_assignment',
+        title: `Settore assegnato: ${SECTOR_INFO[sector].label}`,
+        message: `Ti è stato assegnato il settore ${SECTOR_INFO[sector].label} (${SECTOR_INFO[sector].hours}h). Accedi alla formazione per iniziare i moduli specifici.`,
+        metadata: { sector, assigned_by: user.id },
+      });
 
       // Fire-and-forget: notify employee via email
       supabase.functions.invoke('notify-sector-assignment', {
         body: { employeeUserId: userId, sector },
       }).then(({ error: notifErr }) => {
         if (notifErr) console.error('Notification error:', notifErr);
-        else console.log('Employee notified of sector assignment');
       });
     } catch (err) {
       console.error(err);

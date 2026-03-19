@@ -16,6 +16,7 @@ import { ProgressStats } from '@/components/employee/ProgressStats';
 import { ModulesProgress } from '@/components/employee/ModulesProgress';
 import { RecentSessions } from '@/components/employee/RecentSessions';
 import { Certificates } from '@/components/employee/Certificates';
+import { EmployeeNotifications } from '@/components/employee/EmployeeNotifications';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
@@ -174,8 +175,9 @@ const EmployeeDashboard = () => {
               <RecentSessions userId={user!.id} />
             </div>
 
-            {/* Right Column - Certificates */}
-            <div>
+            {/* Right Column - Notifications + Certificates */}
+            <div className="space-y-6">
+              <EmployeeNotifications />
               <Certificates userId={user!.id} />
             </div>
           </div>
