@@ -48,7 +48,7 @@ export const useUserRole = () => {
         }
         
         const roleValue = data?.role as UserRole || null;
-        console.log('✅ useUserRole - Role set to:', roleValue);
+        if (import.meta.env.DEV) console.log('✅ useUserRole - Role set to:', roleValue);
         setRole(roleValue);
       } catch (error) {
         console.error('❌ useUserRole - Error fetching user role:', error);

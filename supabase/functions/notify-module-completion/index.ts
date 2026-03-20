@@ -43,7 +43,13 @@ serve(async (req: Request) => {
       return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
+    const callerId = claimsData.claims.sub as string;
     const { userId, moduleId, moduleTitle, score, maxScore, xpEarned, timeSpentMinutes }: NotifyRequest = await req.json();
+
+    // Verify the caller is the same user as the userId in the request
+    if (userId !== callerId) {
+      return new Response(JSON.stringify({ error: "Forbidden: cannot notify on behalf of another user" }), { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    }
 
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
