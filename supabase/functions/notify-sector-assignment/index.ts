@@ -52,6 +52,45 @@ serve(async (req: Request) => {
     }
 
     const { employeeUserId, sector }: NotifyRequest = await req.json();
+
+    // Authorization: caller must be platform admin or company admin of the target employee
+    const { data: isAdmin } = await supabase
+      .from('user_roles')
+      .select('role')
+      .eq('user_id', caller.id)
+      .eq('role', 'admin')
+      .maybeSingle();
+
+    if (!isAdmin) {
+      const { data: callerCompany } = await supabase
+        .from('company_users')
+        .select('company_id')
+        .eq('user_id', caller.id)
+        .eq('is_admin', true)
+        .maybeSingle();
+
+      if (!callerCompany) {
+        return new Response(JSON.stringify({ error: "Forbidden" }), {
+          status: 403,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      const { data: employeeInCompany } = await supabase
+        .from('company_users')
+        .select('id')
+        .eq('user_id', employeeUserId)
+        .eq('company_id', callerCompany.company_id)
+        .maybeSingle();
+
+      if (!employeeInCompany) {
+        return new Response(JSON.stringify({ error: "Forbidden" }), {
+          status: 403,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+    }
+
     const sectorInfo = SECTOR_LABELS[sector];
     if (!sectorInfo) {
       return new Response(JSON.stringify({ error: "Invalid sector" }), {
@@ -154,15 +193,15 @@ serve(async (req: Request) => {
       `,
     });
 
-    console.log("Sector assignment notification sent to:", employee.email, emailResponse);
+    console.log("Sector assignment notification sent");
 
-    return new Response(JSON.stringify({ success: true, sentTo: employee.email }), {
+    return new Response(JSON.stringify({ success: true }), {
       status: 200,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (error: any) {
     console.error("Error in notify-sector-assignment:", error);
-    return new Response(JSON.stringify({ error: error.message }), {
+    return new Response(JSON.stringify({ error: "Internal server error" }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
