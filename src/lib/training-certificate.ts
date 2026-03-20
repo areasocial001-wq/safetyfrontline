@@ -162,16 +162,15 @@ export const generateTrainingCertificatePDF = async (data: TrainingCertificateDa
   pdf.setFontSize(7);
   pdf.text('Safety Frontline Platform', w - 55, h - 27, { align: 'center' });
 
-  // Save to DB
+  // Save to DB via secure RPC
   const { data: authUser } = await supabase.auth.getUser();
   if (authUser.user) {
-    await supabase.from('certificates').insert({
-      user_id: authUser.user.id,
-      scenario: 'formazione_generale',
-      certificate_code: certificateCode,
-      score: data.score,
-      completions: 1,
-      verification_hash: verificationHash,
+    await supabase.rpc('issue_certificate', {
+      _scenario: 'formazione_generale',
+      _score: data.score,
+      _certificate_code: certificateCode,
+      _verification_hash: verificationHash,
+      _completions: 1,
     });
   }
 
