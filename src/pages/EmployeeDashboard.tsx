@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useUserRole } from '@/hooks/useUserRole';
-import { Shield, ArrowLeft, User, Play, Home, ChevronRight } from 'lucide-react';
+import { Shield, ArrowLeft, User, Play, Home, ChevronRight, Award } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { 
   Breadcrumb,
