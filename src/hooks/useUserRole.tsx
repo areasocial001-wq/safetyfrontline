@@ -12,7 +12,7 @@ export const useUserRole = () => {
 
   useEffect(() => {
     const fetchRole = async () => {
-      console.log('🔍 useUserRole - fetchRole called with userId:', userId, 'authLoading:', authLoading);
+      if (import.meta.env.DEV) console.log('🔍 useUserRole - fetchRole called, authLoading:', authLoading);
       
       // Se auth sta ancora caricando, aspetta
       if (authLoading) {
