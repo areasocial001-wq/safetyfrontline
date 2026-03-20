@@ -16,7 +16,7 @@ export const useUserRole = () => {
       
       // Se auth sta ancora caricando, aspetta
       if (authLoading) {
-        console.log('⏳ useUserRole - Auth still loading, waiting...');
+        if (import.meta.env.DEV) console.log('⏳ useUserRole - Auth still loading, waiting...');
         return;
       }
       
