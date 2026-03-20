@@ -20,6 +20,7 @@ import { MultiplayerChallenges } from '@/components/training/MultiplayerChalleng
 import { SectorSelector } from '@/components/training/SectorSelector';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
+import { generatePathCertificatePDF } from '@/lib/path-certificate-generator';
 
 const ALL_ICONS: Record<string, any> = {
   Scale, Users, Search, Shield, Monitor, Brain, Thermometer, Zap,
@@ -62,6 +63,7 @@ interface TrainingPath {
   color: string;
   moduleIds: string[];
   requiresSector?: boolean;
+  normativeRef: string;
 }
 
 const TRAINING_PATHS: TrainingPath[] = [
@@ -75,6 +77,7 @@ const TRAINING_PATHS: TrainingPath[] = [
     color: 'primary',
     moduleIds: GENERAL_MODULES,
     requiresSector: true,
+    normativeRef: 'Accordo Stato-Regioni 2025',
   },
   {
     id: 'rspp',
@@ -85,6 +88,7 @@ const TRAINING_PATHS: TrainingPath[] = [
     hours: '16-48h',
     color: 'destructive',
     moduleIds: ['rspp_dl_giuridico', 'rspp_dl_gestione_rischi', 'rspp_dl_tecnico', 'rspp_dl_relazionale'],
+    normativeRef: 'Art. 34 D.Lgs 81/08',
   },
   {
     id: 'rls',
@@ -95,6 +99,7 @@ const TRAINING_PATHS: TrainingPath[] = [
     hours: '32h',
     color: 'accent',
     moduleIds: ['rls_ruolo_compiti', 'rls_rischi_valutazione', 'rls_comunicazione'],
+    normativeRef: 'Art. 37 comma 10-11 D.Lgs 81/08',
   },
   {
     id: 'preposto',
@@ -105,6 +110,7 @@ const TRAINING_PATHS: TrainingPath[] = [
     hours: '8h',
     color: 'secondary',
     moduleIds: ['preposto_ruolo_obblighi', 'preposto_valutazione_dpi', 'preposto_emergenze'],
+    normativeRef: 'Art. 37 D.Lgs 81/08 - L. 215/2021',
   },
   {
     id: 'cybersecurity',
@@ -115,6 +121,7 @@ const TRAINING_PATHS: TrainingPath[] = [
     hours: '4h',
     color: 'primary',
     moduleIds: ['cybersecurity-awareness'],
+    normativeRef: 'Reg. UE 2016/679 (GDPR)',
   },
   {
     id: 'antincendio',
@@ -125,6 +132,7 @@ const TRAINING_PATHS: TrainingPath[] = [
     hours: '4-16h',
     color: 'destructive',
     moduleIds: ['antincendio_prevenzione', 'antincendio_protezione', 'antincendio_esercitazioni'],
+    normativeRef: 'D.M. 2 Settembre 2021',
   },
   {
     id: 'primo_soccorso',
@@ -135,6 +143,7 @@ const TRAINING_PATHS: TrainingPath[] = [
     hours: '12-16h',
     color: 'accent',
     moduleIds: ['primo_soccorso_allertare', 'primo_soccorso_intervento', 'primo_soccorso_conoscenze'],
+    normativeRef: 'D.M. 388/2003',
   },
 ];
 
@@ -286,6 +295,43 @@ const TrainingHub = () => {
                   <div className="mt-3">
                     <Progress value={progressPercent} className="h-2" />
                   </div>
+                )}
+                {isComplete && (
+                  <Button
+                    variant="default"
+                    size="sm"
+                    className="mt-3 w-full"
+                    onClick={async (e) => {
+                      e.stopPropagation();
+                      const moduleIds = path.requiresSector && userSector 
+                        ? [...path.moduleIds, ...SECTOR_MODULES[userSector.sector]] 
+                        : path.moduleIds;
+                      const completedMods = moduleIds.map(id => {
+                        const mp = getModuleProgress(id);
+                        const mod = allModules.find(m => m.id === id);
+                        return { title: mod?.title || id, score: mp?.max_score ? Math.round((mp.score / mp.max_score) * 100) : 0 };
+                      });
+                      const avgScore = Math.round(completedMods.reduce((s, m) => s + m.score, 0) / completedMods.length);
+                      const totalMinutes = Math.round(moduleIds.reduce((s, id) => s + (getModuleProgress(id)?.time_spent_seconds || 0), 0) / 60);
+                      const { data: profile } = await supabase.from('profiles').select('full_name, company_name').eq('id', user!.id).maybeSingle();
+                      await generatePathCertificatePDF({
+                        userName: profile?.full_name || user!.email || 'Utente',
+                        companyName: profile?.company_name || '',
+                        pathId: path.id,
+                        pathTitle: path.title,
+                        pathSubtitle: path.subtitle,
+                        normativeRef: path.normativeRef,
+                        hours: path.hours,
+                        score: avgScore,
+                        totalTimeMinutes: totalMinutes,
+                        completedModules: completedMods,
+                        date: new Date().toLocaleDateString('it-IT', { day: '2-digit', month: 'long', year: 'numeric' }),
+                      });
+                      toast({ title: '🎓 Attestato generato!', description: `Attestato "${path.title}" scaricato con successo.` });
+                    }}
+                  >
+                    <Download className="w-4 h-4 mr-2" /> Scarica Attestato
+                  </Button>
                 )}
               </div>
               <div className="shrink-0">
