@@ -116,6 +116,26 @@ const TRAINING_PATHS: TrainingPath[] = [
     color: 'primary',
     moduleIds: ['cybersecurity-awareness'],
   },
+  {
+    id: 'antincendio',
+    title: 'Addetto Antincendio',
+    subtitle: 'D.M. 2 Settembre 2021',
+    description: 'Incendio e prevenzione, protezione attiva/passiva, procedure di emergenza, esercitazioni pratiche con estintori.',
+    icon: Flame,
+    hours: '4-16h',
+    color: 'destructive',
+    moduleIds: ['antincendio_prevenzione', 'antincendio_protezione', 'antincendio_esercitazioni'],
+  },
+  {
+    id: 'primo_soccorso',
+    title: 'Addetto Primo Soccorso',
+    subtitle: 'D.M. 388/2003',
+    description: 'Allertamento soccorsi, BLS e DAE, gestione traumi, emorragie, ustioni, intossicazioni. Gruppi A, B e C.',
+    icon: Heart,
+    hours: '12-16h',
+    color: 'accent',
+    moduleIds: ['primo_soccorso_allertare', 'primo_soccorso_intervento', 'primo_soccorso_conoscenze'],
+  },
 ];
 
 const TrainingHub = () => {

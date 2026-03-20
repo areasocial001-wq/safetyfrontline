@@ -886,6 +886,12 @@ import { moduloRLS3Content } from './training-content-rls-m3';
 import { prepostoContents } from './training-content-preposto';
 import { moduloP2Content } from './training-content-preposto-m2';
 import { moduloP3Content } from './training-content-preposto-m3';
+import { antincendioPrevenzioneContent } from './training-content-antincendio-m1';
+import { antincendioProtezioneContent } from './training-content-antincendio-m2';
+import { antincendioEsercitazioniContent } from './training-content-antincendio-m3';
+import { primoSoccorsoAllertareContent } from './training-content-primo-soccorso-m1';
+import { primoSoccorsoInterventoContent } from './training-content-primo-soccorso-m2';
+import { primoSoccorsoConoscenzeContent } from './training-content-primo-soccorso-m3';
 
 export const allModulesContent: ModuleContent[] = [
   modulo1Content,
@@ -907,6 +913,12 @@ export const allModulesContent: ModuleContent[] = [
   ...prepostoContents,
   moduloP2Content,
   moduloP3Content,
+  antincendioPrevenzioneContent as any,
+  antincendioProtezioneContent as any,
+  antincendioEsercitazioniContent as any,
+  primoSoccorsoAllertareContent as any,
+  primoSoccorsoInterventoContent as any,
+  primoSoccorsoConoscenzeContent as any,
 ];
 
 export const getModuleContent = (moduleId: string): ModuleContent | undefined => {
