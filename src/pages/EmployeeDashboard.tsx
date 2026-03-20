@@ -123,12 +123,20 @@ const EmployeeDashboard = () => {
                 <p className="text-sm text-muted-foreground">Dashboard Personale</p>
               </div>
             </div>
-            <Link to="/demo">
-              <Button variant="hero" className="gap-2">
-                <Play className="w-4 h-4" />
-                Nuova Sessione
-              </Button>
-            </Link>
+            <div className="flex items-center gap-2">
+              <Link to="/i-miei-attestati">
+                <Button variant="outline" className="gap-2">
+                  <Award className="w-4 h-4" />
+                  I Miei Attestati
+                </Button>
+              </Link>
+              <Link to="/demo">
+                <Button variant="hero" className="gap-2">
+                  <Play className="w-4 h-4" />
+                  Nuova Sessione
+                </Button>
+              </Link>
+            </div>
           </div>
 
           {/* Breadcrumb Navigation */}
