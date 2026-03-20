@@ -32,7 +32,7 @@ export const useUserRole = () => {
       setLoading(true);
 
       try {
-        console.log('📡 useUserRole - Fetching role from database for userId:', userId);
+        if (import.meta.env.DEV) console.log('📡 useUserRole - Fetching role from database');
         
         const { data, error } = await supabase
           .from('user_roles')
