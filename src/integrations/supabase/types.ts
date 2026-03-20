@@ -977,6 +977,16 @@ export type Database = {
         }
         Returns: boolean
       }
+      issue_certificate: {
+        Args: {
+          _certificate_code: string
+          _completions?: number
+          _scenario: string
+          _score: number
+          _verification_hash: string
+        }
+        Returns: string
+      }
     }
     Enums: {
       demo_scenario: "office" | "warehouse" | "general"
