@@ -22,7 +22,7 @@ export const useUserRole = () => {
       
       // Se auth ha finito ma non c'è userId, allora l'utente non è loggato
       if (!userId) {
-        console.log('⚠️ useUserRole - No userId after auth completed, user not logged in');
+        if (import.meta.env.DEV) console.log('⚠️ useUserRole - No userId, user not logged in');
         setRole(null);
         setLoading(false);
         return;
