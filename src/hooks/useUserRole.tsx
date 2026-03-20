@@ -12,17 +12,17 @@ export const useUserRole = () => {
 
   useEffect(() => {
     const fetchRole = async () => {
-      console.log('🔍 useUserRole - fetchRole called with userId:', userId, 'authLoading:', authLoading);
+      if (import.meta.env.DEV) console.log('🔍 useUserRole - fetchRole called, authLoading:', authLoading);
       
       // Se auth sta ancora caricando, aspetta
       if (authLoading) {
-        console.log('⏳ useUserRole - Auth still loading, waiting...');
+        if (import.meta.env.DEV) console.log('⏳ useUserRole - Auth still loading, waiting...');
         return;
       }
       
       // Se auth ha finito ma non c'è userId, allora l'utente non è loggato
       if (!userId) {
-        console.log('⚠️ useUserRole - No userId after auth completed, user not logged in');
+        if (import.meta.env.DEV) console.log('⚠️ useUserRole - No userId, user not logged in');
         setRole(null);
         setLoading(false);
         return;
@@ -32,7 +32,7 @@ export const useUserRole = () => {
       setLoading(true);
 
       try {
-        console.log('📡 useUserRole - Fetching role from database for userId:', userId);
+        if (import.meta.env.DEV) console.log('📡 useUserRole - Fetching role from database');
         
         const { data, error } = await supabase
           .from('user_roles')
@@ -40,7 +40,7 @@ export const useUserRole = () => {
           .eq('user_id', userId)
           .maybeSingle();
         
-        console.log('📊 useUserRole - Query result:', { data, error });
+        if (import.meta.env.DEV) console.log('📊 useUserRole - Query result:', { data, error });
         
         if (error) {
           console.error('❌ useUserRole - Error from Supabase:', error);
@@ -48,7 +48,7 @@ export const useUserRole = () => {
         }
         
         const roleValue = data?.role as UserRole || null;
-        console.log('✅ useUserRole - Role set to:', roleValue);
+        if (import.meta.env.DEV) console.log('✅ useUserRole - Role set to:', roleValue);
         setRole(roleValue);
       } catch (error) {
         console.error('❌ useUserRole - Error fetching user role:', error);

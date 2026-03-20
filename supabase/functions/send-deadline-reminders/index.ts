@@ -4,7 +4,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.1";
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type",
+    "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
 serve(async (req: Request) => {
@@ -15,7 +15,46 @@ serve(async (req: Request) => {
   try {
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+    const supabaseAnonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
+
+    // Auth check - require authenticated admin user
+    const authHeader = req.headers.get("Authorization");
+    if (!authHeader?.startsWith("Bearer ")) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401,
+        headers: { "Content-Type": "application/json", ...corsHeaders },
+      });
+    }
+
+    const authSupabase = createClient(supabaseUrl, supabaseAnonKey, {
+      global: { headers: { Authorization: authHeader } },
+    });
+    const token = authHeader.replace("Bearer ", "");
+    const { data: claimsData, error: claimsError } = await authSupabase.auth.getClaims(token);
+    if (claimsError || !claimsData?.claims) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401,
+        headers: { "Content-Type": "application/json", ...corsHeaders },
+      });
+    }
+
+    const callerId = claimsData.claims.sub as string;
+
+    // Verify caller is admin
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
+    const { data: roleData } = await supabase
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", callerId)
+      .eq("role", "admin")
+      .maybeSingle();
+
+    if (!roleData) {
+      return new Response(JSON.stringify({ error: "Forbidden: admin role required" }), {
+        status: 403,
+        headers: { "Content-Type": "application/json", ...corsHeaders },
+      });
+    }
 
     // Get mandatory modules with deadlines approaching (within 7 days)
     const sevenDaysFromNow = new Date();
@@ -48,7 +87,6 @@ serve(async (req: Request) => {
     let remindersSent = 0;
 
     for (const mm of mandatoryModules) {
-      // Get employees of this company
       const { data: companyEmployees } = await supabase
         .from("company_users")
         .select("user_id")
@@ -58,7 +96,6 @@ serve(async (req: Request) => {
       if (!companyEmployees) continue;
 
       for (const emp of companyEmployees) {
-        // Check if employee already completed this module
         const { data: progress } = await supabase
           .from("training_progress")
           .select("status")
@@ -68,7 +105,6 @@ serve(async (req: Request) => {
 
         if (progress?.status === "completed") continue;
 
-        // Check if we already sent a reminder today
         const today = new Date().toISOString().split("T")[0];
         const { count } = await supabase
           .from("employee_notifications")
@@ -104,7 +140,7 @@ serve(async (req: Request) => {
     });
   } catch (error: any) {
     console.error("Error in send-deadline-reminders:", error);
-    return new Response(JSON.stringify({ error: error.message }), {
+    return new Response(JSON.stringify({ error: "Internal server error" }), {
       status: 500,
       headers: { "Content-Type": "application/json", ...corsHeaders },
     });
