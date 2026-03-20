@@ -48,9 +48,25 @@ const handler = async (req: Request): Promise<Response> => {
       return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
-    console.log("Starting training reminders job...");
-    
+    const callerId = claimsData.claims.sub as string;
+
+    // Verify caller is admin
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
+    const { data: roleData } = await supabase
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", callerId)
+      .eq("role", "admin")
+      .maybeSingle();
+
+    if (!roleData) {
+      return new Response(JSON.stringify({ error: "Forbidden: admin role required" }), {
+        status: 403,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    console.log("Starting training reminders job...");
 
     // Get all employees (users with 'employee' role)
     const { data: employeeRoles, error: rolesError } = await supabase
