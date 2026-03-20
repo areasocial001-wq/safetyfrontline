@@ -62,6 +62,7 @@ interface TrainingPath {
   color: string;
   moduleIds: string[];
   requiresSector?: boolean;
+  normativeRef: string;
 }
 
 const TRAINING_PATHS: TrainingPath[] = [
