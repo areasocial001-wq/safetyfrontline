@@ -76,6 +76,7 @@ const TRAINING_PATHS: TrainingPath[] = [
     color: 'primary',
     moduleIds: GENERAL_MODULES,
     requiresSector: true,
+    normativeRef: 'Accordo Stato-Regioni 2025',
   },
   {
     id: 'rspp',
@@ -86,6 +87,7 @@ const TRAINING_PATHS: TrainingPath[] = [
     hours: '16-48h',
     color: 'destructive',
     moduleIds: ['rspp_dl_giuridico', 'rspp_dl_gestione_rischi', 'rspp_dl_tecnico', 'rspp_dl_relazionale'],
+    normativeRef: 'Art. 34 D.Lgs 81/08',
   },
   {
     id: 'rls',
@@ -96,6 +98,7 @@ const TRAINING_PATHS: TrainingPath[] = [
     hours: '32h',
     color: 'accent',
     moduleIds: ['rls_ruolo_compiti', 'rls_rischi_valutazione', 'rls_comunicazione'],
+    normativeRef: 'Art. 37 comma 10-11 D.Lgs 81/08',
   },
   {
     id: 'preposto',
@@ -106,6 +109,7 @@ const TRAINING_PATHS: TrainingPath[] = [
     hours: '8h',
     color: 'secondary',
     moduleIds: ['preposto_ruolo_obblighi', 'preposto_valutazione_dpi', 'preposto_emergenze'],
+    normativeRef: 'Art. 37 D.Lgs 81/08 - L. 215/2021',
   },
   {
     id: 'cybersecurity',
@@ -116,6 +120,7 @@ const TRAINING_PATHS: TrainingPath[] = [
     hours: '4h',
     color: 'primary',
     moduleIds: ['cybersecurity-awareness'],
+    normativeRef: 'Reg. UE 2016/679 (GDPR)',
   },
   {
     id: 'antincendio',
@@ -126,6 +131,7 @@ const TRAINING_PATHS: TrainingPath[] = [
     hours: '4-16h',
     color: 'destructive',
     moduleIds: ['antincendio_prevenzione', 'antincendio_protezione', 'antincendio_esercitazioni'],
+    normativeRef: 'D.M. 2 Settembre 2021',
   },
   {
     id: 'primo_soccorso',
@@ -136,6 +142,7 @@ const TRAINING_PATHS: TrainingPath[] = [
     hours: '12-16h',
     color: 'accent',
     moduleIds: ['primo_soccorso_allertare', 'primo_soccorso_intervento', 'primo_soccorso_conoscenze'],
+    normativeRef: 'D.M. 388/2003',
   },
 ];
 
