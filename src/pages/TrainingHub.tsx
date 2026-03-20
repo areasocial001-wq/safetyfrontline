@@ -10,7 +10,7 @@ import {
   Building2, Factory, HardHat, Monitor, Brain, Thermometer,
   Cog, Package, Volume2, FlaskConical, ArrowDown, Flame, Heart,
   AlertTriangle, Box, ArrowUp, Truck, Bomb, Bug, Radiation, Siren,
-  GraduationCap, Crown, Eye, KeyRound, ShieldAlert
+  GraduationCap, Crown, Eye, KeyRound, ShieldAlert, Cross
 } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useTrainingProgress } from '@/hooks/useTrainingProgress';
@@ -25,7 +25,7 @@ const ALL_ICONS: Record<string, any> = {
   Scale, Users, Search, Shield, Monitor, Brain, Thermometer, Zap,
   Cog, Package, Volume2, FlaskConical, ArrowDown, Flame, Heart,
   AlertTriangle, Box, ArrowUp, Truck, Bomb, Bug, Radiation, Siren, HardHat,
-  GraduationCap, Crown, Eye, KeyRound, ShieldAlert,
+  GraduationCap, Crown, Eye, KeyRound, ShieldAlert, Cross,
 };
 
 const GENERAL_MODULES = ['giuridico_normativo', 'gestione_organizzazione', 'valutazione_rischi', 'dpi_protezione'];
@@ -47,6 +47,8 @@ const SECTION_COUNTS: Record<string, number> = {
   rspp_dl_giuridico: 7, rspp_dl_gestione_rischi: 6, rspp_dl_tecnico: 5, rspp_dl_relazionale: 5,
   rls_ruolo_compiti: 6, rls_rischi_valutazione: 5, rls_comunicazione: 5,
   preposto_ruolo_obblighi: 7, preposto_valutazione_dpi: 6, preposto_emergenze: 6,
+  antincendio_prevenzione: 5, antincendio_protezione: 5, antincendio_esercitazioni: 3,
+  primo_soccorso_allertare: 4, primo_soccorso_intervento: 5, primo_soccorso_conoscenze: 5,
 };
 
 // Training path definitions - all independent
@@ -113,6 +115,26 @@ const TRAINING_PATHS: TrainingPath[] = [
     hours: '4h',
     color: 'primary',
     moduleIds: ['cybersecurity-awareness'],
+  },
+  {
+    id: 'antincendio',
+    title: 'Addetto Antincendio',
+    subtitle: 'D.M. 2 Settembre 2021',
+    description: 'Incendio e prevenzione, protezione attiva/passiva, procedure di emergenza, esercitazioni pratiche con estintori.',
+    icon: Flame,
+    hours: '4-16h',
+    color: 'destructive',
+    moduleIds: ['antincendio_prevenzione', 'antincendio_protezione', 'antincendio_esercitazioni'],
+  },
+  {
+    id: 'primo_soccorso',
+    title: 'Addetto Primo Soccorso',
+    subtitle: 'D.M. 388/2003',
+    description: 'Allertamento soccorsi, BLS e DAE, gestione traumi, emorragie, ustioni, intossicazioni. Gruppi A, B e C.',
+    icon: Heart,
+    hours: '12-16h',
+    color: 'accent',
+    moduleIds: ['primo_soccorso_allertare', 'primo_soccorso_intervento', 'primo_soccorso_conoscenze'],
   },
 ];
 
