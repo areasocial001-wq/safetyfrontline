@@ -22,6 +22,7 @@ import TrainingHub from "./pages/TrainingHub";
 import TrainingModule from "./pages/TrainingModule";
 import TrainingAnalytics from "./pages/TrainingAnalytics";
 import GuidePage from "./pages/GuidePage";
+import MyCertificates from "./pages/MyCertificates";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -52,6 +53,7 @@ const App = () => (
           <Route path="/formazione/:moduleId" element={<TrainingModule />} />
           <Route path="/admin/training-analytics" element={<TrainingAnalytics />} />
           <Route path="/guida" element={<GuidePage />} />
+          <Route path="/i-miei-attestati" element={<MyCertificates />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
