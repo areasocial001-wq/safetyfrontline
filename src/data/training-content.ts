@@ -913,12 +913,12 @@ export const allModulesContent: ModuleContent[] = [
   ...prepostoContents,
   moduloP2Content,
   moduloP3Content,
-  antincendioPrevenzioneContent as any,
-  antincendioProtezioneContent as any,
-  antincendioEsercitazioniContent as any,
-  primoSoccorsoAllertareContent as any,
-  primoSoccorsoInterventoContent as any,
-  primoSoccorsoConoscenzeContent as any,
+  antincendioPrevenzioneContent,
+  antincendioProtezioneContent,
+  antincendioEsercitazioniContent,
+  primoSoccorsoAllertareContent,
+  primoSoccorsoInterventoContent,
+  primoSoccorsoConoscenzeContent,
 ];
 
 export const getModuleContent = (moduleId: string): ModuleContent | undefined => {

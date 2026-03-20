@@ -48,8 +48,8 @@ const SECTION_COUNTS: Record<string, number> = {
   rspp_dl_giuridico: 7, rspp_dl_gestione_rischi: 6, rspp_dl_tecnico: 5, rspp_dl_relazionale: 5,
   rls_ruolo_compiti: 6, rls_rischi_valutazione: 5, rls_comunicazione: 5,
   preposto_ruolo_obblighi: 7, preposto_valutazione_dpi: 6, preposto_emergenze: 6,
-  antincendio_prevenzione: 5, antincendio_protezione: 5, antincendio_esercitazioni: 3,
-  primo_soccorso_allertare: 4, primo_soccorso_intervento: 5, primo_soccorso_conoscenze: 5,
+  antincendio_prevenzione: 9, antincendio_protezione: 12, antincendio_esercitazioni: 8,
+  primo_soccorso_allertare: 10, primo_soccorso_intervento: 12, primo_soccorso_conoscenze: 12,
 };
 
 // Training path definitions - all independent

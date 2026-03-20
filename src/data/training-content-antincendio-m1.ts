@@ -1,9 +1,12 @@
-export const antincendioPrevenzioneContent = {
+import type { ModuleContent } from './training-content';
+
+export const antincendioPrevenzioneContent: ModuleContent = {
   moduleId: 'antincendio_prevenzione',
   sections: [
     {
-      id: 'fire_chemistry',
+      id: 'ai1_fire_chemistry',
       title: 'Il Triangolo del Fuoco',
+      type: 'lesson',
       content: `La combustione è una reazione chimica di ossidazione sufficientemente rapida da produrre calore e generalmente una fiamma. Per avere un incendio servono tre elementi simultaneamente presenti, rappresentati dal **triangolo del fuoco**:
 
 - **Combustibile**: qualsiasi sostanza in grado di bruciare (legno, carta, liquidi infiammabili, gas)
@@ -11,17 +14,31 @@ export const antincendioPrevenzioneContent = {
 - **Energia di innesco**: fonte di calore sufficiente ad avviare la reazione (fiamma, scintilla, surriscaldamento)
 
 Rimuovendo anche solo uno di questi elementi, la combustione si interrompe. Questo principio è alla base di tutte le strategie di spegnimento.`,
-      duration_minutes: 8,
-      quiz: {
-        question: 'Quali sono i tre elementi del triangolo del fuoco?',
-        options: ['Combustibile, comburente, energia di innesco', 'Fumo, fiamma, calore', 'Ossigeno, azoto, carbonio', 'Vapore, gas, polvere'],
-        correct: 0,
-        explanation: 'Il triangolo del fuoco è composto da combustibile, comburente (ossigeno) ed energia di innesco.'
-      }
+      minTimeSeconds: 60,
+      xpReward: 20,
     },
     {
-      id: 'fire_classes',
+      id: 'ai1_quiz_chemistry',
+      title: 'Verifica: Triangolo del Fuoco',
+      type: 'quiz',
+      questions: [
+        {
+          id: 'ai1_q1',
+          question: 'Quali sono i tre elementi del triangolo del fuoco?',
+          options: ['Combustibile, comburente, energia di innesco', 'Fumo, fiamma, calore', 'Ossigeno, azoto, carbonio', 'Vapore, gas, polvere'],
+          correctIndex: 0,
+          explanation: 'Il triangolo del fuoco è composto da combustibile, comburente (ossigeno) ed energia di innesco.',
+          xpReward: 15,
+          difficulty: 'easy',
+        },
+      ],
+      minTimeSeconds: 30,
+      xpReward: 10,
+    },
+    {
+      id: 'ai1_fire_classes',
       title: 'Classi di Incendio',
+      type: 'lesson',
       content: `Gli incendi vengono classificati in base alla natura del combustibile:
 
 | Classe | Combustibile | Esempi |
@@ -33,116 +50,178 @@ Rimuovendo anche solo uno di questi elementi, la combustione si interrompe. Ques
 | **F** | Oli da cucina | Grassi e oli per cottura |
 
 La corretta classificazione è fondamentale per scegliere l'agente estinguente appropriato. Usare l'estinguente sbagliato può essere inefficace o addirittura pericoloso.`,
-      duration_minutes: 8,
-      quiz: {
-        question: 'Un incendio di benzina appartiene alla classe:',
-        options: ['Classe A', 'Classe B', 'Classe C', 'Classe D'],
-        correct: 1,
-        explanation: 'La classe B comprende gli incendi di liquidi infiammabili come benzina, alcol e solventi.'
-      }
+      minTimeSeconds: 60,
+      xpReward: 20,
     },
     {
-      id: 'prevention_measures',
+      id: 'ai1_quiz_classes',
+      title: 'Verifica: Classi di Incendio',
+      type: 'quiz',
+      questions: [
+        {
+          id: 'ai1_q2',
+          question: 'Un incendio di benzina appartiene alla classe:',
+          options: ['Classe A', 'Classe B', 'Classe C', 'Classe D'],
+          correctIndex: 1,
+          explanation: 'La classe B comprende gli incendi di liquidi infiammabili come benzina, alcol e solventi.',
+          xpReward: 15,
+          difficulty: 'easy',
+        },
+      ],
+      minTimeSeconds: 30,
+      xpReward: 10,
+    },
+    {
+      id: 'ai1_prevention',
       title: 'Misure di Prevenzione Incendi',
+      type: 'lesson',
       content: `Le misure di prevenzione mirano a **ridurre la probabilità** che si verifichi un incendio:
 
 **Misure tecniche:**
 - Impianti elettrici a norma e manutenuti
-- Corretta conservazione di sostanze infiammabili
-- Impianti di rilevazione e allarme
+- Corretta classificazione delle aree a rischio
 - Ventilazione adeguata dei locali
+- Separazione e isolamento delle aree a rischio
 
 **Misure organizzative:**
-- Formazione del personale
 - Divieto di fumo nelle aree a rischio
-- Procedure per lavori a caldo (permessi di lavoro)
-- Controlli periodici e manutenzione programmata
+- Corretta gestione dei rifiuti combustibili
+- Manutenzione programmata degli impianti
+- Permessi di lavoro a caldo (hot work permit)
+- Ordine e pulizia dei luoghi di lavoro
 
 **Misure comportamentali:**
-- Non sovraccaricare prese elettriche
-- Mantenere ordine e pulizia
-- Segnalare anomalie e malfunzionamenti
-- Rispettare la segnaletica di sicurezza`,
-      duration_minutes: 8,
-      quiz: {
-        question: 'Quale tra queste è una misura di prevenzione incendi?',
-        options: ['Usare l\'estintore', 'Attivare l\'allarme durante un incendio', 'Manutenzione programmata degli impianti elettrici', 'Evacuare l\'edificio'],
-        correct: 2,
-        explanation: 'La manutenzione programmata è una misura preventiva che riduce la probabilità di incendio.'
-      }
+- Non sovraccaricare le prese elettriche
+- Non ostruire le vie di fuga
+- Segnalare immediatamente anomalie
+- Non lasciare incustodite fiamme libere`,
+      minTimeSeconds: 60,
+      xpReward: 20,
     },
     {
-      id: 'extinguishing_agents',
-      title: 'Sostanze Estinguenti',
-      content: `Ogni agente estinguente agisce rimuovendo uno o più elementi del triangolo del fuoco:
-
-**Acqua** — Azione di raffreddamento. Adatta per classe A. MAI su impianti elettrici o classe D.
-
-**Schiuma** — Soffocamento e raffreddamento. Efficace su classe A e B.
-
-**Polvere** — Inibizione chimica della combustione. Versatile (ABC), ma lascia residui e riduce la visibilità.
-
-**CO₂ (anidride carbonica)** — Soffocamento e leggero raffreddamento. Ideale per apparecchiature elettriche e ambienti chiusi. Non lascia residui.
-
-**Agenti puliti (gas inerti)** — Soffocamento. Per protezione di server room, archivi, beni di valore.`,
-      duration_minutes: 7,
-      quiz: {
-        question: 'Quale agente estinguente è più adatto per un incendio su apparecchiature elettriche?',
-        options: ['Acqua', 'Schiuma', 'CO₂', 'Sabbia'],
-        correct: 2,
-        explanation: 'Il CO₂ non conduce elettricità e non lascia residui, ideale per apparecchiature elettriche.'
-      }
+      id: 'ai1_quiz_prevention',
+      title: 'Verifica: Prevenzione',
+      type: 'quiz',
+      questions: [
+        {
+          id: 'ai1_q3',
+          question: 'Quale delle seguenti NON è una misura di prevenzione incendi?',
+          options: ['Manutenzione degli impianti elettrici', 'Installazione di estintori', 'Divieto di fumo in aree a rischio', 'Corretta gestione dei rifiuti'],
+          correctIndex: 1,
+          explanation: 'L\'installazione di estintori è una misura di PROTEZIONE (intervento), non di prevenzione (riduzione della probabilità).',
+          xpReward: 15,
+          difficulty: 'medium',
+        },
+      ],
+      minTimeSeconds: 30,
+      xpReward: 10,
     },
     {
-      id: 'fire_dynamics',
-      title: 'Dinamica dell\'Incendio',
-      content: `Un incendio si sviluppa attraverso fasi caratteristiche:
+      id: 'ai1_products_combustion',
+      title: 'Prodotti della Combustione',
+      type: 'lesson',
+      content: `La combustione produce sostanze pericolose per la salute:
 
-1. **Fase di innesco** — Il combustibile raggiunge la temperatura di accensione. Fase ancora controllabile.
-2. **Fase di propagazione** — L'incendio si estende ai materiali circostanti. La temperatura sale rapidamente.
-3. **Incendio generalizzato (flashover)** — Tutti i materiali combustibili sono coinvolti. Temperature oltre 600°C. Impossibile intervenire senza mezzi professionali.
-4. **Fase di decadimento** — Il combustibile si esaurisce, la temperatura diminuisce.
+**Fumi:**
+- Particelle solide e liquide sospese nell'aria
+- Riducono la visibilità (disorientamento)
+- Irritano le vie respiratorie
 
-Il **flashover** è il punto critico: prima si può tentare lo spegnimento, dopo è necessaria l'evacuazione immediata.
+**Gas tossici:**
+- **CO (monossido di carbonio)**: inodore, incolore, LETALE — si lega all'emoglobina impedendo il trasporto di ossigeno
+- **CO₂ (anidride carbonica)**: in alte concentrazioni causa asfissia
+- **HCN (acido cianidrico)**: prodotto dalla combustione di materiali plastici, tessuti sintetici
+- **HCl (acido cloridrico)**: dalla combustione del PVC
 
-**Prodotti della combustione pericolosi:**
-- Fiamme e calore (ustioni)
-- Fumo (riduzione visibilità)
-- Gas tossici (CO, HCN, acido cloridrico)
-- Carenza di ossigeno`,
-      duration_minutes: 7,
-      quiz: {
-        question: 'Cos\'è il flashover?',
-        options: ['L\'esplosione iniziale', 'Il momento in cui tutti i materiali prendono fuoco simultaneamente', 'Lo spegnimento dell\'incendio', 'L\'arrivo dei vigili del fuoco'],
-        correct: 1,
-        explanation: 'Il flashover è il passaggio all\'incendio generalizzato, quando tutti i materiali combustibili si accendono.'
-      }
-    }
+**Calore:**
+- Ustioni dirette e da irraggiamento
+- Colpo di calore
+- Disidratazione
+
+**Il fumo è la prima causa di morte negli incendi**, non le fiamme dirette. Per questo è fondamentale evacuare rapidamente e stare bassi.`,
+      minTimeSeconds: 60,
+      xpReward: 20,
+    },
+    {
+      id: 'ai1_quiz_combustion',
+      title: 'Verifica: Prodotti della Combustione',
+      type: 'quiz',
+      questions: [
+        {
+          id: 'ai1_q4',
+          question: 'Qual è la prima causa di morte negli incendi?',
+          options: ['Le fiamme dirette', 'Il crollo delle strutture', 'Il fumo e i gas tossici', 'Le ustioni'],
+          correctIndex: 2,
+          explanation: 'Il fumo e i gas tossici (soprattutto il CO) sono la prima causa di morte negli incendi.',
+          xpReward: 15,
+          difficulty: 'easy',
+        },
+        {
+          id: 'ai1_q4b',
+          question: 'Il monossido di carbonio (CO) è pericoloso perché:',
+          options: ['Ha un odore forte', 'È visibile e irritante', 'È inodore e si lega all\'emoglobina impedendo il trasporto di ossigeno', 'Provoca ustioni'],
+          correctIndex: 2,
+          explanation: 'Il CO è inodore e incolore, si lega all\'emoglobina con affinità 200 volte superiore all\'ossigeno.',
+          xpReward: 20,
+          difficulty: 'medium',
+        },
+      ],
+      minTimeSeconds: 30,
+      xpReward: 10,
+    },
+    {
+      id: 'ai1_boss_test',
+      title: '🏆 Test Finale — Prevenzione Incendi',
+      type: 'boss_test',
+      questions: [
+        {
+          id: 'ai1_boss1',
+          question: 'Il triangolo del fuoco è composto da:',
+          options: ['Fumo, fiamme, calore', 'Combustibile, comburente, innesco', 'Acqua, polvere, CO₂', 'Ossigeno, azoto, idrogeno'],
+          correctIndex: 1,
+          explanation: 'Combustibile, comburente (ossigeno) ed energia di innesco.',
+          xpReward: 30,
+          difficulty: 'easy',
+        },
+        {
+          id: 'ai1_boss2',
+          question: 'Gli incendi di gas appartengono alla classe:',
+          options: ['A', 'B', 'C', 'D'],
+          correctIndex: 2,
+          explanation: 'La classe C comprende gli incendi di gas (metano, GPL, acetilene).',
+          xpReward: 30,
+          difficulty: 'easy',
+        },
+        {
+          id: 'ai1_boss3',
+          question: 'Per spegnere un incendio è sufficiente:',
+          options: ['Rimuovere tutti e tre gli elementi del triangolo', 'Rimuovere anche solo uno dei tre elementi', 'Aggiungere acqua', 'Soffiare sulle fiamme'],
+          correctIndex: 1,
+          explanation: 'Basta rimuovere uno solo dei tre elementi del triangolo del fuoco per interrompere la combustione.',
+          xpReward: 35,
+          difficulty: 'medium',
+        },
+        {
+          id: 'ai1_boss4',
+          question: 'Il monossido di carbonio è pericoloso perché:',
+          options: ['Ha un forte odore', 'È visibile', 'È inodore e impedisce il trasporto di ossigeno nel sangue', 'Causa ustioni'],
+          correctIndex: 2,
+          explanation: 'Il CO è inodore, incolore e si lega all\'emoglobina impedendo il trasporto di ossigeno.',
+          xpReward: 35,
+          difficulty: 'medium',
+        },
+        {
+          id: 'ai1_boss5',
+          question: 'La differenza tra prevenzione e protezione antincendio è:',
+          options: ['Sono la stessa cosa', 'La prevenzione riduce la probabilità, la protezione limita le conseguenze', 'La protezione è obbligatoria, la prevenzione no', 'La prevenzione è più costosa'],
+          correctIndex: 1,
+          explanation: 'La prevenzione agisce sulla probabilità di incendio, la protezione sulle conseguenze.',
+          xpReward: 35,
+          difficulty: 'medium',
+        },
+      ],
+      minTimeSeconds: 90,
+      xpReward: 50,
+    },
   ],
-  bossTest: {
-    title: 'Test Finale — L\'Incendio e la Prevenzione',
-    questions: [
-      { question: 'Qual è il comburente più comune?', options: ['Azoto', 'Ossigeno', 'Idrogeno', 'Carbonio'], correct: 1 },
-      { question: 'Un incendio di metano è di classe:', options: ['A', 'B', 'C', 'D'], correct: 2 },
-      { question: 'Quale agente estinguente NON si deve usare su impianti elettrici sotto tensione?', options: ['CO₂', 'Polvere', 'Acqua', 'Gas inerti'], correct: 2 },
-      { question: 'Il flashover si verifica quando:', options: ['L\'incendio si spegne', 'Tutti i combustibili si accendono', 'Arrivano i soccorsi', 'Si attiva l\'allarme'], correct: 1 },
-      { question: 'La polvere estinguente agisce per:', options: ['Solo raffreddamento', 'Inibizione chimica', 'Solo soffocamento', 'Diluizione'], correct: 1 },
-    ]
-  },
-  npcScenarios: [
-    {
-      id: 'fire_prevention_check',
-      title: 'Ispezione Antincendio',
-      npcName: 'Ing. Ferrara',
-      npcRole: 'Responsabile Prevenzione Incendi',
-      situation: 'Stai effettuando un\'ispezione antincendio nel reparto produzione. Noti diverse situazioni potenzialmente pericolose.',
-      question: 'Trovi un estintore a polvere posizionato dietro un carrello che ne blocca l\'accesso. Cosa fai?',
-      options: [
-        { text: 'Ignoro, tanto ce ne sono altri nel corridoio', isCorrect: false, feedback: 'Ogni estintore deve essere sempre accessibile e visibile.' },
-        { text: 'Sposto il carrello e verifico che l\'estintore sia accessibile, segnalato e revisionato', isCorrect: true, feedback: 'Corretto! L\'accessibilità degli estintori è un requisito fondamentale della prevenzione incendi.' },
-        { text: 'Rimuovo l\'estintore e lo porto in magazzino', isCorrect: false, feedback: 'L\'estintore deve restare nella posizione prevista dal piano antincendio.' },
-        { text: 'Metto un cartello "non ostruire"', isCorrect: false, feedback: 'Il cartello è utile ma prima devi ripristinare l\'accessibilità immediata.' }
-      ]
-    }
-  ]
 };
