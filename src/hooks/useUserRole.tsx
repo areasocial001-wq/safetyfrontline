@@ -40,7 +40,7 @@ export const useUserRole = () => {
           .eq('user_id', userId)
           .maybeSingle();
         
-        console.log('📊 useUserRole - Query result:', { data, error });
+        if (import.meta.env.DEV) console.log('📊 useUserRole - Query result:', { data, error });
         
         if (error) {
           console.error('❌ useUserRole - Error from Supabase:', error);
