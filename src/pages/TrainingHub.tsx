@@ -296,6 +296,43 @@ const TrainingHub = () => {
                     <Progress value={progressPercent} className="h-2" />
                   </div>
                 )}
+                {isComplete && (
+                  <Button
+                    variant="default"
+                    size="sm"
+                    className="mt-3 w-full"
+                    onClick={async (e) => {
+                      e.stopPropagation();
+                      const moduleIds = path.requiresSector && userSector 
+                        ? [...path.moduleIds, ...SECTOR_MODULES[userSector.sector]] 
+                        : path.moduleIds;
+                      const completedMods = moduleIds.map(id => {
+                        const mp = getModuleProgress(id);
+                        const mod = allModules.find(m => m.id === id);
+                        return { title: mod?.title || id, score: mp?.max_score ? Math.round((mp.score / mp.max_score) * 100) : 0 };
+                      });
+                      const avgScore = Math.round(completedMods.reduce((s, m) => s + m.score, 0) / completedMods.length);
+                      const totalMinutes = Math.round(moduleIds.reduce((s, id) => s + (getModuleProgress(id)?.time_spent_seconds || 0), 0) / 60);
+                      const { data: profile } = await supabase.from('profiles').select('full_name, company_name').eq('id', user!.id).maybeSingle();
+                      await generatePathCertificatePDF({
+                        userName: profile?.full_name || user!.email || 'Utente',
+                        companyName: profile?.company_name || '',
+                        pathId: path.id,
+                        pathTitle: path.title,
+                        pathSubtitle: path.subtitle,
+                        normativeRef: path.normativeRef,
+                        hours: path.hours,
+                        score: avgScore,
+                        totalTimeMinutes: totalMinutes,
+                        completedModules: completedMods,
+                        date: new Date().toLocaleDateString('it-IT', { day: '2-digit', month: 'long', year: 'numeric' }),
+                      });
+                      toast({ title: '🎓 Attestato generato!', description: `Attestato "${path.title}" scaricato con successo.` });
+                    }}
+                  >
+                    <Download className="w-4 h-4 mr-2" /> Scarica Attestato
+                  </Button>
+                )}
               </div>
               <div className="shrink-0">
                 <Button variant={isExpanded ? 'default' : 'outline'} size="sm">
