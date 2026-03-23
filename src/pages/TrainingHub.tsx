@@ -151,6 +151,9 @@ const TrainingHub = () => {
   
   const [allModules, setAllModules] = useState<any[]>([]);
   const [expandedPath, setExpandedPath] = useState<string | null>(null);
+  const [assignedSpecifica, setAssignedSpecifica] = useState<SpecificaCategory | null>(null);
+  const [specificaOverride, setSpecificaOverride] = useState<SpecificaCategory | null>(null);
+  const [specificaSource, setSpecificaSource] = useState<'ateco' | 'manual' | null>(null);
 
   useEffect(() => {
     const fetchModules = async () => {
