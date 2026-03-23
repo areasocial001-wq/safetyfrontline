@@ -22,7 +22,7 @@ export const Modules = () => {
   const [activeTab, setActiveTab] = useState<TabKey>('generale');
 
   const tabs: { key: TabKey; label: string; icon: typeof Shield; badge?: string }[] = [
-    { key: 'generale', label: 'Formazione Generale', icon: GraduationCap, badge: '5 moduli' },
+    { key: 'generale', label: 'Formazione Generale', icon: GraduationCap, badge: '7 moduli' },
     { key: 'basso', label: 'Rischio Basso', icon: Building2, badge: '4 moduli' },
     { key: 'medio', label: 'Rischio Medio', icon: Cog, badge: '8 moduli' },
     { key: 'alto', label: 'Rischio Alto', icon: AlertTriangle, badge: '8 moduli' },
@@ -38,7 +38,9 @@ export const Modules = () => {
       { icon: AlertCircle, title: "Rischi e Prevenzione", subtitle: "Valutazione dei Rischi", description: "Identificazione dei pericoli, valutazione dei rischi, misure di prevenzione e protezione.", color: "secondary" },
       { icon: Flame, title: "Emergenze", subtitle: "Procedure di Evacuazione", description: "Piano di emergenza, vie di fuga, punti di raccolta, primo soccorso base e antincendio.", color: "destructive" },
       { icon: FileCheck, title: "Test Finale", subtitle: "Verifica Apprendimento", description: "Boss test con domande avanzate, punteggio minimo 70%, certificato digitale con QR code.", color: "accent" },
-      { icon: Briefcase, title: "Lavoratori Specifica", subtitle: "Formazione Specifica per Settore di Rischio", description: "Formazione obbligatoria ai sensi dell'art. 37 D.Lgs 81/08 e Accordo Stato-Regioni. Contenuti calibrati sul livello di rischio aziendale (basso 4h, medio 8h, alto 12h): rischi specifici della mansione, DPI dedicati, procedure operative di sicurezza, gestione emergenze settoriali e aggiornamento quinquennale di 6 ore.", color: "muted" },
+      { icon: Monitor, title: "Specifica Uffici", subtitle: "Rischio Basso – ATECO Uffici e Servizi", description: "Rischi VDT, ergonomia, microclima, stress lavoro-correlato, rischio elettrico e incendio in ambiente d'ufficio. 4 ore di formazione specifica.", color: "muted" },
+      { icon: FlaskConical, title: "Specifica Aziende", subtitle: "Rischio Medio-Alto – Manifattura e Logistica", description: "Rischi meccanici, chimici, movimentazione carichi, rumore, vibrazioni, cadute dall'alto, macchine e attrezzature industriali. 8-12 ore.", color: "accent" },
+      { icon: Flame, title: "Specifica Ristorazione", subtitle: "Rischio Medio – ATECO 55/56", description: "Rischi da taglio, ustione, scivolamento, agenti chimici alimentari, HACCP, movimentazione manuale e stress da servizio. 8 ore.", color: "destructive" },
     ],
     basso: [
       { icon: Monitor, title: "Videoterminali e Postura", subtitle: "Rischi da VDT e Ergonomia", description: "Utilizzo corretto del videoterminale, pause, postura e illuminazione per prevenire disturbi.", color: "primary" },

@@ -14,10 +14,10 @@ import {
 } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useTrainingProgress } from '@/hooks/useTrainingProgress';
-import { useRiskSector, SECTOR_INFO, RiskSector } from '@/hooks/useRiskSector';
+
 import { getLevelFromXp, getNextLevel } from '@/data/training-content';
 import { MultiplayerChallenges } from '@/components/training/MultiplayerChallenges';
-import { SectorSelector } from '@/components/training/SectorSelector';
+
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 import { generatePathCertificatePDF } from '@/lib/path-certificate-generator';
@@ -31,11 +31,6 @@ const ALL_ICONS: Record<string, any> = {
 
 const GENERAL_MODULES = ['giuridico_normativo', 'gestione_organizzazione', 'valutazione_rischi', 'dpi_protezione'];
 
-const SECTOR_MODULES: Record<RiskSector, string[]> = {
-  basso: ['rb_videoterminali', 'rb_stress_lavoro', 'rb_rischio_elettrico', 'rb_microclima_ergonomia'],
-  medio: ['rm_rischi_meccanici', 'rm_movimentazione', 'rm_rischio_elettrico', 'rm_agenti_fisici', 'rm_sostanze_pericolose', 'rm_cadute_alto', 'rm_incendio', 'rm_primo_soccorso'],
-  alto: ['ra_rischi_meccanici_avanzati', 'ra_rischio_chimico', 'ra_rischio_biologico', 'ra_amianto', 'ra_spazi_confinati', 'ra_lavori_quota', 'ra_movimentazione_avanzata', 'ra_atmosfere_esplosive', 'ra_rumore_vibrazioni', 'ra_radiazioni', 'ra_emergenze_complesse', 'ra_cantiere'],
-};
 
 const SECTION_COUNTS: Record<string, number> = {
   giuridico_normativo: 9, gestione_organizzazione: 6, valutazione_rischi: 4, dpi_protezione: 4,
@@ -77,7 +72,7 @@ const TRAINING_PATHS: TrainingPath[] = [
     hours: '4h + 4-12h',
     color: 'primary',
     moduleIds: [...GENERAL_MODULES, 'ls_uffici', 'ls_aziende', 'ls_ristorazione'],
-    requiresSector: true,
+    requiresSector: false,
     normativeRef: 'Accordo Stato-Regioni 2025',
   },
   {
@@ -152,7 +147,7 @@ const TrainingHub = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { progress, userXp, loading: progressLoading, getModuleProgress } = useTrainingProgress();
-  const { userSector, loading: sectorLoading, selectSector } = useRiskSector();
+  
   const [allModules, setAllModules] = useState<any[]>([]);
   const [expandedPath, setExpandedPath] = useState<string | null>(null);
 
@@ -181,10 +176,7 @@ const TrainingHub = () => {
   const totalTimeMinutes = Math.round(progress.reduce((sum, p) => sum + p.time_spent_seconds, 0) / 60);
 
   const getPathProgress = (path: TrainingPath) => {
-    let moduleIds = path.moduleIds;
-    if (path.requiresSector && userSector) {
-      moduleIds = [...moduleIds, ...SECTOR_MODULES[userSector.sector]];
-    }
+    const moduleIds = path.moduleIds;
     const completed = moduleIds.filter(id => getModuleProgress(id)?.status === 'completed').length;
     return { completed, total: moduleIds.length };
   };
@@ -304,9 +296,7 @@ const TrainingHub = () => {
                     className="mt-3 w-full"
                     onClick={async (e) => {
                       e.stopPropagation();
-                      const moduleIds = path.requiresSector && userSector 
-                        ? [...path.moduleIds, ...SECTOR_MODULES[userSector.sector]] 
-                        : path.moduleIds;
+                      const moduleIds = path.moduleIds;
                       const completedMods = moduleIds.map(id => {
                         const mp = getModuleProgress(id);
                         const mod = allModules.find(m => m.id === id);
@@ -357,26 +347,16 @@ const TrainingHub = () => {
                   {allModules.filter(m => GENERAL_MODULES.includes(m.id)).map((mod, i) => renderModuleCard(mod, i, GENERAL_MODULES))}
                 </div>
 
-                {/* Sector selection + specific modules */}
+                {/* Specific modules - 3 macro-categories */}
                 <h4 className="text-lg font-semibold flex items-center gap-2 mt-6 mb-2">
-                  <Shield className="w-5 h-5 text-primary" /> Parte Specifica
+                  <Shield className="w-5 h-5 text-primary" /> Parte Specifica (3 macro-categorie)
                 </h4>
-                {!userSector ? (
-                  <SectorSelector onSelect={async (sector) => {
-                    const err = await selectSector(sector);
-                    if (!err) toast({ title: '✅ Settore selezionato', description: `Formazione Specifica: ${SECTOR_INFO[sector].label}` });
-                  }} />
-                ) : (
-                  <>
-                    <div className="mb-4">
-                      <Badge className="text-sm px-4 py-1">{SECTOR_INFO[userSector.sector].label} • {SECTOR_INFO[userSector.sector].hours} ore</Badge>
-                      <p className="text-xs text-muted-foreground mt-1">{SECTOR_INFO[userSector.sector].description}</p>
-                    </div>
-                    <div className="grid md:grid-cols-2 gap-4">
-                      {allModules.filter(m => SECTOR_MODULES[userSector.sector].includes(m.id)).map((mod, i) => renderModuleCard(mod, i, SECTOR_MODULES[userSector.sector]))}
-                    </div>
-                  </>
-                )}
+                <p className="text-sm text-muted-foreground mb-4">
+                  Scegli il modulo corrispondente al tuo settore lavorativo: Uffici (4h), Aziende (8-12h) o Ristorazione (8h).
+                </p>
+                <div className="grid md:grid-cols-2 gap-4">
+                  {allModules.filter(m => ['ls_uffici', 'ls_aziende', 'ls_ristorazione'].includes(m.id)).map((mod, i) => renderModuleCard(mod, i, ['ls_uffici', 'ls_aziende', 'ls_ristorazione']))}
+                </div>
               </>
             )}
 
