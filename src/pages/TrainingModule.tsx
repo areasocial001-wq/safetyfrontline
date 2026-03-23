@@ -70,9 +70,8 @@ const TrainingModule = () => {
   }, [moduleId]);
 
   // Effective min time per section (DB override > static default)
-  const effectiveMinTime = currentSection
-    ? (timeOverrides[currentSection.id] ?? currentSection.minTimeSeconds ?? 0)
-    : 0;
+  // TODO: restore min time after testing — set to 0 to bypass timer
+  const effectiveMinTime = 0;
 
   // Timer anti-cheat
   useEffect(() => {
