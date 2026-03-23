@@ -301,9 +301,7 @@ const TrainingHub = () => {
                     className="mt-3 w-full"
                     onClick={async (e) => {
                       e.stopPropagation();
-                      const moduleIds = path.requiresSector && userSector 
-                        ? [...path.moduleIds, ...SECTOR_MODULES[userSector.sector]] 
-                        : path.moduleIds;
+                      const moduleIds = path.moduleIds;
                       const completedMods = moduleIds.map(id => {
                         const mp = getModuleProgress(id);
                         const mod = allModules.find(m => m.id === id);
