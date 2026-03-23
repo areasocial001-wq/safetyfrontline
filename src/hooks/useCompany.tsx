@@ -53,6 +53,7 @@ export const useCompany = () => {
               sector,
               employees_count,
               logo_url,
+              ateco_code,
               certificate_template,
               certificate_theme_color,
               certificate_font,
