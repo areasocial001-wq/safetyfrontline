@@ -13,6 +13,7 @@ interface Company {
   sector: string | null;
   employees_count: number | null;
   logo_url: string | null;
+  ateco_code: string | null;
   certificate_template: string;
   certificate_theme_color: string;
   certificate_font: string;
