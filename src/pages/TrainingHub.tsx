@@ -14,7 +14,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useTrainingProgress } from '@/hooks/useTrainingProgress';
-import { useRiskSector, SECTOR_INFO, RiskSector } from '@/hooks/useRiskSector';
+
 import { getLevelFromXp, getNextLevel } from '@/data/training-content';
 import { MultiplayerChallenges } from '@/components/training/MultiplayerChallenges';
 import { SectorSelector } from '@/components/training/SectorSelector';
