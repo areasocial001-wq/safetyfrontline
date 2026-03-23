@@ -141,3 +141,57 @@ All colors MUST be HSL.
     @apply bg-background text-foreground;
   }
 }
+
+/* Gamification utilities */
+@layer utilities {
+  .game-bounce {
+    animation: game-bounce 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  }
+  .game-xp-float {
+    animation: xp-float 1.2s ease-out forwards;
+  }
+  .game-correct-pulse {
+    animation: correct-pulse 0.6s ease-out;
+  }
+  .game-wrong-shake {
+    animation: wrong-shake 0.5s ease-out;
+  }
+  .game-streak-glow {
+    box-shadow: 0 0 20px hsl(var(--game-streak) / 0.4), 0 0 40px hsl(var(--game-streak) / 0.2);
+  }
+  .game-option-hover {
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .game-option-hover:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px hsl(var(--primary) / 0.15);
+  }
+}
+
+@keyframes game-bounce {
+  0% { transform: scale(0.3); opacity: 0; }
+  50% { transform: scale(1.15); }
+  70% { transform: scale(0.9); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes xp-float {
+  0% { transform: translateY(0); opacity: 1; }
+  100% { transform: translateY(-40px); opacity: 0; }
+}
+
+@keyframes correct-pulse {
+  0% { transform: scale(1); }
+  30% { transform: scale(1.05); }
+  60% { transform: scale(0.97); }
+  100% { transform: scale(1); }
+}
+
+@keyframes wrong-shake {
+  0%, 100% { transform: translateX(0); }
+  15% { transform: translateX(-6px); }
+  30% { transform: translateX(6px); }
+  45% { transform: translateX(-4px); }
+  60% { transform: translateX(4px); }
+  75% { transform: translateX(-2px); }
+}
