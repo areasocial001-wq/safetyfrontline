@@ -181,10 +181,7 @@ const TrainingHub = () => {
   const totalTimeMinutes = Math.round(progress.reduce((sum, p) => sum + p.time_spent_seconds, 0) / 60);
 
   const getPathProgress = (path: TrainingPath) => {
-    let moduleIds = path.moduleIds;
-    if (path.requiresSector && userSector) {
-      moduleIds = [...moduleIds, ...SECTOR_MODULES[userSector.sector]];
-    }
+    const moduleIds = path.moduleIds;
     const completed = moduleIds.filter(id => getModuleProgress(id)?.status === 'completed').length;
     return { completed, total: moduleIds.length };
   };
