@@ -27,6 +27,7 @@ import { CompletionsByModuleChart } from '@/components/company/CompletionsByModu
 import { ScoreTrendChart } from '@/components/company/ScoreTrendChart';
 import { DashboardPDFExport } from '@/components/company/DashboardPDFExport';
 import { EmployeeSectorAssignment } from '@/components/company/EmployeeSectorAssignment';
+import { AtecoCodeInput } from '@/components/company/AtecoCodeInput';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
