@@ -77,7 +77,7 @@ const TRAINING_PATHS: TrainingPath[] = [
     hours: '4h + 4-12h',
     color: 'primary',
     moduleIds: [...GENERAL_MODULES, 'ls_uffici', 'ls_aziende', 'ls_ristorazione'],
-    requiresSector: true,
+    requiresSector: false,
     normativeRef: 'Accordo Stato-Regioni 2025',
   },
   {
