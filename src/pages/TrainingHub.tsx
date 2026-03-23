@@ -31,11 +31,6 @@ const ALL_ICONS: Record<string, any> = {
 
 const GENERAL_MODULES = ['giuridico_normativo', 'gestione_organizzazione', 'valutazione_rischi', 'dpi_protezione'];
 
-const SECTOR_MODULES: Record<RiskSector, string[]> = {
-  basso: ['rb_videoterminali', 'rb_stress_lavoro', 'rb_rischio_elettrico', 'rb_microclima_ergonomia'],
-  medio: ['rm_rischi_meccanici', 'rm_movimentazione', 'rm_rischio_elettrico', 'rm_agenti_fisici', 'rm_sostanze_pericolose', 'rm_cadute_alto', 'rm_incendio', 'rm_primo_soccorso'],
-  alto: ['ra_rischi_meccanici_avanzati', 'ra_rischio_chimico', 'ra_rischio_biologico', 'ra_amianto', 'ra_spazi_confinati', 'ra_lavori_quota', 'ra_movimentazione_avanzata', 'ra_atmosfere_esplosive', 'ra_rumore_vibrazioni', 'ra_radiazioni', 'ra_emergenze_complesse', 'ra_cantiere'],
-};
 
 const SECTION_COUNTS: Record<string, number> = {
   giuridico_normativo: 9, gestione_organizzazione: 6, valutazione_rischi: 4, dpi_protezione: 4,
