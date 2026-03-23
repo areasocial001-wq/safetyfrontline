@@ -17,6 +17,7 @@ import { useTrainingProgress } from '@/hooks/useTrainingProgress';
 
 import { getLevelFromXp, getNextLevel } from '@/data/training-content';
 import { MultiplayerChallenges } from '@/components/training/MultiplayerChallenges';
+import { getSpecificaFromAteco, SPECIFICA_CATEGORIES, SpecificaCategory } from '@/lib/ateco-mapping';
 
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
