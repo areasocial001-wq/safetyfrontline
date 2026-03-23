@@ -264,6 +264,11 @@ const CompanyDashboard = () => {
           <div className="grid lg:grid-cols-3 gap-6">
             {/* Left Column - Employees + Chart */}
             <div className="lg:col-span-2 space-y-6">
+              <AtecoCodeInput 
+                companyId={company.id} 
+                currentAtecoCode={company.ateco_code || null} 
+                onUpdate={() => setRefreshKey((prev) => prev + 1)} 
+              />
               <EmployeeSectorAssignment companyId={company.id} />
               <EmployeesTable companyId={company.id} />
               <CompletionsByModuleChart companyId={company.id} />
