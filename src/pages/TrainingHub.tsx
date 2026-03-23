@@ -357,26 +357,16 @@ const TrainingHub = () => {
                   {allModules.filter(m => GENERAL_MODULES.includes(m.id)).map((mod, i) => renderModuleCard(mod, i, GENERAL_MODULES))}
                 </div>
 
-                {/* Sector selection + specific modules */}
+                {/* Specific modules - 3 macro-categories */}
                 <h4 className="text-lg font-semibold flex items-center gap-2 mt-6 mb-2">
-                  <Shield className="w-5 h-5 text-primary" /> Parte Specifica
+                  <Shield className="w-5 h-5 text-primary" /> Parte Specifica (3 macro-categorie)
                 </h4>
-                {!userSector ? (
-                  <SectorSelector onSelect={async (sector) => {
-                    const err = await selectSector(sector);
-                    if (!err) toast({ title: '✅ Settore selezionato', description: `Formazione Specifica: ${SECTOR_INFO[sector].label}` });
-                  }} />
-                ) : (
-                  <>
-                    <div className="mb-4">
-                      <Badge className="text-sm px-4 py-1">{SECTOR_INFO[userSector.sector].label} • {SECTOR_INFO[userSector.sector].hours} ore</Badge>
-                      <p className="text-xs text-muted-foreground mt-1">{SECTOR_INFO[userSector.sector].description}</p>
-                    </div>
-                    <div className="grid md:grid-cols-2 gap-4">
-                      {allModules.filter(m => SECTOR_MODULES[userSector.sector].includes(m.id)).map((mod, i) => renderModuleCard(mod, i, SECTOR_MODULES[userSector.sector]))}
-                    </div>
-                  </>
-                )}
+                <p className="text-sm text-muted-foreground mb-4">
+                  Scegli il modulo corrispondente al tuo settore lavorativo: Uffici (4h), Aziende (8-12h) o Ristorazione (8h).
+                </p>
+                <div className="grid md:grid-cols-2 gap-4">
+                  {allModules.filter(m => ['ls_uffici', 'ls_aziende', 'ls_ristorazione'].includes(m.id)).map((mod, i) => renderModuleCard(mod, i, ['ls_uffici', 'ls_aziende', 'ls_ristorazione']))}
+                </div>
               </>
             )}
 
