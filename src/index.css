@@ -60,6 +60,16 @@ All colors MUST be HSL.
     
     /* Transitions */
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    
+    /* Gamification tokens */
+    --game-xp: 48 100% 50%;
+    --game-health: 142 76% 42%;
+    --game-streak: 16 100% 60%;
+    --game-combo: 280 80% 60%;
+    --game-correct: 142 76% 42%;
+    --game-wrong: 0 84% 60%;
+    --game-card-hover: 0 0% 97%;
+    --game-card-active: 210 100% 97%;
 
     --sidebar-background: 0 0% 98%;
     --sidebar-foreground: 220 13% 13%;
