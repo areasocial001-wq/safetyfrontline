@@ -22,7 +22,7 @@ export const Modules = () => {
   const [activeTab, setActiveTab] = useState<TabKey>('generale');
 
   const tabs: { key: TabKey; label: string; icon: typeof Shield; badge?: string }[] = [
-    { key: 'generale', label: 'Formazione Generale', icon: GraduationCap, badge: '5 moduli' },
+    { key: 'generale', label: 'Formazione Generale', icon: GraduationCap, badge: '7 moduli' },
     { key: 'basso', label: 'Rischio Basso', icon: Building2, badge: '4 moduli' },
     { key: 'medio', label: 'Rischio Medio', icon: Cog, badge: '8 moduli' },
     { key: 'alto', label: 'Rischio Alto', icon: AlertTriangle, badge: '8 moduli' },
