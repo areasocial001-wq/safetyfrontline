@@ -875,7 +875,9 @@ import { rischioBassContents } from './training-content-basso';
 import { rischioMedioContents } from './training-content-medio';
 import { rischioAltoContents } from './training-content-alto';
 import { cybersecurityContent } from './training-content-cybersecurity';
-import { lavoratoriSpecificaContents } from './training-content-lavoratori-specifica';
+import { specificaUfficiContent } from './training-content-specifica-uffici';
+import { specificaAziendeContent } from './training-content-specifica-aziende';
+import { specificaRistorazioneContent } from './training-content-specifica-ristorazione';
 import { rsppDatoreContents } from './training-content-rspp-datore';
 import { moduloRSPP2Content } from './training-content-rspp-datore-m2';
 import { moduloRSPP3Content } from './training-content-rspp-datore-m3';
@@ -902,7 +904,9 @@ export const allModulesContent: ModuleContent[] = [
   ...rischioMedioContents,
   ...rischioAltoContents,
   cybersecurityContent,
-  ...lavoratoriSpecificaContents,
+  specificaUfficiContent,
+  specificaAziendeContent,
+  specificaRistorazioneContent,
   ...rsppDatoreContents,
   moduloRSPP2Content,
   moduloRSPP3Content,
