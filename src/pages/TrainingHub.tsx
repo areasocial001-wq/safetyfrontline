@@ -163,6 +163,28 @@ const TrainingHub = () => {
     fetchModules();
   }, []);
 
+  // Fetch company ATECO code for auto-assignment
+  useEffect(() => {
+    const fetchCompanyAteco = async () => {
+      if (!user) return;
+      const { data } = await supabase
+        .from('company_users')
+        .select('companies(ateco_code)')
+        .eq('user_id', user.id)
+        .maybeSingle();
+      
+      if (data?.companies) {
+        const company = data.companies as any;
+        const detected = getSpecificaFromAteco(company.ateco_code);
+        if (detected) {
+          setAssignedSpecifica(detected);
+          setSpecificaSource('ateco');
+        }
+      }
+    };
+    fetchCompanyAteco();
+  }, [user]);
+
   const getModuleStatus = (moduleId: string, index: number, moduleList: string[]): 'locked' | 'available' | 'in_progress' | 'completed' => {
     const mp = getModuleProgress(moduleId);
     if (mp) return mp.status;
