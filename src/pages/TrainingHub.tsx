@@ -17,7 +17,7 @@ import { useTrainingProgress } from '@/hooks/useTrainingProgress';
 
 import { getLevelFromXp, getNextLevel } from '@/data/training-content';
 import { MultiplayerChallenges } from '@/components/training/MultiplayerChallenges';
-import { SectorSelector } from '@/components/training/SectorSelector';
+
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 import { generatePathCertificatePDF } from '@/lib/path-certificate-generator';
