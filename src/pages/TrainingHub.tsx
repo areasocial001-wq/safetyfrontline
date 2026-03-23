@@ -17,6 +17,7 @@ import { useTrainingProgress } from '@/hooks/useTrainingProgress';
 
 import { getLevelFromXp, getNextLevel } from '@/data/training-content';
 import { MultiplayerChallenges } from '@/components/training/MultiplayerChallenges';
+import { getSpecificaFromAteco, SPECIFICA_CATEGORIES, SpecificaCategory } from '@/lib/ateco-mapping';
 
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
@@ -150,6 +151,9 @@ const TrainingHub = () => {
   
   const [allModules, setAllModules] = useState<any[]>([]);
   const [expandedPath, setExpandedPath] = useState<string | null>(null);
+  const [assignedSpecifica, setAssignedSpecifica] = useState<SpecificaCategory | null>(null);
+  const [specificaOverride, setSpecificaOverride] = useState<SpecificaCategory | null>(null);
+  const [specificaSource, setSpecificaSource] = useState<'ateco' | 'manual' | null>(null);
 
   useEffect(() => {
     const fetchModules = async () => {
@@ -158,6 +162,28 @@ const TrainingHub = () => {
     };
     fetchModules();
   }, []);
+
+  // Fetch company ATECO code for auto-assignment
+  useEffect(() => {
+    const fetchCompanyAteco = async () => {
+      if (!user) return;
+      const { data } = await supabase
+        .from('company_users')
+        .select('companies(ateco_code)')
+        .eq('user_id', user.id)
+        .maybeSingle();
+      
+      if (data?.companies) {
+        const company = data.companies as any;
+        const detected = getSpecificaFromAteco(company.ateco_code);
+        if (detected) {
+          setAssignedSpecifica(detected);
+          setSpecificaSource('ateco');
+        }
+      }
+    };
+    fetchCompanyAteco();
+  }, [user]);
 
   const getModuleStatus = (moduleId: string, index: number, moduleList: string[]): 'locked' | 'available' | 'in_progress' | 'completed' => {
     const mp = getModuleProgress(moduleId);
@@ -349,14 +375,68 @@ const TrainingHub = () => {
 
                 {/* Specific modules - 3 macro-categories */}
                 <h4 className="text-lg font-semibold flex items-center gap-2 mt-6 mb-2">
-                  <Shield className="w-5 h-5 text-primary" /> Parte Specifica (3 macro-categorie)
+                  <Shield className="w-5 h-5 text-primary" /> Parte Specifica
                 </h4>
-                <p className="text-sm text-muted-foreground mb-4">
-                  Scegli il modulo corrispondente al tuo settore lavorativo: Uffici (4h), Aziende (8-12h) o Ristorazione (8h).
-                </p>
-                <div className="grid md:grid-cols-2 gap-4">
-                  {allModules.filter(m => ['ls_uffici', 'ls_aziende', 'ls_ristorazione'].includes(m.id)).map((mod, i) => renderModuleCard(mod, i, ['ls_uffici', 'ls_aziende', 'ls_ristorazione']))}
-                </div>
+
+                {/* Auto-assignment info */}
+                {assignedSpecifica && !specificaOverride && (
+                  <div className="mb-4 p-3 rounded-lg bg-primary/5 border border-primary/20">
+                    <div className="flex items-center justify-between flex-wrap gap-2">
+                      <div>
+                        <p className="text-sm font-semibold">
+                          📋 Modulo assegnato automaticamente via codice ATECO:
+                        </p>
+                        <div className="flex items-center gap-2 mt-1">
+                          <Badge variant="default">{SPECIFICA_CATEGORIES[assignedSpecifica].label}</Badge>
+                          <span className="text-xs text-muted-foreground">{SPECIFICA_CATEGORIES[assignedSpecifica].hours}</span>
+                        </div>
+                      </div>
+                      <Button variant="outline" size="sm" onClick={() => setSpecificaOverride(assignedSpecifica)}>
+                        Cambia modulo
+                      </Button>
+                    </div>
+                  </div>
+                )}
+
+                {/* Manual selection - shown when no ATECO or when overriding */}
+                {(!assignedSpecifica || specificaOverride) && (
+                  <div className="mb-4">
+                    <p className="text-sm text-muted-foreground mb-3">
+                      {specificaOverride ? 'Seleziona un modulo diverso:' : 'Scegli il modulo corrispondente al tuo settore lavorativo:'}
+                    </p>
+                    <div className="flex flex-wrap gap-2 mb-3">
+                      {(['ls_uffici', 'ls_aziende', 'ls_ristorazione'] as SpecificaCategory[]).map((cat) => (
+                        <Button
+                          key={cat}
+                          variant={(specificaOverride || assignedSpecifica) === cat ? 'default' : 'outline'}
+                          size="sm"
+                          onClick={() => {
+                            setSpecificaOverride(cat);
+                            setSpecificaSource('manual');
+                          }}
+                        >
+                          {SPECIFICA_CATEGORIES[cat].label} • {SPECIFICA_CATEGORIES[cat].hours}
+                        </Button>
+                      ))}
+                      {specificaOverride && assignedSpecifica && (
+                        <Button variant="ghost" size="sm" onClick={() => { setSpecificaOverride(null); setSpecificaSource('ateco'); }}>
+                          Ripristina ATECO
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {/* Render the specific module cards */}
+                {(() => {
+                  const activeSpecifica = specificaOverride || assignedSpecifica;
+                  const specificaModuleIds = activeSpecifica ? [activeSpecifica] : ['ls_uffici', 'ls_aziende', 'ls_ristorazione'];
+                  return (
+                    <div className="grid md:grid-cols-2 gap-4">
+                      {allModules.filter(m => specificaModuleIds.includes(m.id)).map((mod, i) => renderModuleCard(mod, i, specificaModuleIds))}
+                    </div>
+                  );
+                })()}
               </>
             )}
 

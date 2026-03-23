@@ -27,6 +27,7 @@ import { CompletionsByModuleChart } from '@/components/company/CompletionsByModu
 import { ScoreTrendChart } from '@/components/company/ScoreTrendChart';
 import { DashboardPDFExport } from '@/components/company/DashboardPDFExport';
 import { EmployeeSectorAssignment } from '@/components/company/EmployeeSectorAssignment';
+import { AtecoCodeInput } from '@/components/company/AtecoCodeInput';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
@@ -263,6 +264,11 @@ const CompanyDashboard = () => {
           <div className="grid lg:grid-cols-3 gap-6">
             {/* Left Column - Employees + Chart */}
             <div className="lg:col-span-2 space-y-6">
+              <AtecoCodeInput 
+                companyId={company.id} 
+                currentAtecoCode={company.ateco_code || null} 
+                onUpdate={() => setRefreshKey((prev) => prev + 1)} 
+              />
               <EmployeeSectorAssignment companyId={company.id} />
               <EmployeesTable companyId={company.id} />
               <CompletionsByModuleChart companyId={company.id} />

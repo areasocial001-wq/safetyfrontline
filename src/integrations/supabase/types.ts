@@ -150,6 +150,7 @@ export type Database = {
       companies: {
         Row: {
           address: string | null
+          ateco_code: string | null
           certificate_font: string | null
           certificate_logo_position: string | null
           certificate_template: string | null
@@ -169,6 +170,7 @@ export type Database = {
         }
         Insert: {
           address?: string | null
+          ateco_code?: string | null
           certificate_font?: string | null
           certificate_logo_position?: string | null
           certificate_template?: string | null
@@ -188,6 +190,7 @@ export type Database = {
         }
         Update: {
           address?: string | null
+          ateco_code?: string | null
           certificate_font?: string | null
           certificate_logo_position?: string | null
           certificate_template?: string | null
