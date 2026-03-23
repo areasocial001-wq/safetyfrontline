@@ -50,6 +50,14 @@ export default {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        game: {
+          xp: "hsl(var(--game-xp))",
+          health: "hsl(var(--game-health))",
+          streak: "hsl(var(--game-streak))",
+          combo: "hsl(var(--game-combo))",
+          correct: "hsl(var(--game-correct))",
+          wrong: "hsl(var(--game-wrong))",
+        },
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",
           foreground: "hsl(var(--sidebar-foreground))",

@@ -229,55 +229,113 @@ const TrainingHub = () => {
     const Icon = ALL_ICONS[mod.icon_name] || Shield;
     const isLocked = status === 'locked';
     const isCompleted = status === 'completed';
+    const isInProgress = status === 'in_progress';
     const sectionProgress = mp ? (mp.current_section / (SECTION_COUNTS[mod.id] || 1)) * 100 : 0;
 
     return (
-      <Card key={mod.id} className={`relative overflow-hidden transition-all duration-300 ${isLocked ? 'opacity-60 grayscale' : 'hover:shadow-lg hover:-translate-y-1'} ${isCompleted ? 'border-accent/50 bg-accent/5' : ''}`}>
-        <div className="absolute top-4 right-4">
-          <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold ${isCompleted ? 'bg-accent text-accent-foreground' : isLocked ? 'bg-muted text-muted-foreground' : 'bg-primary text-primary-foreground'}`}>
-            {isCompleted ? <CheckCircle className="w-5 h-5" /> : index + 1}
-          </div>
-        </div>
-        <CardHeader>
-          <div className="flex items-center gap-3">
-            <div className={`p-3 rounded-xl ${isCompleted ? 'bg-accent/20' : isLocked ? 'bg-muted' : 'bg-primary/10'}`}>
-              {isLocked ? <Lock className="w-6 h-6 text-muted-foreground" /> : <Icon className="w-6 h-6 text-primary" />}
-            </div>
-            <div className="flex-1">
-              <CardTitle className="text-lg">{mod.title}</CardTitle>
-              <CardDescription>{mod.subtitle}</CardDescription>
-            </div>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <p className="text-sm text-muted-foreground mb-4">{mod.description}</p>
-          <div className="flex items-center gap-2 mb-4">
-            <Badge variant={mod.style === '3d' ? 'default' : mod.style === 'hybrid' ? 'secondary' : 'outline'}>
-              {mod.style === '3d' ? '3D Simulato' : mod.style === 'hybrid' ? 'Ibrido 2D/3D' : '2D Interattivo'}
-            </Badge>
-            <Badge variant="outline"><Clock className="w-3 h-3 mr-1" />{mod.min_duration_minutes} min</Badge>
-          </div>
-          {status === 'in_progress' && mp && (
-            <div className="mb-4">
-              <div className="flex justify-between text-xs text-muted-foreground mb-1">
-                <span>Sezione {mp.current_section}/{SECTION_COUNTS[mod.id]}</span>
-                <span>{mp.xp_earned} XP</span>
+      <div key={mod.id} className={`relative group ${isLocked ? 'opacity-50' : ''}`}>
+        {/* Connector line */}
+        {index > 0 && (
+          <div className="absolute -top-4 left-1/2 w-0.5 h-4 bg-border" />
+        )}
+        <Card className={`relative overflow-hidden transition-all duration-300 border-2 ${
+          isCompleted ? 'border-accent/60 bg-accent/5 shadow-md' :
+          isInProgress ? 'border-primary/50 bg-primary/5 shadow-lg ring-2 ring-primary/20' :
+          isLocked ? 'border-muted bg-muted/5' :
+          'border-border hover:border-primary/40 hover:shadow-lg hover:-translate-y-1'
+        } rounded-2xl`}>
+          {/* Top accent bar */}
+          {!isLocked && (
+            <div className={`h-1.5 ${isCompleted ? 'bg-gradient-to-r from-accent to-game-health' : isInProgress ? 'bg-gradient-to-r from-primary to-secondary' : 'bg-gradient-to-r from-muted-foreground/20 to-muted-foreground/10'}`} />
+          )}
+          <CardContent className="p-5">
+            <div className="flex items-start gap-4">
+              {/* Icon circle - Duolingo node style */}
+              <div className={`relative w-14 h-14 rounded-2xl flex items-center justify-center shrink-0 transition-all ${
+                isCompleted ? 'bg-accent/20 shadow-inner' :
+                isLocked ? 'bg-muted' :
+                isInProgress ? 'bg-primary/15 shadow-md' :
+                'bg-primary/10 group-hover:bg-primary/15'
+              }`}>
+                {isLocked ? (
+                  <Lock className="w-6 h-6 text-muted-foreground" />
+                ) : isCompleted ? (
+                  <CheckCircle className="w-7 h-7 text-accent" />
+                ) : (
+                  <Icon className={`w-7 h-7 ${isInProgress ? 'text-primary' : 'text-primary/80'}`} />
+                )}
+                {/* Step number badge */}
+                <div className={`absolute -top-1.5 -right-1.5 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
+                  isCompleted ? 'bg-accent text-accent-foreground' :
+                  isLocked ? 'bg-muted-foreground/30 text-muted-foreground' :
+                  'bg-primary text-primary-foreground'
+                }`}>
+                  {isCompleted ? '✓' : index + 1}
+                </div>
               </div>
-              <Progress value={sectionProgress} className="h-2" />
+
+              <div className="flex-1 min-w-0">
+                <h4 className={`font-bold text-base mb-0.5 ${isLocked ? 'text-muted-foreground' : ''}`}>{mod.title}</h4>
+                {mod.subtitle && <p className="text-xs text-muted-foreground mb-2">{mod.subtitle}</p>}
+                
+                <div className="flex items-center gap-2 flex-wrap mb-3">
+                  <span className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-muted text-muted-foreground">
+                    <Clock className="w-3 h-3" />{mod.min_duration_minutes} min
+                  </span>
+                  <span className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-game-xp/10 text-game-xp">
+                    <Star className="w-3 h-3" />{mod.style === '3d' ? '3D' : mod.style === 'hybrid' ? 'Ibrido' : 'Interattivo'}
+                  </span>
+                </div>
+
+                {/* Progress bar for in-progress */}
+                {isInProgress && mp && (
+                  <div className="mb-3">
+                    <div className="flex justify-between text-xs mb-1">
+                      <span className="text-muted-foreground">Sezione {mp.current_section}/{SECTION_COUNTS[mod.id]}</span>
+                      <span className="font-semibold text-primary">{mp.xp_earned} XP</span>
+                    </div>
+                    <div className="relative h-3 bg-muted rounded-full overflow-hidden">
+                      <div className="h-full rounded-full bg-gradient-to-r from-primary to-secondary transition-all duration-500" style={{ width: `${sectionProgress}%` }}>
+                        <div className="absolute inset-0 bg-white/20 rounded-full" style={{ height: '50%' }} />
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Completed stats */}
+                {isCompleted && mp && (
+                  <div className="flex items-center gap-3 mb-3 p-2 rounded-xl bg-accent/10">
+                    <div className="flex items-center gap-1">
+                      <Trophy className="w-4 h-4 text-accent" />
+                      <span className="text-sm font-semibold">{mp.score}/{mp.max_score}</span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <Star className="w-3 h-3 text-game-xp fill-game-xp" />
+                      <span className="text-xs font-medium text-game-xp">{mp.xp_earned} XP</span>
+                    </div>
+                  </div>
+                )}
+
+                <Button
+                  className={`w-full rounded-xl h-10 font-bold transition-all ${
+                    isCompleted ? 'bg-accent/10 text-accent hover:bg-accent/20 border border-accent/30' :
+                    isInProgress ? 'bg-primary shadow-md' :
+                    isLocked ? '' : 'bg-primary shadow-sm'
+                  }`}
+                  variant={isLocked ? 'outline' : isCompleted ? 'ghost' : 'default'}
+                  disabled={isLocked}
+                  onClick={() => navigate(`/formazione/${mod.id}`)}
+                >
+                  {isLocked ? <><Lock className="w-4 h-4 mr-2" /> Sblocca</> :
+                   isCompleted ? <><Award className="w-4 h-4 mr-2" /> Rivedi</> :
+                   isInProgress ? <><Play className="w-4 h-4 mr-2" /> Continua</> :
+                   <><Play className="w-4 h-4 mr-2" /> Inizia</>}
+                </Button>
+              </div>
             </div>
-          )}
-          {isCompleted && mp && (
-            <div className="flex items-center gap-2 mb-4 p-2 rounded-lg bg-accent/10">
-              <Trophy className="w-4 h-4 text-accent" />
-              <span className="text-sm font-medium">Punteggio: {mp.score}/{mp.max_score}</span>
-              <span className="text-xs text-muted-foreground ml-auto">{mp.xp_earned} XP</span>
-            </div>
-          )}
-          <Button className="w-full" variant={isLocked ? 'outline' : isCompleted ? 'secondary' : 'default'} disabled={isLocked} onClick={() => navigate(`/formazione/${mod.id}`)}>
-            {isLocked ? <><Lock className="w-4 h-4 mr-2" /> Completa il modulo precedente</> : isCompleted ? <><Award className="w-4 h-4 mr-2" /> Rivedi</> : status === 'in_progress' ? <><Play className="w-4 h-4 mr-2" /> Continua</> : <><Play className="w-4 h-4 mr-2" /> Inizia</>}
-          </Button>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      </div>
     );
   };
 
@@ -288,38 +346,64 @@ const TrainingHub = () => {
     const progressPercent = pathProgress.total > 0 ? (pathProgress.completed / pathProgress.total) * 100 : 0;
     const isComplete = pathProgress.completed === pathProgress.total && pathProgress.total > 0;
 
+    const PATH_EMOJIS: Record<string, string> = {
+      lavoratori: '🎓', rspp: '👑', rls: '🤝', preposto: '👁️',
+      cybersecurity: '🛡️', antincendio: '🔥', primo_soccorso: '❤️‍🩹',
+    };
+
     return (
       <div key={path.id} className="space-y-4">
         <Card 
-          className={`cursor-pointer transition-all duration-300 hover:shadow-lg hover:-translate-y-1 ${isExpanded ? 'ring-2 ring-primary/50' : ''} ${isComplete ? 'border-accent/50' : ''}`}
+          className={`cursor-pointer transition-all duration-300 hover:shadow-lg hover:-translate-y-1 border-2 rounded-2xl overflow-hidden ${
+            isExpanded ? 'ring-2 ring-primary/30 border-primary/40' :
+            isComplete ? 'border-accent/50' : 'border-border'
+          }`}
           onClick={() => setExpandedPath(isExpanded ? null : path.id)}
         >
+          {/* Top gradient bar */}
+          <div className={`h-2 bg-gradient-to-r ${
+            isComplete ? 'from-accent to-game-health' :
+            progressPercent > 0 ? 'from-primary to-secondary' :
+            'from-muted-foreground/20 to-muted-foreground/10'
+          }`} />
           <CardContent className="p-6">
             <div className="flex items-start gap-4">
-              <div className={`p-4 rounded-2xl bg-${path.color}/10 shrink-0`}>
-                <Icon className={`w-8 h-8 text-${path.color}`} />
+              <div className={`w-16 h-16 rounded-2xl flex items-center justify-center shrink-0 text-3xl ${
+                isComplete ? 'bg-accent/15' : 'bg-primary/10'
+              }`}>
+                {PATH_EMOJIS[path.id] || '📚'}
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-1">
                   <h3 className="text-xl font-bold">{path.title}</h3>
-                  {isComplete && <CheckCircle className="w-5 h-5 text-accent shrink-0" />}
+                  {isComplete && <span className="text-lg">✅</span>}
                 </div>
                 <p className="text-sm font-medium text-muted-foreground">{path.subtitle}</p>
-                <p className="text-sm text-muted-foreground mt-2">{path.description}</p>
-                <div className="flex items-center gap-3 mt-3">
-                  <Badge variant="outline"><Clock className="w-3 h-3 mr-1" />{path.hours}</Badge>
-                  <Badge variant="secondary">{pathProgress.completed}/{pathProgress.total} moduli</Badge>
+                <p className="text-sm text-muted-foreground mt-2 line-clamp-2">{path.description}</p>
+                <div className="flex items-center gap-2 mt-3 flex-wrap">
+                  <span className="inline-flex items-center gap-1 text-xs px-2.5 py-1 rounded-full bg-muted text-muted-foreground">
+                    <Clock className="w-3 h-3" />{path.hours}
+                  </span>
+                  <span className={`inline-flex items-center gap-1 text-xs px-2.5 py-1 rounded-full font-semibold ${
+                    isComplete ? 'bg-accent/10 text-accent' : 'bg-primary/10 text-primary'
+                  }`}>
+                    {pathProgress.completed}/{pathProgress.total} moduli
+                  </span>
                 </div>
                 {pathProgress.total > 0 && (
                   <div className="mt-3">
-                    <Progress value={progressPercent} className="h-2" />
+                    <div className="relative h-3 bg-muted rounded-full overflow-hidden">
+                      <div className={`h-full rounded-full transition-all duration-700 ${isComplete ? 'bg-gradient-to-r from-accent to-game-health' : 'bg-gradient-to-r from-primary to-secondary'}`} style={{ width: `${progressPercent}%` }}>
+                        <div className="absolute inset-0 bg-white/20 rounded-full" style={{ height: '50%' }} />
+                      </div>
+                    </div>
                   </div>
                 )}
                 {isComplete && (
                   <Button
                     variant="default"
                     size="sm"
-                    className="mt-3 w-full"
+                    className="mt-3 w-full rounded-xl font-bold"
                     onClick={async (e) => {
                       e.stopPropagation();
                       const moduleIds = path.moduleIds;
@@ -347,12 +431,12 @@ const TrainingHub = () => {
                       toast({ title: '🎓 Attestato generato!', description: `Attestato "${path.title}" scaricato con successo.` });
                     }}
                   >
-                    <Download className="w-4 h-4 mr-2" /> Scarica Attestato
+                    <Download className="w-4 h-4 mr-2" /> Scarica Attestato 🎉
                   </Button>
                 )}
               </div>
               <div className="shrink-0">
-                <Button variant={isExpanded ? 'default' : 'outline'} size="sm">
+                <Button variant={isExpanded ? 'default' : 'outline'} size="sm" className="rounded-xl">
                   {isExpanded ? 'Chiudi' : 'Apri'}
                 </Button>
               </div>
@@ -453,43 +537,56 @@ const TrainingHub = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
-      <div className="bg-gradient-to-r from-primary/10 via-primary/5 to-background border-b">
+      {/* Header - gamified */}
+      <div className="bg-gradient-to-br from-primary/10 via-secondary/5 to-accent/5 border-b">
         <div className="container mx-auto px-4 py-6">
           <Button variant="ghost" size="sm" onClick={() => navigate('/')} className="mb-4">
             <ArrowLeft className="w-4 h-4 mr-2" /> Torna alla Home
           </Button>
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             <div>
-              <h1 className="text-3xl font-bold">Piano Formativo</h1>
-              <p className="text-muted-foreground mt-1">Tutti i percorsi sono indipendenti • Accordo Stato-Regioni 2025</p>
+              <h1 className="text-3xl font-bold flex items-center gap-3">
+                <span className="text-3xl">🎓</span> Piano Formativo
+              </h1>
+              <p className="text-muted-foreground mt-1">Completa i percorsi e guadagna XP • Accordo Stato-Regioni 2025</p>
             </div>
-            <Card className="min-w-[280px]">
+            {/* Level card - Duolingo style */}
+            <Card className="min-w-[280px] border-2 border-primary/20 rounded-2xl overflow-hidden">
+              <div className="h-1.5 bg-gradient-to-r from-primary via-game-xp to-accent" />
               <CardContent className="p-4">
-                <div className="flex items-center gap-3 mb-2">
-                  <div className="p-2 rounded-full bg-primary/10"><Star className="w-5 h-5 text-primary" /></div>
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary/20 to-game-xp/20 flex items-center justify-center">
+                    <span className="text-2xl font-black text-primary">{currentLevel.level}</span>
+                  </div>
                   <div>
-                    <p className="text-sm font-semibold">Livello {currentLevel.level} • {currentLevel.title}</p>
-                    <p className="text-xs text-muted-foreground">{userXp.total_xp} XP totali</p>
+                    <p className="text-sm font-bold">{currentLevel.title}</p>
+                    <p className="text-xs text-muted-foreground flex items-center gap-1">
+                      <Star className="w-3 h-3 text-game-xp fill-game-xp" /> {userXp.total_xp} XP totali
+                    </p>
                   </div>
                 </div>
-                <Progress value={xpProgress} className="h-2" />
-                {nextLevel && <p className="text-[10px] text-muted-foreground mt-1 text-right">{nextLevel.minXp - userXp.total_xp} XP al prossimo livello</p>}
+                <div className="relative h-3 bg-muted rounded-full overflow-hidden">
+                  <div className="h-full rounded-full bg-gradient-to-r from-primary to-game-xp transition-all duration-700" style={{ width: `${xpProgress}%` }}>
+                    <div className="absolute inset-0 bg-white/20 rounded-full" style={{ height: '50%' }} />
+                  </div>
+                </div>
+                {nextLevel && <p className="text-[10px] text-muted-foreground mt-1.5 text-right">{nextLevel.minXp - userXp.total_xp} XP al prossimo livello</p>}
               </CardContent>
             </Card>
           </div>
-          <div className="grid grid-cols-3 gap-4 mt-6">
-            <div className="flex items-center gap-2">
+          {/* Stats row - fun badges */}
+          <div className="flex flex-wrap gap-3 mt-6">
+            <div className="flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-accent/10 border border-accent/20">
               <CheckCircle className="w-5 h-5 text-accent" />
-              <div><p className="text-lg font-bold">{totalCompleted}</p><p className="text-xs text-muted-foreground">Moduli completati</p></div>
+              <div><p className="text-lg font-bold leading-tight">{totalCompleted}</p><p className="text-[10px] text-muted-foreground">Completati</p></div>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-secondary/10 border border-secondary/20">
               <Clock className="w-5 h-5 text-secondary" />
-              <div><p className="text-lg font-bold">{totalTimeMinutes} min</p><p className="text-xs text-muted-foreground">Tempo totale</p></div>
+              <div><p className="text-lg font-bold leading-tight">{totalTimeMinutes}m</p><p className="text-[10px] text-muted-foreground">Studio</p></div>
             </div>
-            <div className="flex items-center gap-2">
-              <Zap className="w-5 h-5 text-primary" />
-              <div><p className="text-lg font-bold">{userXp.total_xp}</p><p className="text-xs text-muted-foreground">Punti XP</p></div>
+            <div className="flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-game-xp/10 border border-game-xp/30">
+              <Zap className="w-5 h-5 text-game-xp" />
+              <div><p className="text-lg font-bold leading-tight">{userXp.total_xp}</p><p className="text-[10px] text-muted-foreground">XP</p></div>
             </div>
           </div>
         </div>
