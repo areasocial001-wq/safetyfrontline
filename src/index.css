@@ -112,6 +112,15 @@ All colors MUST be HSL.
     
     --shadow-glow: 0 0 30px hsl(16 100% 60% / 0.4);
     
+    --game-xp: 48 100% 55%;
+    --game-health: 142 76% 50%;
+    --game-streak: 16 100% 65%;
+    --game-combo: 280 80% 65%;
+    --game-correct: 142 76% 50%;
+    --game-wrong: 0 84% 60%;
+    --game-card-hover: 220 13% 14%;
+    --game-card-active: 210 40% 15%;
+    
     --sidebar-background: 220 13% 9%;
     --sidebar-foreground: 0 0% 98%;
     --sidebar-primary: 16 100% 60%;
