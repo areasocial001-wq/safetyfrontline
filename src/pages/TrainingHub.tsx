@@ -346,38 +346,64 @@ const TrainingHub = () => {
     const progressPercent = pathProgress.total > 0 ? (pathProgress.completed / pathProgress.total) * 100 : 0;
     const isComplete = pathProgress.completed === pathProgress.total && pathProgress.total > 0;
 
+    const PATH_EMOJIS: Record<string, string> = {
+      lavoratori: '🎓', rspp: '👑', rls: '🤝', preposto: '👁️',
+      cybersecurity: '🛡️', antincendio: '🔥', primo_soccorso: '❤️‍🩹',
+    };
+
     return (
       <div key={path.id} className="space-y-4">
         <Card 
-          className={`cursor-pointer transition-all duration-300 hover:shadow-lg hover:-translate-y-1 ${isExpanded ? 'ring-2 ring-primary/50' : ''} ${isComplete ? 'border-accent/50' : ''}`}
+          className={`cursor-pointer transition-all duration-300 hover:shadow-lg hover:-translate-y-1 border-2 rounded-2xl overflow-hidden ${
+            isExpanded ? 'ring-2 ring-primary/30 border-primary/40' :
+            isComplete ? 'border-accent/50' : 'border-border'
+          }`}
           onClick={() => setExpandedPath(isExpanded ? null : path.id)}
         >
+          {/* Top gradient bar */}
+          <div className={`h-2 bg-gradient-to-r ${
+            isComplete ? 'from-accent to-game-health' :
+            progressPercent > 0 ? 'from-primary to-secondary' :
+            'from-muted-foreground/20 to-muted-foreground/10'
+          }`} />
           <CardContent className="p-6">
             <div className="flex items-start gap-4">
-              <div className={`p-4 rounded-2xl bg-${path.color}/10 shrink-0`}>
-                <Icon className={`w-8 h-8 text-${path.color}`} />
+              <div className={`w-16 h-16 rounded-2xl flex items-center justify-center shrink-0 text-3xl ${
+                isComplete ? 'bg-accent/15' : 'bg-primary/10'
+              }`}>
+                {PATH_EMOJIS[path.id] || '📚'}
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-1">
                   <h3 className="text-xl font-bold">{path.title}</h3>
-                  {isComplete && <CheckCircle className="w-5 h-5 text-accent shrink-0" />}
+                  {isComplete && <span className="text-lg">✅</span>}
                 </div>
                 <p className="text-sm font-medium text-muted-foreground">{path.subtitle}</p>
-                <p className="text-sm text-muted-foreground mt-2">{path.description}</p>
-                <div className="flex items-center gap-3 mt-3">
-                  <Badge variant="outline"><Clock className="w-3 h-3 mr-1" />{path.hours}</Badge>
-                  <Badge variant="secondary">{pathProgress.completed}/{pathProgress.total} moduli</Badge>
+                <p className="text-sm text-muted-foreground mt-2 line-clamp-2">{path.description}</p>
+                <div className="flex items-center gap-2 mt-3 flex-wrap">
+                  <span className="inline-flex items-center gap-1 text-xs px-2.5 py-1 rounded-full bg-muted text-muted-foreground">
+                    <Clock className="w-3 h-3" />{path.hours}
+                  </span>
+                  <span className={`inline-flex items-center gap-1 text-xs px-2.5 py-1 rounded-full font-semibold ${
+                    isComplete ? 'bg-accent/10 text-accent' : 'bg-primary/10 text-primary'
+                  }`}>
+                    {pathProgress.completed}/{pathProgress.total} moduli
+                  </span>
                 </div>
                 {pathProgress.total > 0 && (
                   <div className="mt-3">
-                    <Progress value={progressPercent} className="h-2" />
+                    <div className="relative h-3 bg-muted rounded-full overflow-hidden">
+                      <div className={`h-full rounded-full transition-all duration-700 ${isComplete ? 'bg-gradient-to-r from-accent to-game-health' : 'bg-gradient-to-r from-primary to-secondary'}`} style={{ width: `${progressPercent}%` }}>
+                        <div className="absolute inset-0 bg-white/20 rounded-full" style={{ height: '50%' }} />
+                      </div>
+                    </div>
                   </div>
                 )}
                 {isComplete && (
                   <Button
                     variant="default"
                     size="sm"
-                    className="mt-3 w-full"
+                    className="mt-3 w-full rounded-xl font-bold"
                     onClick={async (e) => {
                       e.stopPropagation();
                       const moduleIds = path.moduleIds;
@@ -405,12 +431,12 @@ const TrainingHub = () => {
                       toast({ title: '🎓 Attestato generato!', description: `Attestato "${path.title}" scaricato con successo.` });
                     }}
                   >
-                    <Download className="w-4 h-4 mr-2" /> Scarica Attestato
+                    <Download className="w-4 h-4 mr-2" /> Scarica Attestato 🎉
                   </Button>
                 )}
               </div>
               <div className="shrink-0">
-                <Button variant={isExpanded ? 'default' : 'outline'} size="sm">
+                <Button variant={isExpanded ? 'default' : 'outline'} size="sm" className="rounded-xl">
                   {isExpanded ? 'Chiudi' : 'Apri'}
                 </Button>
               </div>
