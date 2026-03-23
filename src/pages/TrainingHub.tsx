@@ -152,7 +152,7 @@ const TrainingHub = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { progress, userXp, loading: progressLoading, getModuleProgress } = useTrainingProgress();
-  const { userSector, loading: sectorLoading, selectSector } = useRiskSector();
+  
   const [allModules, setAllModules] = useState<any[]>([]);
   const [expandedPath, setExpandedPath] = useState<string | null>(null);
 
