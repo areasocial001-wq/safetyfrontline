@@ -229,55 +229,113 @@ const TrainingHub = () => {
     const Icon = ALL_ICONS[mod.icon_name] || Shield;
     const isLocked = status === 'locked';
     const isCompleted = status === 'completed';
+    const isInProgress = status === 'in_progress';
     const sectionProgress = mp ? (mp.current_section / (SECTION_COUNTS[mod.id] || 1)) * 100 : 0;
 
     return (
-      <Card key={mod.id} className={`relative overflow-hidden transition-all duration-300 ${isLocked ? 'opacity-60 grayscale' : 'hover:shadow-lg hover:-translate-y-1'} ${isCompleted ? 'border-accent/50 bg-accent/5' : ''}`}>
-        <div className="absolute top-4 right-4">
-          <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold ${isCompleted ? 'bg-accent text-accent-foreground' : isLocked ? 'bg-muted text-muted-foreground' : 'bg-primary text-primary-foreground'}`}>
-            {isCompleted ? <CheckCircle className="w-5 h-5" /> : index + 1}
-          </div>
-        </div>
-        <CardHeader>
-          <div className="flex items-center gap-3">
-            <div className={`p-3 rounded-xl ${isCompleted ? 'bg-accent/20' : isLocked ? 'bg-muted' : 'bg-primary/10'}`}>
-              {isLocked ? <Lock className="w-6 h-6 text-muted-foreground" /> : <Icon className="w-6 h-6 text-primary" />}
-            </div>
-            <div className="flex-1">
-              <CardTitle className="text-lg">{mod.title}</CardTitle>
-              <CardDescription>{mod.subtitle}</CardDescription>
-            </div>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <p className="text-sm text-muted-foreground mb-4">{mod.description}</p>
-          <div className="flex items-center gap-2 mb-4">
-            <Badge variant={mod.style === '3d' ? 'default' : mod.style === 'hybrid' ? 'secondary' : 'outline'}>
-              {mod.style === '3d' ? '3D Simulato' : mod.style === 'hybrid' ? 'Ibrido 2D/3D' : '2D Interattivo'}
-            </Badge>
-            <Badge variant="outline"><Clock className="w-3 h-3 mr-1" />{mod.min_duration_minutes} min</Badge>
-          </div>
-          {status === 'in_progress' && mp && (
-            <div className="mb-4">
-              <div className="flex justify-between text-xs text-muted-foreground mb-1">
-                <span>Sezione {mp.current_section}/{SECTION_COUNTS[mod.id]}</span>
-                <span>{mp.xp_earned} XP</span>
+      <div key={mod.id} className={`relative group ${isLocked ? 'opacity-50' : ''}`}>
+        {/* Connector line */}
+        {index > 0 && (
+          <div className="absolute -top-4 left-1/2 w-0.5 h-4 bg-border" />
+        )}
+        <Card className={`relative overflow-hidden transition-all duration-300 border-2 ${
+          isCompleted ? 'border-accent/60 bg-accent/5 shadow-md' :
+          isInProgress ? 'border-primary/50 bg-primary/5 shadow-lg ring-2 ring-primary/20' :
+          isLocked ? 'border-muted bg-muted/5' :
+          'border-border hover:border-primary/40 hover:shadow-lg hover:-translate-y-1'
+        } rounded-2xl`}>
+          {/* Top accent bar */}
+          {!isLocked && (
+            <div className={`h-1.5 ${isCompleted ? 'bg-gradient-to-r from-accent to-game-health' : isInProgress ? 'bg-gradient-to-r from-primary to-secondary' : 'bg-gradient-to-r from-muted-foreground/20 to-muted-foreground/10'}`} />
+          )}
+          <CardContent className="p-5">
+            <div className="flex items-start gap-4">
+              {/* Icon circle - Duolingo node style */}
+              <div className={`relative w-14 h-14 rounded-2xl flex items-center justify-center shrink-0 transition-all ${
+                isCompleted ? 'bg-accent/20 shadow-inner' :
+                isLocked ? 'bg-muted' :
+                isInProgress ? 'bg-primary/15 shadow-md' :
+                'bg-primary/10 group-hover:bg-primary/15'
+              }`}>
+                {isLocked ? (
+                  <Lock className="w-6 h-6 text-muted-foreground" />
+                ) : isCompleted ? (
+                  <CheckCircle className="w-7 h-7 text-accent" />
+                ) : (
+                  <Icon className={`w-7 h-7 ${isInProgress ? 'text-primary' : 'text-primary/80'}`} />
+                )}
+                {/* Step number badge */}
+                <div className={`absolute -top-1.5 -right-1.5 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
+                  isCompleted ? 'bg-accent text-accent-foreground' :
+                  isLocked ? 'bg-muted-foreground/30 text-muted-foreground' :
+                  'bg-primary text-primary-foreground'
+                }`}>
+                  {isCompleted ? '✓' : index + 1}
+                </div>
               </div>
-              <Progress value={sectionProgress} className="h-2" />
+
+              <div className="flex-1 min-w-0">
+                <h4 className={`font-bold text-base mb-0.5 ${isLocked ? 'text-muted-foreground' : ''}`}>{mod.title}</h4>
+                {mod.subtitle && <p className="text-xs text-muted-foreground mb-2">{mod.subtitle}</p>}
+                
+                <div className="flex items-center gap-2 flex-wrap mb-3">
+                  <span className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-muted text-muted-foreground">
+                    <Clock className="w-3 h-3" />{mod.min_duration_minutes} min
+                  </span>
+                  <span className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-game-xp/10 text-game-xp">
+                    <Star className="w-3 h-3" />{mod.style === '3d' ? '3D' : mod.style === 'hybrid' ? 'Ibrido' : 'Interattivo'}
+                  </span>
+                </div>
+
+                {/* Progress bar for in-progress */}
+                {isInProgress && mp && (
+                  <div className="mb-3">
+                    <div className="flex justify-between text-xs mb-1">
+                      <span className="text-muted-foreground">Sezione {mp.current_section}/{SECTION_COUNTS[mod.id]}</span>
+                      <span className="font-semibold text-primary">{mp.xp_earned} XP</span>
+                    </div>
+                    <div className="relative h-3 bg-muted rounded-full overflow-hidden">
+                      <div className="h-full rounded-full bg-gradient-to-r from-primary to-secondary transition-all duration-500" style={{ width: `${sectionProgress}%` }}>
+                        <div className="absolute inset-0 bg-white/20 rounded-full" style={{ height: '50%' }} />
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Completed stats */}
+                {isCompleted && mp && (
+                  <div className="flex items-center gap-3 mb-3 p-2 rounded-xl bg-accent/10">
+                    <div className="flex items-center gap-1">
+                      <Trophy className="w-4 h-4 text-accent" />
+                      <span className="text-sm font-semibold">{mp.score}/{mp.max_score}</span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <Star className="w-3 h-3 text-game-xp fill-game-xp" />
+                      <span className="text-xs font-medium text-game-xp">{mp.xp_earned} XP</span>
+                    </div>
+                  </div>
+                )}
+
+                <Button
+                  className={`w-full rounded-xl h-10 font-bold transition-all ${
+                    isCompleted ? 'bg-accent/10 text-accent hover:bg-accent/20 border border-accent/30' :
+                    isInProgress ? 'bg-primary shadow-md' :
+                    isLocked ? '' : 'bg-primary shadow-sm'
+                  }`}
+                  variant={isLocked ? 'outline' : isCompleted ? 'ghost' : 'default'}
+                  disabled={isLocked}
+                  onClick={() => navigate(`/formazione/${mod.id}`)}
+                >
+                  {isLocked ? <><Lock className="w-4 h-4 mr-2" /> Sblocca</> :
+                   isCompleted ? <><Award className="w-4 h-4 mr-2" /> Rivedi</> :
+                   isInProgress ? <><Play className="w-4 h-4 mr-2" /> Continua</> :
+                   <><Play className="w-4 h-4 mr-2" /> Inizia</>}
+                </Button>
+              </div>
             </div>
-          )}
-          {isCompleted && mp && (
-            <div className="flex items-center gap-2 mb-4 p-2 rounded-lg bg-accent/10">
-              <Trophy className="w-4 h-4 text-accent" />
-              <span className="text-sm font-medium">Punteggio: {mp.score}/{mp.max_score}</span>
-              <span className="text-xs text-muted-foreground ml-auto">{mp.xp_earned} XP</span>
-            </div>
-          )}
-          <Button className="w-full" variant={isLocked ? 'outline' : isCompleted ? 'secondary' : 'default'} disabled={isLocked} onClick={() => navigate(`/formazione/${mod.id}`)}>
-            {isLocked ? <><Lock className="w-4 h-4 mr-2" /> Completa il modulo precedente</> : isCompleted ? <><Award className="w-4 h-4 mr-2" /> Rivedi</> : status === 'in_progress' ? <><Play className="w-4 h-4 mr-2" /> Continua</> : <><Play className="w-4 h-4 mr-2" /> Inizia</>}
-          </Button>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      </div>
     );
   };
 
