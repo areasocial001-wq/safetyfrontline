@@ -698,6 +698,27 @@ const Demo3D = () => {
     }
   };
 
+  // Quick-swap extinguisher with number keys 1-4 during fire simulation
+  useEffect(() => {
+    if (!gameStarted || !selectedScenario || selectedScenario.type !== 'laboratory') return;
+    const TYPES: ExtinguisherType[] = ['co2', 'powder', 'foam', 'water'];
+    const LABELS: Record<ExtinguisherType, string> = { co2: 'CO₂', powder: 'Polvere', foam: 'Schiuma', water: 'Acqua' };
+    const handleKey = (e: KeyboardEvent) => {
+      const idx = parseInt(e.key) - 1;
+      if (idx >= 0 && idx < 4) {
+        const newType = TYPES[idx];
+        if (newType !== selectedExtinguisher) {
+          setSelectedExtinguisher(newType);
+          setExtinguisherCharge(100);
+          setExtinguisherMaxCharge(100);
+          toast.info(`🧯 Estintore cambiato: ${LABELS[newType]}`);
+        }
+      }
+    };
+    window.addEventListener('keydown', handleKey);
+    return () => window.removeEventListener('keydown', handleKey);
+  }, [gameStarted, selectedScenario, selectedExtinguisher]);
+
   // Handle gyroscope toggle
   const handleGyroscopeToggle = async () => {
     if (isGyroEnabled) {

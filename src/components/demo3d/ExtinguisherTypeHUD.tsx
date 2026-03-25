@@ -1,10 +1,12 @@
-import { Flame, Droplets, Wind, CloudRain } from 'lucide-react';
+import { Flame, Droplets, Wind, CloudRain, FlaskConical } from 'lucide-react';
 import type { ExtinguisherType } from '@/components/demo3d/ExtinguisherSelection';
 
 interface ExtinguisherTypeHUDProps {
   type: ExtinguisherType;
   visible: boolean;
 }
+
+const TYPES_ORDER: ExtinguisherType[] = ['co2', 'powder', 'foam', 'water'];
 
 const CONFIG: Record<ExtinguisherType, { label: string; icon: typeof Flame; color: string; bgColor: string; borderColor: string }> = {
   co2: {
@@ -16,7 +18,7 @@ const CONFIG: Record<ExtinguisherType, { label: string; icon: typeof Flame; colo
   },
   powder: {
     label: 'Polvere',
-    icon: CloudRain,
+    icon: FlaskConical,
     color: 'text-yellow-400',
     bgColor: 'bg-yellow-500/15',
     borderColor: 'border-yellow-500/40',
@@ -40,24 +42,45 @@ const CONFIG: Record<ExtinguisherType, { label: string; icon: typeof Flame; colo
 export const ExtinguisherTypeHUD = ({ type, visible }: ExtinguisherTypeHUDProps) => {
   if (!visible) return null;
 
-  const cfg = CONFIG[type];
-  const Icon = cfg.icon;
-
   return (
     <div className="absolute bottom-36 right-4 z-30 pointer-events-none">
-      <div className={`
-        flex items-center gap-2.5 px-4 py-2.5 rounded-lg backdrop-blur-md border-2 
-        shadow-lg transition-all duration-500 animate-fade-in
-        ${cfg.bgColor} ${cfg.borderColor}
-      `}>
-        <div className={`p-1.5 rounded-md ${cfg.bgColor}`}>
-          <Icon className={`w-5 h-5 ${cfg.color}`} />
+      <div className="flex flex-col items-end gap-1.5">
+        {/* Quick-swap slots */}
+        <div className="flex gap-1.5">
+          {TYPES_ORDER.map((t, i) => {
+            const cfg = CONFIG[t];
+            const Icon = cfg.icon;
+            const isActive = t === type;
+            return (
+              <div
+                key={t}
+                className={`
+                  relative flex flex-col items-center gap-0.5 px-2 py-1.5 rounded-lg backdrop-blur-md border transition-all duration-300
+                  ${isActive
+                    ? `${cfg.bgColor} ${cfg.borderColor} border-2 shadow-lg scale-110`
+                    : 'bg-background/40 border-border/30 opacity-50'
+                  }
+                `}
+              >
+                {/* Key number badge */}
+                <span className={`
+                  absolute -top-2 -left-1 w-4 h-4 rounded text-[9px] font-bold flex items-center justify-center
+                  ${isActive ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground'}
+                `}>
+                  {i + 1}
+                </span>
+                <Icon className={`w-4 h-4 ${isActive ? cfg.color : 'text-muted-foreground'}`} />
+                <span className={`text-[9px] font-semibold ${isActive ? cfg.color : 'text-muted-foreground'}`}>
+                  {cfg.label}
+                </span>
+              </div>
+            );
+          })}
         </div>
-        <div className="flex flex-col">
-          <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Estintore</span>
-          <span className={`text-sm font-bold ${cfg.color}`}>{cfg.label}</span>
-        </div>
-        <Flame className={`w-3.5 h-3.5 ${cfg.color} opacity-60`} />
+        {/* Hint */}
+        <span className="text-[9px] text-muted-foreground/60 mr-1">
+          Premi 1-4 per cambiare
+        </span>
       </div>
     </div>
   );
