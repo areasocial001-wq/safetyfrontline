@@ -523,9 +523,60 @@ export const BabylonScene = ({
       } catch (e) { /* audio not available */ }
     };
 
+    // Metallic sparks particle effect at extinguisher position
+    const emitSwapSparks = () => {
+      const extNode = scene.getTransformNodeByName('extinguisher_parent');
+      if (!extNode) return;
+
+      const sparkEmitter = BABYLON.MeshBuilder.CreateSphere('sparkEmitter', { diameter: 0.02 }, scene);
+      sparkEmitter.parent = camera;
+      sparkEmitter.position = extNode.position.clone();
+      sparkEmitter.isVisible = false;
+
+      const sparks = new BABYLON.ParticleSystem('swapSparks', 80, scene);
+      sparks.emitter = sparkEmitter;
+      sparks.particleTexture = new BABYLON.Texture('https://assets.babylonjs.com/textures/flare.png', scene);
+
+      // Bright orange-yellow metallic spark colors
+      sparks.color1 = new BABYLON.Color4(1.0, 0.85, 0.3, 1.0);
+      sparks.color2 = new BABYLON.Color4(1.0, 0.5, 0.1, 0.9);
+      sparks.colorDead = new BABYLON.Color4(0.8, 0.2, 0.0, 0.0);
+
+      sparks.minSize = 0.008;
+      sparks.maxSize = 0.03;
+      sparks.minLifeTime = 0.15;
+      sparks.maxLifeTime = 0.4;
+      sparks.emitRate = 200;
+      sparks.blendMode = BABYLON.ParticleSystem.BLENDMODE_ONEONE;
+
+      // Scatter in all directions from swap point
+      sparks.direction1 = new BABYLON.Vector3(-1.5, -1.5, -1.5);
+      sparks.direction2 = new BABYLON.Vector3(1.5, 2.0, 1.5);
+      sparks.minEmitPower = 1.5;
+      sparks.maxEmitPower = 4.0;
+      sparks.updateSpeed = 0.008;
+      sparks.gravity = new BABYLON.Vector3(0, -6, 0);
+
+      sparks.minEmitBox = new BABYLON.Vector3(-0.03, -0.03, -0.03);
+      sparks.maxEmitBox = new BABYLON.Vector3(0.03, 0.03, 0.03);
+
+      // Sparks shrink as they die
+      sparks.addSizeGradient(0, 0.03);
+      sparks.addSizeGradient(1.0, 0.003);
+
+      sparks.start();
+
+      // Stop after short burst
+      setTimeout(() => {
+        sparks.stop();
+        setTimeout(() => { sparks.dispose(); sparkEmitter.dispose(); }, 600);
+      }, 250);
+    };
+
     if (existing) {
-      // Play metallic clank on swap start
+      // Play metallic clank + sparks on swap start
       playSwapSound();
+      emitSwapSparks();
 
       // Animate old extinguisher DOWN then swap
       const restY = existing.position.y;
