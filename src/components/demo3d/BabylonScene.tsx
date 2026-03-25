@@ -437,23 +437,67 @@ export const BabylonScene = ({
     };
   }, [scenario.id, quality]);
 
-  // Create first-person extinguisher when type is selected (after tutorial/quiz flow)
+  // Create first-person extinguisher with swap animation
   useEffect(() => {
     if (!sceneRef.current || !cameraRef.current) return;
     if (scenario.type !== 'laboratory' || !extinguisherType) return;
 
-    // Remove any existing extinguisher parts
     const scene = sceneRef.current;
+    const camera = cameraRef.current;
     const existing = scene.getTransformNodeByName('extinguisher_parent');
+
     if (existing) {
-      existing.getChildMeshes().forEach(m => m.dispose());
-      existing.dispose();
+      // Animate old extinguisher DOWN then swap
+      const restY = existing.position.y;
+      const anim = new BABYLON.Animation(
+        'ext_swapOut', 'position.y', 30,
+        BABYLON.Animation.ANIMATIONTYPE_FLOAT,
+        BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT
+      );
+      anim.setKeys([
+        { frame: 0, value: restY },
+        { frame: 8, value: restY - 0.6 },
+      ]);
+      const ease = new BABYLON.CubicEase();
+      ease.setEasingMode(BABYLON.EasingFunction.EASINGMODE_EASEIN);
+      anim.setEasingFunction(ease);
+      existing.animations = [anim];
+
+      scene.beginAnimation(existing, 0, 8, false, 1, () => {
+        // Dispose old
+        existing.getChildMeshes().forEach(m => m.dispose());
+        existing.dispose();
+
+        // Create new & animate UP
+        createFirstPersonExtinguisher(scene, camera, extinguisherType);
+        const newNode = scene.getTransformNodeByName('extinguisher_parent');
+        if (newNode) {
+          const targetY = newNode.position.y;
+          newNode.position.y = targetY - 0.6;
+          const animIn = new BABYLON.Animation(
+            'ext_swapIn', 'position.y', 30,
+            BABYLON.Animation.ANIMATIONTYPE_FLOAT,
+            BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT
+          );
+          animIn.setKeys([
+            { frame: 0, value: targetY - 0.6 },
+            { frame: 10, value: targetY },
+          ]);
+          const easeIn = new BABYLON.CubicEase();
+          easeIn.setEasingMode(BABYLON.EasingFunction.EASINGMODE_EASEOUT);
+          animIn.setEasingFunction(easeIn);
+          newNode.animations = [animIn];
+          scene.beginAnimation(newNode, 0, 10, false);
+        }
+      });
+    } else {
+      // First time — just create directly
+      createFirstPersonExtinguisher(scene, camera, extinguisherType);
     }
 
-    createFirstPersonExtinguisher(scene, cameraRef.current, extinguisherType);
     extChargeRef.current = { current: 100, max: 100 };
     onChargeChange?.(100, 100);
-    console.log('[BabylonScene] ✓ Extinguisher created/updated:', extinguisherType);
+    console.log('[BabylonScene] ✓ Extinguisher swap:', extinguisherType);
   }, [extinguisherType, scenario.type]);
 
   // Update risk visibility when risksFoundIds changes
