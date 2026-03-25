@@ -566,6 +566,25 @@ export const BabylonScene = ({
 
       sparks.start();
 
+      // Point light flash accompanying sparks
+      const flashLight = new BABYLON.PointLight('swapFlash', extNode.position.clone(), scene);
+      flashLight.parent = camera;
+      flashLight.diffuse = new BABYLON.Color3(1.0, 0.7, 0.2);
+      flashLight.specular = new BABYLON.Color3(1.0, 0.85, 0.4);
+      flashLight.intensity = 8;
+      flashLight.range = 3;
+
+      // Rapid fade-out for the flash
+      let flashTime = 0;
+      const flashObs = scene.onBeforeRenderObservable.add(() => {
+        flashTime += scene.getEngine().getDeltaTime() / 1000;
+        flashLight.intensity = Math.max(0, 8 * (1 - flashTime / 0.35));
+        if (flashTime >= 0.35) {
+          scene.onBeforeRenderObservable.remove(flashObs);
+          flashLight.dispose();
+        }
+      });
+
       // Stop after short burst
       setTimeout(() => {
         sparks.stop();
