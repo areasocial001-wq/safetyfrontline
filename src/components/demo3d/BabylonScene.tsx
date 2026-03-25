@@ -446,7 +446,87 @@ export const BabylonScene = ({
     const camera = cameraRef.current;
     const existing = scene.getTransformNodeByName('extinguisher_parent');
 
+    // Metallic swap sound effect using Web Audio API
+    const playSwapSound = () => {
+      try {
+        const ctx = new AudioContext();
+        const now = ctx.currentTime;
+
+        // Layer 1: metallic clank (short high-freq burst)
+        const osc1 = ctx.createOscillator();
+        const g1 = ctx.createGain();
+        const f1 = ctx.createBiquadFilter();
+        osc1.type = 'square';
+        osc1.frequency.setValueAtTime(1200, now);
+        osc1.frequency.exponentialRampToValueAtTime(300, now + 0.08);
+        f1.type = 'bandpass';
+        f1.frequency.value = 800;
+        f1.Q.value = 5;
+        g1.gain.setValueAtTime(0.35, now);
+        g1.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
+        osc1.connect(f1).connect(g1).connect(ctx.destination);
+        osc1.start(now);
+        osc1.stop(now + 0.12);
+
+        // Layer 2: deep thud (low resonance)
+        const osc2 = ctx.createOscillator();
+        const g2 = ctx.createGain();
+        osc2.type = 'sine';
+        osc2.frequency.setValueAtTime(90, now);
+        osc2.frequency.exponentialRampToValueAtTime(40, now + 0.15);
+        g2.gain.setValueAtTime(0.25, now);
+        g2.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
+        osc2.connect(g2).connect(ctx.destination);
+        osc2.start(now);
+        osc2.stop(now + 0.15);
+
+        // Layer 3: metallic rattle (noise burst through resonant filter)
+        const noiseBuf = ctx.createBuffer(1, ctx.sampleRate * 0.1, ctx.sampleRate);
+        const nd = noiseBuf.getChannelData(0);
+        for (let i = 0; i < nd.length; i++) nd[i] = Math.random() * 2 - 1;
+        const noise = ctx.createBufferSource();
+        noise.buffer = noiseBuf;
+        const nf = ctx.createBiquadFilter();
+        nf.type = 'bandpass';
+        nf.frequency.value = 3500;
+        nf.Q.value = 8;
+        const ng = ctx.createGain();
+        ng.gain.setValueAtTime(0.15, now);
+        ng.gain.exponentialRampToValueAtTime(0.001, now + 0.1);
+        noise.connect(nf).connect(ng).connect(ctx.destination);
+        noise.start(now);
+        noise.stop(now + 0.1);
+
+        setTimeout(() => ctx.close(), 500);
+      } catch (e) { /* audio not available */ }
+    };
+
+    // Second metallic click when new extinguisher locks in
+    const playLockSound = () => {
+      try {
+        const ctx = new AudioContext();
+        const now = ctx.currentTime;
+        const osc = ctx.createOscillator();
+        const g = ctx.createGain();
+        const f = ctx.createBiquadFilter();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(600, now);
+        osc.frequency.exponentialRampToValueAtTime(900, now + 0.06);
+        f.type = 'highpass';
+        f.frequency.value = 400;
+        g.gain.setValueAtTime(0.3, now);
+        g.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
+        osc.connect(f).connect(g).connect(ctx.destination);
+        osc.start(now);
+        osc.stop(now + 0.08);
+        setTimeout(() => ctx.close(), 300);
+      } catch (e) { /* audio not available */ }
+    };
+
     if (existing) {
+      // Play metallic clank on swap start
+      playSwapSound();
+
       // Animate old extinguisher DOWN then swap
       const restY = existing.position.y;
       const anim = new BABYLON.Animation(
@@ -467,6 +547,9 @@ export const BabylonScene = ({
         // Dispose old
         existing.getChildMeshes().forEach(m => m.dispose());
         existing.dispose();
+
+        // Play lock-in click
+        playLockSound();
 
         // Create new & animate UP
         createFirstPersonExtinguisher(scene, camera, extinguisherType);
