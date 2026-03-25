@@ -437,6 +437,25 @@ export const BabylonScene = ({
     };
   }, [scenario.id, quality]);
 
+  // Create first-person extinguisher when type is selected (after tutorial/quiz flow)
+  useEffect(() => {
+    if (!sceneRef.current || !cameraRef.current) return;
+    if (scenario.type !== 'laboratory' || !extinguisherType) return;
+
+    // Remove any existing extinguisher parts
+    const scene = sceneRef.current;
+    const existing = scene.getTransformNodeByName('extinguisher_parent');
+    if (existing) {
+      existing.getChildMeshes().forEach(m => m.dispose());
+      existing.dispose();
+    }
+
+    createFirstPersonExtinguisher(scene, cameraRef.current, extinguisherType);
+    extChargeRef.current = { current: 100, max: 100 };
+    onChargeChange?.(100, 100);
+    console.log('[BabylonScene] ✓ Extinguisher created/updated:', extinguisherType);
+  }, [extinguisherType, scenario.type]);
+
   // Update risk visibility when risksFoundIds changes
   useEffect(() => {
     if (!sceneRef.current) return;
