@@ -711,7 +711,7 @@ const Demo3D = () => {
           setSelectedExtinguisher(newType);
           setExtinguisherCharge(100);
           setExtinguisherMaxCharge(100);
-          toast.info(`🧯 Estintore cambiato: ${LABELS[newType]}`);
+          toast({ title: `🧯 Estintore cambiato: ${LABELS[newType]}` });
         }
       }
     };
