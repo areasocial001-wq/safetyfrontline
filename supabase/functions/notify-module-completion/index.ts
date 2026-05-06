@@ -38,12 +38,12 @@ serve(async (req: Request) => {
       global: { headers: { Authorization: authHeader } },
     });
     const token = authHeader.replace("Bearer ", "");
-    const { data: claimsData, error: claimsError } = await authSupabase.auth.getClaims(token);
-    if (claimsError || !claimsData?.claims) {
+    const { data: userData, error: userError } = await authSupabase.auth.getUser(token);
+    if (userError || !userData?.user) {
       return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
-    const callerId = claimsData.claims.sub as string;
+    const callerId = userData.user.id;
     const { userId, moduleId, moduleTitle, score, maxScore, xpEarned, timeSpentMinutes }: NotifyRequest = await req.json();
 
     // Verify the caller is the same user as the userId in the request
