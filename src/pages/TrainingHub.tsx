@@ -15,7 +15,7 @@ import {
 import { useAuth } from '@/hooks/useAuth';
 import { useTrainingProgress } from '@/hooks/useTrainingProgress';
 
-import { getLevelFromXp, getNextLevel } from '@/data/training-content';
+import { getLevelFromXp, getNextLevel, getModuleContent } from '@/data/training-content';
 import { MultiplayerChallenges } from '@/components/training/MultiplayerChallenges';
 import { getSpecificaFromAteco, SPECIFICA_CATEGORIES, SpecificaCategory } from '@/lib/ateco-mapping';
 
