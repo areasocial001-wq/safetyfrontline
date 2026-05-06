@@ -206,6 +206,7 @@ const PointAndClickLevel = ({ levelData = DEFAULT_LEVEL, forcedPreset, readOnly,
   }, [user, levelData.level_id, levelData.total_hazards]);
 
   const handleHazardClick = useCallback((hazard: Hazard) => {
+    if (readOnly) return;
     if (calibrate) { setSelectedId(hazard.id); return; }
     if (foundHazards.has(hazard.id)) return;
     const newFound = new Set(foundHazards).add(hazard.id);
