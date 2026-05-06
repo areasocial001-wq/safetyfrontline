@@ -2,7 +2,7 @@ import { NavLink } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Gamepad2, Trophy, Target, Zap, Play, Sparkles } from "lucide-react";
+import { Gamepad2, Trophy, Target, Zap, Play, Sparkles, Flame, ShieldAlert, Users, Bot } from "lucide-react";
 import heroGameImage from "@/assets/hero-game-corridor.jpg";
 
 export const Demo3DShowcase = () => {
@@ -26,10 +26,10 @@ export const Demo3DShowcase = () => {
             </div>
             
             <h2 className="text-4xl md:text-6xl font-bold mb-4">
-              Gioco <span className="bg-gradient-hero bg-clip-text text-transparent drop-shadow-lg">3D First-Person</span>
+              Simulazioni <span className="bg-gradient-hero bg-clip-text text-transparent drop-shadow-lg">3D First-Person</span>
             </h2>
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-              Esplora ambienti di lavoro realistici in prima persona. Identifica i rischi, sblocca achievements e scala la classifica.
+              Antincendio con estintore reale, cybersecurity in ufficio, evacuazione ed NPC realistici (Ready Player Me + Mixamo). Tutto in browser con Babylon.js.
             </p>
           </div>
 
@@ -48,16 +48,16 @@ export const Demo3DShowcase = () => {
                 {/* Floating Badges on Image */}
                 <div className="absolute top-4 left-4 flex flex-col gap-2">
                   <Badge className="bg-primary/90 backdrop-blur-sm border-primary text-primary-foreground shadow-lg animate-pulse">
-                    <Trophy className="w-3 h-3 mr-1" />
-                    Achievements
+                    <Flame className="w-3 h-3 mr-1" />
+                    Estintore reale
                   </Badge>
                   <Badge className="bg-secondary/90 backdrop-blur-sm border-secondary text-secondary-foreground shadow-lg animate-pulse" style={{ animationDelay: '0.3s' }}>
-                    <Target className="w-3 h-3 mr-1" />
-                    Leaderboard
+                    <ShieldAlert className="w-3 h-3 mr-1" />
+                    Cybersecurity
                   </Badge>
                   <Badge className="bg-accent/90 backdrop-blur-sm border-accent text-accent-foreground shadow-lg animate-pulse" style={{ animationDelay: '0.6s' }}>
-                    <Zap className="w-3 h-3 mr-1" />
-                    Replay System
+                    <Users className="w-3 h-3 mr-1" />
+                    NPC realistici
                   </Badge>
                 </div>
 
@@ -79,29 +79,29 @@ export const Demo3DShowcase = () => {
                 <ul className="space-y-4">
                   <li className="flex items-start gap-3 group">
                     <div className="mt-1 p-2 rounded-lg bg-primary/10 group-hover:bg-primary/20 transition-colors">
-                      <Target className="w-5 h-5 text-primary" />
+                      <Flame className="w-5 h-5 text-primary" />
                     </div>
                     <div>
-                      <p className="font-semibold">Esplorazione 3D Realistica</p>
-                      <p className="text-sm text-muted-foreground">Muoviti liberamente in ambienti di lavoro autentici</p>
+                      <p className="font-semibold">Simulatore Antincendio Realistico</p>
+                      <p className="text-sm text-muted-foreground">Estintore in prima persona con particelle, classi di fuoco e quiz contestuali</p>
                     </div>
                   </li>
                   <li className="flex items-start gap-3 group">
                     <div className="mt-1 p-2 rounded-lg bg-secondary/10 group-hover:bg-secondary/20 transition-colors">
-                      <Trophy className="w-5 h-5 text-secondary" />
+                      <ShieldAlert className="w-5 h-5 text-secondary" />
                     </div>
                     <div>
-                      <p className="font-semibold">Sistema Achievement Avanzato</p>
-                      <p className="text-sm text-muted-foreground">Sblocca badges e confronta le tue performance</p>
+                      <p className="font-semibold">Cybersecurity in Ufficio 3D</p>
+                      <p className="text-sm text-muted-foreground">8 rischi nascosti da identificare con feedback educativo immediato</p>
                     </div>
                   </li>
                   <li className="flex items-start gap-3 group">
                     <div className="mt-1 p-2 rounded-lg bg-accent/10 group-hover:bg-accent/20 transition-colors">
-                      <Zap className="w-5 h-5 text-accent" />
+                      <Bot className="w-5 h-5 text-accent" />
                     </div>
                     <div>
-                      <p className="font-semibold">Replay & Confronto Split-Screen</p>
-                      <p className="text-sm text-muted-foreground">Rivedi e confronta le tue sessioni per migliorare</p>
+                      <p className="font-semibold">NPC Realistici + AI Tutor</p>
+                      <p className="text-sm text-muted-foreground">Avatar Ready Player Me con animazioni Mixamo, dialoghi e tutor conversazionale</p>
                     </div>
                   </li>
                 </ul>
@@ -133,10 +133,10 @@ export const Demo3DShowcase = () => {
                 <div className="p-3 rounded-lg bg-primary/10 group-hover:bg-primary/20 transition-colors">
                   <Trophy className="w-6 h-6 text-primary" />
                 </div>
-                <h4 className="font-bold text-lg">Classifica Globale</h4>
+                <h4 className="font-bold text-lg">Achievement & Classifica</h4>
               </div>
               <p className="text-sm text-muted-foreground">
-                Competi con altri giocatori e scala le posizioni in base a tempo, punteggio e collisioni.
+                Sistema badges, leaderboard globale e profilo giocatore con statistiche su tempo, accuratezza e collisioni.
               </p>
             </Card>
 
@@ -145,10 +145,10 @@ export const Demo3DShowcase = () => {
                 <div className="p-3 rounded-lg bg-secondary/10 group-hover:bg-secondary/20 transition-colors">
                   <Target className="w-6 h-6 text-secondary" />
                 </div>
-                <h4 className="font-bold text-lg">Mini-Map & HUD</h4>
+                <h4 className="font-bold text-lg">Audio Spaziale Procedurale</h4>
               </div>
               <p className="text-sm text-muted-foreground">
-                Sistema di navigazione avanzato con indicatori direzionali e mappa overhead in tempo reale.
+                Sintesi sonora Web Audio API: crepitio del fuoco, allarmi e voci NPC posizionate nello spazio 3D.
               </p>
             </Card>
 
@@ -157,10 +157,10 @@ export const Demo3DShowcase = () => {
                 <div className="p-3 rounded-lg bg-accent/10 group-hover:bg-accent/20 transition-colors">
                   <Zap className="w-6 h-6 text-accent" />
                 </div>
-                <h4 className="font-bold text-lg">Picture-in-Picture</h4>
+                <h4 className="font-bold text-lg">Replay & Picture-in-Picture</h4>
               </div>
               <p className="text-sm text-muted-foreground">
-                Visualizza fino a due replay simultaneamente durante il gioco per analisi comparativa avanzata.
+                Registra, rivedi e confronta fino a due sessioni in split-screen per analizzare gli errori.
               </p>
             </Card>
           </div>
