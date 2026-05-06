@@ -925,8 +925,33 @@ export const allModulesContent: ModuleContent[] = [
   primoSoccorsoConoscenzeContent,
 ];
 
+// Inject a "Caccia ai Rischi" interactive level between theory and the boss test,
+// for any module that doesn't already include one.
+const injectRiskHuntSection = (mod: ModuleContent): ModuleContent => {
+  const hasRiskHunt = mod.sections.some(s => s.type === 'point_and_click');
+  if (hasRiskHunt) return mod;
+
+  const newSection: TrainingSection = {
+    id: `${mod.moduleId}_risk_hunt`,
+    title: '🔍 Caccia ai Rischi',
+    type: 'point_and_click',
+    content: 'Metti in pratica la teoria: identifica i rischi nello scenario.',
+    minTimeSeconds: 10,
+    xpReward: 30,
+  };
+
+  // Insert just before the boss_test if present, otherwise at the end
+  const bossIdx = mod.sections.findIndex(s => s.type === 'boss_test');
+  const sections = [...mod.sections];
+  if (bossIdx >= 0) sections.splice(bossIdx, 0, newSection);
+  else sections.push(newSection);
+
+  return { ...mod, sections };
+};
+
 export const getModuleContent = (moduleId: string): ModuleContent | undefined => {
-  return allModulesContent.find(m => m.moduleId === moduleId);
+  const mod = allModulesContent.find(m => m.moduleId === moduleId);
+  return mod ? injectRiskHuntSection(mod) : undefined;
 };
 
 // XP Leveling thresholds
