@@ -2,7 +2,7 @@ import { NavLink } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Gamepad2, Trophy, Target, Zap, Play, Sparkles } from "lucide-react";
+import { Gamepad2, Trophy, Target, Zap, Play, Sparkles, Flame, ShieldAlert, Users, Bot } from "lucide-react";
 import heroGameImage from "@/assets/hero-game-corridor.jpg";
 
 export const Demo3DShowcase = () => {
