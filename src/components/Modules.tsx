@@ -13,9 +13,12 @@ import {
 } from "lucide-react";
 import officeModule from "@/assets/office-module.jpg";
 import warehouseModule from "@/assets/warehouse-module.jpg";
+import cartoonConstruction from "@/assets/cartoon-construction.jpg";
+import cartoonOffice from "@/assets/cartoon-office.jpg";
+import cartoonWarehouse from "@/assets/cartoon-warehouse.jpg";
 import { QuoteRequestDialog } from "@/components/QuoteRequestDialog";
 
-type TabKey = 'generale' | 'basso' | 'medio' | 'alto' | 'ruolo' | 'cybersecurity' | 'simulazioni' | 'piattaforma';
+type TabKey = 'generale' | 'basso' | 'medio' | 'alto' | 'ruolo' | 'cybersecurity' | 'simulazioni' | 'minigame2d' | 'piattaforma';
 
 export const Modules = () => {
   const [quoteDialogOpen, setQuoteDialogOpen] = useState(false);
