@@ -15,7 +15,7 @@ import {
 import { useAuth } from '@/hooks/useAuth';
 import { useTrainingProgress } from '@/hooks/useTrainingProgress';
 
-import { getLevelFromXp, getNextLevel } from '@/data/training-content';
+import { getLevelFromXp, getNextLevel, getModuleContent } from '@/data/training-content';
 import { MultiplayerChallenges } from '@/components/training/MultiplayerChallenges';
 import { getSpecificaFromAteco, SPECIFICA_CATEGORIES, SpecificaCategory } from '@/lib/ateco-mapping';
 
@@ -230,7 +230,8 @@ const TrainingHub = () => {
     const isLocked = status === 'locked';
     const isCompleted = status === 'completed';
     const isInProgress = status === 'in_progress';
-    const sectionProgress = mp ? (mp.current_section / (SECTION_COUNTS[mod.id] || 1)) * 100 : 0;
+    const totalSections = getModuleContent(mod.id)?.sections.length || SECTION_COUNTS[mod.id] || 1;
+    const sectionProgress = mp ? (mp.current_section / totalSections) * 100 : 0;
 
     return (
       <div key={mod.id} className={`relative group ${isLocked ? 'opacity-50' : ''}`}>
@@ -291,7 +292,7 @@ const TrainingHub = () => {
                 {isInProgress && mp && (
                   <div className="mb-3">
                     <div className="flex justify-between text-xs mb-1">
-                      <span className="text-muted-foreground">Sezione {mp.current_section}/{SECTION_COUNTS[mod.id]}</span>
+                      <span className="text-muted-foreground">Sezione {mp.current_section}/{totalSections}</span>
                       <span className="font-semibold text-primary">{mp.xp_earned} XP</span>
                     </div>
                     <div className="relative h-3 bg-muted rounded-full overflow-hidden">

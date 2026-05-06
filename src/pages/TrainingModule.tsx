@@ -19,6 +19,7 @@ import AITutorChat from '@/components/training/AITutorChat';
 import AdaptiveLearningCard from '@/components/training/AdaptiveLearningCard';
 import TrainingAchievementPopup from '@/components/training/TrainingAchievementPopup';
 import PointAndClickLevel from '@/components/training/PointAndClickLevel';
+import { getRiskHuntLevelForModule } from '@/data/risk-hunt-levels';
 
 // Floating XP component
 const FloatingXP = ({ amount, id }: { amount: number; id: number }) => (
@@ -410,9 +411,9 @@ const TrainingModule = () => {
         )}
 
         {/* Point and Click Level */}
-        {currentSection.type === 'point_and_click' && (
+        {currentSection.type === 'point_and_click' && moduleId && (
           <div className="mb-6">
-            <PointAndClickLevel />
+            <PointAndClickLevel levelData={getRiskHuntLevelForModule(moduleId)} />
           </div>
         )}
 
