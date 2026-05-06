@@ -31,7 +31,7 @@ export const Modules = () => {
     { key: 'alto', label: 'Rischio Alto', icon: AlertTriangle, badge: '8 moduli' },
     { key: 'ruolo', label: 'Corsi di Ruolo', icon: Crown, badge: '3 corsi' },
     { key: 'cybersecurity', label: 'Cybersecurity', icon: Lock, badge: 'nuovo' },
-    { key: 'simulazioni', label: 'Simulazioni 3D', icon: Gamepad2, badge: '4 scenari' },
+    { key: 'simulazioni', label: 'Simulazioni 3D', icon: Gamepad2, badge: '5 scenari' },
     { key: 'minigame2d', label: 'Spot the Hazard 2D', icon: Target, badge: '3 livelli' },
     { key: 'piattaforma', label: 'Piattaforma', icon: Settings },
   ];
@@ -86,10 +86,11 @@ export const Modules = () => {
       { icon: Trophy, title: "Boss Test Finale", subtitle: "Verifica Cybersecurity", description: "6 domande avanzate su scenari reali: CEO Fraud, baiting, data breach. Punteggio minimo 70% per il certificato.", color: "primary" },
     ],
     simulazioni: [
-      { icon: Package, title: "Safety Run", subtitle: "Rischi Generali 3D", description: "Percorso in prima persona con cadute, inciampi, ordine & pulizia e valutazione rischi in tempo reale.", color: "primary" },
-      { icon: Building2, title: "Office Hazard Quest", subtitle: "Uffici & VDT", description: "Simulazione 3D per PMI del terziario: postura, videoterminale, pause, micro-ergonomia.", color: "secondary", image: officeModule },
-      { icon: Warehouse, title: "Magazzino 2.5D", subtitle: "Carrelli & Movimentazione", description: "Muletti, movimentazione manuale, segnaletica, interazione pedoni/mezzi in ambiente 3D.", color: "accent", image: warehouseModule },
-      { icon: Lock, title: "Cyber Security Office", subtitle: "Rischi Informatici 3D", description: "Identifica post-it con password, schermi non bloccati, email di phishing e chiavette USB sospette in un ufficio 3D.", color: "destructive" },
+      { icon: Building2, title: "Ufficio Amministrativo", subtitle: "Rischi VDT & Ergonomia", description: "Caccia ai rischi in prima persona in un ufficio 3D: cavi scoperti, estintori bloccati, uscite ostruite, pavimenti bagnati. 6 rischi critici da identificare.", color: "primary", image: officeModule },
+      { icon: Warehouse, title: "Magazzino Logistica", subtitle: "Carrelli & Movimentazione", description: "Magazzino industriale Babylon.js con muletti, bancali, materiali infiammabili e rischi procedurali generati dinamicamente. Modello GLTF realistico.", color: "secondary", image: warehouseModule },
+      { icon: AlertTriangle, title: "Cantiere Edile", subtitle: "Lavori in Quota & DPI", description: "Scenario hard con macchinari pesanti, ponteggi, lavori in quota e rischi procedurali. Per formazione Rischio Alto.", color: "accent" },
+      { icon: Flame, title: "Simulazione Antincendio", subtitle: "Estintore First-Person", description: "Esercitazione realistica con estintore in prima persona: classi di fuoco, particelle, quiz contestuali e procedure di evacuazione.", color: "destructive" },
+      { icon: Lock, title: "Cyber Security Office", subtitle: "Rischi Informatici 3D", description: "8 rischi cyber da identificare in un ufficio 3D: post-it con password, schermi sbloccati, email di phishing, chiavette USB sospette.", color: "muted" },
     ],
     minigame2d: [
       { icon: Building2, title: "Cantiere Cartoon", subtitle: "7 rischi · 3 vite", description: "Caccia ai rischi 2D in stile cartoon: imbracatura, carichi sospesi, ferri d'armatura, quadri elettrici. Spiegazione educativa con riferimenti normativi.", color: "destructive", image: cartoonConstruction },
@@ -140,7 +141,7 @@ export const Modules = () => {
               I Moduli del Sistema <span className="text-primary">Safety Frontline</span>
             </h2>
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-              29 moduli formativi, 4 simulazioni 3D e una piattaforma completa per la formazione sulla sicurezza nelle PMI italiane.
+              29 moduli formativi, 5 simulazioni 3D, 3 mini-game 2D e una piattaforma completa per la formazione sulla sicurezza nelle PMI italiane.
             </p>
           </div>
 
@@ -209,7 +210,7 @@ export const Modules = () => {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-12 mb-8">
             {[
               { value: "29+", label: "Moduli Formativi", icon: GraduationCap },
-              { value: "4", label: "Simulazioni 3D", icon: Gamepad2 },
+              { value: "5", label: "Simulazioni 3D", icon: Gamepad2 },
               { value: "3", label: "Settori di Rischio", icon: Shield },
               { value: "∞", label: "Personalizzazioni", icon: Settings },
             ].map((stat, i) => (
