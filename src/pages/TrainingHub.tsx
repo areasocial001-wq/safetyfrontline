@@ -230,7 +230,8 @@ const TrainingHub = () => {
     const isLocked = status === 'locked';
     const isCompleted = status === 'completed';
     const isInProgress = status === 'in_progress';
-    const sectionProgress = mp ? (mp.current_section / (SECTION_COUNTS[mod.id] || 1)) * 100 : 0;
+    const totalSections = getModuleContent(mod.id)?.sections.length || SECTION_COUNTS[mod.id] || 1;
+    const sectionProgress = mp ? (mp.current_section / totalSections) * 100 : 0;
 
     return (
       <div key={mod.id} className={`relative group ${isLocked ? 'opacity-50' : ''}`}>
