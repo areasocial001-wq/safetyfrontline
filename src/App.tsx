@@ -24,6 +24,7 @@ import TrainingAnalytics from "./pages/TrainingAnalytics";
 import GuidePage from "./pages/GuidePage";
 import MyCertificates from "./pages/MyCertificates";
 import NotFound from "./pages/NotFound";
+import PresetTestPage from "./pages/PresetTestPage";
 
 const queryClient = new QueryClient();
 
