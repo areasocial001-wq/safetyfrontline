@@ -242,7 +242,19 @@ const PointAndClickLevel = ({ levelData = DEFAULT_LEVEL }: PointAndClickLevelPro
     toast.success("Coordinate copiate negli appunti");
   };
 
-  const activeHazards = calibrate ? editable : levelData.hazards;
+  const savePreset = () => {
+    const out: HazardOverride[] = editable.map(h => ({ id: h.id, position: h.position, hitbox_size: h.hitbox_size }));
+    localStorage.setItem(presetStorageKey(levelData.level_id, preset), JSON.stringify(out));
+    toast.success(`Preset salvato per ${PRESET_LABELS[preset]}`);
+  };
+
+  const resetPreset = () => {
+    localStorage.removeItem(presetStorageKey(levelData.level_id, preset));
+    setEditable(levelData.hazards);
+    toast.success(`Preset ${PRESET_LABELS[preset]} ripristinato`);
+  };
+
+  const activeHazards = calibrate ? editable : baseHazards;
 
   return (
     <div
