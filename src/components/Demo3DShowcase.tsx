@@ -48,16 +48,16 @@ export const Demo3DShowcase = () => {
                 {/* Floating Badges on Image */}
                 <div className="absolute top-4 left-4 flex flex-col gap-2">
                   <Badge className="bg-primary/90 backdrop-blur-sm border-primary text-primary-foreground shadow-lg animate-pulse">
-                    <Trophy className="w-3 h-3 mr-1" />
-                    Achievements
+                    <Flame className="w-3 h-3 mr-1" />
+                    Estintore reale
                   </Badge>
                   <Badge className="bg-secondary/90 backdrop-blur-sm border-secondary text-secondary-foreground shadow-lg animate-pulse" style={{ animationDelay: '0.3s' }}>
-                    <Target className="w-3 h-3 mr-1" />
-                    Leaderboard
+                    <ShieldAlert className="w-3 h-3 mr-1" />
+                    Cybersecurity
                   </Badge>
                   <Badge className="bg-accent/90 backdrop-blur-sm border-accent text-accent-foreground shadow-lg animate-pulse" style={{ animationDelay: '0.6s' }}>
-                    <Zap className="w-3 h-3 mr-1" />
-                    Replay System
+                    <Users className="w-3 h-3 mr-1" />
+                    NPC realistici
                   </Badge>
                 </div>
 
