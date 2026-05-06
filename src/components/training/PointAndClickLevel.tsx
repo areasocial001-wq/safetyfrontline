@@ -1,9 +1,44 @@
 import { useState, useCallback, useEffect, useRef, useMemo } from "react";
 import { toast } from "sonner";
-import { Check, Eye, EyeOff, Trophy, Star, Move, Copy, AlertTriangle } from "lucide-react";
+import { Check, Eye, EyeOff, Trophy, Star, Move, Copy, AlertTriangle, Save, Smartphone, Monitor, Tv, Projector } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+
+// ───────────────────── Device presets ─────────────────────
+type DevicePreset = "mobile" | "desktop" | "tv" | "projector";
+const PRESET_ICONS: Record<DevicePreset, typeof Smartphone> = {
+  mobile: Smartphone, desktop: Monitor, tv: Tv, projector: Projector,
+};
+const PRESET_LABELS: Record<DevicePreset, string> = {
+  mobile: "Mobile", desktop: "Desktop", tv: "TV", projector: "Proiettore",
+};
+const detectPreset = (): DevicePreset => {
+  if (typeof window === "undefined") return "desktop";
+  const w = window.innerWidth;
+  const isTouch = "ontouchstart" in window || navigator.maxTouchPoints > 0;
+  if (w < 768 && isTouch) return "mobile";
+  if (w >= 2400) return "projector";
+  if (w >= 1800) return "tv";
+  return "desktop";
+};
+const presetStorageKey = (levelId: string, preset: DevicePreset) =>
+  `risk-hunt:hotspots:${levelId}:${preset}`;
+type HazardOverride = { id: string; position: { top: string; left: string }; hitbox_size: { width: string; height: string } };
+const loadOverrides = (levelId: string, preset: DevicePreset): HazardOverride[] | null => {
+  try {
+    const raw = localStorage.getItem(presetStorageKey(levelId, preset));
+    return raw ? JSON.parse(raw) : null;
+  } catch { return null; }
+};
+const applyOverrides = (base: Hazard[], overrides: HazardOverride[] | null): Hazard[] => {
+  if (!overrides?.length) return base;
+  const map = new Map(overrides.map(o => [o.id, o]));
+  return base.map(h => {
+    const o = map.get(h.id);
+    return o ? { ...h, position: o.position, hitbox_size: o.hitbox_size } : h;
+  });
+};
 
 interface Hazard {
   id: string;
