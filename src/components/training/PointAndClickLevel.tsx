@@ -140,13 +140,27 @@ const PointAndClickLevel = ({ levelData = DEFAULT_LEVEL }: PointAndClickLevelPro
   const [score, setScore] = useState(0);
   const [showHitboxes, setShowHitboxes] = useState(false);
   const [calibrate, setCalibrate] = useState(false);
-  const [editable, setEditable] = useState<Hazard[]>(levelData.hazards);
+  const [preset, setPreset] = useState<DevicePreset>(() => detectPreset());
+  const [autoPreset, setAutoPreset] = useState(true);
+  const baseHazards = useMemo(
+    () => applyOverrides(levelData.hazards, loadOverrides(levelData.level_id, preset)),
+    [levelData.hazards, levelData.level_id, preset]
+  );
+  const [editable, setEditable] = useState<Hazard[]>(baseHazards);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [lastClicked, setLastClicked] = useState<{ name: string; type: string } | null>(null);
 
-  // Reset editable copy when level changes
-  useEffect(() => { setEditable(levelData.hazards); }, [levelData.hazards]);
+  // Reset editable copy when level or preset changes (loads preset overrides)
+  useEffect(() => { setEditable(baseHazards); }, [baseHazards]);
+
+  // Auto-switch preset on resize
+  useEffect(() => {
+    if (!autoPreset) return;
+    const onResize = () => setPreset(detectPreset());
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, [autoPreset]);
 
   // Enable calibration via ?calibrate=1
   useEffect(() => {
