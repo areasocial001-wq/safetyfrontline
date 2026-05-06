@@ -91,6 +91,11 @@ export const Modules = () => {
       { icon: Warehouse, title: "Magazzino 2.5D", subtitle: "Carrelli & Movimentazione", description: "Muletti, movimentazione manuale, segnaletica, interazione pedoni/mezzi in ambiente 3D.", color: "accent", image: warehouseModule },
       { icon: Lock, title: "Cyber Security Office", subtitle: "Rischi Informatici 3D", description: "Identifica post-it con password, schermi non bloccati, email di phishing e chiavette USB sospette in un ufficio 3D.", color: "destructive" },
     ],
+    minigame2d: [
+      { icon: Building2, title: "Cantiere Cartoon", subtitle: "7 rischi · 3 vite", description: "Caccia ai rischi 2D in stile cartoon: imbracatura, carichi sospesi, ferri d'armatura, quadri elettrici. Spiegazione educativa con riferimenti normativi.", color: "destructive", image: cartoonConstruction },
+      { icon: Monitor, title: "Ufficio Cartoon", subtitle: "8 rischi · 3 vite", description: "Cavi a terra, postura scorretta, uscite ostruite, ciabatte sovraccariche, ergonomia VDT. Modale didattico per ogni hotspot.", color: "primary", image: cartoonOffice },
+      { icon: Warehouse, title: "Magazzino Cartoon", subtitle: "8 rischi · 3 vite", description: "Muletti, cataste instabili, pavimenti oleosi, cavi sospesi, sollevamento manuale errato. Punteggio e tentativi limitati.", color: "accent", image: cartoonWarehouse },
+    ],
     piattaforma: [
       { icon: Bell, title: "Notifiche Smart", subtitle: "In-App & Email", description: "Notifiche automatiche per completamento moduli, scadenze, assegnazione settori e promemoria giornalieri.", color: "primary" },
       { icon: Bot, title: "AI Tutor", subtitle: "Assistente Intelligente", description: "Tutor AI integrato che risponde a domande sulla sicurezza e guida il percorso formativo.", color: "secondary" },
