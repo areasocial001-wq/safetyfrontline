@@ -79,29 +79,29 @@ export const Demo3DShowcase = () => {
                 <ul className="space-y-4">
                   <li className="flex items-start gap-3 group">
                     <div className="mt-1 p-2 rounded-lg bg-primary/10 group-hover:bg-primary/20 transition-colors">
-                      <Target className="w-5 h-5 text-primary" />
+                      <Flame className="w-5 h-5 text-primary" />
                     </div>
                     <div>
-                      <p className="font-semibold">Esplorazione 3D Realistica</p>
-                      <p className="text-sm text-muted-foreground">Muoviti liberamente in ambienti di lavoro autentici</p>
+                      <p className="font-semibold">Simulatore Antincendio Realistico</p>
+                      <p className="text-sm text-muted-foreground">Estintore in prima persona con particelle, classi di fuoco e quiz contestuali</p>
                     </div>
                   </li>
                   <li className="flex items-start gap-3 group">
                     <div className="mt-1 p-2 rounded-lg bg-secondary/10 group-hover:bg-secondary/20 transition-colors">
-                      <Trophy className="w-5 h-5 text-secondary" />
+                      <ShieldAlert className="w-5 h-5 text-secondary" />
                     </div>
                     <div>
-                      <p className="font-semibold">Sistema Achievement Avanzato</p>
-                      <p className="text-sm text-muted-foreground">Sblocca badges e confronta le tue performance</p>
+                      <p className="font-semibold">Cybersecurity in Ufficio 3D</p>
+                      <p className="text-sm text-muted-foreground">8 rischi nascosti da identificare con feedback educativo immediato</p>
                     </div>
                   </li>
                   <li className="flex items-start gap-3 group">
                     <div className="mt-1 p-2 rounded-lg bg-accent/10 group-hover:bg-accent/20 transition-colors">
-                      <Zap className="w-5 h-5 text-accent" />
+                      <Bot className="w-5 h-5 text-accent" />
                     </div>
                     <div>
-                      <p className="font-semibold">Replay & Confronto Split-Screen</p>
-                      <p className="text-sm text-muted-foreground">Rivedi e confronta le tue sessioni per migliorare</p>
+                      <p className="font-semibold">NPC Realistici + AI Tutor</p>
+                      <p className="text-sm text-muted-foreground">Avatar Ready Player Me con animazioni Mixamo, dialoghi e tutor conversazionale</p>
                     </div>
                   </li>
                 </ul>
