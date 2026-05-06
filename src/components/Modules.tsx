@@ -13,9 +13,12 @@ import {
 } from "lucide-react";
 import officeModule from "@/assets/office-module.jpg";
 import warehouseModule from "@/assets/warehouse-module.jpg";
+import cartoonConstruction from "@/assets/cartoon-construction.jpg";
+import cartoonOffice from "@/assets/cartoon-office.jpg";
+import cartoonWarehouse from "@/assets/cartoon-warehouse.jpg";
 import { QuoteRequestDialog } from "@/components/QuoteRequestDialog";
 
-type TabKey = 'generale' | 'basso' | 'medio' | 'alto' | 'ruolo' | 'cybersecurity' | 'simulazioni' | 'piattaforma';
+type TabKey = 'generale' | 'basso' | 'medio' | 'alto' | 'ruolo' | 'cybersecurity' | 'simulazioni' | 'minigame2d' | 'piattaforma';
 
 export const Modules = () => {
   const [quoteDialogOpen, setQuoteDialogOpen] = useState(false);
@@ -29,6 +32,7 @@ export const Modules = () => {
     { key: 'ruolo', label: 'Corsi di Ruolo', icon: Crown, badge: '3 corsi' },
     { key: 'cybersecurity', label: 'Cybersecurity', icon: Lock, badge: 'nuovo' },
     { key: 'simulazioni', label: 'Simulazioni 3D', icon: Gamepad2, badge: '4 scenari' },
+    { key: 'minigame2d', label: 'Spot the Hazard 2D', icon: Target, badge: '3 livelli' },
     { key: 'piattaforma', label: 'Piattaforma', icon: Settings },
   ];
 
@@ -86,6 +90,11 @@ export const Modules = () => {
       { icon: Building2, title: "Office Hazard Quest", subtitle: "Uffici & VDT", description: "Simulazione 3D per PMI del terziario: postura, videoterminale, pause, micro-ergonomia.", color: "secondary", image: officeModule },
       { icon: Warehouse, title: "Magazzino 2.5D", subtitle: "Carrelli & Movimentazione", description: "Muletti, movimentazione manuale, segnaletica, interazione pedoni/mezzi in ambiente 3D.", color: "accent", image: warehouseModule },
       { icon: Lock, title: "Cyber Security Office", subtitle: "Rischi Informatici 3D", description: "Identifica post-it con password, schermi non bloccati, email di phishing e chiavette USB sospette in un ufficio 3D.", color: "destructive" },
+    ],
+    minigame2d: [
+      { icon: Building2, title: "Cantiere Cartoon", subtitle: "7 rischi · 3 vite", description: "Caccia ai rischi 2D in stile cartoon: imbracatura, carichi sospesi, ferri d'armatura, quadri elettrici. Spiegazione educativa con riferimenti normativi.", color: "destructive", image: cartoonConstruction },
+      { icon: Monitor, title: "Ufficio Cartoon", subtitle: "8 rischi · 3 vite", description: "Cavi a terra, postura scorretta, uscite ostruite, ciabatte sovraccariche, ergonomia VDT. Modale didattico per ogni hotspot.", color: "primary", image: cartoonOffice },
+      { icon: Warehouse, title: "Magazzino Cartoon", subtitle: "8 rischi · 3 vite", description: "Muletti, cataste instabili, pavimenti oleosi, cavi sospesi, sollevamento manuale errato. Punteggio e tentativi limitati.", color: "accent", image: cartoonWarehouse },
     ],
     piattaforma: [
       { icon: Bell, title: "Notifiche Smart", subtitle: "In-App & Email", description: "Notifiche automatiche per completamento moduli, scadenze, assegnazione settori e promemoria giornalieri.", color: "primary" },
