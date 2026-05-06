@@ -26,10 +26,10 @@ export const Demo3DShowcase = () => {
             </div>
             
             <h2 className="text-4xl md:text-6xl font-bold mb-4">
-              Gioco <span className="bg-gradient-hero bg-clip-text text-transparent drop-shadow-lg">3D First-Person</span>
+              Simulazioni <span className="bg-gradient-hero bg-clip-text text-transparent drop-shadow-lg">3D First-Person</span>
             </h2>
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-              Esplora ambienti di lavoro realistici in prima persona. Identifica i rischi, sblocca achievements e scala la classifica.
+              Antincendio con estintore reale, cybersecurity in ufficio, evacuazione ed NPC realistici (Ready Player Me + Mixamo). Tutto in browser con Babylon.js.
             </p>
           </div>
 
