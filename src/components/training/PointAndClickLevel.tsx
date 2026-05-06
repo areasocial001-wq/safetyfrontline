@@ -1,9 +1,44 @@
 import { useState, useCallback, useEffect, useRef, useMemo } from "react";
 import { toast } from "sonner";
-import { Check, Eye, EyeOff, Trophy, Star, Move, Copy, AlertTriangle } from "lucide-react";
+import { Check, Eye, EyeOff, Trophy, Star, Move, Copy, AlertTriangle, Save, Smartphone, Monitor, Tv, Projector } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+
+// ───────────────────── Device presets ─────────────────────
+type DevicePreset = "mobile" | "desktop" | "tv" | "projector";
+const PRESET_ICONS: Record<DevicePreset, typeof Smartphone> = {
+  mobile: Smartphone, desktop: Monitor, tv: Tv, projector: Projector,
+};
+const PRESET_LABELS: Record<DevicePreset, string> = {
+  mobile: "Mobile", desktop: "Desktop", tv: "TV", projector: "Proiettore",
+};
+const detectPreset = (): DevicePreset => {
+  if (typeof window === "undefined") return "desktop";
+  const w = window.innerWidth;
+  const isTouch = "ontouchstart" in window || navigator.maxTouchPoints > 0;
+  if (w < 768 && isTouch) return "mobile";
+  if (w >= 2400) return "projector";
+  if (w >= 1800) return "tv";
+  return "desktop";
+};
+const presetStorageKey = (levelId: string, preset: DevicePreset) =>
+  `risk-hunt:hotspots:${levelId}:${preset}`;
+type HazardOverride = { id: string; position: { top: string; left: string }; hitbox_size: { width: string; height: string } };
+const loadOverrides = (levelId: string, preset: DevicePreset): HazardOverride[] | null => {
+  try {
+    const raw = localStorage.getItem(presetStorageKey(levelId, preset));
+    return raw ? JSON.parse(raw) : null;
+  } catch { return null; }
+};
+const applyOverrides = (base: Hazard[], overrides: HazardOverride[] | null): Hazard[] => {
+  if (!overrides?.length) return base;
+  const map = new Map(overrides.map(o => [o.id, o]));
+  return base.map(h => {
+    const o = map.get(h.id);
+    return o ? { ...h, position: o.position, hitbox_size: o.hitbox_size } : h;
+  });
+};
 
 interface Hazard {
   id: string;
@@ -105,13 +140,27 @@ const PointAndClickLevel = ({ levelData = DEFAULT_LEVEL }: PointAndClickLevelPro
   const [score, setScore] = useState(0);
   const [showHitboxes, setShowHitboxes] = useState(false);
   const [calibrate, setCalibrate] = useState(false);
-  const [editable, setEditable] = useState<Hazard[]>(levelData.hazards);
+  const [preset, setPreset] = useState<DevicePreset>(() => detectPreset());
+  const [autoPreset, setAutoPreset] = useState(true);
+  const baseHazards = useMemo(
+    () => applyOverrides(levelData.hazards, loadOverrides(levelData.level_id, preset)),
+    [levelData.hazards, levelData.level_id, preset]
+  );
+  const [editable, setEditable] = useState<Hazard[]>(baseHazards);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [lastClicked, setLastClicked] = useState<{ name: string; type: string } | null>(null);
 
-  // Reset editable copy when level changes
-  useEffect(() => { setEditable(levelData.hazards); }, [levelData.hazards]);
+  // Reset editable copy when level or preset changes (loads preset overrides)
+  useEffect(() => { setEditable(baseHazards); }, [baseHazards]);
+
+  // Auto-switch preset on resize
+  useEffect(() => {
+    if (!autoPreset) return;
+    const onResize = () => setPreset(detectPreset());
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, [autoPreset]);
 
   // Enable calibration via ?calibrate=1
   useEffect(() => {
@@ -193,7 +242,19 @@ const PointAndClickLevel = ({ levelData = DEFAULT_LEVEL }: PointAndClickLevelPro
     toast.success("Coordinate copiate negli appunti");
   };
 
-  const activeHazards = calibrate ? editable : levelData.hazards;
+  const savePreset = () => {
+    const out: HazardOverride[] = editable.map(h => ({ id: h.id, position: h.position, hitbox_size: h.hitbox_size }));
+    localStorage.setItem(presetStorageKey(levelData.level_id, preset), JSON.stringify(out));
+    toast.success(`Preset salvato per ${PRESET_LABELS[preset]}`);
+  };
+
+  const resetPreset = () => {
+    localStorage.removeItem(presetStorageKey(levelData.level_id, preset));
+    setEditable(levelData.hazards);
+    toast.success(`Preset ${PRESET_LABELS[preset]} ripristinato`);
+  };
+
+  const activeHazards = calibrate ? editable : baseHazards;
 
   return (
     <div
@@ -222,10 +283,42 @@ const PointAndClickLevel = ({ levelData = DEFAULT_LEVEL }: PointAndClickLevelPro
           <Move className="h-4 w-4 mr-1" />{calibrate ? "Esci" : "Calibra"}
         </Button>
         {calibrate && (
-          <Button variant="outline" size="sm" onClick={copyJSON} className="bg-background/80 backdrop-blur-sm">
-            <Copy className="h-4 w-4 mr-1" />Copia JSON
-          </Button>
+          <>
+            <Button variant="outline" size="sm" onClick={copyJSON} className="bg-background/80 backdrop-blur-sm">
+              <Copy className="h-4 w-4 mr-1" />Copia JSON
+            </Button>
+            <Button variant="default" size="sm" onClick={savePreset} className="bg-background/80 backdrop-blur-sm">
+              <Save className="h-4 w-4 mr-1" />Salva preset
+            </Button>
+            <Button variant="outline" size="sm" onClick={resetPreset} className="bg-background/80 backdrop-blur-sm">
+              Reset
+            </Button>
+          </>
         )}
+        {/* Device preset selector */}
+        <div className="flex items-center gap-1 bg-background/80 backdrop-blur-sm rounded-md border border-border px-1">
+          {(Object.keys(PRESET_LABELS) as DevicePreset[]).map(p => {
+            const Icon = PRESET_ICONS[p];
+            const active = preset === p;
+            return (
+              <button
+                key={p}
+                onClick={() => { setAutoPreset(false); setPreset(p); }}
+                title={PRESET_LABELS[p] + (autoPreset && active ? " (auto)" : "")}
+                className={`p-1.5 rounded ${active ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:bg-accent"}`}
+              >
+                <Icon className="h-4 w-4" />
+              </button>
+            );
+          })}
+          <button
+            onClick={() => { setAutoPreset(true); setPreset(detectPreset()); }}
+            title="Auto-detect"
+            className={`px-1.5 text-[10px] font-semibold rounded ${autoPreset ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:bg-accent"}`}
+          >
+            AUTO
+          </button>
+        </div>
       </div>
 
       {/* Last clicked label */}
