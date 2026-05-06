@@ -32,6 +32,7 @@ export const Modules = () => {
     { key: 'ruolo', label: 'Corsi di Ruolo', icon: Crown, badge: '3 corsi' },
     { key: 'cybersecurity', label: 'Cybersecurity', icon: Lock, badge: 'nuovo' },
     { key: 'simulazioni', label: 'Simulazioni 3D', icon: Gamepad2, badge: '4 scenari' },
+    { key: 'minigame2d', label: 'Spot the Hazard 2D', icon: Target, badge: '3 livelli' },
     { key: 'piattaforma', label: 'Piattaforma', icon: Settings },
   ];
 
