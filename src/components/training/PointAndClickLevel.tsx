@@ -283,10 +283,42 @@ const PointAndClickLevel = ({ levelData = DEFAULT_LEVEL }: PointAndClickLevelPro
           <Move className="h-4 w-4 mr-1" />{calibrate ? "Esci" : "Calibra"}
         </Button>
         {calibrate && (
-          <Button variant="outline" size="sm" onClick={copyJSON} className="bg-background/80 backdrop-blur-sm">
-            <Copy className="h-4 w-4 mr-1" />Copia JSON
-          </Button>
+          <>
+            <Button variant="outline" size="sm" onClick={copyJSON} className="bg-background/80 backdrop-blur-sm">
+              <Copy className="h-4 w-4 mr-1" />Copia JSON
+            </Button>
+            <Button variant="default" size="sm" onClick={savePreset} className="bg-background/80 backdrop-blur-sm">
+              <Save className="h-4 w-4 mr-1" />Salva preset
+            </Button>
+            <Button variant="outline" size="sm" onClick={resetPreset} className="bg-background/80 backdrop-blur-sm">
+              Reset
+            </Button>
+          </>
         )}
+        {/* Device preset selector */}
+        <div className="flex items-center gap-1 bg-background/80 backdrop-blur-sm rounded-md border border-border px-1">
+          {(Object.keys(PRESET_LABELS) as DevicePreset[]).map(p => {
+            const Icon = PRESET_ICONS[p];
+            const active = preset === p;
+            return (
+              <button
+                key={p}
+                onClick={() => { setAutoPreset(false); setPreset(p); }}
+                title={PRESET_LABELS[p] + (autoPreset && active ? " (auto)" : "")}
+                className={`p-1.5 rounded ${active ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:bg-accent"}`}
+              >
+                <Icon className="h-4 w-4" />
+              </button>
+            );
+          })}
+          <button
+            onClick={() => { setAutoPreset(true); setPreset(detectPreset()); }}
+            title="Auto-detect"
+            className={`px-1.5 text-[10px] font-semibold rounded ${autoPreset ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:bg-accent"}`}
+          >
+            AUTO
+          </button>
+        </div>
       </div>
 
       {/* Last clicked label */}
