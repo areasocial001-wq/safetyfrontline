@@ -25,6 +25,7 @@ import GuidePage from "./pages/GuidePage";
 import MyCertificates from "./pages/MyCertificates";
 import NotFound from "./pages/NotFound";
 import PresetTestPage from "./pages/PresetTestPage";
+import SpotTheHazardPage from "./pages/SpotTheHazardPage";
 
 const queryClient = new QueryClient();
 
