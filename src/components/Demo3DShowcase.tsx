@@ -133,10 +133,10 @@ export const Demo3DShowcase = () => {
                 <div className="p-3 rounded-lg bg-primary/10 group-hover:bg-primary/20 transition-colors">
                   <Trophy className="w-6 h-6 text-primary" />
                 </div>
-                <h4 className="font-bold text-lg">Classifica Globale</h4>
+                <h4 className="font-bold text-lg">Achievement & Classifica</h4>
               </div>
               <p className="text-sm text-muted-foreground">
-                Competi con altri giocatori e scala le posizioni in base a tempo, punteggio e collisioni.
+                Sistema badges, leaderboard globale e profilo giocatore con statistiche su tempo, accuratezza e collisioni.
               </p>
             </Card>
 
@@ -145,10 +145,10 @@ export const Demo3DShowcase = () => {
                 <div className="p-3 rounded-lg bg-secondary/10 group-hover:bg-secondary/20 transition-colors">
                   <Target className="w-6 h-6 text-secondary" />
                 </div>
-                <h4 className="font-bold text-lg">Mini-Map & HUD</h4>
+                <h4 className="font-bold text-lg">Audio Spaziale Procedurale</h4>
               </div>
               <p className="text-sm text-muted-foreground">
-                Sistema di navigazione avanzato con indicatori direzionali e mappa overhead in tempo reale.
+                Sintesi sonora Web Audio API: crepitio del fuoco, allarmi e voci NPC posizionate nello spazio 3D.
               </p>
             </Card>
 
@@ -157,10 +157,10 @@ export const Demo3DShowcase = () => {
                 <div className="p-3 rounded-lg bg-accent/10 group-hover:bg-accent/20 transition-colors">
                   <Zap className="w-6 h-6 text-accent" />
                 </div>
-                <h4 className="font-bold text-lg">Picture-in-Picture</h4>
+                <h4 className="font-bold text-lg">Replay & Picture-in-Picture</h4>
               </div>
               <p className="text-sm text-muted-foreground">
-                Visualizza fino a due replay simultaneamente durante il gioco per analisi comparativa avanzata.
+                Registra, rivedi e confronta fino a due sessioni in split-screen per analizzare gli errori.
               </p>
             </Card>
           </div>
