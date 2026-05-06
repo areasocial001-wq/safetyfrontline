@@ -292,7 +292,7 @@ const TrainingHub = () => {
                 {isInProgress && mp && (
                   <div className="mb-3">
                     <div className="flex justify-between text-xs mb-1">
-                      <span className="text-muted-foreground">Sezione {mp.current_section}/{SECTION_COUNTS[mod.id]}</span>
+                      <span className="text-muted-foreground">Sezione {mp.current_section}/{totalSections}</span>
                       <span className="font-semibold text-primary">{mp.xp_earned} XP</span>
                     </div>
                     <div className="relative h-3 bg-muted rounded-full overflow-hidden">
