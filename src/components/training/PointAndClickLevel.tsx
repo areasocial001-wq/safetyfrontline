@@ -131,17 +131,22 @@ const LevelCompleteModal = ({ score, totalHazards }: { score: number; totalHazar
   );
 };
 
-interface PointAndClickLevelProps { levelData?: LevelData }
+interface PointAndClickLevelProps {
+  levelData?: LevelData;
+  forcedPreset?: DevicePreset;
+  readOnly?: boolean;
+  forceShowHitboxes?: boolean;
+}
 
-const PointAndClickLevel = ({ levelData = DEFAULT_LEVEL }: PointAndClickLevelProps) => {
+const PointAndClickLevel = ({ levelData = DEFAULT_LEVEL, forcedPreset, readOnly, forceShowHitboxes }: PointAndClickLevelProps) => {
   const { user } = useAuth();
   const containerRef = useRef<HTMLDivElement>(null);
   const [foundHazards, setFoundHazards] = useState<Set<string>>(new Set());
   const [score, setScore] = useState(0);
-  const [showHitboxes, setShowHitboxes] = useState(false);
+  const [showHitboxes, setShowHitboxes] = useState(!!forceShowHitboxes);
   const [calibrate, setCalibrate] = useState(false);
-  const [preset, setPreset] = useState<DevicePreset>(() => detectPreset());
-  const [autoPreset, setAutoPreset] = useState(true);
+  const [preset, setPreset] = useState<DevicePreset>(() => forcedPreset ?? detectPreset());
+  const [autoPreset, setAutoPreset] = useState(!forcedPreset);
   const baseHazards = useMemo(
     () => applyOverrides(levelData.hazards, loadOverrides(levelData.level_id, preset)),
     [levelData.hazards, levelData.level_id, preset]
