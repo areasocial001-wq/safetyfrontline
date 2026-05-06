@@ -36,11 +36,11 @@ const OFFICE: RiskHuntLevel = {
   total_hazards: 5,
   intro_dialogue: { speaker: "RSPP", text: "Trova i rischi cliccando sulle aree sospette." },
   hazards: [
-    { id: "o_cables", name: "Cavi a terra", position: { top: "80%", left: "18%" }, hitbox_size: { width: "18%", height: "15%" }, points: 100, feedback: { title: "Inciampo!", message: "Cavi volanti vanno fissati con canaline.", type: "warning" } },
-    { id: "o_exit", name: "Uscita ostruita", position: { top: "55%", left: "45%" }, hitbox_size: { width: "12%", height: "20%" }, points: 150, feedback: { title: "Pericolo grave", message: "Le vie di fuga non vanno mai ostruite.", type: "critical" } },
-    { id: "o_extinguisher", name: "Estintore nascosto", position: { top: "70%", left: "75%" }, hitbox_size: { width: "10%", height: "15%" }, points: 100, feedback: { title: "Estintore non visibile", message: "Deve essere segnalato e accessibile.", type: "warning" } },
-    { id: "o_posture", name: "Postura scorretta", position: { top: "55%", left: "78%" }, hitbox_size: { width: "12%", height: "15%" }, points: 50, feedback: { title: "Ergonomia", message: "Il monitor va all'altezza degli occhi.", type: "warning" } },
-    { id: "o_overload", name: "Multipresa sovraccarica", position: { top: "85%", left: "8%" }, hitbox_size: { width: "10%", height: "12%" }, points: 100, feedback: { title: "Rischio elettrico", message: "Non sovraccaricare le prese multiple.", type: "critical" } },
+    { id: "o_cables", name: "Cavi a terra", position: { top: "70%", left: "4%" }, hitbox_size: { width: "22%", height: "25%" }, points: 100, feedback: { title: "Inciampo!", message: "Cavi volanti vanno fissati con canaline.", type: "warning" } },
+    { id: "o_exit", name: "Uscita ostruita", position: { top: "15%", left: "0%" }, hitbox_size: { width: "13%", height: "55%" }, points: 150, feedback: { title: "Pericolo grave", message: "Le vie di fuga non vanno mai ostruite.", type: "critical" } },
+    { id: "o_extinguisher", name: "Estintore mal posizionato", position: { top: "60%", left: "52%" }, hitbox_size: { width: "9%", height: "28%" }, points: 100, feedback: { title: "Estintore", message: "Deve essere segnalato e accessibile.", type: "warning" } },
+    { id: "o_posture", name: "Postura scorretta", position: { top: "30%", left: "62%" }, hitbox_size: { width: "16%", height: "32%" }, points: 50, feedback: { title: "Ergonomia", message: "Il monitor va all'altezza degli occhi.", type: "warning" } },
+    { id: "o_overload", name: "Cavi sulla cassettiera", position: { top: "30%", left: "13%" }, hitbox_size: { width: "13%", height: "20%" }, points: 100, feedback: { title: "Rischio elettrico", message: "Non lasciare matasse di cavi sui mobili.", type: "critical" } },
   ],
 };
 
@@ -52,11 +52,11 @@ const WORKSHOP: RiskHuntLevel = {
   total_hazards: 5,
   intro_dialogue: { speaker: "RSPP", text: "Cerca i rischi meccanici, elettrici ed ergonomici." },
   hazards: [
-    { id: "w_lift", name: "Sollevamento scorretto", position: { top: "60%", left: "60%" }, hitbox_size: { width: "15%", height: "30%" }, points: 100, feedback: { title: "MMC", message: "Schiena dritta e gambe piegate.", type: "warning" } },
-    { id: "w_panel", name: "Quadro elettrico aperto", position: { top: "40%", left: "82%" }, hitbox_size: { width: "10%", height: "25%" }, points: 150, feedback: { title: "Rischio elettrico", message: "I quadri devono essere chiusi a chiave.", type: "critical" } },
-    { id: "w_helmet", name: "Manca DPI casco", position: { top: "45%", left: "62%" }, hitbox_size: { width: "8%", height: "10%" }, points: 100, feedback: { title: "DPI obbligatori", message: "In officina serve casco di protezione.", type: "critical" } },
-    { id: "w_sparks", name: "Saldatura senza protezione", position: { top: "75%", left: "92%" }, hitbox_size: { width: "8%", height: "15%" }, points: 100, feedback: { title: "Scintille", message: "Materiali infiammabili lontani.", type: "warning" } },
-    { id: "w_machine", name: "Macchina senza riparo", position: { top: "45%", left: "40%" }, hitbox_size: { width: "12%", height: "15%" }, points: 100, feedback: { title: "Rischio meccanico", message: "Le parti rotanti vanno schermate.", type: "critical" } },
+    { id: "w_lift", name: "Sollevamento scorretto", position: { top: "28%", left: "58%" }, hitbox_size: { width: "18%", height: "60%" }, points: 100, feedback: { title: "MMC", message: "Schiena dritta e gambe piegate.", type: "warning" } },
+    { id: "w_panel", name: "Quadro elettrico aperto", position: { top: "18%", left: "80%" }, hitbox_size: { width: "20%", height: "55%" }, points: 150, feedback: { title: "Rischio elettrico", message: "I quadri devono essere chiusi a chiave.", type: "critical" } },
+    { id: "w_helmet", name: "Operaio in zona macchine", position: { top: "30%", left: "20%" }, hitbox_size: { width: "16%", height: "55%" }, points: 100, feedback: { title: "DPI obbligatori", message: "In officina serve casco di protezione.", type: "critical" } },
+    { id: "w_sparks", name: "Saldatura senza protezione", position: { top: "62%", left: "82%" }, hitbox_size: { width: "18%", height: "35%" }, points: 100, feedback: { title: "Scintille", message: "Materiali infiammabili lontani da scintille.", type: "warning" } },
+    { id: "w_machine", name: "Macchina senza riparo", position: { top: "28%", left: "35%" }, hitbox_size: { width: "20%", height: "35%" }, points: 100, feedback: { title: "Rischio meccanico", message: "Le parti rotanti vanno schermate.", type: "critical" } },
   ],
 };
 
@@ -68,11 +68,11 @@ const KITCHEN: RiskHuntLevel = {
   total_hazards: 5,
   intro_dialogue: { speaker: "RSPP", text: "Cerca rischi di taglio, ustione, scivolamento, chimico." },
   hazards: [
-    { id: "k_knife", name: "Coltello sul bordo", position: { top: "55%", left: "20%" }, hitbox_size: { width: "10%", height: "10%" }, points: 100, feedback: { title: "Rischio taglio", message: "Mai lasciare lame sul bordo.", type: "warning" } },
-    { id: "k_fire", name: "Fiamma vicino a panni", position: { top: "40%", left: "50%" }, hitbox_size: { width: "12%", height: "20%" }, points: 150, feedback: { title: "Rischio incendio", message: "Tenere materiali infiammabili lontani.", type: "critical" } },
-    { id: "k_chem", name: "Detergenti vicino al cibo", position: { top: "75%", left: "92%" }, hitbox_size: { width: "8%", height: "20%" }, points: 100, feedback: { title: "Rischio chimico", message: "I prodotti chimici vanno separati dagli alimenti.", type: "critical" } },
-    { id: "k_spill", name: "Pavimento bagnato", position: { top: "85%", left: "55%" }, hitbox_size: { width: "12%", height: "10%" }, points: 50, feedback: { title: "Scivolamento", message: "Asciugare subito e segnalare.", type: "warning" } },
-    { id: "k_cable", name: "Cavo elettrico vicino acqua", position: { top: "30%", left: "55%" }, hitbox_size: { width: "10%", height: "15%" }, points: 100, feedback: { title: "Rischio elettrico", message: "Cavi e acqua = pericolo.", type: "critical" } },
+    { id: "k_knife", name: "Coltello sul bordo", position: { top: "52%", left: "16%" }, hitbox_size: { width: "16%", height: "12%" }, points: 100, feedback: { title: "Rischio taglio", message: "Mai lasciare lame sul bordo.", type: "warning" } },
+    { id: "k_fire", name: "Fiamma sui fornelli", position: { top: "30%", left: "36%" }, hitbox_size: { width: "20%", height: "40%" }, points: 150, feedback: { title: "Rischio incendio", message: "Tenere materiali infiammabili lontani.", type: "critical" } },
+    { id: "k_chem", name: "Detergenti vicino al cibo", position: { top: "60%", left: "85%" }, hitbox_size: { width: "15%", height: "38%" }, points: 100, feedback: { title: "Rischio chimico", message: "I prodotti chimici vanno separati dagli alimenti.", type: "critical" } },
+    { id: "k_spill", name: "Pavimento sporco", position: { top: "72%", left: "32%" }, hitbox_size: { width: "26%", height: "22%" }, points: 50, feedback: { title: "Scivolamento", message: "Pulire e segnalare subito.", type: "warning" } },
+    { id: "k_cable", name: "Cavi sopra cappa", position: { top: "8%", left: "48%" }, hitbox_size: { width: "20%", height: "28%" }, points: 100, feedback: { title: "Rischio elettrico", message: "Cavi volanti vicino a fonti di calore.", type: "critical" } },
   ],
 };
 
@@ -84,11 +84,11 @@ const CONSTRUCTION: RiskHuntLevel = {
   total_hazards: 5,
   intro_dialogue: { speaker: "Coordinatore", text: "Identifica rischi caduta, DPI mancanti, carichi sospesi." },
   hazards: [
-    { id: "c_harness", name: "Lavoro in quota senza imbracatura", position: { top: "20%", left: "10%" }, hitbox_size: { width: "12%", height: "20%" }, points: 200, feedback: { title: "Caduta dall'alto", message: "Sopra i 2m serve imbracatura.", type: "critical" } },
-    { id: "c_load", name: "Carico sospeso sopra persone", position: { top: "55%", left: "60%" }, hitbox_size: { width: "12%", height: "15%" }, points: 150, feedback: { title: "Caduta materiali", message: "Mai sostare sotto i carichi.", type: "critical" } },
-    { id: "c_helmet", name: "Lavoratore senza casco", position: { top: "70%", left: "45%" }, hitbox_size: { width: "10%", height: "20%" }, points: 100, feedback: { title: "DPI", message: "Casco obbligatorio in cantiere.", type: "warning" } },
-    { id: "c_debris", name: "Detriti caduti", position: { top: "20%", left: "35%" }, hitbox_size: { width: "12%", height: "15%" }, points: 50, feedback: { title: "Caduta oggetti", message: "Servono parasassi e mantovane.", type: "warning" } },
-    { id: "c_signs", name: "Segnaletica assente", position: { top: "65%", left: "8%" }, hitbox_size: { width: "12%", height: "15%" }, points: 50, feedback: { title: "Segnaletica", message: "Cartelli obbligatori in cantiere.", type: "warning" } },
+    { id: "c_harness", name: "Lavoro in quota senza imbracatura", position: { top: "5%", left: "3%" }, hitbox_size: { width: "20%", height: "30%" }, points: 200, feedback: { title: "Caduta dall'alto", message: "Sopra i 2m serve imbracatura.", type: "critical" } },
+    { id: "c_load", name: "Carico sospeso sopra persone", position: { top: "48%", left: "47%" }, hitbox_size: { width: "20%", height: "28%" }, points: 150, feedback: { title: "Caduta materiali", message: "Mai sostare sotto i carichi.", type: "critical" } },
+    { id: "c_helmet", name: "Operaio sul ponteggio", position: { top: "30%", left: "22%" }, hitbox_size: { width: "20%", height: "30%" }, points: 100, feedback: { title: "DPI", message: "Casco e imbracatura obbligatori in quota.", type: "warning" } },
+    { id: "c_debris", name: "Detriti in caduta", position: { top: "5%", left: "26%" }, hitbox_size: { width: "22%", height: "25%" }, points: 50, feedback: { title: "Caduta oggetti", message: "Servono parasassi e mantovane.", type: "warning" } },
+    { id: "c_signs", name: "Cartelli a terra", position: { top: "78%", left: "3%" }, hitbox_size: { width: "22%", height: "20%" }, points: 50, feedback: { title: "Segnaletica", message: "Cartelli vanno installati in modo visibile.", type: "warning" } },
   ],
 };
 
@@ -100,11 +100,11 @@ const FIRE: RiskHuntLevel = {
   total_hazards: 5,
   intro_dialogue: { speaker: "Addetto Antincendio", text: "Trova innesco, ostacoli alla fuga e dispositivi non funzionanti." },
   hazards: [
-    { id: "f_overload", name: "Multipresa in fiamme", position: { top: "20%", left: "10%" }, hitbox_size: { width: "12%", height: "25%" }, points: 150, feedback: { title: "Innesco elettrico", message: "Mai sovraccaricare prese multiple.", type: "critical" } },
-    { id: "f_door", name: "Porta REI bloccata aperta", position: { top: "45%", left: "40%" }, hitbox_size: { width: "12%", height: "30%" }, points: 200, feedback: { title: "Compartimentazione", message: "Le porte tagliafuoco devono restare chiuse.", type: "critical" } },
-    { id: "f_bin", name: "Mozzicone nel cestino", position: { top: "60%", left: "55%" }, hitbox_size: { width: "10%", height: "15%" }, points: 100, feedback: { title: "Innesco", message: "Mai gettare mozziconi accesi.", type: "critical" } },
-    { id: "f_solvent", name: "Solventi vicino al calore", position: { top: "10%", left: "85%" }, hitbox_size: { width: "12%", height: "20%" }, points: 150, feedback: { title: "Sostanze infiammabili", message: "Stoccare lontano da fonti di calore.", type: "critical" } },
-    { id: "f_sprinkler", name: "Sprinkler ostruito", position: { top: "5%", left: "92%" }, hitbox_size: { width: "8%", height: "15%" }, points: 100, feedback: { title: "Impianto", message: "Nessun oggetto deve schermare gli sprinkler.", type: "warning" } },
+    { id: "f_overload", name: "Quadro elettrico in fiamme", position: { top: "12%", left: "3%" }, hitbox_size: { width: "22%", height: "45%" }, points: 150, feedback: { title: "Innesco elettrico", message: "Mai sovraccaricare prese multiple.", type: "critical" } },
+    { id: "f_door", name: "Porta REI bloccata aperta", position: { top: "15%", left: "35%" }, hitbox_size: { width: "16%", height: "60%" }, points: 200, feedback: { title: "Compartimentazione", message: "Le porte tagliafuoco devono restare chiuse.", type: "critical" } },
+    { id: "f_bin", name: "Cestino in fiamme", position: { top: "55%", left: "55%" }, hitbox_size: { width: "16%", height: "35%" }, points: 100, feedback: { title: "Innesco", message: "Mai gettare mozziconi accesi.", type: "critical" } },
+    { id: "f_solvent", name: "Poltrona in fiamme", position: { top: "50%", left: "5%" }, hitbox_size: { width: "25%", height: "35%" }, points: 150, feedback: { title: "Materiali infiammabili", message: "Tenere imbottiti lontano da fonti di calore.", type: "critical" } },
+    { id: "f_sprinkler", name: "Sprinkler ostruito", position: { top: "0%", left: "88%" }, hitbox_size: { width: "12%", height: "28%" }, points: 100, feedback: { title: "Impianto", message: "Nessun oggetto deve schermare gli sprinkler.", type: "warning" } },
   ],
 };
 
@@ -116,11 +116,11 @@ const FIRSTAID: RiskHuntLevel = {
   total_hazards: 5,
   intro_dialogue: { speaker: "Addetto PS", text: "Verifica presidi, formazione e accessibilità." },
   hazards: [
-    { id: "p_kit", name: "Cassetta vuota", position: { top: "15%", left: "8%" }, hitbox_size: { width: "15%", height: "30%" }, points: 150, feedback: { title: "Presidio mancante", message: "Pacchetto di medicazione sempre completo.", type: "critical" } },
-    { id: "p_aed", name: "DAE mancante", position: { top: "20%", left: "30%" }, hitbox_size: { width: "12%", height: "25%" }, points: 200, feedback: { title: "Defibrillatore", message: "Il DAE deve essere sempre presente e segnalato.", type: "critical" } },
-    { id: "p_victim", name: "Infortunato a terra", position: { top: "70%", left: "55%" }, hitbox_size: { width: "20%", height: "25%" }, points: 100, feedback: { title: "Allertare 112", message: "Chiamare subito i soccorsi.", type: "critical" } },
-    { id: "p_cpr", name: "BLS scorretto", position: { top: "30%", left: "60%" }, hitbox_size: { width: "15%", height: "20%" }, points: 100, feedback: { title: "Formazione", message: "Solo personale formato esegue il BLS.", type: "warning" } },
-    { id: "p_numbers", name: "Numeri emergenza assenti", position: { top: "30%", left: "80%" }, hitbox_size: { width: "12%", height: "20%" }, points: 50, feedback: { title: "Comunicazione", message: "Numeri di emergenza sempre visibili.", type: "warning" } },
+    { id: "p_kit", name: "Cassetta vuota", position: { top: "3%", left: "0%" }, hitbox_size: { width: "20%", height: "38%" }, points: 150, feedback: { title: "Presidio mancante", message: "Pacchetto di medicazione sempre completo.", type: "critical" } },
+    { id: "p_aed", name: "DAE non accessibile", position: { top: "8%", left: "44%" }, hitbox_size: { width: "16%", height: "25%" }, points: 200, feedback: { title: "Defibrillatore", message: "Il DAE deve essere sempre accessibile e segnalato.", type: "critical" } },
+    { id: "p_victim", name: "Infortunato a terra", position: { top: "65%", left: "55%" }, hitbox_size: { width: "28%", height: "32%" }, points: 100, feedback: { title: "Allertare 112", message: "Chiamare subito i soccorsi.", type: "critical" } },
+    { id: "p_cpr", name: "Cartello BLS confuso", position: { top: "12%", left: "62%" }, hitbox_size: { width: "20%", height: "30%" }, points: 100, feedback: { title: "Formazione", message: "Solo personale formato esegue il BLS.", type: "warning" } },
+    { id: "p_numbers", name: "Persona non formata", position: { top: "12%", left: "82%" }, hitbox_size: { width: "18%", height: "55%" }, points: 50, feedback: { title: "Formazione", message: "Servono addetti formati al primo soccorso.", type: "warning" } },
   ],
 };
 
@@ -132,11 +132,11 @@ const WAREHOUSE: RiskHuntLevel = {
   total_hazards: 5,
   intro_dialogue: { speaker: "RSPP", text: "Attenzione a movimentazione, traffico interno e cataste." },
   hazards: [
-    { id: "wh_forklift", name: "Carrello vicino a pedone", position: { top: "55%", left: "20%" }, hitbox_size: { width: "20%", height: "30%" }, points: 200, feedback: { title: "Investimento", message: "Separare percorsi pedoni e carrelli.", type: "critical" } },
-    { id: "wh_pallet", name: "Pallet instabili", position: { top: "30%", left: "50%" }, hitbox_size: { width: "15%", height: "25%" }, points: 150, feedback: { title: "Caduta carichi", message: "Cataste sempre in equilibrio.", type: "critical" } },
-    { id: "wh_lift", name: "MMC scorretta", position: { top: "55%", left: "55%" }, hitbox_size: { width: "12%", height: "30%" }, points: 100, feedback: { title: "Schiena", message: "Sollevare con le gambe.", type: "warning" } },
-    { id: "wh_oil", name: "Macchia d'olio", position: { top: "85%", left: "50%" }, hitbox_size: { width: "10%", height: "10%" }, points: 50, feedback: { title: "Scivolamento", message: "Pulire e segnalare subito.", type: "warning" } },
-    { id: "wh_overhang", name: "Carico sporgente", position: { top: "30%", left: "85%" }, hitbox_size: { width: "12%", height: "15%" }, points: 100, feedback: { title: "Caduta", message: "Niente deve sporgere dagli scaffali.", type: "warning" } },
+    { id: "wh_forklift", name: "Carrello vicino a pedone", position: { top: "35%", left: "3%" }, hitbox_size: { width: "32%", height: "55%" }, points: 200, feedback: { title: "Investimento", message: "Separare percorsi pedoni e carrelli.", type: "critical" } },
+    { id: "wh_pallet", name: "Pallet instabili", position: { top: "22%", left: "42%" }, hitbox_size: { width: "22%", height: "40%" }, points: 150, feedback: { title: "Caduta carichi", message: "Cataste sempre in equilibrio.", type: "critical" } },
+    { id: "wh_lift", name: "MMC scorretta", position: { top: "38%", left: "44%" }, hitbox_size: { width: "16%", height: "45%" }, points: 100, feedback: { title: "Schiena", message: "Sollevare con le gambe, non con la schiena.", type: "warning" } },
+    { id: "wh_oil", name: "Macchia d'olio", position: { top: "78%", left: "30%" }, hitbox_size: { width: "14%", height: "12%" }, points: 50, feedback: { title: "Scivolamento", message: "Pulire e segnalare subito.", type: "warning" } },
+    { id: "wh_overhang", name: "Cartello di pericolo", position: { top: "5%", left: "85%" }, hitbox_size: { width: "15%", height: "20%" }, points: 100, feedback: { title: "Segnaletica", message: "Verificare la segnaletica delle aree a rischio.", type: "warning" } },
   ],
 };
 
