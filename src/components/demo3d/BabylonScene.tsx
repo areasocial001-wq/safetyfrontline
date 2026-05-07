@@ -10,7 +10,17 @@ import { SubtitlesOverlay } from './SubtitlesOverlay';
 import { PropLabel } from './PropLabel';
 import { NPCDialogOverlay } from './NPCDialogOverlay';
 import { NPCRoleQuiz } from './NPCRoleQuiz';
-import { Archive, Drum, Construction, ShieldAlert, Package2, Cog, FlaskConical, Monitor, LucideIcon } from 'lucide-react';
+import { Archive, Drum, Construction, ShieldAlert, Package2, Cog, FlaskConical, Monitor, Cable, Flame, DoorOpen, Droplets, Library, Lightbulb, LucideIcon } from 'lucide-react';
+
+// Friendly tooltip icon mapping for hazard meshes (multilingual-friendly: icons + simple words)
+const TOOLTIP_ICONS: Record<string, LucideIcon> = {
+  cable: Cable,
+  extinguisher: Flame,
+  exit: DoorOpen,
+  puddle: Droplets,
+  shelf: Library,
+  emlight: Lightbulb,
+};
 import type { AudioSettings } from '@/hooks/useGraphicsSettings';
 import { loadGLTFProps } from '@/lib/babylon-prop-loader';
 import { loadProceduralProps } from '@/lib/babylon-procedural-props';
@@ -333,12 +343,13 @@ export const BabylonScene = ({
       }
     };
 
-    // 11. Prop detection (raycast look-at)
+    // 11. Prop detection (raycast look-at) — supports metadata.tooltip for hazards
     const LOOK_DISTANCE = 6;
     const detectLookedAtProp = () => {
       if (!camera) return;
       const ray = camera.getForwardRay(LOOK_DISTANCE);
       const hit = scene.pickWithRay(ray, (mesh) => {
+        if (mesh.metadata?.tooltip) return true;
         return mesh.name.includes('pallet') || mesh.name.includes('barrel') ||
           mesh.name.includes('cone') || mesh.name.includes('barrier') ||
           mesh.name.includes('cargo') || mesh.name.includes('equipment') ||
@@ -349,23 +360,34 @@ export const BabylonScene = ({
 
       if (hit && hit.pickedMesh && hit.distance <= LOOK_DISTANCE) {
         const meshName = hit.pickedMesh.name;
-        let info = { name: 'Oggetto', type: 'Generico', condition: 'good' as 'good' | 'warning' | 'damaged', icon: Package2 as LucideIcon };
-        if (meshName.includes('pallet') || meshName.includes('filing') || meshName.includes('storage'))
-          info = { name: 'Pallet / Scaffale', type: 'Archiviazione', condition: 'good', icon: Archive };
-        else if (meshName.includes('barrel') || meshName.includes('waste') || meshName.includes('recycling'))
-          info = { name: 'Contenitore', type: 'Stoccaggio rifiuti', condition: 'good', icon: Drum };
-        else if (meshName.includes('cone'))
-          info = { name: 'Cono segnaletico', type: 'Sicurezza', condition: 'warning', icon: Construction };
-        else if (meshName.includes('barrier'))
-          info = { name: 'Barriera sicurezza', type: 'Protezione', condition: 'good', icon: ShieldAlert };
-        else if (meshName.includes('cargo'))
-          info = { name: 'Scatola merci', type: 'Magazzino', condition: 'good', icon: Package2 };
-        else if (meshName.includes('equipment'))
-          info = { name: 'Attrezzatura', type: 'Macchinario', condition: 'warning', icon: Cog };
-        else if (meshName.includes('bench'))
-          info = { name: 'Banco laboratorio', type: 'Attrezzatura lab', condition: 'good', icon: FlaskConical };
-        else if (meshName.includes('desk'))
-          info = { name: 'Scrivania', type: 'Postazione lavoro', condition: 'good', icon: Monitor };
+        const tt = hit.pickedMesh.metadata?.tooltip;
+        let info: { name: string; type: string; condition: 'good' | 'warning' | 'damaged'; icon: LucideIcon };
+        if (tt) {
+          info = {
+            name: tt.name,
+            type: tt.type,
+            condition: tt.condition,
+            icon: TOOLTIP_ICONS[tt.iconKey] || Package2,
+          };
+        } else {
+          info = { name: 'Oggetto', type: 'Generico', condition: 'good', icon: Package2 };
+          if (meshName.includes('pallet') || meshName.includes('filing') || meshName.includes('storage'))
+            info = { name: 'Pallet / Scaffale', type: 'Archiviazione', condition: 'good', icon: Archive };
+          else if (meshName.includes('barrel') || meshName.includes('waste') || meshName.includes('recycling'))
+            info = { name: 'Contenitore', type: 'Stoccaggio rifiuti', condition: 'good', icon: Drum };
+          else if (meshName.includes('cone'))
+            info = { name: 'Cono segnaletico', type: 'Sicurezza', condition: 'warning', icon: Construction };
+          else if (meshName.includes('barrier'))
+            info = { name: 'Barriera sicurezza', type: 'Protezione', condition: 'good', icon: ShieldAlert };
+          else if (meshName.includes('cargo'))
+            info = { name: 'Scatola merci', type: 'Magazzino', condition: 'good', icon: Package2 };
+          else if (meshName.includes('equipment'))
+            info = { name: 'Attrezzatura', type: 'Macchinario', condition: 'warning', icon: Cog };
+          else if (meshName.includes('bench'))
+            info = { name: 'Banco laboratorio', type: 'Attrezzatura lab', condition: 'good', icon: FlaskConical };
+          else if (meshName.includes('desk'))
+            info = { name: 'Scrivania', type: 'Postazione lavoro', condition: 'good', icon: Monitor };
+        }
 
         setLookedAtProp({ ...info, distance: hit.distance });
       } else {
