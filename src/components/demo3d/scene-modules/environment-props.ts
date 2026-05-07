@@ -635,16 +635,39 @@ function addOfficeProps(
   const carpet = BABYLON.MeshBuilder.CreateGround('off_carpet', { width: 47.5, height: 47.5 }, scene);
   carpet.position.y = 0.005;
   const carpetMat = new BABYLON.StandardMaterial('off_carpetMat', scene);
-  carpetMat.diffuseColor = new BABYLON.Color3(0.55, 0.5, 0.45);
-  carpetMat.specularColor = new BABYLON.Color3(0.05, 0.05, 0.05);
+  // Procedural carpet texture (warm beige with noise)
+  const carpetTex = new BABYLON.DynamicTexture('off_carpetTex', { width: 512, height: 512 }, scene, false);
+  const cctx = carpetTex.getContext() as CanvasRenderingContext2D;
+  cctx.fillStyle = '#8a7d6c';
+  cctx.fillRect(0, 0, 512, 512);
+  for (let i = 0; i < 6000; i++) {
+    const x = Math.random() * 512, y = Math.random() * 512;
+    const v = 90 + Math.floor(Math.random() * 60);
+    cctx.fillStyle = `rgb(${v + 20},${v + 5},${v - 10})`;
+    cctx.fillRect(x, y, 1.5, 1.5);
+  }
+  carpetTex.update();
+  carpetTex.uScale = 8; carpetTex.vScale = 8;
+  carpetMat.diffuseTexture = carpetTex;
+  carpetMat.specularColor = new BABYLON.Color3(0.04, 0.04, 0.04);
   carpet.material = carpetMat;
   carpet.receiveShadows = true;
   carpet.isPickable = false;
 
-  // Interior wall material (warm off-white)
+  // Interior wall material with subtle plaster texture
   const interiorWallMat = new BABYLON.StandardMaterial('off_interiorWall', scene);
-  interiorWallMat.diffuseColor = new BABYLON.Color3(0.88, 0.85, 0.78);
-  interiorWallMat.specularColor = new BABYLON.Color3(0.08, 0.08, 0.08);
+  const wallTex = new BABYLON.DynamicTexture('off_wallTex', { width: 512, height: 512 }, scene, false);
+  const wctx = wallTex.getContext() as CanvasRenderingContext2D;
+  wctx.fillStyle = '#ece6d9';
+  wctx.fillRect(0, 0, 512, 512);
+  for (let i = 0; i < 3000; i++) {
+    wctx.fillStyle = `rgba(120,110,90,${0.04 + Math.random() * 0.06})`;
+    wctx.fillRect(Math.random() * 512, Math.random() * 512, 2, 2);
+  }
+  wallTex.update();
+  wallTex.uScale = 4; wallTex.vScale = 2;
+  interiorWallMat.diffuseTexture = wallTex;
+  interiorWallMat.specularColor = new BABYLON.Color3(0.05, 0.05, 0.05);
   interiorWallMat.backFaceCulling = false;
 
   // Skirting board material
@@ -668,7 +691,6 @@ function addOfficeProps(
     wall.checkCollisions = true;
     wall.isPickable = false;
 
-    // Skirting board at base
     const skirt = BABYLON.MeshBuilder.CreateBox(`${cfg.name}_skirt`, {
       width: cfg.w === 0.15 ? 0.18 : cfg.w,
       height: 0.12,
@@ -679,13 +701,30 @@ function addOfficeProps(
     skirt.isPickable = false;
   });
 
-  // Visible drop ceiling (acoustic tiles)
+  // Drop ceiling with acoustic-tile texture (slightly emissive for soft fill)
   const ceiling = BABYLON.MeshBuilder.CreateGround('off_ceiling', { width: 30, height: 30 }, scene);
   ceiling.position.y = 3.0;
-  ceiling.rotation.x = Math.PI; // face downward
+  ceiling.rotation.x = Math.PI;
   const ceilingMat = new BABYLON.StandardMaterial('off_ceilingMat', scene);
-  ceilingMat.diffuseColor = new BABYLON.Color3(0.93, 0.93, 0.9);
-  ceilingMat.specularColor = new BABYLON.Color3(0.05, 0.05, 0.05);
+  const ceilTex = new BABYLON.DynamicTexture('off_ceilTex', { width: 512, height: 512 }, scene, false);
+  const cectx = ceilTex.getContext() as CanvasRenderingContext2D;
+  cectx.fillStyle = '#eeeae0';
+  cectx.fillRect(0, 0, 512, 512);
+  cectx.strokeStyle = '#bdb6a6';
+  cectx.lineWidth = 4;
+  for (let i = 0; i <= 512; i += 128) {
+    cectx.beginPath(); cectx.moveTo(i, 0); cectx.lineTo(i, 512); cectx.stroke();
+    cectx.beginPath(); cectx.moveTo(0, i); cectx.lineTo(512, i); cectx.stroke();
+  }
+  for (let i = 0; i < 1500; i++) {
+    cectx.fillStyle = 'rgba(140,130,110,0.08)';
+    cectx.fillRect(Math.random() * 512, Math.random() * 512, 2, 2);
+  }
+  ceilTex.update();
+  ceilTex.uScale = 5; ceilTex.vScale = 5;
+  ceilingMat.diffuseTexture = ceilTex;
+  ceilingMat.emissiveColor = new BABYLON.Color3(0.22, 0.22, 0.20);
+  ceilingMat.specularColor = new BABYLON.Color3(0.04, 0.04, 0.04);
   ceiling.material = ceilingMat;
   ceiling.isPickable = false;
 
@@ -1068,7 +1107,107 @@ function addOfficeProps(
   rugMat.specularColor = new BABYLON.Color3(0.05, 0.05, 0.05);
   rug.material = rugMat;
 
-  console.log('[Office] Full office furnishing complete — desks, chairs, monitors, bookshelves, windows, break area');
+  // ============================================================
+  // OFFICE HAZARD PROPS — visual anchors for the 6 office risks
+  // ============================================================
+  const hazardRedMat = new BABYLON.StandardMaterial('off_hazardRed', scene);
+  hazardRedMat.diffuseColor = new BABYLON.Color3(0.85, 0.15, 0.15);
+  hazardRedMat.emissiveColor = new BABYLON.Color3(0.25, 0.04, 0.04);
+
+  // Risk 1 — Cavo elettrico scoperto sul pavimento [-8, 0.1, -3]
+  const cableSegments = 6;
+  for (let s = 0; s < cableSegments; s++) {
+    const seg = BABYLON.MeshBuilder.CreateCylinder(`off_cable_${s}`, { height: 0.45, diameter: 0.04, tessellation: 8 }, scene);
+    seg.rotation.z = Math.PI / 2;
+    seg.position = new BABYLON.Vector3(-8 + (s - cableSegments / 2) * 0.42, 0.04, -3 + Math.sin(s * 0.9) * 0.25);
+    seg.material = hazardRedMat;
+  }
+  const plug = BABYLON.MeshBuilder.CreateBox('off_cable_plug', { width: 0.12, height: 0.06, depth: 0.08 }, scene);
+  plug.position = new BABYLON.Vector3(-8 - 1.4, 0.06, -3);
+  plug.material = blackMat;
+
+  // Risk 2 — Estintore bloccato da archivi [-14, 0.5, -1]
+  const extBody = BABYLON.MeshBuilder.CreateCylinder('off_ext_body', { height: 0.55, diameter: 0.18, tessellation: 16 }, scene);
+  extBody.position = new BABYLON.Vector3(-14.7, 0.35, -1);
+  extBody.material = hazardRedMat;
+  const extHandle = BABYLON.MeshBuilder.CreateBox('off_ext_handle', { width: 0.12, height: 0.05, depth: 0.06 }, scene);
+  extHandle.position = new BABYLON.Vector3(-14.7, 0.68, -1);
+  extHandle.material = blackMat;
+  const cardboardMat = new BABYLON.StandardMaterial('off_cardboard', scene);
+  cardboardMat.diffuseColor = new BABYLON.Color3(0.72, 0.55, 0.35);
+  for (let b = 0; b < 4; b++) {
+    const box = BABYLON.MeshBuilder.CreateBox(`off_extBlock_${b}`, { width: 0.55, height: 0.4, depth: 0.5 }, scene);
+    box.position = new BABYLON.Vector3(-14.2 + (b % 2) * 0.05, 0.2 + Math.floor(b / 2) * 0.42, -1.3 + (b % 2) * 0.6);
+    box.material = cardboardMat;
+    box.checkCollisions = true;
+    if (shadowGenerator) shadowGenerator.addShadowCaster(box);
+  }
+
+  // Risk 3 — Uscita di emergenza ostruita [0, 0.5, 11]
+  const exitDoor = BABYLON.MeshBuilder.CreateBox('off_exitDoor', { width: 1.6, height: 2.2, depth: 0.06 }, scene);
+  exitDoor.position = new BABYLON.Vector3(0, 1.1, 14.85);
+  const exitDoorMat = new BABYLON.StandardMaterial('off_exitDoorMat', scene);
+  exitDoorMat.diffuseColor = new BABYLON.Color3(0.15, 0.5, 0.25);
+  exitDoor.material = exitDoorMat;
+  const exitSign = BABYLON.MeshBuilder.CreateBox('off_exitSign', { width: 0.7, height: 0.25, depth: 0.04 }, scene);
+  exitSign.position = new BABYLON.Vector3(0, 2.55, 14.83);
+  const exitSignMat = new BABYLON.StandardMaterial('off_exitSignMat', scene);
+  exitSignMat.diffuseColor = new BABYLON.Color3(0.1, 0.7, 0.3);
+  exitSignMat.emissiveColor = new BABYLON.Color3(0.15, 0.6, 0.25);
+  exitSign.material = exitSignMat;
+  for (let b = 0; b < 5; b++) {
+    const obs = BABYLON.MeshBuilder.CreateBox(`off_exitBlock_${b}`, { width: 0.55, height: 0.45, depth: 0.5 }, scene);
+    obs.position = new BABYLON.Vector3(-0.6 + (b % 3) * 0.6, 0.22 + Math.floor(b / 3) * 0.46, 11 + (b % 2) * 0.4);
+    obs.material = cardboardMat;
+    obs.checkCollisions = true;
+    if (shadowGenerator) shadowGenerator.addShadowCaster(obs);
+  }
+
+  // Risk 4 — Pavimento bagnato non segnalato [-5, 0.02, 6]
+  const puddle = BABYLON.MeshBuilder.CreateDisc('off_puddle', { radius: 0.7, tessellation: 24 }, scene);
+  puddle.rotation.x = Math.PI / 2;
+  puddle.position = new BABYLON.Vector3(-5, 0.012, 6);
+  const puddleMat = new BABYLON.StandardMaterial('off_puddleMat', scene);
+  puddleMat.diffuseColor = new BABYLON.Color3(0.35, 0.5, 0.65);
+  puddleMat.specularColor = new BABYLON.Color3(0.95, 0.95, 1.0);
+  puddleMat.specularPower = 256;
+  puddleMat.alpha = 0.75;
+  puddle.material = puddleMat;
+  puddle.isPickable = false;
+
+  // Risk 5 — Scaffalatura instabile sovraccarica [-13, 0.5, -6]
+  const tiltedShelf = BABYLON.MeshBuilder.CreateBox('off_tiltedShelf', { width: 1.0, height: 1.8, depth: 0.45 }, scene);
+  tiltedShelf.position = new BABYLON.Vector3(-13, 0.9, -6);
+  tiltedShelf.rotation.z = 0.12;
+  tiltedShelf.material = darkWoodMat;
+  if (shadowGenerator) shadowGenerator.addShadowCaster(tiltedShelf);
+  const folderColors = [
+    new BABYLON.Color3(0.7, 0.2, 0.2),
+    new BABYLON.Color3(0.2, 0.4, 0.7),
+    new BABYLON.Color3(0.6, 0.55, 0.15),
+  ];
+  for (let f = 0; f < 5; f++) {
+    const folder = BABYLON.MeshBuilder.CreateBox(`off_folder_${f}`, { width: 0.18, height: 0.28, depth: 0.32 }, scene);
+    folder.position = new BABYLON.Vector3(-13 - 0.4 + f * 0.18, 1.95, -6);
+    folder.rotation.z = 0.12;
+    const fMat = new BABYLON.StandardMaterial(`off_folderMat_${f}`, scene);
+    fMat.diffuseColor = folderColors[f % folderColors.length];
+    folder.material = fMat;
+  }
+
+  // Risk 6 — Luce di emergenza non funzionante [10, 0.5, -9]
+  const emLightHousing = BABYLON.MeshBuilder.CreateBox('off_emLight', { width: 0.35, height: 0.16, depth: 0.1 }, scene);
+  emLightHousing.position = new BABYLON.Vector3(10, 2.55, -9.85);
+  const emLightMat = new BABYLON.StandardMaterial('off_emLightMat', scene);
+  emLightMat.diffuseColor = new BABYLON.Color3(0.85, 0.85, 0.85);
+  emLightHousing.material = emLightMat;
+  const emLens = BABYLON.MeshBuilder.CreateBox('off_emLens', { width: 0.28, height: 0.1, depth: 0.02 }, scene);
+  emLens.position = new BABYLON.Vector3(10, 2.55, -9.79);
+  const emLensMat = new BABYLON.StandardMaterial('off_emLensMat', scene);
+  emLensMat.diffuseColor = new BABYLON.Color3(0.25, 0.25, 0.22);
+  emLens.material = emLensMat;
+
+  console.log('[Office] Full office furnishing complete — props + hazards');
 }
 
 // ============================================================
