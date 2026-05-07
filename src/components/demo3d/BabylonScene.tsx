@@ -10,7 +10,17 @@ import { SubtitlesOverlay } from './SubtitlesOverlay';
 import { PropLabel } from './PropLabel';
 import { NPCDialogOverlay } from './NPCDialogOverlay';
 import { NPCRoleQuiz } from './NPCRoleQuiz';
-import { Archive, Drum, Construction, ShieldAlert, Package2, Cog, FlaskConical, Monitor, LucideIcon } from 'lucide-react';
+import { Archive, Drum, Construction, ShieldAlert, Package2, Cog, FlaskConical, Monitor, Cable, Flame, DoorOpen, Droplets, Library, Lightbulb, LucideIcon } from 'lucide-react';
+
+// Friendly tooltip icon mapping for hazard meshes (multilingual-friendly: icons + simple words)
+const TOOLTIP_ICONS: Record<string, LucideIcon> = {
+  cable: Cable,
+  extinguisher: Flame,
+  exit: DoorOpen,
+  puddle: Droplets,
+  shelf: Library,
+  emlight: Lightbulb,
+};
 import type { AudioSettings } from '@/hooks/useGraphicsSettings';
 import { loadGLTFProps } from '@/lib/babylon-prop-loader';
 import { loadProceduralProps } from '@/lib/babylon-procedural-props';
