@@ -724,7 +724,7 @@ function addOfficeProps(
   ceilTex.update();
   ceilTex.uScale = 5; ceilTex.vScale = 5;
   ceilingMat.diffuseTexture = ceilTex;
-  ceilingMat.emissiveColor = new BABYLON.Color3(0.22, 0.22, 0.20);
+  ceilingMat.emissiveColor = new BABYLON.Color3(0.08, 0.08, 0.07);
   ceilingMat.specularColor = new BABYLON.Color3(0.04, 0.04, 0.04);
   ceiling.material = ceilingMat;
   ceiling.isPickable = false;
