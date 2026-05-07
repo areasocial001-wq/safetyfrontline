@@ -635,16 +635,39 @@ function addOfficeProps(
   const carpet = BABYLON.MeshBuilder.CreateGround('off_carpet', { width: 47.5, height: 47.5 }, scene);
   carpet.position.y = 0.005;
   const carpetMat = new BABYLON.StandardMaterial('off_carpetMat', scene);
-  carpetMat.diffuseColor = new BABYLON.Color3(0.55, 0.5, 0.45);
-  carpetMat.specularColor = new BABYLON.Color3(0.05, 0.05, 0.05);
+  // Procedural carpet texture (warm beige with noise)
+  const carpetTex = new BABYLON.DynamicTexture('off_carpetTex', { width: 512, height: 512 }, scene, false);
+  const cctx = carpetTex.getContext() as CanvasRenderingContext2D;
+  cctx.fillStyle = '#8a7d6c';
+  cctx.fillRect(0, 0, 512, 512);
+  for (let i = 0; i < 6000; i++) {
+    const x = Math.random() * 512, y = Math.random() * 512;
+    const v = 90 + Math.floor(Math.random() * 60);
+    cctx.fillStyle = `rgb(${v + 20},${v + 5},${v - 10})`;
+    cctx.fillRect(x, y, 1.5, 1.5);
+  }
+  carpetTex.update();
+  carpetTex.uScale = 8; carpetTex.vScale = 8;
+  carpetMat.diffuseTexture = carpetTex;
+  carpetMat.specularColor = new BABYLON.Color3(0.04, 0.04, 0.04);
   carpet.material = carpetMat;
   carpet.receiveShadows = true;
   carpet.isPickable = false;
 
-  // Interior wall material (warm off-white)
+  // Interior wall material with subtle plaster texture
   const interiorWallMat = new BABYLON.StandardMaterial('off_interiorWall', scene);
-  interiorWallMat.diffuseColor = new BABYLON.Color3(0.88, 0.85, 0.78);
-  interiorWallMat.specularColor = new BABYLON.Color3(0.08, 0.08, 0.08);
+  const wallTex = new BABYLON.DynamicTexture('off_wallTex', { width: 512, height: 512 }, scene, false);
+  const wctx = wallTex.getContext() as CanvasRenderingContext2D;
+  wctx.fillStyle = '#ece6d9';
+  wctx.fillRect(0, 0, 512, 512);
+  for (let i = 0; i < 3000; i++) {
+    wctx.fillStyle = `rgba(120,110,90,${0.04 + Math.random() * 0.06})`;
+    wctx.fillRect(Math.random() * 512, Math.random() * 512, 2, 2);
+  }
+  wallTex.update();
+  wallTex.uScale = 4; wallTex.vScale = 2;
+  interiorWallMat.diffuseTexture = wallTex;
+  interiorWallMat.specularColor = new BABYLON.Color3(0.05, 0.05, 0.05);
   interiorWallMat.backFaceCulling = false;
 
   // Skirting board material
@@ -668,7 +691,6 @@ function addOfficeProps(
     wall.checkCollisions = true;
     wall.isPickable = false;
 
-    // Skirting board at base
     const skirt = BABYLON.MeshBuilder.CreateBox(`${cfg.name}_skirt`, {
       width: cfg.w === 0.15 ? 0.18 : cfg.w,
       height: 0.12,
@@ -679,13 +701,30 @@ function addOfficeProps(
     skirt.isPickable = false;
   });
 
-  // Visible drop ceiling (acoustic tiles)
+  // Drop ceiling with acoustic-tile texture (slightly emissive for soft fill)
   const ceiling = BABYLON.MeshBuilder.CreateGround('off_ceiling', { width: 30, height: 30 }, scene);
   ceiling.position.y = 3.0;
-  ceiling.rotation.x = Math.PI; // face downward
+  ceiling.rotation.x = Math.PI;
   const ceilingMat = new BABYLON.StandardMaterial('off_ceilingMat', scene);
-  ceilingMat.diffuseColor = new BABYLON.Color3(0.93, 0.93, 0.9);
-  ceilingMat.specularColor = new BABYLON.Color3(0.05, 0.05, 0.05);
+  const ceilTex = new BABYLON.DynamicTexture('off_ceilTex', { width: 512, height: 512 }, scene, false);
+  const cectx = ceilTex.getContext() as CanvasRenderingContext2D;
+  cectx.fillStyle = '#eeeae0';
+  cectx.fillRect(0, 0, 512, 512);
+  cectx.strokeStyle = '#bdb6a6';
+  cectx.lineWidth = 4;
+  for (let i = 0; i <= 512; i += 128) {
+    cectx.beginPath(); cectx.moveTo(i, 0); cectx.lineTo(i, 512); cectx.stroke();
+    cectx.beginPath(); cectx.moveTo(0, i); cectx.lineTo(512, i); cectx.stroke();
+  }
+  for (let i = 0; i < 1500; i++) {
+    cectx.fillStyle = 'rgba(140,130,110,0.08)';
+    cectx.fillRect(Math.random() * 512, Math.random() * 512, 2, 2);
+  }
+  ceilTex.update();
+  ceilTex.uScale = 5; ceilTex.vScale = 5;
+  ceilingMat.diffuseTexture = ceilTex;
+  ceilingMat.emissiveColor = new BABYLON.Color3(0.22, 0.22, 0.20);
+  ceilingMat.specularColor = new BABYLON.Color3(0.04, 0.04, 0.04);
   ceiling.material = ceilingMat;
   ceiling.isPickable = false;
 
