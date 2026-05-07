@@ -658,10 +658,11 @@ function addOfficeProps(
   const interiorWallMat = new BABYLON.StandardMaterial('off_interiorWall', scene);
   const wallTex = new BABYLON.DynamicTexture('off_wallTex', { width: 512, height: 512 }, scene, false);
   const wctx = wallTex.getContext() as CanvasRenderingContext2D;
-  wctx.fillStyle = '#ece6d9';
+  // Cooler off-white with a faint blue tint, clearly distinct from the warm beige carpet
+  wctx.fillStyle = '#d8dde2';
   wctx.fillRect(0, 0, 512, 512);
   for (let i = 0; i < 3000; i++) {
-    wctx.fillStyle = `rgba(120,110,90,${0.04 + Math.random() * 0.06})`;
+    wctx.fillStyle = `rgba(80,90,110,${0.05 + Math.random() * 0.07})`;
     wctx.fillRect(Math.random() * 512, Math.random() * 512, 2, 2);
   }
   wallTex.update();
@@ -670,9 +671,9 @@ function addOfficeProps(
   interiorWallMat.specularColor = new BABYLON.Color3(0.05, 0.05, 0.05);
   interiorWallMat.backFaceCulling = false;
 
-  // Skirting board material
+  // Skirting board material — darker wood for clear floor/wall contrast
   const skirtingMat = new BABYLON.StandardMaterial('off_skirting', scene);
-  skirtingMat.diffuseColor = new BABYLON.Color3(0.95, 0.95, 0.92);
+  skirtingMat.diffuseColor = new BABYLON.Color3(0.28, 0.20, 0.14);
 
   const wallY = 1.5; // wall center height (3m walls)
   const wallH = 3.0;
@@ -723,7 +724,7 @@ function addOfficeProps(
   ceilTex.update();
   ceilTex.uScale = 5; ceilTex.vScale = 5;
   ceilingMat.diffuseTexture = ceilTex;
-  ceilingMat.emissiveColor = new BABYLON.Color3(0.22, 0.22, 0.20);
+  ceilingMat.emissiveColor = new BABYLON.Color3(0.08, 0.08, 0.07);
   ceilingMat.specularColor = new BABYLON.Color3(0.04, 0.04, 0.04);
   ceiling.material = ceilingMat;
   ceiling.isPickable = false;
