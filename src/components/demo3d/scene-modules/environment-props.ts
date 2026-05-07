@@ -630,6 +630,65 @@ function addOfficeProps(
   const greenMat = new BABYLON.StandardMaterial('off_green', scene);
   greenMat.diffuseColor = new BABYLON.Color3(0.25, 0.55, 0.2);
 
+  // ---------- Interior architecture (visible floor, walls, ceiling) ----------
+  // Carpet/floor finish (overlays the gray ground)
+  const carpet = BABYLON.MeshBuilder.CreateGround('off_carpet', { width: 47.5, height: 47.5 }, scene);
+  carpet.position.y = 0.005;
+  const carpetMat = new BABYLON.StandardMaterial('off_carpetMat', scene);
+  carpetMat.diffuseColor = new BABYLON.Color3(0.55, 0.5, 0.45);
+  carpetMat.specularColor = new BABYLON.Color3(0.05, 0.05, 0.05);
+  carpet.material = carpetMat;
+  carpet.receiveShadows = true;
+  carpet.isPickable = false;
+
+  // Interior wall material (warm off-white)
+  const interiorWallMat = new BABYLON.StandardMaterial('off_interiorWall', scene);
+  interiorWallMat.diffuseColor = new BABYLON.Color3(0.88, 0.85, 0.78);
+  interiorWallMat.specularColor = new BABYLON.Color3(0.08, 0.08, 0.08);
+  interiorWallMat.backFaceCulling = false;
+
+  // Skirting board material
+  const skirtingMat = new BABYLON.StandardMaterial('off_skirting', scene);
+  skirtingMat.diffuseColor = new BABYLON.Color3(0.95, 0.95, 0.92);
+
+  const wallY = 1.5; // wall center height (3m walls)
+  const wallH = 3.0;
+  const wallSpan = 30;
+  const wallConfigs = [
+    { name: 'off_wall_n', w: wallSpan, h: wallH, d: 0.15, x: 0, y: wallY, z: -15 },
+    { name: 'off_wall_s', w: wallSpan, h: wallH, d: 0.15, x: 0, y: wallY, z: 15 },
+    { name: 'off_wall_e', w: 0.15, h: wallH, d: wallSpan, x: 15, y: wallY, z: 0 },
+    { name: 'off_wall_w', w: 0.15, h: wallH, d: wallSpan, x: -15, y: wallY, z: 0 },
+  ];
+  wallConfigs.forEach(cfg => {
+    const wall = BABYLON.MeshBuilder.CreateBox(cfg.name, { width: cfg.w, height: cfg.h, depth: cfg.d }, scene);
+    wall.position = new BABYLON.Vector3(cfg.x, cfg.y, cfg.z);
+    wall.material = interiorWallMat;
+    wall.receiveShadows = true;
+    wall.checkCollisions = true;
+    wall.isPickable = false;
+
+    // Skirting board at base
+    const skirt = BABYLON.MeshBuilder.CreateBox(`${cfg.name}_skirt`, {
+      width: cfg.w === 0.15 ? 0.18 : cfg.w,
+      height: 0.12,
+      depth: cfg.d === 0.15 ? 0.18 : cfg.d,
+    }, scene);
+    skirt.position = new BABYLON.Vector3(cfg.x, 0.06, cfg.z);
+    skirt.material = skirtingMat;
+    skirt.isPickable = false;
+  });
+
+  // Visible drop ceiling (acoustic tiles)
+  const ceiling = BABYLON.MeshBuilder.CreateGround('off_ceiling', { width: 30, height: 30 }, scene);
+  ceiling.position.y = 3.0;
+  ceiling.rotation.x = Math.PI; // face downward
+  const ceilingMat = new BABYLON.StandardMaterial('off_ceilingMat', scene);
+  ceilingMat.diffuseColor = new BABYLON.Color3(0.93, 0.93, 0.9);
+  ceilingMat.specularColor = new BABYLON.Color3(0.05, 0.05, 0.05);
+  ceiling.material = ceilingMat;
+  ceiling.isPickable = false;
+
   // ---------- Ceiling lights (panels) ----------
   for (let i = 0; i < 6; i++) {
     const col = i % 3;
