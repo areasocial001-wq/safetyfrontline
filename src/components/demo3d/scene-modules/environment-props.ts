@@ -671,9 +671,9 @@ function addOfficeProps(
   interiorWallMat.specularColor = new BABYLON.Color3(0.05, 0.05, 0.05);
   interiorWallMat.backFaceCulling = false;
 
-  // Skirting board material
+  // Skirting board material — darker wood for clear floor/wall contrast
   const skirtingMat = new BABYLON.StandardMaterial('off_skirting', scene);
-  skirtingMat.diffuseColor = new BABYLON.Color3(0.95, 0.95, 0.92);
+  skirtingMat.diffuseColor = new BABYLON.Color3(0.28, 0.20, 0.14);
 
   const wallY = 1.5; // wall center height (3m walls)
   const wallH = 3.0;
