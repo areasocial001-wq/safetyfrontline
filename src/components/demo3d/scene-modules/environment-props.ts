@@ -1109,30 +1109,47 @@ function addOfficeProps(
 
   // ============================================================
   // OFFICE HAZARD PROPS — visual anchors for the 6 office risks
+  // Each hazard mesh carries metadata: riskId (links click → risk found)
+  // and tooltip { name, type, condition } for the look-at PropLabel.
   // ============================================================
   const hazardRedMat = new BABYLON.StandardMaterial('off_hazardRed', scene);
   hazardRedMat.diffuseColor = new BABYLON.Color3(0.85, 0.15, 0.15);
   hazardRedMat.emissiveColor = new BABYLON.Color3(0.25, 0.04, 0.04);
 
+  const tagHazard = (
+    mesh: BABYLON.AbstractMesh,
+    riskId: string,
+    tooltip: { name: string; type: string; condition: 'good' | 'warning' | 'damaged'; iconKey: string }
+  ) => {
+    mesh.metadata = { ...(mesh.metadata || {}), riskId, tooltip };
+    mesh.isPickable = true;
+  };
+
   // Risk 1 — Cavo elettrico scoperto sul pavimento [-8, 0.1, -3]
+  const cableTip = { name: 'Cavo a terra', type: 'Pericolo inciampo', condition: 'damaged' as const, iconKey: 'cable' };
   const cableSegments = 6;
   for (let s = 0; s < cableSegments; s++) {
     const seg = BABYLON.MeshBuilder.CreateCylinder(`off_cable_${s}`, { height: 0.45, diameter: 0.04, tessellation: 8 }, scene);
     seg.rotation.z = Math.PI / 2;
     seg.position = new BABYLON.Vector3(-8 + (s - cableSegments / 2) * 0.42, 0.04, -3 + Math.sin(s * 0.9) * 0.25);
     seg.material = hazardRedMat;
+    tagHazard(seg, '1', cableTip);
   }
   const plug = BABYLON.MeshBuilder.CreateBox('off_cable_plug', { width: 0.12, height: 0.06, depth: 0.08 }, scene);
   plug.position = new BABYLON.Vector3(-8 - 1.4, 0.06, -3);
   plug.material = blackMat;
+  tagHazard(plug, '1', cableTip);
 
   // Risk 2 — Estintore bloccato da archivi [-14, 0.5, -1]
+  const extTip = { name: 'Estintore bloccato', type: 'Antincendio non accessibile', condition: 'warning' as const, iconKey: 'extinguisher' };
   const extBody = BABYLON.MeshBuilder.CreateCylinder('off_ext_body', { height: 0.55, diameter: 0.18, tessellation: 16 }, scene);
   extBody.position = new BABYLON.Vector3(-14.7, 0.35, -1);
   extBody.material = hazardRedMat;
+  tagHazard(extBody, '2', extTip);
   const extHandle = BABYLON.MeshBuilder.CreateBox('off_ext_handle', { width: 0.12, height: 0.05, depth: 0.06 }, scene);
   extHandle.position = new BABYLON.Vector3(-14.7, 0.68, -1);
   extHandle.material = blackMat;
+  tagHazard(extHandle, '2', extTip);
   const cardboardMat = new BABYLON.StandardMaterial('off_cardboard', scene);
   cardboardMat.diffuseColor = new BABYLON.Color3(0.72, 0.55, 0.35);
   for (let b = 0; b < 4; b++) {
@@ -1141,29 +1158,35 @@ function addOfficeProps(
     box.material = cardboardMat;
     box.checkCollisions = true;
     if (shadowGenerator) shadowGenerator.addShadowCaster(box);
+    tagHazard(box, '2', extTip);
   }
 
   // Risk 3 — Uscita di emergenza ostruita [0, 0.5, 11]
+  const exitTip = { name: 'Uscita bloccata', type: 'Via di fuga ostruita', condition: 'damaged' as const, iconKey: 'exit' };
   const exitDoor = BABYLON.MeshBuilder.CreateBox('off_exitDoor', { width: 1.6, height: 2.2, depth: 0.06 }, scene);
   exitDoor.position = new BABYLON.Vector3(0, 1.1, 14.85);
   const exitDoorMat = new BABYLON.StandardMaterial('off_exitDoorMat', scene);
   exitDoorMat.diffuseColor = new BABYLON.Color3(0.15, 0.5, 0.25);
   exitDoor.material = exitDoorMat;
+  tagHazard(exitDoor, '3', exitTip);
   const exitSign = BABYLON.MeshBuilder.CreateBox('off_exitSign', { width: 0.7, height: 0.25, depth: 0.04 }, scene);
   exitSign.position = new BABYLON.Vector3(0, 2.55, 14.83);
   const exitSignMat = new BABYLON.StandardMaterial('off_exitSignMat', scene);
   exitSignMat.diffuseColor = new BABYLON.Color3(0.1, 0.7, 0.3);
   exitSignMat.emissiveColor = new BABYLON.Color3(0.15, 0.6, 0.25);
   exitSign.material = exitSignMat;
+  tagHazard(exitSign, '3', exitTip);
   for (let b = 0; b < 5; b++) {
     const obs = BABYLON.MeshBuilder.CreateBox(`off_exitBlock_${b}`, { width: 0.55, height: 0.45, depth: 0.5 }, scene);
     obs.position = new BABYLON.Vector3(-0.6 + (b % 3) * 0.6, 0.22 + Math.floor(b / 3) * 0.46, 11 + (b % 2) * 0.4);
     obs.material = cardboardMat;
     obs.checkCollisions = true;
     if (shadowGenerator) shadowGenerator.addShadowCaster(obs);
+    tagHazard(obs, '3', exitTip);
   }
 
   // Risk 4 — Pavimento bagnato non segnalato [-5, 0.02, 6]
+  const puddleTip = { name: 'Pavimento bagnato', type: 'Pericolo scivolamento', condition: 'warning' as const, iconKey: 'puddle' };
   const puddle = BABYLON.MeshBuilder.CreateDisc('off_puddle', { radius: 0.7, tessellation: 24 }, scene);
   puddle.rotation.x = Math.PI / 2;
   puddle.position = new BABYLON.Vector3(-5, 0.012, 6);
@@ -1173,14 +1196,21 @@ function addOfficeProps(
   puddleMat.specularPower = 256;
   puddleMat.alpha = 0.75;
   puddle.material = puddleMat;
-  puddle.isPickable = false;
+  tagHazard(puddle, '4', puddleTip);
+  // Larger invisible click hitbox above the puddle (puddle disc is thin)
+  const puddleHit = BABYLON.MeshBuilder.CreateBox('off_puddle_hit', { width: 1.6, height: 0.4, depth: 1.6 }, scene);
+  puddleHit.position = new BABYLON.Vector3(-5, 0.2, 6);
+  puddleHit.visibility = 0;
+  tagHazard(puddleHit, '4', puddleTip);
 
   // Risk 5 — Scaffalatura instabile sovraccarica [-13, 0.5, -6]
+  const shelfTip = { name: 'Scaffale instabile', type: 'Rischio ribaltamento', condition: 'damaged' as const, iconKey: 'shelf' };
   const tiltedShelf = BABYLON.MeshBuilder.CreateBox('off_tiltedShelf', { width: 1.0, height: 1.8, depth: 0.45 }, scene);
   tiltedShelf.position = new BABYLON.Vector3(-13, 0.9, -6);
   tiltedShelf.rotation.z = 0.12;
   tiltedShelf.material = darkWoodMat;
   if (shadowGenerator) shadowGenerator.addShadowCaster(tiltedShelf);
+  tagHazard(tiltedShelf, '5', shelfTip);
   const folderColors = [
     new BABYLON.Color3(0.7, 0.2, 0.2),
     new BABYLON.Color3(0.2, 0.4, 0.7),
@@ -1193,21 +1223,25 @@ function addOfficeProps(
     const fMat = new BABYLON.StandardMaterial(`off_folderMat_${f}`, scene);
     fMat.diffuseColor = folderColors[f % folderColors.length];
     folder.material = fMat;
+    tagHazard(folder, '5', shelfTip);
   }
 
   // Risk 6 — Luce di emergenza non funzionante [10, 0.5, -9]
+  const emTip = { name: 'Luce emergenza guasta', type: 'Sicurezza blackout', condition: 'damaged' as const, iconKey: 'emlight' };
   const emLightHousing = BABYLON.MeshBuilder.CreateBox('off_emLight', { width: 0.35, height: 0.16, depth: 0.1 }, scene);
   emLightHousing.position = new BABYLON.Vector3(10, 2.55, -9.85);
   const emLightMat = new BABYLON.StandardMaterial('off_emLightMat', scene);
   emLightMat.diffuseColor = new BABYLON.Color3(0.85, 0.85, 0.85);
   emLightHousing.material = emLightMat;
+  tagHazard(emLightHousing, '6', emTip);
   const emLens = BABYLON.MeshBuilder.CreateBox('off_emLens', { width: 0.28, height: 0.1, depth: 0.02 }, scene);
   emLens.position = new BABYLON.Vector3(10, 2.55, -9.79);
   const emLensMat = new BABYLON.StandardMaterial('off_emLensMat', scene);
   emLensMat.diffuseColor = new BABYLON.Color3(0.25, 0.25, 0.22);
   emLens.material = emLensMat;
+  tagHazard(emLens, '6', emTip);
 
-  console.log('[Office] Full office furnishing complete — props + hazards');
+  console.log('[Office] Full office furnishing complete — props + hazards (with tooltips & click metadata)');
 }
 
 // ============================================================
