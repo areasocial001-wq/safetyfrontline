@@ -120,6 +120,19 @@ const Demo3D = () => {
   } = useMouseCalibration();
   
   const [selectedScenario, setSelectedScenario] = useState<Scenario3D | null>(null);
+
+  // Load persisted per-scenario fill settings when scenario changes
+  useEffect(() => {
+    if (!selectedScenario) return;
+    const saved = loadPersistedSettings(selectedScenario.type);
+    if (saved) {
+      if (saved.preset) setFillPreset(saved.preset);
+      if (saved.density) setFillDensity(saved.density);
+      if (typeof saved.seed === 'number') setFillSeed(saved.seed);
+      if (saved.perWall) setFillPerWall({ ...DEFAULT_PER_WALL, ...saved.perWall });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedScenario?.type]);
   const [gameStarted, setGameStarted] = useState(false);
   const [risksFound, setRisksFound] = useState(0);
   const [manualRisksFound, setManualRisksFound] = useState(0);
