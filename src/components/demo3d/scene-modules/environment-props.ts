@@ -1928,6 +1928,269 @@ function addOfficeProps(
   emLens.material = emLensMat;
   tagHazard(emLens, '6', emTip);
 
+  // ============================================================
+  // UNIFORM FILL PASS — micro-props distributed across the room
+  // Ensures every quadrant + every wall has visual density.
+  // ============================================================
+  // No-go circles (x, z, radius) — keep clear of desks, hazards, clusters
+  const noGoZones: Array<[number, number, number]> = [
+    // Workstation desks (rows at z=-5 and z=5, x=-7,0,7)
+    [-7, -5, 1.8], [0, -5, 1.8], [7, -5, 1.8],
+    [-7, 5, 1.8], [0, 5, 1.8], [7, 5, 1.8],
+    // Reception north wall area
+    [0, -13.5, 3.5],
+    // West archive cluster
+    [-11.2, 9.2, 2.6],
+    // East meeting cluster
+    [11, 8.9, 2.8],
+    // South archive
+    [0.5, 12.1, 3.0],
+    // Hazards (avoid clipping)
+    [-8, -3, 1.0], [-14, -1, 1.5], [0, 11, 1.5], [-5, 6, 1.0],
+    [-13, -6, 1.5], [10, -9, 1.5],
+    // Player spawn
+    [0, 12, 1.5],
+  ];
+
+  const isClear = (x: number, z: number, propRadius = 0.6) => {
+    for (const [nx, nz, nr] of noGoZones) {
+      const dx = x - nx, dz = z - nz;
+      if (dx * dx + dz * dz < (nr + propRadius) * (nr + propRadius)) return false;
+    }
+    return true;
+  };
+
+  const placedProps: Array<[number, number, number]> = [];
+  const isFarFromPlaced = (x: number, z: number, minDist = 1.4) => {
+    for (const [px, pz, pr] of placedProps) {
+      const dx = x - px, dz = z - pz;
+      if (dx * dx + dz * dz < (minDist + pr) * (minDist + pr)) return false;
+    }
+    return true;
+  };
+
+  // ---- Micro-prop factory ----
+  const planterMat = new BABYLON.StandardMaterial('off_fillPlanterMat', scene);
+  planterMat.diffuseColor = new BABYLON.Color3(0.32, 0.22, 0.14);
+  const leafMat = new BABYLON.StandardMaterial('off_fillLeafMat', scene);
+  leafMat.diffuseColor = new BABYLON.Color3(0.22, 0.5, 0.22);
+  const binMat = new BABYLON.StandardMaterial('off_fillBinMat', scene);
+  binMat.diffuseColor = new BABYLON.Color3(0.18, 0.18, 0.2);
+  const cabinetMat = new BABYLON.StandardMaterial('off_fillCabMat', scene);
+  cabinetMat.diffuseColor = new BABYLON.Color3(0.78, 0.78, 0.8);
+  const coolerBodyMat = new BABYLON.StandardMaterial('off_fillCoolerMat', scene);
+  coolerBodyMat.diffuseColor = new BABYLON.Color3(0.95, 0.95, 0.97);
+  const bottleMat = new BABYLON.StandardMaterial('off_fillBottleMat', scene);
+  bottleMat.diffuseColor = new BABYLON.Color3(0.55, 0.78, 0.95);
+  bottleMat.alpha = 0.7;
+  const signPostMat = new BABYLON.StandardMaterial('off_fillSignPostMat', scene);
+  signPostMat.diffuseColor = new BABYLON.Color3(0.2, 0.2, 0.22);
+  const signBoardMat = new BABYLON.StandardMaterial('off_fillSignBoardMat', scene);
+  signBoardMat.diffuseColor = new BABYLON.Color3(0.95, 0.78, 0.18);
+  signBoardMat.emissiveColor = new BABYLON.Color3(0.18, 0.14, 0.04);
+
+  const reg = (m: BABYLON.Mesh) => {
+    m.checkCollisions = true;
+    m.isPickable = false;
+    m.receiveShadows = true;
+    if (shadowGenerator) shadowGenerator.addShadowCaster(m);
+  };
+
+  let propId = 0;
+  const placePlant = (x: number, z: number, scale = 1) => {
+    const pot = BABYLON.MeshBuilder.CreateCylinder(`fill_pot_${propId}`,
+      { height: 0.45 * scale, diameterTop: 0.5 * scale, diameterBottom: 0.36 * scale, tessellation: 12 }, scene);
+    pot.position.set(x, 0.225 * scale, z);
+    pot.material = planterMat;
+    reg(pot);
+    for (let f = 0; f < 4; f++) {
+      const leaf = BABYLON.MeshBuilder.CreateSphere(`fill_leaf_${propId}_${f}`,
+        { diameter: (0.36 + f * 0.06) * scale, segments: 6 }, scene);
+      leaf.position.set(x + (f - 1.5) * 0.08 * scale, (0.7 + f * 0.1) * scale, z + (f % 2 ? 0.08 : -0.08) * scale);
+      leaf.scaling = new BABYLON.Vector3(1, 0.7, 1);
+      leaf.material = leafMat;
+      leaf.isPickable = false;
+      if (shadowGenerator) shadowGenerator.addShadowCaster(leaf);
+    }
+    placedProps.push([x, z, 0.35 * scale]);
+    propId++;
+  };
+
+  const placeFileCabinet = (x: number, z: number, rotY: number) => {
+    const body = BABYLON.MeshBuilder.CreateBox(`fill_cab_${propId}`,
+      { width: 0.55, height: 1.35, depth: 0.5 }, scene);
+    body.position.set(x, 0.675, z);
+    body.rotation.y = rotY;
+    body.material = cabinetMat;
+    reg(body);
+    for (let d = 0; d < 4; d++) {
+      const drawer = BABYLON.MeshBuilder.CreateBox(`fill_cabDrw_${propId}_${d}`,
+        { width: 0.5, height: 0.28, depth: 0.02 }, scene);
+      drawer.position.set(
+        x + Math.sin(rotY) * 0.26,
+        0.18 + d * 0.32,
+        z + Math.cos(rotY) * 0.26,
+      );
+      drawer.rotation.y = rotY;
+      drawer.material = metalMat;
+      drawer.isPickable = false;
+    }
+    placedProps.push([x, z, 0.45]);
+    propId++;
+  };
+
+  const placeBin = (x: number, z: number) => {
+    const bin = BABYLON.MeshBuilder.CreateCylinder(`fill_bin_${propId}`,
+      { height: 0.55, diameter: 0.34, tessellation: 12 }, scene);
+    bin.position.set(x, 0.275, z);
+    bin.material = binMat;
+    reg(bin);
+    placedProps.push([x, z, 0.2]);
+    propId++;
+  };
+
+  const placeWaterCooler = (x: number, z: number, rotY: number) => {
+    const body = BABYLON.MeshBuilder.CreateBox(`fill_cooler_${propId}`,
+      { width: 0.45, height: 1.05, depth: 0.45 }, scene);
+    body.position.set(x, 0.525, z);
+    body.rotation.y = rotY;
+    body.material = coolerBodyMat;
+    reg(body);
+    const bottle = BABYLON.MeshBuilder.CreateCylinder(`fill_coolerBottle_${propId}`,
+      { height: 0.5, diameterTop: 0.32, diameterBottom: 0.4, tessellation: 14 }, scene);
+    bottle.position.set(x, 1.3, z);
+    bottle.material = bottleMat;
+    if (shadowGenerator) shadowGenerator.addShadowCaster(bottle);
+    bottle.isPickable = false;
+    placedProps.push([x, z, 0.35]);
+    propId++;
+  };
+
+  const placeSafetySign = (x: number, z: number, rotY: number) => {
+    const post = BABYLON.MeshBuilder.CreateCylinder(`fill_signPost_${propId}`,
+      { height: 1.4, diameter: 0.06, tessellation: 8 }, scene);
+    post.position.set(x, 0.7, z);
+    post.material = signPostMat;
+    reg(post);
+    const board = BABYLON.MeshBuilder.CreateBox(`fill_signBoard_${propId}`,
+      { width: 0.5, height: 0.5, depth: 0.04 }, scene);
+    board.position.set(x, 1.55, z);
+    board.rotation.y = rotY;
+    board.material = signBoardMat;
+    if (shadowGenerator) shadowGenerator.addShadowCaster(board);
+    board.isPickable = false;
+    placedProps.push([x, z, 0.3]);
+    propId++;
+  };
+
+  const placeBoxesStack = (x: number, z: number) => {
+    for (let s = 0; s < 3; s++) {
+      const box = BABYLON.MeshBuilder.CreateBox(`fill_stack_${propId}_${s}`,
+        { width: 0.55 - s * 0.05, height: 0.32, depth: 0.45 - s * 0.05 }, scene);
+      box.position.set(x + (s % 2 ? 0.04 : -0.04), 0.16 + s * 0.32, z);
+      box.rotation.y = (s - 1) * 0.18;
+      const m = new BABYLON.StandardMaterial(`fill_stackMat_${propId}_${s}`, scene);
+      const tones = [[0.72, 0.55, 0.32], [0.65, 0.5, 0.3], [0.78, 0.6, 0.36]];
+      const t = tones[s];
+      m.diffuseColor = new BABYLON.Color3(t[0], t[1], t[2]);
+      box.material = m;
+      reg(box);
+    }
+    placedProps.push([x, z, 0.4]);
+    propId++;
+  };
+
+  const placeSideChair = (x: number, z: number, rotY: number) => {
+    const seat = BABYLON.MeshBuilder.CreateBox(`fill_chair_${propId}`,
+      { width: 0.5, height: 0.06, depth: 0.5 }, scene);
+    seat.position.set(x, 0.46, z);
+    seat.rotation.y = rotY;
+    seat.material = chairFabricMat;
+    reg(seat);
+    const back = BABYLON.MeshBuilder.CreateBox(`fill_chairBack_${propId}`,
+      { width: 0.5, height: 0.55, depth: 0.05 }, scene);
+    back.position.set(x - Math.cos(rotY) * 0.22, 0.78, z + Math.sin(rotY) * 0.22);
+    back.rotation.y = rotY;
+    back.material = chairFabricMat;
+    if (shadowGenerator) shadowGenerator.addShadowCaster(back);
+    back.isPickable = false;
+    for (let l = 0; l < 4; l++) {
+      const lx = (l % 2 === 0 ? -0.22 : 0.22);
+      const lz = (l < 2 ? -0.22 : 0.22);
+      const leg = BABYLON.MeshBuilder.CreateBox(`fill_chairLeg_${propId}_${l}`,
+        { width: 0.04, height: 0.42, depth: 0.04 }, scene);
+      leg.position.set(x + lx, 0.21, z + lz);
+      leg.material = metalMat;
+      leg.isPickable = false;
+    }
+    placedProps.push([x, z, 0.3]);
+    propId++;
+  };
+
+  const FILL_TYPES = ['plant', 'cabinet', 'bin', 'cooler', 'sign', 'boxes', 'chair'] as const;
+  const placeByType = (kind: typeof FILL_TYPES[number], x: number, z: number, rotY: number) => {
+    switch (kind) {
+      case 'plant': placePlant(x, z, 0.85 + ((propId * 13) % 30) / 100); break;
+      case 'cabinet': placeFileCabinet(x, z, rotY); break;
+      case 'bin': placeBin(x, z); break;
+      case 'cooler': placeWaterCooler(x, z, rotY); break;
+      case 'sign': placeSafetySign(x, z, rotY); break;
+      case 'boxes': placeBoxesStack(x, z); break;
+      case 'chair': placeSideChair(x, z, rotY); break;
+    }
+  };
+
+  // ---- Wall-edge belt: one prop every ~3.2m along each wall (1m inside) ----
+  const wallBeltSteps = 8; // -12.8..12.8
+  const wallInset = 1.05;
+  for (let i = 0; i < wallBeltSteps; i++) {
+    const t = -12.8 + i * (25.6 / (wallBeltSteps - 1));
+    const candidates = [
+      { x: t, z: -15 + wallInset, rot: 0, wall: 'N' },
+      { x: t, z: 15 - wallInset, rot: Math.PI, wall: 'S' },
+      { x: -15 + wallInset, z: t, rot: Math.PI / 2, wall: 'W' },
+      { x: 15 - wallInset, z: t, rot: -Math.PI / 2, wall: 'E' },
+    ];
+    candidates.forEach((c, ci) => {
+      if (!isClear(c.x, c.z, 0.5) || !isFarFromPlaced(c.x, c.z, 1.6)) return;
+      const seed = (i * 7 + ci * 31) % FILL_TYPES.length;
+      // Wall belt favors plants/cabinets/coolers/signs (no chairs against the wall directly)
+      const wallTypes = ['plant', 'cabinet', 'cooler', 'sign', 'boxes', 'plant', 'cabinet'] as const;
+      placeByType(wallTypes[seed], c.x, c.z, c.rot);
+    });
+  }
+
+  // ---- Interior 4x4 grid (skip aisles already used by desks) ----
+  const interiorXs = [-10, -3.5, 3.5, 10];
+  const interiorZs = [-10, -1.5, 1.5, 10];
+  for (let ix = 0; ix < interiorXs.length; ix++) {
+    for (let iz = 0; iz < interiorZs.length; iz++) {
+      const baseX = interiorXs[ix];
+      const baseZ = interiorZs[iz];
+      // Jitter for organic feel (seeded)
+      const jitter = (n: number) => (((n * 9301 + 49297) % 233280) / 233280 - 0.5) * 1.2;
+      const x = baseX + jitter(ix * 31 + iz);
+      const z = baseZ + jitter(ix * 17 + iz * 13 + 5);
+      if (!isClear(x, z, 0.6)) continue;
+      if (!isFarFromPlaced(x, z, 2.0)) continue;
+      const seed = (ix * 4 + iz * 7) % FILL_TYPES.length;
+      const rot = ((ix + iz) % 4) * (Math.PI / 2);
+      placeByType(FILL_TYPES[seed], x, z, rot);
+    }
+  }
+
+  // ---- Corner accents: tall plants in each corner ----
+  const corners: Array<[number, number]> = [
+    [-13.2, -13.2], [13.2, -13.2], [-13.2, 13.2], [13.2, 13.2],
+  ];
+  corners.forEach(([cx, cz]) => {
+    if (isClear(cx, cz, 0.6) && isFarFromPlaced(cx, cz, 1.0)) {
+      placePlant(cx, cz, 1.25);
+    }
+  });
+
+  console.log(`[Office] Uniform fill pass placed ${placedProps.length} micro-props`);
+
   console.log('[Office] Full office furnishing complete — props + hazards (with tooltips & click metadata)');
 }
 
