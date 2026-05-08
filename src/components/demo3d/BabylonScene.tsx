@@ -56,6 +56,7 @@ interface BabylonSceneProps {
   briefingActive?: boolean;
   onBriefingStep?: (index: number, total: number) => void;
   onBriefingComplete?: () => void;
+  uniformFillConfig?: Partial<import('./scene-modules/uniform-fill-config').UniformFillConfig>;
 }
 
 export const BabylonScene = ({
