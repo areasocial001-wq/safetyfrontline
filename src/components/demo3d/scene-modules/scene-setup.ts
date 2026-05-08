@@ -72,11 +72,15 @@ export function createScene(
   scene.fogColor = atmo.fogColor;
 
   // Create camera (First Person)
-  const camera = new BABYLON.UniversalCamera(
-    'camera',
-    new BABYLON.Vector3(0, 1.7, -5),
-    scene
-  );
+  // For office, spawn near south wall looking north toward the open room
+  // (avoids spawning inside a workstation desk).
+  const spawnPos = scenario.type === 'office'
+    ? new BABYLON.Vector3(0, 1.7, 12)
+    : new BABYLON.Vector3(0, 1.7, -5);
+  const camera = new BABYLON.UniversalCamera('camera', spawnPos, scene);
+  if (scenario.type === 'office') {
+    camera.setTarget(new BABYLON.Vector3(0, 1.5, 0));
+  }
   camera.attachControl(canvas, true);
   camera.speed = 0.3;
   camera.angularSensibility = audioSettings.mouseSensitivity || 500;
