@@ -2178,39 +2178,52 @@ function addOfficeProps(
     return false;
   };
 
-  for (let i = 0; i < fillCfg.wallSteps; i++) {
-    const anchor = -wallFillSpan / 2 + (i + 0.5) * (wallFillSpan / fillCfg.wallSteps);
-    wallOrder.forEach((wall) => {
+  // Per-wall step counts (multiplier-driven), processed independently so lateral walls
+  // are no longer starved by the front/back placement order.
+  const wallStepsByWall: Record<OfficeWall, number> = {
+    N: Math.max(2, Math.round(fillCfg.wallSteps * (fillCfg.perWall.N ?? 1))),
+    S: Math.max(2, Math.round(fillCfg.wallSteps * (fillCfg.perWall.S ?? 1))),
+    E: Math.max(2, Math.round(fillCfg.wallSteps * (fillCfg.perWall.E ?? 1))),
+    W: Math.max(2, Math.round(fillCfg.wallSteps * (fillCfg.perWall.W ?? 1))),
+  };
+  wallOrder.forEach((wall) => {
+    const steps = wallStepsByWall[wall];
+    for (let i = 0; i < steps; i++) {
+      const anchor = -wallFillSpan / 2 + (i + 0.5) * (wallFillSpan / steps);
       placeWallProp(wall, anchor + (rng() - 0.5) * 0.35);
-    });
-  }
+    }
+  });
 
   wallOrder.forEach((wall) => {
-    const repairAttempts = fillCfg.wallSteps * 4;
-    for (let pass = 0; pass < repairAttempts && wallPlacementCounts[wall] < minWallTarget; pass++) {
+    const target = Math.max(4, Math.round(wallStepsByWall[wall] * 0.75));
+    const repairAttempts = wallStepsByWall[wall] * 4;
+    for (let pass = 0; pass < repairAttempts && wallPlacementCounts[wall] < target; pass++) {
       const anchor = -11.8 + ((pass + 0.5) / repairAttempts) * 23.6 + (rng() - 0.5) * 1.1;
       const preferredKind = compactWallKinds[Math.floor(rng() * compactWallKinds.length)];
       placeWallProp(wall, anchor, preferredKind);
     }
   });
 
-  // ---- Interior NxN grid (density-driven) ----
+  // ---- Interior NxN grid (density-driven, anti-center bias) ----
   const grid = fillCfg.interiorGrid;
-  const interiorSpan = 22; // -11..11
+  const interiorSpan = 22;
+  const interiorMult = Math.max(0, Math.min(2, fillCfg.perWall.interior ?? 0.7));
+  const baseRatio = fillCfg.density === 'high' ? 0.6 : fillCfg.density === 'medium' ? 0.45 : 0.32;
   const interiorQuota = Math.max(
-    4,
-    Math.min(
-      grid * grid,
-      Math.round(grid * grid * (fillCfg.density === 'high' ? 0.72 : fillCfg.density === 'medium' ? 0.58 : 0.45))
-    )
+    2,
+    Math.min(grid * grid, Math.round(grid * grid * baseRatio * interiorMult))
   );
+  const exclusion = fillCfg.centerExclusionRadius;
   let interiorPlaced = 0;
   for (let ix = 0; ix < grid; ix++) {
     for (let iz = 0; iz < grid; iz++) {
       if (interiorPlaced >= interiorQuota) continue;
       const baseX = -interiorSpan / 2 + ix * (interiorSpan / Math.max(1, grid - 1));
       const baseZ = -interiorSpan / 2 + iz * (interiorSpan / Math.max(1, grid - 1));
-      if (Math.hypot(baseX, baseZ) < 5 && rng() < 0.65) continue;
+      const distFromCenter = Math.hypot(baseX, baseZ);
+      // Hard exclusion in the inner radius; soft skip just outside it
+      if (distFromCenter < exclusion) continue;
+      if (distFromCenter < exclusion + 1.5 && rng() < 0.55) continue;
       const x = baseX + (rng() - 0.5) * fillCfg.jitter;
       const z = baseZ + (rng() - 0.5) * fillCfg.jitter;
       if (!isClear(x, z, 0.6)) continue;
@@ -2235,17 +2248,20 @@ function addOfficeProps(
   }
 
   // ---- Density metrics + warnings ----
+  const avgWallTarget = (wallStepsByWall.N + wallStepsByWall.S + wallStepsByWall.E + wallStepsByWall.W) / 4;
   const metrics = computeDensityMetrics(placedMeta, {
-    min: Math.max(3, Math.ceil(minWallTarget * 0.7)),
-    max: Math.max(fillCfg.wallSteps + 3, minWallTarget + 4),
+    min: Math.max(3, Math.ceil(avgWallTarget * 0.55)),
+    max: Math.max(fillCfg.wallSteps + 4, Math.ceil(avgWallTarget * 1.4)),
   });
   publishMetrics('office', metrics);
+  publishFillStats('office', { placed: placedMeta, noGoZones, metrics });
 
   console.log(
-    `[Office] Uniform fill (preset=${fillCfg.preset}, density=${fillCfg.density}, seed=${fillCfg.seed}) placed ${placedProps.length} props`
+    `[Office] Uniform fill (preset=${fillCfg.preset}, density=${fillCfg.density}, seed=${fillCfg.seed}, perWall=${JSON.stringify(fillCfg.perWall)}) placed ${placedProps.length} props`
   );
   console.log('[Office] Full office furnishing complete — props + hazards');
 }
+
 
 // ============================================================
 // CYBERSECURITY OFFICE PROPS — Visual cyber risk indicators
