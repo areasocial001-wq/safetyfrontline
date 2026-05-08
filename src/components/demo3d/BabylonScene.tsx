@@ -189,6 +189,16 @@ export const BabylonScene = ({
     const riskGlow = new BABYLON.GlowLayer('riskGlow', scene);
     riskGlow.intensity = 1.5;
 
+    // Highlight layer for hover/click feedback on risk meshes
+    const highlightLayer = new BABYLON.HighlightLayer('riskHighlight', scene, {
+      blurHorizontalSize: 1.5,
+      blurVerticalSize: 1.5,
+    });
+    highlightLayer.innerGlow = false;
+    highlightLayer.outerGlow = true;
+    highlightLayerRef.current = highlightLayer;
+    riskMeshMapRef.current = new Map();
+
     const riskMeshes = scenario.risks.map((risk) => {
       const createContextualHazard = (): BABYLON.Mesh => {
         const label = risk.label.toLowerCase();
