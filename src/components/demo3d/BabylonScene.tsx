@@ -494,6 +494,10 @@ export const BabylonScene = ({
       window.addEventListener('mousemove', handleMouseMove);
     }
 
+    // Capture base imageProcessing values for visual settings to scale from
+    const ipc = scene.imageProcessingConfiguration;
+    baseImageProcRef.current = { exposure: ipc.exposure, contrast: ipc.contrast };
+
     setIsReady(true);
 
     // Cleanup
