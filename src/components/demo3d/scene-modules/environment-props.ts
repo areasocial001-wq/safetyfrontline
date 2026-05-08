@@ -1668,6 +1668,130 @@ function addOfficeProps(
     note.material = noteMat;
   }
 
+  // ---------- Additional perimeter clusters to populate the other three sides ----------
+  const perimeterClusters = [
+    { name: 'westArchive', x: -11.2, z: 9.2, width: 4.4, depth: 1.8, rot: Math.PI / 2 },
+    { name: 'eastMeeting', x: 11.1, z: 8.8, width: 3.8, depth: 2.2, rot: -Math.PI / 2 },
+    { name: 'southArchive', x: 0.5, z: 12.1, width: 5.2, depth: 1.6, rot: Math.PI },
+  ];
+
+  perimeterClusters.forEach((cluster, ci) => {
+    const credenza = BABYLON.MeshBuilder.CreateBox(`off_clusterCredenza_${cluster.name}`, {
+      width: cluster.width,
+      height: 1.15,
+      depth: cluster.depth,
+    }, scene);
+    credenza.position = new BABYLON.Vector3(cluster.x, 0.575, cluster.z);
+    credenza.rotation.y = cluster.rot;
+    credenza.material = ci === 1 ? deskMat : darkWoodMat;
+    credenza.checkCollisions = true;
+    if (shadowGenerator) shadowGenerator.addShadowCaster(credenza);
+
+    const top = BABYLON.MeshBuilder.CreateBox(`off_clusterTop_${cluster.name}`, {
+      width: cluster.width + 0.08,
+      height: 0.05,
+      depth: cluster.depth + 0.08,
+    }, scene);
+    top.position = new BABYLON.Vector3(cluster.x, 1.17, cluster.z);
+    top.rotation.y = cluster.rot;
+    top.material = whiteMat;
+    if (shadowGenerator) shadowGenerator.addShadowCaster(top);
+
+    for (let d = 0; d < 3; d++) {
+      const drawerOffset = -cluster.width / 3 + d * (cluster.width / 3);
+      const dirX = Math.sin(cluster.rot);
+      const dirZ = Math.cos(cluster.rot);
+
+      const drawer = BABYLON.MeshBuilder.CreateBox(`off_clusterDrawer_${cluster.name}_${d}`, {
+        width: cluster.width / 3 - 0.18,
+        height: 0.28,
+        depth: 0.05,
+      }, scene);
+      drawer.position = new BABYLON.Vector3(
+        cluster.x + Math.cos(cluster.rot) * drawerOffset + dirX * (cluster.depth / 2 - 0.05),
+        0.62,
+        cluster.z - Math.sin(cluster.rot) * drawerOffset + dirZ * (cluster.depth / 2 - 0.05)
+      );
+      drawer.rotation.y = cluster.rot;
+      drawer.material = ci === 1 ? whiteMat : metalMat;
+    }
+  });
+
+  const westArchiveBoxes = [
+    { x: -9.8, y: 1.38, z: 9.1, w: 0.75, h: 0.18, d: 0.42 },
+    { x: -11.6, y: 1.38, z: 9.35, w: 0.62, h: 0.14, d: 0.34 },
+    { x: -12.0, y: 1.36, z: 8.75, w: 0.42, h: 0.28, d: 0.42 },
+  ];
+  westArchiveBoxes.forEach((box, bi) => {
+    const mesh = BABYLON.MeshBuilder.CreateBox(`off_clusterBox_${bi}`, {
+      width: box.w,
+      height: box.h,
+      depth: box.d,
+    }, scene);
+    mesh.position = new BABYLON.Vector3(box.x, box.y, box.z);
+    const boxMat = new BABYLON.StandardMaterial(`off_clusterBoxMat_${bi}`, scene);
+    boxMat.diffuseColor = bookColors[(bi + 2) % bookColors.length];
+    mesh.material = boxMat;
+  });
+
+  const eastMeetingTable = BABYLON.MeshBuilder.CreateBox('off_eastMeetingTable', { width: 2.6, height: 0.06, depth: 1.4 }, scene);
+  eastMeetingTable.position = new BABYLON.Vector3(10.9, 0.76, 8.9);
+  eastMeetingTable.rotation.y = Math.PI / 2;
+  eastMeetingTable.material = deskMat;
+  eastMeetingTable.checkCollisions = true;
+  if (shadowGenerator) shadowGenerator.addShadowCaster(eastMeetingTable);
+
+  for (let l = 0; l < 4; l++) {
+    const lx = l % 2 === 0 ? -0.52 : 0.52;
+    const lz = l < 2 ? -1.05 : 1.05;
+    const leg = BABYLON.MeshBuilder.CreateBox(`off_eastMeetingLeg_${l}`, { width: 0.05, height: 0.74, depth: 0.05 }, scene);
+    leg.position = new BABYLON.Vector3(10.9 + lx, 0.37, 8.9 + lz);
+    leg.material = metalMat;
+  }
+
+  [
+    { x: 9.6, z: 8.9 },
+    { x: 12.2, z: 8.9 },
+    { x: 10.9, z: 7.7 },
+    { x: 10.9, z: 10.1 },
+  ].forEach((seat, si) => {
+    const chairSeat = BABYLON.MeshBuilder.CreateBox(`off_eastMeetingSeat_${si}`, { width: 0.44, height: 0.06, depth: 0.44 }, scene);
+    chairSeat.position = new BABYLON.Vector3(seat.x, 0.46, seat.z);
+    chairSeat.material = si % 2 === 0 ? chairFabricMat : whiteMat;
+    chairSeat.checkCollisions = true;
+
+    const chairBack = BABYLON.MeshBuilder.CreateBox(`off_eastMeetingBack_${si}`, { width: 0.44, height: 0.44, depth: 0.05 }, scene);
+    const isSide = si < 2;
+    chairBack.position = new BABYLON.Vector3(
+      seat.x + (isSide ? (si === 0 ? -0.22 : 0.22) : 0),
+      0.74,
+      seat.z + (!isSide ? (si === 2 ? -0.22 : 0.22) : 0)
+    );
+    chairBack.material = si % 2 === 0 ? chairFabricMat : whiteMat;
+  });
+
+  const southPlanterPositions = [
+    { x: -6.6, z: 12.2 },
+    { x: 6.8, z: 12.15 },
+  ];
+  southPlanterPositions.forEach((pp, pi) => {
+    const pot = BABYLON.MeshBuilder.CreateCylinder(`off_southPot_${pi}`, { height: 0.55, diameterTop: 0.58, diameterBottom: 0.42, tessellation: 14 }, scene);
+    pot.position = new BABYLON.Vector3(pp.x, 0.275, pp.z);
+    pot.material = darkWoodMat;
+    pot.checkCollisions = true;
+
+    const trunk = BABYLON.MeshBuilder.CreateCylinder(`off_southPlantTrunk_${pi}`, { height: 1.1, diameter: 0.09, tessellation: 8 }, scene);
+    trunk.position = new BABYLON.Vector3(pp.x, 1.0, pp.z);
+    trunk.material = darkWoodMat;
+
+    for (let f = 0; f < 5; f++) {
+      const foliage = BABYLON.MeshBuilder.CreateSphere(`off_southPlantLeaf_${pi}_${f}`, { diameter: 0.42 + f * 0.08, segments: 8 }, scene);
+      foliage.position = new BABYLON.Vector3(pp.x + (f - 2) * 0.1, 1.45 + f * 0.14, pp.z + (f % 2 === 0 ? 0.12 : -0.12));
+      foliage.scaling = new BABYLON.Vector3(1, 0.75, 1);
+      foliage.material = greenMat;
+    }
+  });
+
   console.log('[Office] Added North/South/East/West wall furniture (reception, lockers, bookshelves, whiteboards, pinboard)');
 
   // ============================================================
