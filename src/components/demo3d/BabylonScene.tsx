@@ -106,6 +106,8 @@ export const BabylonScene = ({
   const [isReady, setIsReady] = useState(false);
   const extChargeRef = useRef({ current: 100, max: 100 });
   const fireHitCountRef = useRef<Map<number, number>>(new Map());
+  const extinguisherTypeRef = useRef<ExtinguisherType | undefined>(extinguisherType);
+  useEffect(() => { extinguisherTypeRef.current = extinguisherType; }, [extinguisherType]);
   const [currentSubtitle, setCurrentSubtitle] = useState<{
     text: string;
     severity: 'critical' | 'moderate';
