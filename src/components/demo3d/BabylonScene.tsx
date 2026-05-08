@@ -370,8 +370,37 @@ export const BabylonScene = ({
 
     // 11. Prop detection (raycast look-at) — supports metadata.tooltip for hazards
     const LOOK_DISTANCE = 6;
+    const RISK_HOVER_DISTANCE = 8;
     const detectLookedAtProp = () => {
       if (!camera) return;
+
+      // --- Risk hover highlight (longer distance) ---
+      const riskRay = camera.getForwardRay(RISK_HOVER_DISTANCE);
+      const riskHit = scene.pickWithRay(riskRay, (mesh) => !!mesh.metadata?.riskId);
+      const newHoverId = (riskHit && riskHit.pickedMesh && riskHit.distance <= RISK_HOVER_DISTANCE)
+        ? (riskHit.pickedMesh.metadata?.riskId as string)
+        : null;
+      if (newHoverId !== hoveredRiskRef.current) {
+        const hl = highlightLayerRef.current;
+        if (hl) {
+          // Clear previous
+          if (hoveredRiskRef.current) {
+            const prev = riskMeshMapRef.current.get(hoveredRiskRef.current) || [];
+            prev.forEach(m => { try { hl.removeMesh(m); } catch {} });
+          }
+          if (newHoverId) {
+            const next = riskMeshMapRef.current.get(newHoverId) || [];
+            const sev = scenario.risks.find(r => r.id === newHoverId)?.severity;
+            const color = sev === 'critical' ? new BABYLON.Color3(1, 0.15, 0.1)
+              : sev === 'high' ? new BABYLON.Color3(1, 0.55, 0.05)
+              : sev === 'medium' ? new BABYLON.Color3(1, 0.85, 0.1)
+              : new BABYLON.Color3(0.2, 0.85, 0.4);
+            next.forEach(m => { try { hl.addMesh(m, color); } catch {} });
+          }
+        }
+        hoveredRiskRef.current = newHoverId;
+      }
+
       const ray = camera.getForwardRay(LOOK_DISTANCE);
       const hit = scene.pickWithRay(ray, (mesh) => {
         if (mesh.metadata?.tooltip) return true;
