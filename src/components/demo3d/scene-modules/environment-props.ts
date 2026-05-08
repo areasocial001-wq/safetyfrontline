@@ -1134,13 +1134,13 @@ function addOfficeProps(
 
   const waterTank = BABYLON.MeshBuilder.CreateCylinder('off_waterTank', { height: 0.5, diameter: 0.32, tessellation: 16 }, scene);
   waterTank.position = new BABYLON.Vector3(-12.5, 1.15, -12.5);
-  const waterMat = new BABYLON.StandardMaterial('off_waterMat', scene);
-  waterMat.diffuseColor = new BABYLON.Color3(0.55, 0.75, 0.85);
-  waterMat.alpha = 0.7;
-  waterTank.material = waterMat;
+  const waterMat2 = new BABYLON.StandardMaterial('off_waterMat22', scene);
+  waterMat2.diffuseColor = new BABYLON.Color3(0.55, 0.75, 0.85);
+  waterMat2.alpha = 0.7;
+  waterTank.material = waterMat2;
 
   // Printer station — front-right corner
-  const printerCounter = BABYLON.MeshBuilder.CreateBox('off_printerCounter', { width: 1.8, height: 0.05, depth: 0.7 }, scene);
+  const printerCounter = BABYLON.MeshBuilder.CreateBox('off_printerCounterB', { width: 1.8, height: 0.05, depth: 0.7 }, scene);
   printerCounter.position = new BABYLON.Vector3(12.5, 0.75, -12.5);
   printerCounter.material = deskMat;
   printerCounter.checkCollisions = true;
@@ -1154,14 +1154,14 @@ function addOfficeProps(
     leg.material = metalMat;
   }
 
-  const printer = BABYLON.MeshBuilder.CreateBox('off_printer', { width: 0.7, height: 0.45, depth: 0.55 }, scene);
+  const printer = BABYLON.MeshBuilder.CreateBox('off_printerB', { width: 0.7, height: 0.45, depth: 0.55 }, scene);
   printer.position = new BABYLON.Vector3(12.5, 1.025, -12.5);
-  const printerMat = new BABYLON.StandardMaterial('off_printerMat', scene);
+  const printerMat = new BABYLON.StandardMaterial('off_printerMatB', scene);
   printerMat.diffuseColor = new BABYLON.Color3(0.85, 0.85, 0.88);
   printer.material = printerMat;
   if (shadowGenerator) shadowGenerator.addShadowCaster(printer);
 
-  const printerTray = BABYLON.MeshBuilder.CreateBox('off_printerTray', { width: 0.55, height: 0.05, depth: 0.35 }, scene);
+  const printerTray = BABYLON.MeshBuilder.CreateBox('off_printerTrayB', { width: 0.55, height: 0.05, depth: 0.35 }, scene);
   printerTray.position = new BABYLON.Vector3(12.5, 1.28, -12.3);
   printerTray.material = whiteMat;
 
@@ -1392,10 +1392,10 @@ function addOfficeProps(
 
   const dispenserBottle = BABYLON.MeshBuilder.CreateCylinder('off_waterBottle', { height: 0.45, diameter: 0.25, tessellation: 12 }, scene);
   dispenserBottle.position = new BABYLON.Vector3(-12, 1.35, 9);
-  const waterMat = new BABYLON.StandardMaterial('off_waterMat', scene);
-  waterMat.diffuseColor = new BABYLON.Color3(0.6, 0.8, 0.95);
-  waterMat.alpha = 0.6;
-  dispenserBottle.material = waterMat;
+  const waterMat2 = new BABYLON.StandardMaterial('off_waterMat22', scene);
+  waterMat2.diffuseColor = new BABYLON.Color3(0.6, 0.8, 0.95);
+  waterMat2.alpha = 0.6;
+  dispenserBottle.material = waterMat2;
 
   // ---------- Filing cabinets ----------
   const cabinetPositions = [{ x: -13, z: -8 }, { x: -13, z: -5 }, { x: 13, z: -8 }, { x: 13, z: -5 }];
@@ -1415,9 +1415,9 @@ function addOfficeProps(
   });
 
   // ---------- Printer ----------
-  const printer = BABYLON.MeshBuilder.CreateBox('off_printer', { width: 0.5, height: 0.35, depth: 0.4 }, scene);
+  const printer = BABYLON.MeshBuilder.CreateBox('off_printerB', { width: 0.5, height: 0.35, depth: 0.4 }, scene);
   printer.position = new BABYLON.Vector3(0, 0.93, -8);
-  const printerMat = new BABYLON.StandardMaterial('off_printerMat', scene);
+  const printerMat = new BABYLON.StandardMaterial('off_printerMatB', scene);
   printerMat.diffuseColor = new BABYLON.Color3(0.25, 0.25, 0.28);
   printerMat.specularColor = new BABYLON.Color3(0.4, 0.4, 0.4);
   printer.material = printerMat;
