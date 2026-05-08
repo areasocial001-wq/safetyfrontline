@@ -1967,12 +1967,29 @@ function addOfficeProps(
 
   const placedProps: Array<[number, number, number]> = [];
   const placedMeta: Array<{ x: number; z: number; kind: string }> = [];
+  type OfficeWall = 'N' | 'S' | 'E' | 'W';
+  const wallPlacementCounts: Record<OfficeWall, number> = { N: 0, S: 0, E: 0, W: 0 };
   const isFarFromPlaced = (x: number, z: number, minDist = 1.4) => {
     for (const [px, pz, pr] of placedProps) {
       const dx = x - px, dz = z - pz;
       if (dx * dx + dz * dz < (minDist + pr) * (minDist + pr)) return false;
     }
     return true;
+  };
+  const clampWallAxis = (value: number) => Math.max(-12.8, Math.min(12.8, value));
+  const compactWallKinds: UniformFillKind[] = ['plant', 'sign', 'bin', 'chair', 'boxes', 'cabinet'];
+  const getKindRadius = (kind: UniformFillKind) => {
+    switch (kind) {
+      case 'cabinet': return 0.6;
+      case 'cooler': return 0.55;
+      case 'boxes': return 0.5;
+      case 'chair': return 0.42;
+      case 'plant': return 0.45;
+      case 'sign': return 0.38;
+      case 'bin':
+      default:
+        return 0.34;
+    }
   };
 
   // ---- Materials (shared) ----
@@ -2110,31 +2127,90 @@ function addOfficeProps(
     }
   };
 
-  // ---- Wall-edge belt — density-driven steps ----
+  // ---- Wall-edge belt — balanced per wall with fallback slots ----
   const wallInset = 1.05;
-  const span = 25.6; // -12.8..12.8
-  for (let i = 0; i < fillCfg.wallSteps; i++) {
-    const t = -span / 2 + i * (span / Math.max(1, fillCfg.wallSteps - 1));
-    const candidates = [
-      { x: t, z: -15 + wallInset, rot: 0 },
-      { x: t, z: 15 - wallInset, rot: Math.PI },
-      { x: -15 + wallInset, z: t, rot: Math.PI / 2 },
-      { x: 15 - wallInset, z: t, rot: -Math.PI / 2 },
+  const wallOrder: OfficeWall[] = ['W', 'E', 'N', 'S'];
+  const wallFillSpan = 23.6;
+  const minWallTarget = Math.max(4, Math.min(fillCfg.wallSteps, Math.ceil(fillCfg.wallSteps * 0.75)));
+  const getWallPose = (wall: OfficeWall, anchor: number, depth: number, along: number) => {
+    switch (wall) {
+      case 'N':
+        return { x: clampWallAxis(anchor + along), z: -15 + wallInset + depth, rot: 0 };
+      case 'S':
+        return { x: clampWallAxis(anchor + along), z: 15 - wallInset - depth, rot: Math.PI };
+      case 'W':
+        return { x: -15 + wallInset + depth, z: clampWallAxis(anchor + along), rot: Math.PI / 2 };
+      case 'E':
+      default:
+        return { x: 15 - wallInset - depth, z: clampWallAxis(anchor + along), rot: -Math.PI / 2 };
+    }
+  };
+  const placeWallProp = (wall: OfficeWall, anchor: number, preferredKind?: UniformFillKind) => {
+    const attempts = [
+      { along: 0, depth: 0 },
+      { along: 0.8, depth: 0 },
+      { along: -0.8, depth: 0 },
+      { along: 0, depth: 0.55 },
+      { along: 1.45, depth: 0.4 },
+      { along: -1.45, depth: 0.4 },
+      { along: 0, depth: 1.0 },
     ];
-    candidates.forEach((c) => {
-      if (!isClear(c.x, c.z, 0.5) || !isFarFromPlaced(c.x, c.z, 1.6)) return;
-      const idx = Math.floor(rng() * fillCfg.wallKinds.length);
-      placeByKind(fillCfg.wallKinds[idx], c.x, c.z, c.rot);
+
+    for (const attempt of attempts) {
+      const pose = getWallPose(wall, anchor, attempt.depth, attempt.along);
+      const pool = attempt.depth >= 0.55 ? compactWallKinds : fillCfg.wallKinds;
+      const choices = preferredKind
+        ? [preferredKind, ...pool.filter((kind) => kind !== preferredKind)]
+        : [...pool];
+
+      while (choices.length > 0) {
+        const nextIndex = Math.floor(rng() * choices.length);
+        const kind = choices.splice(nextIndex, 1)[0];
+        const radius = getKindRadius(kind);
+        if (!isClear(pose.x, pose.z, radius)) continue;
+        if (!isFarFromPlaced(pose.x, pose.z, radius + 0.95)) continue;
+        placeByKind(kind, pose.x, pose.z, pose.rot);
+        wallPlacementCounts[wall] += 1;
+        return true;
+      }
+    }
+
+    return false;
+  };
+
+  for (let i = 0; i < fillCfg.wallSteps; i++) {
+    const anchor = -wallFillSpan / 2 + (i + 0.5) * (wallFillSpan / fillCfg.wallSteps);
+    wallOrder.forEach((wall) => {
+      placeWallProp(wall, anchor + (rng() - 0.5) * 0.35);
     });
   }
+
+  wallOrder.forEach((wall) => {
+    const repairAttempts = fillCfg.wallSteps * 4;
+    for (let pass = 0; pass < repairAttempts && wallPlacementCounts[wall] < minWallTarget; pass++) {
+      const anchor = -11.8 + ((pass + 0.5) / repairAttempts) * 23.6 + (rng() - 0.5) * 1.1;
+      const preferredKind = compactWallKinds[Math.floor(rng() * compactWallKinds.length)];
+      placeWallProp(wall, anchor, preferredKind);
+    }
+  });
 
   // ---- Interior NxN grid (density-driven) ----
   const grid = fillCfg.interiorGrid;
   const interiorSpan = 22; // -11..11
+  const interiorQuota = Math.max(
+    4,
+    Math.min(
+      grid * grid,
+      Math.round(grid * grid * (fillCfg.density === 'high' ? 0.72 : fillCfg.density === 'medium' ? 0.58 : 0.45))
+    )
+  );
+  let interiorPlaced = 0;
   for (let ix = 0; ix < grid; ix++) {
     for (let iz = 0; iz < grid; iz++) {
+      if (interiorPlaced >= interiorQuota) continue;
       const baseX = -interiorSpan / 2 + ix * (interiorSpan / Math.max(1, grid - 1));
       const baseZ = -interiorSpan / 2 + iz * (interiorSpan / Math.max(1, grid - 1));
+      if (Math.hypot(baseX, baseZ) < 5 && rng() < 0.65) continue;
       const x = baseX + (rng() - 0.5) * fillCfg.jitter;
       const z = baseZ + (rng() - 0.5) * fillCfg.jitter;
       if (!isClear(x, z, 0.6)) continue;
@@ -2142,6 +2218,7 @@ function addOfficeProps(
       const idx = Math.floor(rng() * fillCfg.interiorKinds.length);
       const rot = Math.floor(rng() * 4) * (Math.PI / 2);
       placeByKind(fillCfg.interiorKinds[idx], x, z, rot);
+      interiorPlaced += 1;
     }
   }
 
@@ -2158,7 +2235,10 @@ function addOfficeProps(
   }
 
   // ---- Density metrics + warnings ----
-  const metrics = computeDensityMetrics(placedMeta);
+  const metrics = computeDensityMetrics(placedMeta, {
+    min: Math.max(3, Math.ceil(minWallTarget * 0.7)),
+    max: Math.max(fillCfg.wallSteps + 3, minWallTarget + 4),
+  });
   publishMetrics('office', metrics);
 
   console.log(
