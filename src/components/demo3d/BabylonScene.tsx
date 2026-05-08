@@ -70,6 +70,7 @@ export const BabylonScene = ({
   onFireExtinguished,
   onExtinguisherSwap,
   onPositionUpdate,
+  visualSettings,
 }: BabylonSceneProps) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const engineRef = useRef<BABYLON.Engine | null>(null);
