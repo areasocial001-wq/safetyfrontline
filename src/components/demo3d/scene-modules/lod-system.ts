@@ -129,7 +129,9 @@ export class LODSystem {
       proxy.scaling = original.scaling.clone();
       proxy.material = original.material;
       proxy.isPickable = false;
-      proxy.isVisible = false; // Babylon LOD system controls visibility
+      // NOTE: do NOT set isVisible = false. Babylon's LOD system swaps in this
+      // mesh when the camera is far enough; hiding it here would make the
+      // original furniture (desks, shelves, etc.) disappear at distance.
       proxy.checkCollisions = false;
 
       return proxy;
