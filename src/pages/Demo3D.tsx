@@ -87,7 +87,7 @@ const Demo3D = () => {
     enable: enableGyro, 
     disable: disableGyro 
   } = useGyroscope();
-  const { quality, settings: graphicsSettings, setQuality, audioSettings, updateAudioSettings } = useGraphicsSettings();
+  const { quality, settings: graphicsSettings, setQuality, audioSettings, updateAudioSettings, visualSettings, updateVisualSettings, triggerRecalibration } = useGraphicsSettings();
   const { 
     isRunning: isBenchmarkRunning,
     progress: benchmarkProgress,
