@@ -117,11 +117,11 @@ function setupLighting(scene: BABYLON.Scene, scenarioType: string, quality: stri
     dirDiffuse: BABYLON.Color3;
   }> = {
     office: {
-      ambientIntensity: 0.7,
-      ambientDiffuse: new BABYLON.Color3(0.95, 0.93, 0.88),
-      ambientGround: new BABYLON.Color3(0.35, 0.33, 0.30),
-      dirIntensity: 0.55,
-      dirDiffuse: new BABYLON.Color3(1.0, 0.95, 0.85),
+      ambientIntensity: 0.95,
+      ambientDiffuse: new BABYLON.Color3(0.97, 0.95, 0.90),
+      ambientGround: new BABYLON.Color3(0.42, 0.40, 0.36),
+      dirIntensity: 0.75,
+      dirDiffuse: new BABYLON.Color3(1.0, 0.96, 0.88),
     },
     warehouse: {
       ambientIntensity: 0.55,
