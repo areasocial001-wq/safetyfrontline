@@ -79,13 +79,22 @@ const QUALITY_PRESETS: Record<GraphicsQuality, GraphicsSettings> = {
 
 const STORAGE_KEY = 'graphics-settings-quality';
 const AUDIO_STORAGE_KEY = 'audio-settings';
+const VISUAL_STORAGE_KEY = 'visual-settings';
 
 const DEFAULT_AUDIO_SETTINGS: AudioSettings = {
   voiceOverEnabled: true,
   subtitlesEnabled: false,
   musicVolume: 0.5,
   effectsVolume: 0.7,
-  mouseSensitivity: 500, // Default balanced sensitivity
+  mouseSensitivity: 500,
+};
+
+const DEFAULT_VISUAL_SETTINGS: VisualSettings = {
+  brightness: 1.0,
+  contrast: 1.0,
+  highContrast: false,
+  autoExposure: true,
+  recalibrateNonce: 0,
 };
 
 export const useGraphicsSettings = () => {
@@ -97,6 +106,13 @@ export const useGraphicsSettings = () => {
   const [audioSettings, setAudioSettingsState] = useState<AudioSettings>(() => {
     const stored = localStorage.getItem(AUDIO_STORAGE_KEY);
     return stored ? JSON.parse(stored) : DEFAULT_AUDIO_SETTINGS;
+  });
+
+  const [visualSettings, setVisualSettingsState] = useState<VisualSettings>(() => {
+    const stored = localStorage.getItem(VISUAL_STORAGE_KEY);
+    return stored
+      ? { ...DEFAULT_VISUAL_SETTINGS, ...JSON.parse(stored), recalibrateNonce: 0 }
+      : DEFAULT_VISUAL_SETTINGS;
   });
 
   // Memoize settings to prevent re-renders
