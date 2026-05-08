@@ -1413,8 +1413,22 @@ const Demo3D = () => {
               briefingActive={briefingActive}
               onBriefingStep={(idx) => setBriefingIndex(idx)}
               onBriefingComplete={() => setBriefingActive(false)}
+              uniformFillConfig={{ preset: fillPreset, density: fillDensity, seed: fillSeed }}
             />
 
+            {gameStarted && memoizedScenario?.type === 'office' && (
+              <SceneDebugOverlay
+                scenarioType={memoizedScenario.type}
+                initialPreset={fillPreset}
+                initialDensity={fillDensity}
+                initialSeed={fillSeed}
+                onReseed={({ preset, density, seed }) => {
+                  setFillPreset(preset);
+                  setFillDensity(density);
+                  setFillSeed(seed);
+                }}
+              />
+            )}
             {/* Contextual Hints System */}
             {gameStarted && !gameCompleted && memoizedScenario && (
               <ContextualHints
