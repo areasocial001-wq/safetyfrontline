@@ -26,6 +26,9 @@ interface GraphicsSettingsProps {
   onQualityChange: (quality: GraphicsQuality) => void;
   audioSettings: AudioSettings;
   onAudioSettingsChange: (settings: Partial<AudioSettings>) => void;
+  visualSettings?: VisualSettings;
+  onVisualSettingsChange?: (settings: Partial<VisualSettings>) => void;
+  onRecalibrateExposure?: () => void;
   isOpen: boolean;
   onToggle: () => void;
   onRunBenchmark?: () => void;
