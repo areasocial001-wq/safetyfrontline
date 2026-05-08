@@ -1966,7 +1966,7 @@ function addOfficeProps(
   };
 
   const placedProps: Array<[number, number, number]> = [];
-  const placedMeta: Array<{ x: number; z: number; kind: string }> = [];
+  const placedMeta: PlacedProp[] = [];
   type OfficeWall = 'N' | 'S' | 'E' | 'W';
   const wallPlacementCounts: Record<OfficeWall, number> = { N: 0, S: 0, E: 0, W: 0 };
   const isFarFromPlaced = (x: number, z: number, minDist = 1.4) => {
