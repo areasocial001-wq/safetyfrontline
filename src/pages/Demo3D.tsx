@@ -1247,13 +1247,6 @@ const Demo3D = () => {
             onClose={() => setBriefingActive(false)}
           />
         )}
-        {/* placeholder */}
-        {false && (
-          <div />
-        )}
-        {/* end */}
-          />
-        )}
 
         {/* Achievements Panel */}
         {showAchievements && (
