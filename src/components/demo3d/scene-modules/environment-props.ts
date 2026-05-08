@@ -2158,9 +2158,8 @@ function addOfficeProps(
   }
 
   // ---- Density metrics + warnings ----
-  const metricsMod = await import('./scene-metrics');
-  const metrics = metricsMod.computeDensityMetrics(placedMeta);
-  metricsMod.publishMetrics('office', metrics);
+  const metrics = computeDensityMetrics(placedMeta);
+  publishMetrics('office', metrics);
 
   console.log(
     `[Office] Uniform fill (preset=${fillCfg.preset}, density=${fillCfg.density}, seed=${fillCfg.seed}) placed ${placedProps.length} props`
