@@ -43,7 +43,6 @@ export const ScenarioBriefingOverlay = ({
   risk,
   index,
   total,
-  onSkip,
   onClose,
 }: ScenarioBriefingOverlayProps) => {
   const style = SEVERITY_STYLES[risk.severity];
