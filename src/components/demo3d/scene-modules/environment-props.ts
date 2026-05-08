@@ -1392,10 +1392,10 @@ function addOfficeProps(
 
   const dispenserBottle = BABYLON.MeshBuilder.CreateCylinder('off_waterBottle', { height: 0.45, diameter: 0.25, tessellation: 12 }, scene);
   dispenserBottle.position = new BABYLON.Vector3(-12, 1.35, 9);
-  const waterMat2 = new BABYLON.StandardMaterial('off_waterMat22', scene);
-  waterMat2.diffuseColor = new BABYLON.Color3(0.6, 0.8, 0.95);
-  waterMat2.alpha = 0.6;
-  dispenserBottle.material = waterMat2;
+  const waterBottleMat = new BABYLON.StandardMaterial('off_waterBottleMat', scene);
+  waterBottleMat.diffuseColor = new BABYLON.Color3(0.6, 0.8, 0.95);
+  waterBottleMat.alpha = 0.6;
+  dispenserBottle.material = waterBottleMat;
 
   // ---------- Filing cabinets ----------
   const cabinetPositions = [{ x: -13, z: -8 }, { x: -13, z: -5 }, { x: 13, z: -8 }, { x: 13, z: -5 }];
