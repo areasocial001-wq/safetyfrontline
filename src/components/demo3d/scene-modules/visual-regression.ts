@@ -18,12 +18,24 @@ export interface RegressionShot {
   dataUrl: string;     // PNG dataURL
 }
 
+export interface WallCoverageDiff {
+  wall: WallSide;
+  baselineCount: number;
+  currentCount: number;
+  delta: number;
+  uncovered: boolean;
+}
+
 export interface RegressionReport {
   scenarioType: string;
   timestamp: string;
   shots: RegressionShot[];
   diff?: { label: string; distance: number }[];
+  wallCoverage?: WallCoverageDiff[];
+  /** True when at least one wall lost ≥40% of its baseline coverage */
+  wallRegression?: boolean;
 }
+
 
 const ANGLES = [
   { label: 'spawn-front',  position: [0, 1.7, 12] as [number, number, number],  yaw: Math.PI, pitch: 0 },
