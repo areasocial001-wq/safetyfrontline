@@ -157,18 +157,17 @@ export const SceneDebugOverlay = ({
       <div className="space-y-1">
         <Button size="sm" variant={debugOn ? 'default' : 'outline'} className="w-full h-7"
           onClick={() => {
-            const s = sceneRef.current; if (!s) return;
-            toggleSceneDebug(s);
+            const a = getActive(); if (!a) return;
+            toggleSceneDebug(a.scene);
             setDebugOn(isDebugActive());
           }}>
           {debugOn ? 'Hide' : 'Show'} collisions / shadow casters
         </Button>
         <Button size="sm" variant="outline" className="w-full h-7"
           onClick={async () => {
-            const s = sceneRef.current, c = cameraRef.current, e = engineRef.current;
-            if (!s || !c || !e) return;
+            const a = getActive(); if (!a) return;
             toast.info('Running visual regression…');
-            const r = await runVisualRegression(s, c, e, scenarioType, { saveBaseline: false });
+            const r = await runVisualRegression(a.scene, a.camera, a.engine, scenarioType, { saveBaseline: false });
             const fails = r.diff?.filter((d) => d.distance > 12) ?? [];
             toast[fails.length ? 'error' : 'success'](
               fails.length ? `${fails.length}/${r.shots.length} shots differ` : `All ${r.shots.length} shots match baseline`
@@ -178,9 +177,8 @@ export const SceneDebugOverlay = ({
         </Button>
         <Button size="sm" variant="ghost" className="w-full h-7"
           onClick={async () => {
-            const s = sceneRef.current, c = cameraRef.current, e = engineRef.current;
-            if (!s || !c || !e) return;
-            await runVisualRegression(s, c, e, scenarioType, { saveBaseline: true });
+            const a = getActive(); if (!a) return;
+            await runVisualRegression(a.scene, a.camera, a.engine, scenarioType, { saveBaseline: true });
             toast.success('Baseline saved');
           }}>
           <Save className="h-3 w-3 mr-1" /> Save current as baseline
