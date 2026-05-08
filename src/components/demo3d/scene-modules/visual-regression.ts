@@ -5,6 +5,7 @@
  * localStorage). PNGs are downloaded so the user can eyeball-diff if needed.
  */
 import * as BABYLON from '@babylonjs/core';
+import type { SceneDensityMetrics, WallSide } from './scene-metrics';
 
 export interface RegressionShot {
   label: string;
