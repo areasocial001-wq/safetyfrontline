@@ -6,7 +6,6 @@ interface ScenarioBriefingOverlayProps {
   risk: Risk3D;
   index: number;
   total: number;
-  onSkip: () => void;
   onClose: () => void;
 }
 
