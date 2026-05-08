@@ -59,6 +59,7 @@ interface GameResults3DProps {
   firePerformance?: FirePerformanceData;
   onRestart: () => void;
   onChangeScenario: () => void;
+  onReplayBriefing?: () => void;
 }
 
 const FIRE_CLASS_LABELS: Record<string, { label: string; icon: typeof Zap }> = {
