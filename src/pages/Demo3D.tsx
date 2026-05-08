@@ -1391,6 +1391,9 @@ const Demo3D = () => {
               }}
               onPositionUpdate={handlePlayerPositionUpdate}
               visualSettings={visualSettings}
+              briefingActive={briefingActive}
+              onBriefingStep={(idx) => setBriefingIndex(idx)}
+              onBriefingComplete={() => setBriefingActive(false)}
             />
 
             {/* Contextual Hints System */}
