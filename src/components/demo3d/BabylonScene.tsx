@@ -53,6 +53,9 @@ interface BabylonSceneProps {
   onExtinguisherSwap?: (newType: ExtinguisherType) => void;
   onPositionUpdate?: (position: [number, number, number], rotation: number) => void;
   visualSettings?: VisualSettings;
+  briefingActive?: boolean;
+  onBriefingStep?: (index: number, total: number) => void;
+  onBriefingComplete?: () => void;
 }
 
 export const BabylonScene = ({
