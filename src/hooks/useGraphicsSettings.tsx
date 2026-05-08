@@ -129,37 +129,33 @@ export const useGraphicsSettings = () => {
     localStorage.setItem(AUDIO_STORAGE_KEY, JSON.stringify(newSettings));
   };
 
+  const updateVisualSettings = (updates: Partial<VisualSettings>) => {
+    const newSettings = { ...visualSettings, ...updates };
+    setVisualSettingsState(newSettings);
+    // Persist everything except the transient nonce
+    const { recalibrateNonce, ...persisted } = newSettings;
+    localStorage.setItem(VISUAL_STORAGE_KEY, JSON.stringify(persisted));
+  };
+
+  const triggerRecalibration = () => {
+    setVisualSettingsState(prev => ({ ...prev, recalibrateNonce: prev.recalibrateNonce + 1 }));
+  };
+
   // Auto-detect optimal quality on first load
   useEffect(() => {
     const stored = localStorage.getItem(STORAGE_KEY);
     if (!stored) {
-      // Detect device capabilities
       const canvas = document.createElement('canvas');
       const gl = canvas.getContext('webgl2') || canvas.getContext('webgl');
-      
-      if (!gl) {
-        setQuality('low');
-        return;
-      }
-
-      // Check for mobile/tablet
+      if (!gl) { setQuality('low'); return; }
       const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-      
-      if (isMobile) {
-        setQuality('medium');
-      } else {
-        // Desktop - check memory
+      if (isMobile) { setQuality('medium'); }
+      else {
         const memory = (performance as any).memory;
         if (memory && memory.jsHeapSizeLimit) {
           const memoryGB = memory.jsHeapSizeLimit / (1024 * 1024 * 1024);
-          if (memoryGB > 4) {
-            setQuality('high');
-          } else {
-            setQuality('medium');
-          }
-        } else {
-          setQuality('high');
-        }
+          setQuality(memoryGB > 4 ? 'high' : 'medium');
+        } else { setQuality('high'); }
       }
     }
   }, []);
@@ -171,5 +167,8 @@ export const useGraphicsSettings = () => {
     presets: QUALITY_PRESETS,
     audioSettings,
     updateAudioSettings,
+    visualSettings,
+    updateVisualSettings,
+    triggerRecalibration,
   };
 };
