@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/breadcrumb";
 import { ArrowLeft, Shield, Target, Award, ChevronRight, Clock, TrendingUp, Trophy, Play, Home, Flame, Star } from "lucide-react";
 import { GameResults3D } from "@/components/demo3d/GameResults3D";
+import { ScenarioBriefingOverlay } from "@/components/demo3d/ScenarioBriefingOverlay";
 import { FireDangerBar } from "@/components/demo3d/FireDangerBar";
 import { FireVignetteOverlay } from "@/components/demo3d/FireVignetteOverlay";
 import { FireGameOver } from "@/components/demo3d/FireGameOver";
