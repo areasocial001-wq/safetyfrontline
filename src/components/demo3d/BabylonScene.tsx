@@ -143,6 +143,8 @@ export const BabylonScene = ({
 
     // Store scenario ID + uniform-fill config in scene metadata
     scene.metadata = { ...scene.metadata, scenarioId: scenario.id, uniformFillConfig };
+    // Expose live refs for the SceneDebugOverlay
+    (window as unknown as { __activeBabylon?: unknown }).__activeBabylon = { scene, camera, engine };
 
     // 2. First-person extinguisher (laboratory only)
     if (scenario.type === 'laboratory' && extinguisherType) {
