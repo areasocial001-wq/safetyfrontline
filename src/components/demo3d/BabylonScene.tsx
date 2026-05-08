@@ -78,6 +78,7 @@ export const BabylonScene = ({
   briefingActive = false,
   onBriefingStep,
   onBriefingComplete,
+  uniformFillConfig,
 }: BabylonSceneProps) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const engineRef = useRef<BABYLON.Engine | null>(null);
