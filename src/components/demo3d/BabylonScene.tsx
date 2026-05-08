@@ -526,7 +526,7 @@ export const BabylonScene = ({
       scene.dispose();
       engine.dispose();
     };
-  }, [scenario.id, quality, uniformFillConfig?.preset, uniformFillConfig?.density, uniformFillConfig?.seed]);
+  }, [scenario.id, quality, uniformFillConfig?.preset, uniformFillConfig?.density, uniformFillConfig?.seed, JSON.stringify(uniformFillConfig?.perWall ?? {})]);
 
   // Create first-person extinguisher with swap animation
   useEffect(() => {
