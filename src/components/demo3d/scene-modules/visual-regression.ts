@@ -5,6 +5,7 @@
  * localStorage). PNGs are downloaded so the user can eyeball-diff if needed.
  */
 import * as BABYLON from '@babylonjs/core';
+import type { SceneDensityMetrics, WallSide } from './scene-metrics';
 
 export interface RegressionShot {
   label: string;
@@ -17,12 +18,24 @@ export interface RegressionShot {
   dataUrl: string;     // PNG dataURL
 }
 
+export interface WallCoverageDiff {
+  wall: WallSide;
+  baselineCount: number;
+  currentCount: number;
+  delta: number;
+  uncovered: boolean;
+}
+
 export interface RegressionReport {
   scenarioType: string;
   timestamp: string;
   shots: RegressionShot[];
   diff?: { label: string; distance: number }[];
+  wallCoverage?: WallCoverageDiff[];
+  /** True when at least one wall lost ≥40% of its baseline coverage */
+  wallRegression?: boolean;
 }
+
 
 const ANGLES = [
   { label: 'spawn-front',  position: [0, 1.7, 12] as [number, number, number],  yaw: Math.PI, pitch: 0 },
@@ -110,10 +123,19 @@ export async function runVisualRegression(
   }
 
   const baselineKey = `vr-baseline-${scenarioType}`;
+  const metricsBaselineKey = `vr-metrics-${scenarioType}`;
   let diff: { label: string; distance: number }[] | undefined;
+  let wallCoverage: WallCoverageDiff[] | undefined;
+  let wallRegression = false;
+
+  // Pull live metrics from the global publisher
+  const liveMetrics = (window as unknown as { __sceneMetrics?: Record<string, SceneDensityMetrics> })
+    .__sceneMetrics?.[scenarioType];
+
   if (options.saveBaseline) {
     const lite = shots.map(({ dataUrl, ...rest }) => rest);
     localStorage.setItem(baselineKey, JSON.stringify(lite));
+    if (liveMetrics) localStorage.setItem(metricsBaselineKey, JSON.stringify(liveMetrics.perWall));
     console.log(`[VisualRegression] Baseline saved (${shots.length} shots) for ${scenarioType}`);
   } else {
     const raw = localStorage.getItem(baselineKey);
@@ -123,9 +145,27 @@ export async function runVisualRegression(
         const b = baseline.find((x) => x.label === s.label);
         return { label: s.label, distance: b ? hashDistance(s.hash, b.hash) : Infinity };
       });
-      const failures = diff.filter((d) => d.distance > 12);
-      console.log(`[VisualRegression] Compared ${shots.length} shots — ${failures.length} mismatches > threshold`, failures);
-    } else {
+    }
+    const metricsRaw = localStorage.getItem(metricsBaselineKey);
+    if (metricsRaw && liveMetrics) {
+      const baselinePerWall = JSON.parse(metricsRaw) as Record<WallSide, number>;
+      wallCoverage = (['N', 'S', 'E', 'W'] as const).map((wall) => {
+        const baselineCount = baselinePerWall[wall] ?? 0;
+        const currentCount = liveMetrics.perWall[wall] ?? 0;
+        const delta = currentCount - baselineCount;
+        const uncovered = baselineCount > 0
+          ? currentCount < baselineCount * 0.6
+          : currentCount < liveMetrics.thresholds.min;
+        if (uncovered) wallRegression = true;
+        return { wall, baselineCount, currentCount, delta, uncovered };
+      });
+      if (wallRegression) {
+        console.error('[VisualRegression] WALL REGRESSION', wallCoverage.filter((w) => w.uncovered));
+      } else {
+        console.log('[VisualRegression] Wall coverage OK', wallCoverage);
+      }
+    }
+    if (!raw && !metricsRaw) {
       console.warn(`[VisualRegression] No baseline for ${scenarioType}; run with saveBaseline first.`);
     }
   }
@@ -139,5 +179,6 @@ export async function runVisualRegression(
     });
   }
 
-  return { scenarioType, timestamp: new Date().toISOString(), shots, diff };
+  return { scenarioType, timestamp: new Date().toISOString(), shots, diff, wallCoverage, wallRegression };
 }
+

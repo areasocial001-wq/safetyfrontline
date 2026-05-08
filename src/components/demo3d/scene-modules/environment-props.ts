@@ -9,7 +9,7 @@ import {
   type UniformFillConfig,
   type UniformFillKind,
 } from './uniform-fill-config';
-import { computeDensityMetrics, publishMetrics } from './scene-metrics';
+import { computeDensityMetrics, publishMetrics, publishFillStats, type PlacedProp } from './scene-metrics';
 
 /**
  * Deterministic random for consistent prop placement
@@ -1966,7 +1966,7 @@ function addOfficeProps(
   };
 
   const placedProps: Array<[number, number, number]> = [];
-  const placedMeta: Array<{ x: number; z: number; kind: string }> = [];
+  const placedMeta: PlacedProp[] = [];
   type OfficeWall = 'N' | 'S' | 'E' | 'W';
   const wallPlacementCounts: Record<OfficeWall, number> = { N: 0, S: 0, E: 0, W: 0 };
   const isFarFromPlaced = (x: number, z: number, minDist = 1.4) => {
@@ -2034,7 +2034,7 @@ function addOfficeProps(
       if (effShadow) effShadow.addShadowCaster(leaf);
     }
     placedProps.push([x, z, 0.35 * scale]);
-    placedMeta.push({ x, z, kind: 'plant' });
+    placedMeta.push({ x, z, kind: 'plant', bbox: { hx: 0.35 * scale, hz: 0.35 * scale } });
     propId++;
   };
   const placeFileCabinet = (x: number, z: number, rotY: number) => {
@@ -2048,13 +2048,13 @@ function addOfficeProps(
       drawer.position.set(x + Math.sin(rotY) * 0.26, 0.18 + d * 0.32, z + Math.cos(rotY) * 0.26);
       drawer.rotation.y = rotY; drawer.material = metalMat; drawer.isPickable = false;
     }
-    placedProps.push([x, z, 0.45]); placedMeta.push({ x, z, kind: 'cabinet' }); propId++;
+    placedProps.push([x, z, 0.45]); placedMeta.push({ x, z, kind: 'cabinet', bbox: { hx: 0.3, hz: 0.28 } }); propId++;
   };
   const placeBin = (x: number, z: number) => {
     const bin = BABYLON.MeshBuilder.CreateCylinder(`fill_bin_${propId}`,
       { height: 0.55, diameter: 0.34, tessellation: 12 }, scene);
     bin.position.set(x, 0.275, z); bin.material = binMat; reg(bin);
-    placedProps.push([x, z, 0.2]); placedMeta.push({ x, z, kind: 'bin' }); propId++;
+    placedProps.push([x, z, 0.2]); placedMeta.push({ x, z, kind: 'bin', bbox: { hx: 0.18, hz: 0.18 } }); propId++;
   };
   const placeWaterCooler = (x: number, z: number, rotY: number) => {
     const body = BABYLON.MeshBuilder.CreateBox(`fill_cooler_${propId}`,
@@ -2064,7 +2064,7 @@ function addOfficeProps(
       { height: 0.5, diameterTop: 0.32, diameterBottom: 0.4, tessellation: 14 }, scene);
     bottle.position.set(x, 1.3, z); bottle.material = bottleMat; bottle.isPickable = false;
     if (effShadow) effShadow.addShadowCaster(bottle);
-    placedProps.push([x, z, 0.35]); placedMeta.push({ x, z, kind: 'cooler' }); propId++;
+    placedProps.push([x, z, 0.35]); placedMeta.push({ x, z, kind: 'cooler', bbox: { hx: 0.24, hz: 0.24 } }); propId++;
   };
   const placeSafetySign = (x: number, z: number, rotY: number) => {
     const post = BABYLON.MeshBuilder.CreateCylinder(`fill_signPost_${propId}`,
@@ -2075,7 +2075,7 @@ function addOfficeProps(
     board.position.set(x, 1.55, z); board.rotation.y = rotY;
     board.material = signBoardMat; board.isPickable = false;
     if (effShadow) effShadow.addShadowCaster(board);
-    placedProps.push([x, z, 0.3]); placedMeta.push({ x, z, kind: 'sign' }); propId++;
+    placedProps.push([x, z, 0.3]); placedMeta.push({ x, z, kind: 'sign', bbox: { hx: 0.27, hz: 0.07 } }); propId++;
   };
   const placeBoxesStack = (x: number, z: number) => {
     for (let s = 0; s < 3; s++) {
@@ -2089,7 +2089,7 @@ function addOfficeProps(
       m.diffuseColor = new BABYLON.Color3(t[0], t[1], t[2]);
       box.material = m; reg(box);
     }
-    placedProps.push([x, z, 0.4]); placedMeta.push({ x, z, kind: 'boxes' }); propId++;
+    placedProps.push([x, z, 0.4]); placedMeta.push({ x, z, kind: 'boxes', bbox: { hx: 0.3, hz: 0.25 } }); propId++;
   };
   const placeSideChair = (x: number, z: number, rotY: number) => {
     const seat = BABYLON.MeshBuilder.CreateBox(`fill_chair_${propId}`,
@@ -2109,7 +2109,7 @@ function addOfficeProps(
       leg.position.set(x + lx, 0.21, z + lz);
       leg.material = metalMat; leg.isPickable = false;
     }
-    placedProps.push([x, z, 0.3]); placedMeta.push({ x, z, kind: 'chair' }); propId++;
+    placedProps.push([x, z, 0.3]); placedMeta.push({ x, z, kind: 'chair', bbox: { hx: 0.27, hz: 0.27 } }); propId++;
   };
 
   const placeByKind = (
@@ -2178,39 +2178,52 @@ function addOfficeProps(
     return false;
   };
 
-  for (let i = 0; i < fillCfg.wallSteps; i++) {
-    const anchor = -wallFillSpan / 2 + (i + 0.5) * (wallFillSpan / fillCfg.wallSteps);
-    wallOrder.forEach((wall) => {
+  // Per-wall step counts (multiplier-driven), processed independently so lateral walls
+  // are no longer starved by the front/back placement order.
+  const wallStepsByWall: Record<OfficeWall, number> = {
+    N: Math.max(2, Math.round(fillCfg.wallSteps * (fillCfg.perWall.N ?? 1))),
+    S: Math.max(2, Math.round(fillCfg.wallSteps * (fillCfg.perWall.S ?? 1))),
+    E: Math.max(2, Math.round(fillCfg.wallSteps * (fillCfg.perWall.E ?? 1))),
+    W: Math.max(2, Math.round(fillCfg.wallSteps * (fillCfg.perWall.W ?? 1))),
+  };
+  wallOrder.forEach((wall) => {
+    const steps = wallStepsByWall[wall];
+    for (let i = 0; i < steps; i++) {
+      const anchor = -wallFillSpan / 2 + (i + 0.5) * (wallFillSpan / steps);
       placeWallProp(wall, anchor + (rng() - 0.5) * 0.35);
-    });
-  }
+    }
+  });
 
   wallOrder.forEach((wall) => {
-    const repairAttempts = fillCfg.wallSteps * 4;
-    for (let pass = 0; pass < repairAttempts && wallPlacementCounts[wall] < minWallTarget; pass++) {
+    const target = Math.max(4, Math.round(wallStepsByWall[wall] * 0.75));
+    const repairAttempts = wallStepsByWall[wall] * 4;
+    for (let pass = 0; pass < repairAttempts && wallPlacementCounts[wall] < target; pass++) {
       const anchor = -11.8 + ((pass + 0.5) / repairAttempts) * 23.6 + (rng() - 0.5) * 1.1;
       const preferredKind = compactWallKinds[Math.floor(rng() * compactWallKinds.length)];
       placeWallProp(wall, anchor, preferredKind);
     }
   });
 
-  // ---- Interior NxN grid (density-driven) ----
+  // ---- Interior NxN grid (density-driven, anti-center bias) ----
   const grid = fillCfg.interiorGrid;
-  const interiorSpan = 22; // -11..11
+  const interiorSpan = 22;
+  const interiorMult = Math.max(0, Math.min(2, fillCfg.perWall.interior ?? 0.7));
+  const baseRatio = fillCfg.density === 'high' ? 0.6 : fillCfg.density === 'medium' ? 0.45 : 0.32;
   const interiorQuota = Math.max(
-    4,
-    Math.min(
-      grid * grid,
-      Math.round(grid * grid * (fillCfg.density === 'high' ? 0.72 : fillCfg.density === 'medium' ? 0.58 : 0.45))
-    )
+    2,
+    Math.min(grid * grid, Math.round(grid * grid * baseRatio * interiorMult))
   );
+  const exclusion = fillCfg.centerExclusionRadius;
   let interiorPlaced = 0;
   for (let ix = 0; ix < grid; ix++) {
     for (let iz = 0; iz < grid; iz++) {
       if (interiorPlaced >= interiorQuota) continue;
       const baseX = -interiorSpan / 2 + ix * (interiorSpan / Math.max(1, grid - 1));
       const baseZ = -interiorSpan / 2 + iz * (interiorSpan / Math.max(1, grid - 1));
-      if (Math.hypot(baseX, baseZ) < 5 && rng() < 0.65) continue;
+      const distFromCenter = Math.hypot(baseX, baseZ);
+      // Hard exclusion in the inner radius; soft skip just outside it
+      if (distFromCenter < exclusion) continue;
+      if (distFromCenter < exclusion + 1.5 && rng() < 0.55) continue;
       const x = baseX + (rng() - 0.5) * fillCfg.jitter;
       const z = baseZ + (rng() - 0.5) * fillCfg.jitter;
       if (!isClear(x, z, 0.6)) continue;
@@ -2235,17 +2248,20 @@ function addOfficeProps(
   }
 
   // ---- Density metrics + warnings ----
+  const avgWallTarget = (wallStepsByWall.N + wallStepsByWall.S + wallStepsByWall.E + wallStepsByWall.W) / 4;
   const metrics = computeDensityMetrics(placedMeta, {
-    min: Math.max(3, Math.ceil(minWallTarget * 0.7)),
-    max: Math.max(fillCfg.wallSteps + 3, minWallTarget + 4),
+    min: Math.max(3, Math.ceil(avgWallTarget * 0.55)),
+    max: Math.max(fillCfg.wallSteps + 4, Math.ceil(avgWallTarget * 1.4)),
   });
   publishMetrics('office', metrics);
+  publishFillStats('office', { placed: placedMeta, noGoZones, metrics });
 
   console.log(
-    `[Office] Uniform fill (preset=${fillCfg.preset}, density=${fillCfg.density}, seed=${fillCfg.seed}) placed ${placedProps.length} props`
+    `[Office] Uniform fill (preset=${fillCfg.preset}, density=${fillCfg.density}, seed=${fillCfg.seed}, perWall=${JSON.stringify(fillCfg.perWall)}) placed ${placedProps.length} props`
   );
   console.log('[Office] Full office furnishing complete — props + hazards');
 }
+
 
 // ============================================================
 // CYBERSECURITY OFFICE PROPS — Visual cyber risk indicators

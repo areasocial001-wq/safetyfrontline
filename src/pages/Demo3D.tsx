@@ -2,7 +2,13 @@ import { useState, Suspense, useEffect, useRef, useMemo, useCallback } from "rea
 import { Link } from "react-router-dom";
 import { BabylonScene } from "@/components/demo3d/BabylonScene";
 import { SceneDebugOverlay } from "@/components/demo3d/SceneDebugOverlay";
-import type { UniformFillPreset, UniformFillDensity } from "@/components/demo3d/scene-modules/uniform-fill-config";
+import {
+  loadPersistedSettings,
+  DEFAULT_PER_WALL,
+  type UniformFillPreset,
+  type UniformFillDensity,
+  type PerWallMultipliers,
+} from "@/components/demo3d/scene-modules/uniform-fill-config";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -94,6 +100,8 @@ const Demo3D = () => {
   const [fillPreset, setFillPreset] = useState<UniformFillPreset>('office');
   const [fillDensity, setFillDensity] = useState<UniformFillDensity>('medium');
   const [fillSeed, setFillSeed] = useState<number>(1337);
+  const [fillPerWall, setFillPerWall] = useState<PerWallMultipliers>(DEFAULT_PER_WALL);
+
   const { 
     isRunning: isBenchmarkRunning,
     progress: benchmarkProgress,
@@ -112,6 +120,19 @@ const Demo3D = () => {
   } = useMouseCalibration();
   
   const [selectedScenario, setSelectedScenario] = useState<Scenario3D | null>(null);
+
+  // Load persisted per-scenario fill settings when scenario changes
+  useEffect(() => {
+    if (!selectedScenario) return;
+    const saved = loadPersistedSettings(selectedScenario.type);
+    if (saved) {
+      if (saved.preset) setFillPreset(saved.preset);
+      if (saved.density) setFillDensity(saved.density);
+      if (typeof saved.seed === 'number') setFillSeed(saved.seed);
+      if (saved.perWall) setFillPerWall({ ...DEFAULT_PER_WALL, ...saved.perWall });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedScenario?.type]);
   const [gameStarted, setGameStarted] = useState(false);
   const [risksFound, setRisksFound] = useState(0);
   const [manualRisksFound, setManualRisksFound] = useState(0);
@@ -1413,7 +1434,7 @@ const Demo3D = () => {
               briefingActive={briefingActive}
               onBriefingStep={(idx) => setBriefingIndex(idx)}
               onBriefingComplete={() => setBriefingActive(false)}
-              uniformFillConfig={{ preset: fillPreset, density: fillDensity, seed: fillSeed }}
+              uniformFillConfig={{ preset: fillPreset, density: fillDensity, seed: fillSeed, perWall: fillPerWall }}
             />
 
             {gameStarted && memoizedScenario?.type === 'office' && (
@@ -1422,10 +1443,12 @@ const Demo3D = () => {
                 initialPreset={fillPreset}
                 initialDensity={fillDensity}
                 initialSeed={fillSeed}
-                onReseed={({ preset, density, seed }) => {
+                initialPerWall={fillPerWall}
+                onReseed={({ preset, density, seed, perWall }) => {
                   setFillPreset(preset);
                   setFillDensity(density);
                   setFillSeed(seed);
+                  setFillPerWall(perWall);
                 }}
               />
             )}
