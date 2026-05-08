@@ -2034,7 +2034,7 @@ function addOfficeProps(
       if (effShadow) effShadow.addShadowCaster(leaf);
     }
     placedProps.push([x, z, 0.35 * scale]);
-    placedMeta.push({ x, z, kind: 'plant' });
+    placedMeta.push({ x, z, kind: 'plant', bbox: { hx: 0.35 * scale, hz: 0.35 * scale } });
     propId++;
   };
   const placeFileCabinet = (x: number, z: number, rotY: number) => {
@@ -2048,13 +2048,13 @@ function addOfficeProps(
       drawer.position.set(x + Math.sin(rotY) * 0.26, 0.18 + d * 0.32, z + Math.cos(rotY) * 0.26);
       drawer.rotation.y = rotY; drawer.material = metalMat; drawer.isPickable = false;
     }
-    placedProps.push([x, z, 0.45]); placedMeta.push({ x, z, kind: 'cabinet' }); propId++;
+    placedProps.push([x, z, 0.45]); placedMeta.push({ x, z, kind: 'cabinet', bbox: { hx: 0.3, hz: 0.28 } }); propId++;
   };
   const placeBin = (x: number, z: number) => {
     const bin = BABYLON.MeshBuilder.CreateCylinder(`fill_bin_${propId}`,
       { height: 0.55, diameter: 0.34, tessellation: 12 }, scene);
     bin.position.set(x, 0.275, z); bin.material = binMat; reg(bin);
-    placedProps.push([x, z, 0.2]); placedMeta.push({ x, z, kind: 'bin' }); propId++;
+    placedProps.push([x, z, 0.2]); placedMeta.push({ x, z, kind: 'bin', bbox: { hx: 0.18, hz: 0.18 } }); propId++;
   };
   const placeWaterCooler = (x: number, z: number, rotY: number) => {
     const body = BABYLON.MeshBuilder.CreateBox(`fill_cooler_${propId}`,
@@ -2064,7 +2064,7 @@ function addOfficeProps(
       { height: 0.5, diameterTop: 0.32, diameterBottom: 0.4, tessellation: 14 }, scene);
     bottle.position.set(x, 1.3, z); bottle.material = bottleMat; bottle.isPickable = false;
     if (effShadow) effShadow.addShadowCaster(bottle);
-    placedProps.push([x, z, 0.35]); placedMeta.push({ x, z, kind: 'cooler' }); propId++;
+    placedProps.push([x, z, 0.35]); placedMeta.push({ x, z, kind: 'cooler', bbox: { hx: 0.24, hz: 0.24 } }); propId++;
   };
   const placeSafetySign = (x: number, z: number, rotY: number) => {
     const post = BABYLON.MeshBuilder.CreateCylinder(`fill_signPost_${propId}`,
@@ -2075,7 +2075,7 @@ function addOfficeProps(
     board.position.set(x, 1.55, z); board.rotation.y = rotY;
     board.material = signBoardMat; board.isPickable = false;
     if (effShadow) effShadow.addShadowCaster(board);
-    placedProps.push([x, z, 0.3]); placedMeta.push({ x, z, kind: 'sign' }); propId++;
+    placedProps.push([x, z, 0.3]); placedMeta.push({ x, z, kind: 'sign', bbox: { hx: 0.27, hz: 0.07 } }); propId++;
   };
   const placeBoxesStack = (x: number, z: number) => {
     for (let s = 0; s < 3; s++) {
@@ -2089,7 +2089,7 @@ function addOfficeProps(
       m.diffuseColor = new BABYLON.Color3(t[0], t[1], t[2]);
       box.material = m; reg(box);
     }
-    placedProps.push([x, z, 0.4]); placedMeta.push({ x, z, kind: 'boxes' }); propId++;
+    placedProps.push([x, z, 0.4]); placedMeta.push({ x, z, kind: 'boxes', bbox: { hx: 0.3, hz: 0.25 } }); propId++;
   };
   const placeSideChair = (x: number, z: number, rotY: number) => {
     const seat = BABYLON.MeshBuilder.CreateBox(`fill_chair_${propId}`,
@@ -2109,7 +2109,7 @@ function addOfficeProps(
       leg.position.set(x + lx, 0.21, z + lz);
       leg.material = metalMat; leg.isPickable = false;
     }
-    placedProps.push([x, z, 0.3]); placedMeta.push({ x, z, kind: 'chair' }); propId++;
+    placedProps.push([x, z, 0.3]); placedMeta.push({ x, z, kind: 'chair', bbox: { hx: 0.27, hz: 0.27 } }); propId++;
   };
 
   const placeByKind = (
