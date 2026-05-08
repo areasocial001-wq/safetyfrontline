@@ -1939,13 +1939,13 @@ function addOfficeProps(
   // UNIFORM FILL PASS — configurable (preset / density / seed) + metrics
   // ============================================================
   const sceneAny = scene as unknown as {
-    metadata?: { uniformFillConfig?: Partial<import('./uniform-fill-config').UniformFillConfig> };
+    metadata?: { uniformFillConfig?: Partial<UniformFillConfig> };
   };
-  const fillCfg = (await import('./uniform-fill-config')).buildUniformFillConfig(
+  const fillCfg = buildUniformFillConfig(
     sceneAny.metadata?.uniformFillConfig,
     typeof window !== 'undefined' && window.matchMedia('(pointer:coarse), (max-width: 767px)').matches
   );
-  const rng = (await import('./uniform-fill-config')).makeRng(fillCfg.seed);
+  const rng = makeRng(fillCfg.seed);
   // Mobile / low-quality auto-skip of micro-prop shadow casters
   const noShadowOnFill = fillCfg.disableMicroPropShadows || quality === 'low';
   const effShadow = noShadowOnFill ? null : shadowGenerator;
