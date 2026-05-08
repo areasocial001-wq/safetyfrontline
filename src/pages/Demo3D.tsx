@@ -91,6 +91,9 @@ const Demo3D = () => {
     disable: disableGyro 
   } = useGyroscope();
   const { quality, settings: graphicsSettings, setQuality, audioSettings, updateAudioSettings, visualSettings, updateVisualSettings, triggerRecalibration } = useGraphicsSettings();
+  const [fillPreset, setFillPreset] = useState<UniformFillPreset>('office');
+  const [fillDensity, setFillDensity] = useState<UniformFillDensity>('medium');
+  const [fillSeed, setFillSeed] = useState<number>(1337);
   const { 
     isRunning: isBenchmarkRunning,
     progress: benchmarkProgress,
