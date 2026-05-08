@@ -21,7 +21,7 @@ const TOOLTIP_ICONS: Record<string, LucideIcon> = {
   shelf: Library,
   emlight: Lightbulb,
 };
-import type { AudioSettings } from '@/hooks/useGraphicsSettings';
+import type { AudioSettings, VisualSettings } from '@/hooks/useGraphicsSettings';
 import { loadGLTFProps } from '@/lib/babylon-prop-loader';
 import { loadProceduralProps } from '@/lib/babylon-procedural-props';
 import { SCENARIO_PROPS, SCENARIO_PROCEDURAL_PROPS } from '@/types/prop-config';
