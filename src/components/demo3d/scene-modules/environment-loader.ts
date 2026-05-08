@@ -138,7 +138,10 @@ function createProceduralEnvironment(
   shadowGenerator: BABYLON.ShadowGenerator | null
 ) {
   if (type === 'office') {
-    createRealisticOffice(scene, quality, shadowGenerator);
+    // Office geometry is fully authored in environment-props.ts.
+    // Rendering a second office shell here creates overlapping floors/walls
+    // that hide furniture clusters and make most of the room appear empty.
+    console.log('[Office] Skipping duplicate procedural shell from environment-loader');
   } else if (type === 'construction') {
     createConstructionSite(scene, quality, shadowGenerator);
   } else {
