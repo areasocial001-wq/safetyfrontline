@@ -9,7 +9,7 @@ import {
   type UniformFillConfig,
   type UniformFillKind,
 } from './uniform-fill-config';
-import { computeDensityMetrics, publishMetrics } from './scene-metrics';
+import { computeDensityMetrics, publishMetrics, publishFillStats, type PlacedProp } from './scene-metrics';
 
 /**
  * Deterministic random for consistent prop placement
