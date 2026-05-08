@@ -18,7 +18,8 @@ import {
   FlaskConical,
   Zap,
   Package,
-  ShieldAlert
+  ShieldAlert,
+  PlayCircle
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Scenario3D } from "@/data/scenarios3d";
