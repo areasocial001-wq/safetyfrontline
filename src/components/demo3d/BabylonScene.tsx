@@ -307,6 +307,14 @@ export const BabylonScene = ({
       return { mesh: marker, risk };
     });
 
+    // Track risk meshes for hover-highlight (include marker + indicator)
+    riskMeshes.forEach(({ mesh, risk }) => {
+      const list: BABYLON.Mesh[] = [mesh as BABYLON.Mesh];
+      const ind = scene.getMeshByName(`${risk.id}_indicator`);
+      if (ind) list.push(ind as BABYLON.Mesh);
+      riskMeshMapRef.current.set(risk.id, list);
+    });
+
     // 10. Click detection
     scene.onPointerDown = (evt, pickResult) => {
       if (pickResult.hit && pickResult.pickedMesh) {
