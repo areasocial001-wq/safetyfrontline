@@ -2130,7 +2130,7 @@ function addOfficeProps(
   // ---- Wall-edge belt — balanced per wall with fallback slots ----
   const wallInset = 1.05;
   const wallOrder: OfficeWall[] = ['W', 'E', 'N', 'S'];
-  const wallSpan = 23.6;
+  const wallFillSpan = 23.6;
   const minWallTarget = Math.max(4, Math.min(fillCfg.wallSteps, Math.ceil(fillCfg.wallSteps * 0.75)));
   const getWallPose = (wall: OfficeWall, anchor: number, depth: number, along: number) => {
     switch (wall) {
@@ -2179,7 +2179,7 @@ function addOfficeProps(
   };
 
   for (let i = 0; i < fillCfg.wallSteps; i++) {
-    const anchor = -wallSpan / 2 + (i + 0.5) * (wallSpan / fillCfg.wallSteps);
+    const anchor = -wallFillSpan / 2 + (i + 0.5) * (wallFillSpan / fillCfg.wallSteps);
     wallOrder.forEach((wall) => {
       placeWallProp(wall, anchor + (rng() - 0.5) * 0.35);
     });
