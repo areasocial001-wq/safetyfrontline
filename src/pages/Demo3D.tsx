@@ -1194,7 +1194,7 @@ const Demo3D = () => {
           </div>
         )}
 
-        {gameCompleted && !showAchievements && selectedScenario && (
+        {gameCompleted && !showAchievements && !briefingActive && selectedScenario && (
           <div className="absolute inset-0 z-10 flex items-center justify-center bg-background/95 overflow-y-auto py-8">
             <GameResults3D
               scenario={selectedScenario}
