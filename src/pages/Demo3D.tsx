@@ -1387,6 +1387,7 @@ const Demo3D = () => {
                 setSelectedExtinguisher(newType);
               }}
               onPositionUpdate={handlePlayerPositionUpdate}
+              visualSettings={visualSettings}
             />
 
             {/* Contextual Hints System */}
