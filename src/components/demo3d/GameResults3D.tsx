@@ -91,6 +91,7 @@ export const GameResults3D = ({
   firePerformance,
   onRestart,
   onChangeScenario,
+  onReplayBriefing,
 }: GameResults3DProps) => {
   // ... keep existing code (percentages and effectiveness calculation)
   const manualPercentage = totalManualRisks > 0 
