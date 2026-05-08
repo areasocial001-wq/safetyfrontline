@@ -18,9 +18,6 @@ import {
 
 interface SceneDebugOverlayProps {
   scenarioType: string;
-  sceneRef: React.RefObject<BABYLON.Scene | null>;
-  cameraRef: React.RefObject<BABYLON.UniversalCamera | null>;
-  engineRef: React.RefObject<BABYLON.Engine | null>;
   /** Reload the whole scene with a new uniform-fill config */
   onReseed?: (cfg: { preset: UniformFillPreset; density: UniformFillDensity; seed: number }) => void;
   initialPreset?: UniformFillPreset;
@@ -28,11 +25,11 @@ interface SceneDebugOverlayProps {
   initialSeed?: number;
 }
 
+const getActive = () =>
+  (window as unknown as { __activeBabylon?: { scene: BABYLON.Scene; camera: BABYLON.UniversalCamera; engine: BABYLON.Engine } }).__activeBabylon;
+
 export const SceneDebugOverlay = ({
   scenarioType,
-  sceneRef,
-  cameraRef,
-  engineRef,
   onReseed,
   initialPreset = 'office',
   initialDensity = 'medium',
