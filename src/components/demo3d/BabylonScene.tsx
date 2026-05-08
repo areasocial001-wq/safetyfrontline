@@ -490,9 +490,10 @@ export const BabylonScene = ({
         onMouseMove(event.movementX, event.movementY);
       }
     };
-    if (document.pointerLockElement) {
-      window.addEventListener('mousemove', handleMouseMove);
-    }
+    // Always listen for mouse movement so calibration can record samples
+    // even before the user enters pointer lock. movementX/Y is supported
+    // by all modern browsers regardless of pointer lock state.
+    window.addEventListener('mousemove', handleMouseMove);
 
     // Capture base imageProcessing values for visual settings to scale from
     const ipc = scene.imageProcessingConfiguration;
