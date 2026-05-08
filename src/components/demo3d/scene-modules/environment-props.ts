@@ -3,6 +3,13 @@ import { toast } from 'sonner';
 import { AmbientAudioPlayer } from '@/lib/audio-system';
 import { getVoiceNarrator } from '@/lib/voice-narrator';
 import { NPCAmbientSoundSystem } from '@/lib/npc-ambient-sounds';
+import {
+  buildUniformFillConfig,
+  makeRng,
+  type UniformFillConfig,
+  type UniformFillKind,
+} from './uniform-fill-config';
+import { computeDensityMetrics, publishMetrics } from './scene-metrics';
 
 /**
  * Deterministic random for consistent prop placement
