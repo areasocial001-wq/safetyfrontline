@@ -1,29 +1,35 @@
 /**
  * Configurable uniform-fill system for procedural office props.
- * Supports presets (Aula / Office) × density (Bassa / Media / Alta) and seeded RNG
- * so the same scenario can be re-rolled deterministically without recompiling.
+ * Supports presets (Aula / Office) × density (Bassa / Media / Alta) × per-wall multipliers,
+ * with seeded RNG and localStorage persistence so the same scenario can be re-rolled
+ * deterministically without recompiling.
  */
 
 export type UniformFillPreset = 'office' | 'aula';
 export type UniformFillDensity = 'low' | 'medium' | 'high';
+export type WallId = 'N' | 'S' | 'E' | 'W';
+
+export interface PerWallMultipliers {
+  N: number; S: number; E: number; W: number;
+  /** Multiplier applied to interior grid quota */
+  interior: number;
+}
 
 export interface UniformFillConfig {
   preset: UniformFillPreset;
   density: UniformFillDensity;
   seed: number;
-  /** Number of props along each wall (auto-derived from density) */
   wallSteps: number;
-  /** Interior NxN grid resolution (auto-derived) */
   interiorGrid: number;
-  /** Multiplier on jitter for organic placement */
   jitter: number;
-  /** When true, micro-props will NOT be added as shadow casters (mobile FPS) */
   disableMicroPropShadows: boolean;
-  /** Allowed prop kinds (presets pick a different mix) */
   wallKinds: ReadonlyArray<UniformFillKind>;
   interiorKinds: ReadonlyArray<UniformFillKind>;
-  /** Skip corner accents (used for empty Aula preset) */
   cornerAccents: boolean;
+  /** 1.0 = baseline. >1 boost density on that wall, <1 reduce. */
+  perWall: PerWallMultipliers;
+  /** Radius around scene origin where interior props are heavily skipped (anti-overcrowding) */
+  centerExclusionRadius: number;
 }
 
 export type UniformFillKind =
@@ -42,11 +48,14 @@ const PRESET_KINDS: Record<UniformFillPreset, { wall: UniformFillKind[]; interio
     corners: true,
   },
   aula: {
-    // Classroom-like: more chairs/signs along walls, sparser interior
     wall:     ['sign', 'plant', 'cabinet', 'sign', 'plant'],
     interior: ['chair', 'chair', 'bin', 'plant'],
     corners: false,
   },
+};
+
+export const DEFAULT_PER_WALL: PerWallMultipliers = {
+  N: 1.0, S: 1.0, E: 1.0, W: 1.0, interior: 0.7,
 };
 
 export function buildUniformFillConfig(
@@ -54,7 +63,6 @@ export function buildUniformFillConfig(
   isMobile = false
 ): UniformFillConfig {
   const preset: UniformFillPreset = partial?.preset ?? 'office';
-  // Mobile auto-downgrades density unless explicitly set
   const baseDensity: UniformFillDensity =
     partial?.density ?? (isMobile ? 'low' : 'medium');
   const d = DENSITY_TABLE[baseDensity];
@@ -66,11 +74,12 @@ export function buildUniformFillConfig(
     wallSteps: partial?.wallSteps ?? d.wallSteps,
     interiorGrid: partial?.interiorGrid ?? d.interiorGrid,
     jitter: partial?.jitter ?? d.jitter,
-    disableMicroPropShadows:
-      partial?.disableMicroPropShadows ?? isMobile,
+    disableMicroPropShadows: partial?.disableMicroPropShadows ?? isMobile,
     wallKinds: partial?.wallKinds ?? kinds.wall,
     interiorKinds: partial?.interiorKinds ?? kinds.interior,
     cornerAccents: partial?.cornerAccents ?? kinds.corners,
+    perWall: { ...DEFAULT_PER_WALL, ...(partial?.perWall ?? {}) },
+    centerExclusionRadius: partial?.centerExclusionRadius ?? 5.5,
   };
 }
 
@@ -84,4 +93,40 @@ export function makeRng(seed: number): () => number {
     t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
     return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
   };
+}
+
+// ============================================================
+// PERSISTENCE — per-scenario settings saved to localStorage
+// ============================================================
+
+export interface PersistedFillSettings {
+  preset: UniformFillPreset;
+  density: UniformFillDensity;
+  seed: number;
+  perWall: PerWallMultipliers;
+  centerExclusionRadius: number;
+}
+
+const STORAGE_KEY = 'uniform-fill-settings-v2';
+
+export function loadPersistedSettings(scenarioType: string): Partial<PersistedFillSettings> | null {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return null;
+    const all = JSON.parse(raw) as Record<string, PersistedFillSettings>;
+    return all[scenarioType] ?? null;
+  } catch {
+    return null;
+  }
+}
+
+export function savePersistedSettings(scenarioType: string, settings: PersistedFillSettings): void {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    const all = raw ? JSON.parse(raw) : {};
+    all[scenarioType] = settings;
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(all));
+  } catch {
+    /* ignore quota errors */
+  }
 }
