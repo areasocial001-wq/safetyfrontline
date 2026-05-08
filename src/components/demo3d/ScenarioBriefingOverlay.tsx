@@ -102,11 +102,6 @@ export const ScenarioBriefingOverlay = ({
             </div>
           </div>
 
-          <div className="mt-4 flex justify-end">
-            <Button size="sm" variant="outline" onClick={onSkip}>
-              Avanti →
-            </Button>
-          </div>
         </div>
       </div>
     </>
