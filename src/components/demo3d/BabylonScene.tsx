@@ -56,6 +56,7 @@ interface BabylonSceneProps {
   briefingActive?: boolean;
   onBriefingStep?: (index: number, total: number) => void;
   onBriefingComplete?: () => void;
+  uniformFillConfig?: Partial<import('./scene-modules/uniform-fill-config').UniformFillConfig>;
 }
 
 export const BabylonScene = ({
@@ -77,6 +78,7 @@ export const BabylonScene = ({
   briefingActive = false,
   onBriefingStep,
   onBriefingComplete,
+  uniformFillConfig,
 }: BabylonSceneProps) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const engineRef = useRef<BABYLON.Engine | null>(null);
@@ -139,8 +141,10 @@ export const BabylonScene = ({
     cameraRef.current = ctx.camera;
     const { engine, scene, camera, shadowGenerator } = ctx;
 
-    // Store scenario ID in scene metadata for conditional props
-    scene.metadata = { ...scene.metadata, scenarioId: scenario.id };
+    // Store scenario ID + uniform-fill config in scene metadata
+    scene.metadata = { ...scene.metadata, scenarioId: scenario.id, uniformFillConfig };
+    // Expose live refs for the SceneDebugOverlay
+    (window as unknown as { __activeBabylon?: unknown }).__activeBabylon = { scene, camera, engine };
 
     // 2. First-person extinguisher (laboratory only)
     if (scenario.type === 'laboratory' && extinguisherType) {
@@ -522,7 +526,7 @@ export const BabylonScene = ({
       scene.dispose();
       engine.dispose();
     };
-  }, [scenario.id, quality]);
+  }, [scenario.id, quality, uniformFillConfig?.preset, uniformFillConfig?.density, uniformFillConfig?.seed]);
 
   // Create first-person extinguisher with swap animation
   useEffect(() => {
