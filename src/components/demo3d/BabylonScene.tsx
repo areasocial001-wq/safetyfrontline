@@ -815,6 +815,82 @@ export const BabylonScene = ({
     }
   }, [isActive]);
 
+  // Robust WASD: forward window keys to the Babylon camera even when
+  // the canvas loses focus (clicks on overlays, HUDs, dialogs, etc.)
+  useEffect(() => {
+    if (!isActive) return;
+    const camera = cameraRef.current;
+    const canvas = canvasRef.current;
+    if (!camera || !canvas) return;
+
+    const MOVE_KEYS = new Set([
+      'KeyW', 'KeyA', 'KeyS', 'KeyD',
+      'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight',
+    ]);
+
+    const isTypingTarget = (el: EventTarget | null) => {
+      const node = el as HTMLElement | null;
+      if (!node) return false;
+      const tag = node.tagName;
+      return (
+        tag === 'INPUT' ||
+        tag === 'TEXTAREA' ||
+        tag === 'SELECT' ||
+        (node as HTMLElement).isContentEditable
+      );
+    };
+
+    // Internal state shared by keydown/keyup
+    const state = { w: false, a: false, s: false, d: false };
+
+    const setKey = (code: string, value: boolean) => {
+      switch (code) {
+        case 'KeyW': case 'ArrowUp': state.w = value; break;
+        case 'KeyS': case 'ArrowDown': state.s = value; break;
+        case 'KeyA': case 'ArrowLeft': state.a = value; break;
+        case 'KeyD': case 'ArrowRight': state.d = value; break;
+      }
+    };
+
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (!MOVE_KEYS.has(e.code)) return;
+      if (isTypingTarget(e.target)) return;
+      setKey(e.code, true);
+      // Refocus canvas so Babylon's own pipeline also keeps working
+      if (document.activeElement !== canvas) canvas.focus({ preventScroll: true });
+      e.preventDefault();
+    };
+    const onKeyUp = (e: KeyboardEvent) => {
+      if (!MOVE_KEYS.has(e.code)) return;
+      setKey(e.code, false);
+    };
+    const clearKeys = () => { state.w = state.a = state.s = state.d = false; };
+
+    window.addEventListener('keydown', onKeyDown);
+    window.addEventListener('keyup', onKeyUp);
+    window.addEventListener('blur', clearKeys);
+
+    // Drive camera each frame from our own state so movement works even if
+    // Babylon's keyboard input lost the canvas focus.
+    const scene = sceneRef.current;
+    const obs = scene?.onBeforeRenderObservable.add(() => {
+      if (!state.w && !state.a && !state.s && !state.d) return;
+      const speed = camera.speed ?? 0.3;
+      // UniversalCamera: translate in local space
+      if (state.w) camera.position.addInPlace(camera.getDirection(BABYLON.Vector3.Forward()).scale(speed));
+      if (state.s) camera.position.addInPlace(camera.getDirection(BABYLON.Vector3.Backward()).scale(speed));
+      if (state.a) camera.position.addInPlace(camera.getDirection(BABYLON.Vector3.Left()).scale(speed));
+      if (state.d) camera.position.addInPlace(camera.getDirection(BABYLON.Vector3.Right()).scale(speed));
+    });
+
+    return () => {
+      window.removeEventListener('keydown', onKeyDown);
+      window.removeEventListener('keyup', onKeyUp);
+      window.removeEventListener('blur', clearKeys);
+      if (obs && scene) scene.onBeforeRenderObservable.remove(obs);
+    };
+  }, [isActive]);
+
   // Apply brightness / contrast live to image processing pipeline
   useEffect(() => {
     const scene = sceneRef.current;
