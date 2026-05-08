@@ -1459,6 +1459,217 @@ function addOfficeProps(
   rugMat.specularColor = new BABYLON.Color3(0.05, 0.05, 0.05);
   rug.material = rugMat;
 
+  // ---------- NORTH WALL: reception + lockers + bookshelves ----------
+  // Reception desk (long, against north wall)
+  const receptionDesk = BABYLON.MeshBuilder.CreateBox('off_receptionDesk', { width: 4.5, height: 1.1, depth: 0.85 }, scene);
+  receptionDesk.position = new BABYLON.Vector3(-6, 0.55, -14.2);
+  receptionDesk.material = darkWoodMat;
+  receptionDesk.checkCollisions = true;
+  if (shadowGenerator) shadowGenerator.addShadowCaster(receptionDesk);
+
+  // Reception desk top (lighter)
+  const receptionTop = BABYLON.MeshBuilder.CreateBox('off_receptionTop', { width: 4.7, height: 0.06, depth: 0.95 }, scene);
+  receptionTop.position = new BABYLON.Vector3(-6, 1.13, -14.2);
+  receptionTop.material = whiteMat;
+  if (shadowGenerator) shadowGenerator.addShadowCaster(receptionTop);
+
+  // Reception desk monitor + items
+  const recMonitorStand = BABYLON.MeshBuilder.CreateBox('off_recMonStand', { width: 0.12, height: 0.22, depth: 0.08 }, scene);
+  recMonitorStand.position = new BABYLON.Vector3(-7, 1.27, -14.0);
+  recMonitorStand.material = blackMat;
+  const recMonitor = BABYLON.MeshBuilder.CreateBox('off_recMonitor', { width: 0.85, height: 0.5, depth: 0.04 }, scene);
+  recMonitor.position = new BABYLON.Vector3(-7, 1.6, -14.05);
+  recMonitor.material = screenMat;
+  if (shadowGenerator) shadowGenerator.addShadowCaster(recMonitor);
+
+  // Reception phone
+  const recPhone = BABYLON.MeshBuilder.CreateBox('off_recPhone', { width: 0.22, height: 0.06, depth: 0.18 }, scene);
+  recPhone.position = new BABYLON.Vector3(-5, 1.19, -14.0);
+  recPhone.material = blackMat;
+
+  // Reception logo plaque on wall behind desk
+  const recPlaque = BABYLON.MeshBuilder.CreatePlane('off_recPlaque', { width: 2.5, height: 0.8 }, scene);
+  recPlaque.position = new BABYLON.Vector3(-6, 2.2, -14.85);
+  const recPlaqueMat = new BABYLON.StandardMaterial('off_recPlaqueMat', scene);
+  recPlaqueMat.diffuseColor = new BABYLON.Color3(0.25, 0.4, 0.6);
+  recPlaqueMat.emissiveColor = new BABYLON.Color3(0.05, 0.08, 0.12);
+  recPlaque.material = recPlaqueMat;
+
+  // Lockers row against north wall (right side)
+  const lockerColors = [
+    new BABYLON.Color3(0.35, 0.5, 0.7),
+    new BABYLON.Color3(0.55, 0.35, 0.3),
+    new BABYLON.Color3(0.4, 0.55, 0.4),
+    new BABYLON.Color3(0.5, 0.5, 0.55),
+  ];
+  for (let lk = 0; lk < 6; lk++) {
+    const lockerX = 2 + lk * 0.85;
+    const locker = BABYLON.MeshBuilder.CreateBox(`off_locker_${lk}`, { width: 0.8, height: 1.85, depth: 0.5 }, scene);
+    locker.position = new BABYLON.Vector3(lockerX, 0.925, -14.45);
+    const lockerMat = new BABYLON.StandardMaterial(`off_lockerMat_${lk}`, scene);
+    lockerMat.diffuseColor = lockerColors[lk % lockerColors.length];
+    lockerMat.specularColor = new BABYLON.Color3(0.4, 0.4, 0.4);
+    locker.material = lockerMat;
+    locker.checkCollisions = true;
+    if (shadowGenerator) shadowGenerator.addShadowCaster(locker);
+
+    // Locker handle
+    const lockerHandle = BABYLON.MeshBuilder.CreateBox(`off_lockerHandle_${lk}`, { width: 0.04, height: 0.12, depth: 0.04 }, scene);
+    lockerHandle.position = new BABYLON.Vector3(lockerX + 0.25, 1.0, -14.18);
+    lockerHandle.material = metalMat;
+
+    // Locker number plate
+    const lockerNum = BABYLON.MeshBuilder.CreatePlane(`off_lockerNum_${lk}`, { width: 0.18, height: 0.12 }, scene);
+    lockerNum.position = new BABYLON.Vector3(lockerX, 1.55, -14.19);
+    lockerNum.rotation.y = Math.PI;
+    const lockerNumMat = new BABYLON.StandardMaterial(`off_lockerNumMat_${lk}`, scene);
+    lockerNumMat.diffuseColor = new BABYLON.Color3(0.95, 0.95, 0.95);
+    lockerNumMat.emissiveColor = new BABYLON.Color3(0.2, 0.2, 0.2);
+    lockerNum.material = lockerNumMat;
+  }
+
+  // Reception waiting chairs (in front of reception desk)
+  for (let wc = 0; wc < 3; wc++) {
+    const wcx = -8.5 + wc * 1.2;
+    const waitSeat = BABYLON.MeshBuilder.CreateBox(`off_waitSeat_${wc}`, { width: 0.55, height: 0.08, depth: 0.55 }, scene);
+    waitSeat.position = new BABYLON.Vector3(wcx, 0.45, -12.5);
+    waitSeat.material = chairFabricMat;
+    waitSeat.checkCollisions = true;
+    if (shadowGenerator) shadowGenerator.addShadowCaster(waitSeat);
+
+    const waitBack = BABYLON.MeshBuilder.CreateBox(`off_waitBack_${wc}`, { width: 0.55, height: 0.55, depth: 0.06 }, scene);
+    waitBack.position = new BABYLON.Vector3(wcx, 0.77, -12.78);
+    waitBack.material = chairFabricMat;
+
+    for (let l = 0; l < 4; l++) {
+      const lx = l % 2 === 0 ? -0.22 : 0.22;
+      const lz = l < 2 ? -0.22 : 0.22;
+      const leg = BABYLON.MeshBuilder.CreateBox(`off_waitLeg_${wc}_${l}`, { width: 0.04, height: 0.45, depth: 0.04 }, scene);
+      leg.position = new BABYLON.Vector3(wcx + lx, 0.22, -12.5 + lz);
+      leg.material = metalMat;
+    }
+  }
+
+  // Tall bookshelves against North wall (far left and far right)
+  const northBookshelfPositions = [
+    { x: -13, z: -14.4 },
+    { x: 13, z: -14.4 },
+  ];
+  northBookshelfPositions.forEach((bp, bi) => {
+    const bookshelf = BABYLON.MeshBuilder.CreateBox(`off_nBookshelf_${bi}`, { width: 1.6, height: 2.6, depth: 0.45 }, scene);
+    bookshelf.position = new BABYLON.Vector3(bp.x, 1.3, bp.z);
+    bookshelf.material = darkWoodMat;
+    bookshelf.checkCollisions = true;
+    if (shadowGenerator) shadowGenerator.addShadowCaster(bookshelf);
+
+    // Books on each shelf level
+    for (let lvl = 0; lvl < 5; lvl++) {
+      const yLvl = 0.3 + lvl * 0.5;
+      for (let b = 0; b < 8; b++) {
+        const book = BABYLON.MeshBuilder.CreateBox(`off_nBook_${bi}_${lvl}_${b}`, {
+          width: 0.13,
+          height: 0.32 + seededRandom(bi * 50 + lvl * 8 + b) * 0.1,
+          depth: 0.28,
+        }, scene);
+        book.position = new BABYLON.Vector3(bp.x - 0.65 + b * 0.18, yLvl, bp.z + 0.05);
+        const bookMat = new BABYLON.StandardMaterial(`off_nBookMat_${bi}_${lvl}_${b}`, scene);
+        bookMat.diffuseColor = bookColors[(bi + lvl + b) % bookColors.length];
+        book.material = bookMat;
+      }
+    }
+  });
+
+  // ---------- WHITEBOARDS on East and West walls (between window groups) ----------
+  const whiteboardPositions = [
+    { x: -14.85, z: -1, ry: Math.PI / 2 },
+    { x: 14.85, z: -1, ry: -Math.PI / 2 },
+  ];
+  whiteboardPositions.forEach((wb, wi) => {
+    const board = BABYLON.MeshBuilder.CreateBox(`off_whiteboard_${wi}`, { width: 0.04, height: 1.2, depth: 2.2 }, scene);
+    board.position = new BABYLON.Vector3(wb.x, 1.7, wb.z);
+    const boardMat = new BABYLON.StandardMaterial(`off_whiteboardMat_${wi}`, scene);
+    boardMat.diffuseColor = new BABYLON.Color3(0.96, 0.96, 0.96);
+    boardMat.emissiveColor = new BABYLON.Color3(0.12, 0.12, 0.12);
+    board.material = boardMat;
+    if (shadowGenerator) shadowGenerator.addShadowCaster(board);
+
+    // Frame
+    const frame = BABYLON.MeshBuilder.CreateBox(`off_wbFrame_${wi}`, { width: 0.06, height: 1.32, depth: 2.32 }, scene);
+    frame.position = new BABYLON.Vector3(wb.x + (wb.x < 0 ? 0.01 : -0.01), 1.7, wb.z);
+    frame.material = darkWoodMat;
+
+    // Marker tray
+    const tray = BABYLON.MeshBuilder.CreateBox(`off_wbTray_${wi}`, { width: 0.08, height: 0.04, depth: 2.2 }, scene);
+    tray.position = new BABYLON.Vector3(wb.x + (wb.x < 0 ? 0.05 : -0.05), 1.06, wb.z);
+    tray.material = metalMat;
+  });
+
+  // ---------- Tall bookshelves against East and West walls (mid-room) ----------
+  const sideBookshelves = [
+    { x: -14.3, z: -3, ry: Math.PI / 2 },
+    { x: -14.3, z: 4, ry: Math.PI / 2 },
+    { x: 14.3, z: -3, ry: -Math.PI / 2 },
+    { x: 14.3, z: 4, ry: -Math.PI / 2 },
+  ];
+  sideBookshelves.forEach((sb, si) => {
+    const sbMesh = BABYLON.MeshBuilder.CreateBox(`off_sideBook_${si}`, { width: 0.45, height: 2.3, depth: 1.4 }, scene);
+    sbMesh.position = new BABYLON.Vector3(sb.x, 1.15, sb.z);
+    sbMesh.material = darkWoodMat;
+    sbMesh.checkCollisions = true;
+    if (shadowGenerator) shadowGenerator.addShadowCaster(sbMesh);
+
+    // Books on shelves
+    for (let lvl = 0; lvl < 4; lvl++) {
+      const yLvl = 0.35 + lvl * 0.55;
+      for (let b = 0; b < 6; b++) {
+        const book = BABYLON.MeshBuilder.CreateBox(`off_sideBookItem_${si}_${lvl}_${b}`, {
+          width: 0.28,
+          height: 0.32 + seededRandom(si * 100 + lvl * 10 + b) * 0.1,
+          depth: 0.13,
+        }, scene);
+        book.position = new BABYLON.Vector3(
+          sb.x + (sb.x < 0 ? 0.05 : -0.05),
+          yLvl,
+          sb.z - 0.5 + b * 0.18
+        );
+        const bookMat = new BABYLON.StandardMaterial(`off_sideBookMat_${si}_${lvl}_${b}`, scene);
+        bookMat.diffuseColor = bookColors[(si + lvl + b) % bookColors.length];
+        book.material = bookMat;
+      }
+    }
+  });
+
+  // ---------- SOUTH WALL: large pinboard + extra cabinets between filing cabinets ----------
+  // Big pinboard
+  const pinboard = BABYLON.MeshBuilder.CreateBox('off_pinboard', { width: 3.5, height: 1.4, depth: 0.05 }, scene);
+  pinboard.position = new BABYLON.Vector3(9, 1.9, 14.85);
+  pinboard.rotation.y = Math.PI;
+  const pinboardMat = new BABYLON.StandardMaterial('off_pinboardMat', scene);
+  pinboardMat.diffuseColor = new BABYLON.Color3(0.45, 0.32, 0.22);
+  pinboard.material = pinboardMat;
+
+  // Notes pinned on it
+  for (let n = 0; n < 8; n++) {
+    const note = BABYLON.MeshBuilder.CreatePlane(`off_note_${n}`, {
+      width: 0.28 + seededRandom(n * 7) * 0.1,
+      height: 0.28 + seededRandom(n * 11) * 0.1,
+    }, scene);
+    note.position = new BABYLON.Vector3(
+      7.6 + (n % 4) * 0.85,
+      1.55 + Math.floor(n / 4) * 0.55,
+      14.82,
+    );
+    note.rotation.y = Math.PI;
+    const noteMat = new BABYLON.StandardMaterial(`off_noteMat_${n}`, scene);
+    const colors = [[0.95, 0.9, 0.4], [0.9, 0.55, 0.55], [0.55, 0.85, 0.95], [0.85, 0.95, 0.6]];
+    const c = colors[n % colors.length];
+    noteMat.diffuseColor = new BABYLON.Color3(c[0], c[1], c[2]);
+    noteMat.emissiveColor = new BABYLON.Color3(c[0] * 0.15, c[1] * 0.15, c[2] * 0.15);
+    note.material = noteMat;
+  }
+
+  console.log('[Office] Added North/South/East/West wall furniture (reception, lockers, bookshelves, whiteboards, pinboard)');
+
   // ============================================================
   // OFFICE HAZARD PROPS — visual anchors for the 6 office risks
   // Each hazard mesh carries metadata: riskId (links click → risk found)
