@@ -1244,14 +1244,14 @@ const Demo3D = () => {
             risk={selectedScenario.risks[briefingIndex]}
             index={briefingIndex}
             total={selectedScenario.risks.length}
-            onSkip={() => {
-              if (briefingIndex + 1 >= selectedScenario.risks.length) {
-                setBriefingActive(false);
-              } else {
-                setBriefingIndex(briefingIndex + 1);
-              }
-            }}
             onClose={() => setBriefingActive(false)}
+          />
+        )}
+        {/* placeholder */}
+        {false && (
+          <div />
+        )}
+        {/* end */}
           />
         )}
 
