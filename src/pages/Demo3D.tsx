@@ -2,7 +2,13 @@ import { useState, Suspense, useEffect, useRef, useMemo, useCallback } from "rea
 import { Link } from "react-router-dom";
 import { BabylonScene } from "@/components/demo3d/BabylonScene";
 import { SceneDebugOverlay } from "@/components/demo3d/SceneDebugOverlay";
-import type { UniformFillPreset, UniformFillDensity } from "@/components/demo3d/scene-modules/uniform-fill-config";
+import {
+  loadPersistedSettings,
+  DEFAULT_PER_WALL,
+  type UniformFillPreset,
+  type UniformFillDensity,
+  type PerWallMultipliers,
+} from "@/components/demo3d/scene-modules/uniform-fill-config";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
