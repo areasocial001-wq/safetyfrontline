@@ -1058,6 +1058,187 @@ function addOfficeProps(
     }
   });
 
+  // ---------- Filing cabinets distributed along walls ----------
+  const filingCabinetPositions = [
+    // West wall
+    { x: -14.2, z: -11, ry: Math.PI / 2 },
+    { x: -14.2, z: -7, ry: Math.PI / 2 },
+    { x: -14.2, z: 6, ry: Math.PI / 2 },
+    { x: -14.2, z: 13, ry: Math.PI / 2 },
+    // East wall
+    { x: 14.2, z: -11, ry: -Math.PI / 2 },
+    { x: 14.2, z: -7, ry: -Math.PI / 2 },
+    { x: 14.2, z: 6, ry: -Math.PI / 2 },
+    { x: 14.2, z: 13, ry: -Math.PI / 2 },
+    // South wall
+    { x: -10, z: 14.2, ry: Math.PI },
+    { x: -3, z: 14.2, ry: Math.PI },
+    { x: 4, z: 14.2, ry: Math.PI },
+  ];
+
+  filingCabinetPositions.forEach((fc, fi) => {
+    const cabinet = BABYLON.MeshBuilder.CreateBox(`off_filing_${fi}`, { width: 1.2, height: 1.4, depth: 0.55 }, scene);
+    cabinet.position = new BABYLON.Vector3(fc.x, 0.7, fc.z);
+    cabinet.rotation.y = fc.ry;
+    cabinet.material = fi % 2 === 0 ? metalMat : darkWoodMat;
+    cabinet.checkCollisions = true;
+    if (shadowGenerator) shadowGenerator.addShadowCaster(cabinet);
+
+    // 3 drawer fronts
+    for (let d = 0; d < 3; d++) {
+      const drawer = BABYLON.MeshBuilder.CreateBox(`off_filing_drawer_${fi}_${d}`, { width: 1.05, height: 0.38, depth: 0.04 }, scene);
+      const dy = 0.2 + d * 0.42;
+      // place drawer on the front face according to rotation
+      const dirX = Math.sin(fc.ry);
+      const dirZ = Math.cos(fc.ry);
+      drawer.position = new BABYLON.Vector3(fc.x + dirX * 0.28, dy, fc.z + dirZ * 0.28);
+      drawer.rotation.y = fc.ry;
+      drawer.material = fi % 2 === 0 ? blackMat : metalMat;
+
+      // handle
+      const handle = BABYLON.MeshBuilder.CreateBox(`off_filing_handle_${fi}_${d}`, { width: 0.18, height: 0.03, depth: 0.04 }, scene);
+      handle.position = new BABYLON.Vector3(fc.x + dirX * 0.31, dy, fc.z + dirZ * 0.31);
+      handle.rotation.y = fc.ry;
+      handle.material = metalMat;
+    }
+
+    // small decoration on top (folder stack or plant) - varies by index
+    if (fi % 3 === 0) {
+      const plant = BABYLON.MeshBuilder.CreateSphere(`off_filing_plant_${fi}`, { diameter: 0.34, segments: 8 }, scene);
+      plant.position = new BABYLON.Vector3(fc.x, 1.55, fc.z);
+      plant.scaling = new BABYLON.Vector3(1, 1.2, 1);
+      plant.material = greenMat;
+    } else if (fi % 3 === 1) {
+      const folderStack = BABYLON.MeshBuilder.CreateBox(`off_filing_folders_${fi}`, { width: 0.7, height: 0.18, depth: 0.32 }, scene);
+      folderStack.position = new BABYLON.Vector3(fc.x, 1.49, fc.z);
+      const folderMat = new BABYLON.StandardMaterial(`off_filing_foldersMat_${fi}`, scene);
+      folderMat.diffuseColor = bookColors[fi % bookColors.length];
+      folderStack.material = folderMat;
+    } else {
+      const lamp = BABYLON.MeshBuilder.CreateCylinder(`off_filing_lamp_${fi}`, { height: 0.28, diameterTop: 0.18, diameterBottom: 0.12, tessellation: 12 }, scene);
+      lamp.position = new BABYLON.Vector3(fc.x, 1.54, fc.z);
+      const lampMat = new BABYLON.StandardMaterial(`off_filing_lampMat_${fi}`, scene);
+      lampMat.diffuseColor = new BABYLON.Color3(0.9, 0.85, 0.6);
+      lampMat.emissiveColor = new BABYLON.Color3(0.4, 0.35, 0.2);
+      lamp.material = lampMat;
+    }
+  });
+
+  // ---------- Corner pieces: water cooler, printer station, plants ----------
+  // Water cooler — front-left corner
+  const waterBase = BABYLON.MeshBuilder.CreateBox('off_waterBase', { width: 0.4, height: 0.9, depth: 0.4 }, scene);
+  waterBase.position = new BABYLON.Vector3(-12.5, 0.45, -12.5);
+  waterBase.material = whiteMat;
+  waterBase.checkCollisions = true;
+  if (shadowGenerator) shadowGenerator.addShadowCaster(waterBase);
+
+  const waterTank = BABYLON.MeshBuilder.CreateCylinder('off_waterTank', { height: 0.5, diameter: 0.32, tessellation: 16 }, scene);
+  waterTank.position = new BABYLON.Vector3(-12.5, 1.15, -12.5);
+  const waterMat = new BABYLON.StandardMaterial('off_waterMat', scene);
+  waterMat.diffuseColor = new BABYLON.Color3(0.55, 0.75, 0.85);
+  waterMat.alpha = 0.7;
+  waterTank.material = waterMat;
+
+  // Printer station — front-right corner
+  const printerCounter = BABYLON.MeshBuilder.CreateBox('off_printerCounter', { width: 1.8, height: 0.05, depth: 0.7 }, scene);
+  printerCounter.position = new BABYLON.Vector3(12.5, 0.75, -12.5);
+  printerCounter.material = deskMat;
+  printerCounter.checkCollisions = true;
+  if (shadowGenerator) shadowGenerator.addShadowCaster(printerCounter);
+
+  for (let l = 0; l < 4; l++) {
+    const lx = l % 2 === 0 ? -0.8 : 0.8;
+    const lz = l < 2 ? -0.3 : 0.3;
+    const leg = BABYLON.MeshBuilder.CreateBox(`off_printerLeg_${l}`, { width: 0.05, height: 0.75, depth: 0.05 }, scene);
+    leg.position = new BABYLON.Vector3(12.5 + lx, 0.375, -12.5 + lz);
+    leg.material = metalMat;
+  }
+
+  const printer = BABYLON.MeshBuilder.CreateBox('off_printer', { width: 0.7, height: 0.45, depth: 0.55 }, scene);
+  printer.position = new BABYLON.Vector3(12.5, 1.025, -12.5);
+  const printerMat = new BABYLON.StandardMaterial('off_printerMat', scene);
+  printerMat.diffuseColor = new BABYLON.Color3(0.85, 0.85, 0.88);
+  printer.material = printerMat;
+  if (shadowGenerator) shadowGenerator.addShadowCaster(printer);
+
+  const printerTray = BABYLON.MeshBuilder.CreateBox('off_printerTray', { width: 0.55, height: 0.05, depth: 0.35 }, scene);
+  printerTray.position = new BABYLON.Vector3(12.5, 1.28, -12.3);
+  printerTray.material = whiteMat;
+
+  // Tall plant — between desk rows on west side
+  const tallPlantPot = BABYLON.MeshBuilder.CreateCylinder('off_tallPlantPot', { height: 0.5, diameterTop: 0.45, diameterBottom: 0.32, tessellation: 14 }, scene);
+  tallPlantPot.position = new BABYLON.Vector3(-12, 0.25, 0);
+  tallPlantPot.material = darkWoodMat;
+  tallPlantPot.checkCollisions = true;
+
+  const tallPlantTrunk = BABYLON.MeshBuilder.CreateCylinder('off_tallPlantTrunk', { height: 1.4, diameter: 0.08, tessellation: 8 }, scene);
+  tallPlantTrunk.position = new BABYLON.Vector3(-12, 1.2, 0);
+  tallPlantTrunk.material = darkWoodMat;
+
+  for (let f = 0; f < 4; f++) {
+    const foliage = BABYLON.MeshBuilder.CreateSphere(`off_tallPlantFoliage_${f}`, { diameter: 0.55 + f * 0.05, segments: 8 }, scene);
+    foliage.position = new BABYLON.Vector3(-12 + (f - 1.5) * 0.2, 1.7 + f * 0.18, (f % 2 === 0 ? 0.15 : -0.15));
+    foliage.scaling = new BABYLON.Vector3(1, 0.7, 1);
+    foliage.material = greenMat;
+  }
+
+  // Tall plant — east side mirror
+  const tallPlantPot2 = BABYLON.MeshBuilder.CreateCylinder('off_tallPlantPot2', { height: 0.5, diameterTop: 0.45, diameterBottom: 0.32, tessellation: 14 }, scene);
+  tallPlantPot2.position = new BABYLON.Vector3(12, 0.25, 0);
+  tallPlantPot2.material = darkWoodMat;
+  tallPlantPot2.checkCollisions = true;
+
+  const tallPlantTrunk2 = BABYLON.MeshBuilder.CreateCylinder('off_tallPlantTrunk2', { height: 1.4, diameter: 0.08, tessellation: 8 }, scene);
+  tallPlantTrunk2.position = new BABYLON.Vector3(12, 1.2, 0);
+  tallPlantTrunk2.material = darkWoodMat;
+
+  for (let f = 0; f < 4; f++) {
+    const foliage = BABYLON.MeshBuilder.CreateSphere(`off_tallPlantFoliage2_${f}`, { diameter: 0.55 + f * 0.05, segments: 8 }, scene);
+    foliage.position = new BABYLON.Vector3(12 + (f - 1.5) * 0.2, 1.7 + f * 0.18, (f % 2 === 0 ? 0.15 : -0.15));
+    foliage.scaling = new BABYLON.Vector3(1, 0.7, 1);
+    foliage.material = greenMat;
+  }
+
+  // ---------- Sofa lounge area — front of room (between spawn and back wall) ----------
+  const sofa = BABYLON.MeshBuilder.CreateBox('off_sofa', { width: 2.4, height: 0.55, depth: 0.9 }, scene);
+  sofa.position = new BABYLON.Vector3(0, 0.275, -11);
+  sofa.material = chairFabricMat;
+  sofa.checkCollisions = true;
+  if (shadowGenerator) shadowGenerator.addShadowCaster(sofa);
+
+  const sofaBack = BABYLON.MeshBuilder.CreateBox('off_sofaBack', { width: 2.4, height: 0.7, depth: 0.2 }, scene);
+  sofaBack.position = new BABYLON.Vector3(0, 0.9, -11.4);
+  sofaBack.material = chairFabricMat;
+  if (shadowGenerator) shadowGenerator.addShadowCaster(sofaBack);
+
+  for (let a = 0; a < 2; a++) {
+    const arm = BABYLON.MeshBuilder.CreateBox(`off_sofaArm_${a}`, { width: 0.18, height: 0.7, depth: 0.9 }, scene);
+    arm.position = new BABYLON.Vector3(a === 0 ? -1.2 : 1.2, 0.45, -11);
+    arm.material = chairFabricMat;
+  }
+
+  // Coffee table in front of sofa
+  const coffeeTable = BABYLON.MeshBuilder.CreateBox('off_coffeeTable', { width: 1.4, height: 0.04, depth: 0.7 }, scene);
+  coffeeTable.position = new BABYLON.Vector3(0, 0.4, -9.5);
+  coffeeTable.material = darkWoodMat;
+  coffeeTable.checkCollisions = true;
+  if (shadowGenerator) shadowGenerator.addShadowCaster(coffeeTable);
+
+  for (let l = 0; l < 4; l++) {
+    const lx = l % 2 === 0 ? -0.6 : 0.6;
+    const lz = l < 2 ? -0.28 : 0.28;
+    const leg = BABYLON.MeshBuilder.CreateCylinder(`off_coffeeTableLeg_${l}`, { height: 0.4, diameter: 0.04, tessellation: 8 }, scene);
+    leg.position = new BABYLON.Vector3(lx, 0.2, -9.5 + lz);
+    leg.material = metalMat;
+  }
+
+  // Magazines on coffee table
+  const magazine = BABYLON.MeshBuilder.CreateBox('off_magazine', { width: 0.32, height: 0.01, depth: 0.22 }, scene);
+  magazine.position = new BABYLON.Vector3(0.2, 0.425, -9.5);
+  const magMat = new BABYLON.StandardMaterial('off_magMat', scene);
+  magMat.diffuseColor = bookColors[1];
+  magazine.material = magMat;
+
   // ---------- Windows on side walls ----------
   const windowPositions = [
     { x: -14.9, z: -6, ry: Math.PI / 2 },
