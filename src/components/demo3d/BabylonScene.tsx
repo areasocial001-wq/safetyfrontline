@@ -90,6 +90,11 @@ export const BabylonScene = ({
     lightBurstMesh: BABYLON.Mesh | null;
     burstIntensity: number;
   } | null>(null);
+  const highlightLayerRef = useRef<BABYLON.HighlightLayer | null>(null);
+  const riskMeshMapRef = useRef<Map<string, BABYLON.Mesh[]>>(new Map());
+  const hoveredRiskRef = useRef<string | null>(null);
+  const baseImageProcRef = useRef<{ exposure: number; contrast: number } | null>(null);
+  const originalMatColorsRef = useRef<Map<string, BABYLON.Color3>>(new Map());
   const [isReady, setIsReady] = useState(false);
   const extChargeRef = useRef({ current: 100, max: 100 });
   const fireHitCountRef = useRef<Map<number, number>>(new Map());
