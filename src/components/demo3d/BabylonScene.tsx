@@ -814,6 +814,84 @@ export const BabylonScene = ({
     }
   }, [isActive]);
 
+  // Apply brightness / contrast live to image processing pipeline
+  useEffect(() => {
+    const scene = sceneRef.current;
+    const base = baseImageProcRef.current;
+    if (!scene || !base || !visualSettings) return;
+    const ipc = scene.imageProcessingConfiguration;
+    ipc.exposure = base.exposure * visualSettings.brightness;
+    ipc.contrast = base.contrast * visualSettings.contrast;
+  }, [visualSettings?.brightness, visualSettings?.contrast, isReady]);
+
+  // Toggle high-contrast mode for office walls vs floor (and other scenarios)
+  useEffect(() => {
+    const scene = sceneRef.current;
+    if (!scene || !visualSettings) return;
+    const targets: Array<{ name: string; hc: BABYLON.Color3 }> = [
+      { name: 'off_carpetMat',     hc: new BABYLON.Color3(0.18, 0.16, 0.14) },
+      { name: 'off_interiorWall',  hc: new BABYLON.Color3(0.97, 0.97, 0.99) },
+      { name: 'off_skirting',      hc: new BABYLON.Color3(0.05, 0.05, 0.05) },
+      { name: 'groundMat',         hc: new BABYLON.Color3(0.18, 0.18, 0.20) },
+    ];
+    targets.forEach(({ name, hc }) => {
+      const mat = scene.getMaterialByName(name) as BABYLON.StandardMaterial | null;
+      if (!mat) return;
+      if (visualSettings.highContrast) {
+        if (!originalMatColorsRef.current.has(name)) {
+          originalMatColorsRef.current.set(name, mat.diffuseColor.clone());
+        }
+        // Reduce texture influence by tinting via diffuse
+        mat.diffuseColor = hc;
+      } else {
+        const orig = originalMatColorsRef.current.get(name);
+        if (orig) mat.diffuseColor = orig.clone();
+      }
+    });
+  }, [visualSettings?.highContrast, isReady]);
+
+  // Auto-exposure: recalibrate when scene ready, on nonce change, or autoExposure toggled on
+  useEffect(() => {
+    const scene = sceneRef.current;
+    const engine = engineRef.current;
+    const base = baseImageProcRef.current;
+    if (!scene || !engine || !base || !visualSettings) return;
+    if (!visualSettings.autoExposure && visualSettings.recalibrateNonce === 0) return;
+
+    const t = setTimeout(() => {
+      try {
+        const canvas = engine.getRenderingCanvas();
+        if (!canvas) return;
+        const w = 64, h = 64;
+        const cx = Math.floor(canvas.width / 2 - w / 2);
+        const cy = Math.floor(canvas.height / 2 - h / 2);
+        const pixels = engine.readPixels(cx, cy, w, h) as ArrayBufferView | Promise<ArrayBufferView>;
+        const apply = (buf: ArrayBufferView) => {
+          const arr = buf as unknown as Uint8Array;
+          let lum = 0;
+          let n = 0;
+          for (let i = 0; i < arr.length; i += 4) {
+            // Rec. 709 luminance
+            lum += (0.2126 * arr[i] + 0.7152 * arr[i + 1] + 0.0722 * arr[i + 2]) / 255;
+            n++;
+          }
+          if (n === 0) return;
+          const avg = lum / n; // 0..1
+          const target = 0.45;
+          // Clamp adjustment to a sensible range
+          const factor = Math.max(0.6, Math.min(1.6, target / Math.max(0.05, avg)));
+          const ipc = scene.imageProcessingConfiguration;
+          ipc.exposure = base.exposure * visualSettings.brightness * factor;
+          console.log('[AutoExposure] avg luminance', avg.toFixed(3), '→ factor', factor.toFixed(2));
+        };
+        if (pixels instanceof Promise) pixels.then(apply); else apply(pixels);
+      } catch (e) {
+        console.warn('[AutoExposure] failed', e);
+      }
+    }, 600);
+    return () => clearTimeout(t);
+  }, [visualSettings?.autoExposure, visualSettings?.recalibrateNonce, isReady]);
+
   return (
     <div className="relative w-full h-full">
       <canvas
