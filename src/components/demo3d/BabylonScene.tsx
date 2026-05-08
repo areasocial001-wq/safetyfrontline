@@ -74,6 +74,9 @@ export const BabylonScene = ({
   onExtinguisherSwap,
   onPositionUpdate,
   visualSettings,
+  briefingActive = false,
+  onBriefingStep,
+  onBriefingComplete,
 }: BabylonSceneProps) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const engineRef = useRef<BABYLON.Engine | null>(null);
