@@ -369,14 +369,15 @@ export const BabylonScene = ({
       }
 
       // Extinguisher spray (laboratory)
-      if (scenario.type === 'laboratory' && extinguisherType) {
+      const activeExt = extinguisherTypeRef.current;
+      if (scenario.type === 'laboratory' && activeExt) {
         if (extChargeRef.current.current <= 0) {
           toast.error('🔴 Estintore vuoto! Cercane uno nuovo.');
           return;
         }
         extChargeRef.current.current = Math.max(0, extChargeRef.current.current - 10);
         onChargeChange?.(extChargeRef.current.current, extChargeRef.current.max);
-        shootExtinguisherSpray(scene, camera, extinguisherType, fireHitCountRef.current, onFireExtinguished);
+        shootExtinguisherSpray(scene, camera, activeExt, fireHitCountRef.current, onFireExtinguished);
       }
     };
 
