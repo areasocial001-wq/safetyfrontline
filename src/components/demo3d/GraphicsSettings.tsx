@@ -71,6 +71,9 @@ export const GraphicsSettings = ({
   onQualityChange,
   audioSettings,
   onAudioSettingsChange,
+  visualSettings,
+  onVisualSettingsChange,
+  onRecalibrateExposure,
   isOpen,
   onToggle,
   onRunBenchmark
