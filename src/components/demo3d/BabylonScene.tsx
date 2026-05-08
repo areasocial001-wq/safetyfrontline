@@ -106,6 +106,8 @@ export const BabylonScene = ({
   const [isReady, setIsReady] = useState(false);
   const extChargeRef = useRef({ current: 100, max: 100 });
   const fireHitCountRef = useRef<Map<number, number>>(new Map());
+  const extinguisherTypeRef = useRef<ExtinguisherType | undefined>(extinguisherType);
+  useEffect(() => { extinguisherTypeRef.current = extinguisherType; }, [extinguisherType]);
   const [currentSubtitle, setCurrentSubtitle] = useState<{
     text: string;
     severity: 'critical' | 'moderate';
@@ -367,14 +369,15 @@ export const BabylonScene = ({
       }
 
       // Extinguisher spray (laboratory)
-      if (scenario.type === 'laboratory' && extinguisherType) {
+      const activeExt = extinguisherTypeRef.current;
+      if (scenario.type === 'laboratory' && activeExt) {
         if (extChargeRef.current.current <= 0) {
           toast.error('🔴 Estintore vuoto! Cercane uno nuovo.');
           return;
         }
         extChargeRef.current.current = Math.max(0, extChargeRef.current.current - 10);
         onChargeChange?.(extChargeRef.current.current, extChargeRef.current.max);
-        shootExtinguisherSpray(scene, camera, extinguisherType, fireHitCountRef.current, onFireExtinguished);
+        shootExtinguisherSpray(scene, camera, activeExt, fireHitCountRef.current, onFireExtinguished);
       }
     };
 
