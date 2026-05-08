@@ -18,7 +18,8 @@ import {
   FlaskConical,
   Zap,
   Package,
-  ShieldAlert
+  ShieldAlert,
+  PlayCircle
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Scenario3D } from "@/data/scenarios3d";
@@ -59,6 +60,7 @@ interface GameResults3DProps {
   firePerformance?: FirePerformanceData;
   onRestart: () => void;
   onChangeScenario: () => void;
+  onReplayBriefing?: () => void;
 }
 
 const FIRE_CLASS_LABELS: Record<string, { label: string; icon: typeof Zap }> = {
@@ -90,6 +92,7 @@ export const GameResults3D = ({
   firePerformance,
   onRestart,
   onChangeScenario,
+  onReplayBriefing,
 }: GameResults3DProps) => {
   // ... keep existing code (percentages and effectiveness calculation)
   const manualPercentage = totalManualRisks > 0 
@@ -500,6 +503,17 @@ export const GameResults3D = ({
             Prova Altro Scenario
           </Button>
         </div>
+        {onReplayBriefing && (
+          <Button
+            onClick={onReplayBriefing}
+            variant="outline"
+            size="lg"
+            className="w-full border-primary/50 hover:bg-primary/5"
+          >
+            <PlayCircle className="w-5 h-5 mr-2" />
+            Rivedi spiegazione 3D dei rischi
+          </Button>
+        )}
         <Button
           asChild
           variant="outline"

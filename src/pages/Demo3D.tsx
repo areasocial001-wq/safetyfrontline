@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/breadcrumb";
 import { ArrowLeft, Shield, Target, Award, ChevronRight, Clock, TrendingUp, Trophy, Play, Home, Flame, Star } from "lucide-react";
 import { GameResults3D } from "@/components/demo3d/GameResults3D";
+import { ScenarioBriefingOverlay } from "@/components/demo3d/ScenarioBriefingOverlay";
 import { FireDangerBar } from "@/components/demo3d/FireDangerBar";
 import { FireVignetteOverlay } from "@/components/demo3d/FireVignetteOverlay";
 import { FireGameOver } from "@/components/demo3d/FireGameOver";
@@ -129,6 +130,8 @@ const Demo3D = () => {
     return localStorage.getItem('benchmark-completed') === 'true';
   });
   const [isPointerLocked, setIsPointerLocked] = useState(false);
+  const [briefingActive, setBriefingActive] = useState(false);
+  const [briefingIndex, setBriefingIndex] = useState(0);
   
   // Keyboard state for HUD indicator
   const [keysPressed, setKeysPressed] = useState({
@@ -1191,7 +1194,7 @@ const Demo3D = () => {
           </div>
         )}
 
-        {gameCompleted && !showAchievements && selectedScenario && (
+        {gameCompleted && !showAchievements && !briefingActive && selectedScenario && (
           <div className="absolute inset-0 z-10 flex items-center justify-center bg-background/95 overflow-y-auto py-8">
             <GameResults3D
               scenario={selectedScenario}
@@ -1227,8 +1230,22 @@ const Demo3D = () => {
               onChangeScenario={() => {
                 resetGame();
               }}
+              onReplayBriefing={() => {
+                setBriefingIndex(0);
+                setBriefingActive(true);
+              }}
             />
           </div>
+        )}
+
+        {/* Briefing 3D Overlay */}
+        {briefingActive && selectedScenario && selectedScenario.risks[briefingIndex] && (
+          <ScenarioBriefingOverlay
+            risk={selectedScenario.risks[briefingIndex]}
+            index={briefingIndex}
+            total={selectedScenario.risks.length}
+            onClose={() => setBriefingActive(false)}
+          />
         )}
 
         {/* Achievements Panel */}
@@ -1388,6 +1405,9 @@ const Demo3D = () => {
               }}
               onPositionUpdate={handlePlayerPositionUpdate}
               visualSettings={visualSettings}
+              briefingActive={briefingActive}
+              onBriefingStep={(idx) => setBriefingIndex(idx)}
+              onBriefingComplete={() => setBriefingActive(false)}
             />
 
             {/* Contextual Hints System */}

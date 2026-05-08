@@ -53,6 +53,9 @@ interface BabylonSceneProps {
   onExtinguisherSwap?: (newType: ExtinguisherType) => void;
   onPositionUpdate?: (position: [number, number, number], rotation: number) => void;
   visualSettings?: VisualSettings;
+  briefingActive?: boolean;
+  onBriefingStep?: (index: number, total: number) => void;
+  onBriefingComplete?: () => void;
 }
 
 export const BabylonScene = ({
@@ -71,6 +74,9 @@ export const BabylonScene = ({
   onExtinguisherSwap,
   onPositionUpdate,
   visualSettings,
+  briefingActive = false,
+  onBriefingStep,
+  onBriefingComplete,
 }: BabylonSceneProps) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const engineRef = useRef<BABYLON.Engine | null>(null);
@@ -890,6 +896,112 @@ export const BabylonScene = ({
       if (obs && scene) scene.onBeforeRenderObservable.remove(obs);
     };
   }, [isActive]);
+
+  // === BRIEFING MODE: cinematic flythrough of all risks with annotations ===
+  useEffect(() => {
+    if (!briefingActive) return;
+    const camera = cameraRef.current;
+    const scene = sceneRef.current;
+    if (!camera || !scene || !scenario.risks.length) return;
+
+    let cancelled = false;
+    let activeAnim: BABYLON.Animatable | null = null;
+    const savedPos = camera.position.clone();
+    const savedRot = camera.rotation.clone();
+    const savedCheckCollisions = camera.checkCollisions;
+    const savedApplyGravity = camera.applyGravity;
+
+    // Disable controls/collisions during cinematic
+    camera.detachControl();
+    camera.checkCollisions = false;
+    camera.applyGravity = false;
+
+    const flyTo = (target: BABYLON.Vector3, lookAt: BABYLON.Vector3, durationMs: number) =>
+      new Promise<void>((resolve) => {
+        const fps = 60;
+        const totalFrames = Math.max(1, Math.round((durationMs / 1000) * fps));
+
+        const posAnim = new BABYLON.Animation(
+          'briefingPos', 'position', fps,
+          BABYLON.Animation.ANIMATIONTYPE_VECTOR3,
+          BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT,
+        );
+        posAnim.setKeys([
+          { frame: 0, value: camera.position.clone() },
+          { frame: totalFrames, value: target.clone() },
+        ]);
+        const ease = new BABYLON.CubicEase();
+        ease.setEasingMode(BABYLON.EasingFunction.EASINGMODE_EASEINOUT);
+        posAnim.setEasingFunction(ease);
+
+        // Compute target rotation from lookAt
+        const tmpCam = new BABYLON.UniversalCamera('tmp', target, scene);
+        tmpCam.setTarget(lookAt);
+        const targetRot = tmpCam.rotation.clone();
+        tmpCam.dispose();
+
+        const rotAnim = new BABYLON.Animation(
+          'briefingRot', 'rotation', fps,
+          BABYLON.Animation.ANIMATIONTYPE_VECTOR3,
+          BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT,
+        );
+        rotAnim.setKeys([
+          { frame: 0, value: camera.rotation.clone() },
+          { frame: totalFrames, value: targetRot },
+        ]);
+        rotAnim.setEasingFunction(ease);
+
+        camera.animations = [posAnim, rotAnim];
+        activeAnim = scene.beginAnimation(camera, 0, totalFrames, false, 1, () => resolve());
+      });
+
+    const wait = (ms: number) =>
+      new Promise<void>((resolve) => {
+        const id = window.setTimeout(resolve, ms);
+        // Track for cancellation
+        (wait as any)._id = id;
+      });
+
+    (async () => {
+      const risks = scenario.risks;
+      for (let i = 0; i < risks.length; i++) {
+        if (cancelled) return;
+        const risk = risks[i];
+        const [rx, ry, rz] = risk.position;
+        const riskPos = new BABYLON.Vector3(rx, Math.max(ry, 0.5), rz);
+
+        // Camera offset: 3.5m back from origin direction, 1.7m height
+        const fromOrigin = riskPos.clone();
+        fromOrigin.y = 0;
+        const dir = fromOrigin.length() > 0.01
+          ? fromOrigin.normalize()
+          : new BABYLON.Vector3(0, 0, 1);
+        const camTarget = riskPos.add(dir.scale(3.5));
+        camTarget.y = 1.7;
+
+        onBriefingStep?.(i, risks.length);
+        await flyTo(camTarget, riskPos, 1800);
+        if (cancelled) return;
+        await wait(4500);
+      }
+      if (!cancelled) onBriefingComplete?.();
+    })();
+
+    return () => {
+      cancelled = true;
+      if (activeAnim) activeAnim.stop();
+      const pendingId = (wait as any)._id;
+      if (pendingId) window.clearTimeout(pendingId);
+      // Restore camera state
+      camera.position.copyFrom(savedPos);
+      camera.rotation.copyFrom(savedRot);
+      camera.checkCollisions = savedCheckCollisions;
+      camera.applyGravity = savedApplyGravity;
+      if (canvasRef.current && isActive) {
+        camera.attachControl(canvasRef.current, true);
+      }
+    };
+  }, [briefingActive, scenario, isActive, onBriefingStep, onBriefingComplete]);
 
   // Apply brightness / contrast live to image processing pipeline
   useEffect(() => {
