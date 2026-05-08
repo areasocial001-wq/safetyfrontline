@@ -2096,7 +2096,7 @@ function addOfficeProps(
   };
 
   const placeByKind = (
-    kind: import('./uniform-fill-config').UniformFillKind,
+    kind: UniformFillKind,
     x: number, z: number, rotY: number
   ) => {
     switch (kind) {
