@@ -3,9 +3,9 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
-import { Settings, Zap, Eye, Sparkles, Crown, Activity, Volume2, VolumeX, Subtitles, Target, Snail, Users, Rocket, Trophy } from "lucide-react";
+import { Settings, Zap, Eye, Sparkles, Crown, Activity, Volume2, VolumeX, Subtitles, Target, Snail, Users, Rocket, Trophy, Sun, Contrast, RefreshCw } from "lucide-react";
 import { GraphicsQuality } from "@/hooks/useGraphicsSettings";
-import type { AudioSettings } from "@/hooks/useGraphicsSettings";
+import type { AudioSettings, VisualSettings } from "@/hooks/useGraphicsSettings";
 
 type SensitivityPreset = {
   label: string;
