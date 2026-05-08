@@ -102,18 +102,6 @@ const Demo3D = () => {
   const [fillSeed, setFillSeed] = useState<number>(1337);
   const [fillPerWall, setFillPerWall] = useState<PerWallMultipliers>(DEFAULT_PER_WALL);
 
-  // Load persisted per-scenario settings whenever scenario changes
-  useEffect(() => {
-    if (!selectedScenario) return;
-    const saved = loadPersistedSettings(selectedScenario.type);
-    if (saved) {
-      if (saved.preset) setFillPreset(saved.preset);
-      if (saved.density) setFillDensity(saved.density);
-      if (typeof saved.seed === 'number') setFillSeed(saved.seed);
-      if (saved.perWall) setFillPerWall({ ...DEFAULT_PER_WALL, ...saved.perWall });
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedScenario?.type]);
   const { 
     isRunning: isBenchmarkRunning,
     progress: benchmarkProgress,
