@@ -3,9 +3,9 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
-import { Settings, Zap, Eye, Sparkles, Crown, Activity, Volume2, VolumeX, Subtitles, Target, Snail, Users, Rocket, Trophy } from "lucide-react";
+import { Settings, Zap, Eye, Sparkles, Crown, Activity, Volume2, VolumeX, Subtitles, Target, Snail, Users, Rocket, Trophy, Sun, Contrast, RefreshCw } from "lucide-react";
 import { GraphicsQuality } from "@/hooks/useGraphicsSettings";
-import type { AudioSettings } from "@/hooks/useGraphicsSettings";
+import type { AudioSettings, VisualSettings } from "@/hooks/useGraphicsSettings";
 
 type SensitivityPreset = {
   label: string;
@@ -26,6 +26,9 @@ interface GraphicsSettingsProps {
   onQualityChange: (quality: GraphicsQuality) => void;
   audioSettings: AudioSettings;
   onAudioSettingsChange: (settings: Partial<AudioSettings>) => void;
+  visualSettings?: VisualSettings;
+  onVisualSettingsChange?: (settings: Partial<VisualSettings>) => void;
+  onRecalibrateExposure?: () => void;
   isOpen: boolean;
   onToggle: () => void;
   onRunBenchmark?: () => void;
@@ -68,6 +71,9 @@ export const GraphicsSettings = ({
   onQualityChange,
   audioSettings,
   onAudioSettingsChange,
+  visualSettings,
+  onVisualSettingsChange,
+  onRecalibrateExposure,
   isOpen,
   onToggle,
   onRunBenchmark
@@ -189,6 +195,78 @@ export const GraphicsSettings = ({
               </div>
             </div>
           </div>
+
+          {/* Visual / Display Settings */}
+          {visualSettings && onVisualSettingsChange && (
+            <div className="space-y-3 pt-2 border-t border-border">
+              <p className="text-xs font-semibold text-muted-foreground uppercase">Visione & Schermo</p>
+
+              <div className="space-y-2">
+                <div className="flex justify-between text-xs">
+                  <span className="flex items-center gap-1 text-muted-foreground"><Sun className="w-3 h-3" /> Luminosità</span>
+                  <span className="font-medium">{Math.round(visualSettings.brightness * 100)}%</span>
+                </div>
+                <Slider
+                  value={[visualSettings.brightness * 100]}
+                  onValueChange={(v) => onVisualSettingsChange({ brightness: v[0] / 100 })}
+                  min={50} max={150} step={5}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <div className="flex justify-between text-xs">
+                  <span className="flex items-center gap-1 text-muted-foreground"><Contrast className="w-3 h-3" /> Contrasto</span>
+                  <span className="font-medium">{Math.round(visualSettings.contrast * 100)}%</span>
+                </div>
+                <Slider
+                  value={[visualSettings.contrast * 100]}
+                  onValueChange={(v) => onVisualSettingsChange({ contrast: v[0] / 100 })}
+                  min={50} max={150} step={5}
+                />
+              </div>
+
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Contrast className="w-4 h-4 text-primary" />
+                  <span className="text-sm">Modalità alto contrasto</span>
+                </div>
+                <Switch
+                  checked={visualSettings.highContrast}
+                  onCheckedChange={(c) => onVisualSettingsChange({ highContrast: c })}
+                />
+              </div>
+
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Eye className="w-4 h-4 text-primary" />
+                  <span className="text-sm">Esposizione automatica</span>
+                </div>
+                <Switch
+                  checked={visualSettings.autoExposure}
+                  onCheckedChange={(c) => onVisualSettingsChange({ autoExposure: c })}
+                />
+              </div>
+
+              <Button
+                onClick={() => onRecalibrateExposure?.()}
+                variant="outline"
+                size="sm"
+                className="w-full"
+              >
+                <RefreshCw className="w-3 h-3 mr-2" />
+                Ricalibra esposizione ora
+              </Button>
+
+              <Button
+                onClick={() => onVisualSettingsChange({ brightness: 1, contrast: 1, highContrast: false })}
+                variant="ghost"
+                size="sm"
+                className="w-full text-xs h-7"
+              >
+                Ripristina valori predefiniti
+              </Button>
+            </div>
+          )}
 
           {/* Audio Settings */}
           <div className="space-y-3 pt-2 border-t border-border">

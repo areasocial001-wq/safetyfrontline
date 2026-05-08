@@ -87,7 +87,7 @@ const Demo3D = () => {
     enable: enableGyro, 
     disable: disableGyro 
   } = useGyroscope();
-  const { quality, settings: graphicsSettings, setQuality, audioSettings, updateAudioSettings } = useGraphicsSettings();
+  const { quality, settings: graphicsSettings, setQuality, audioSettings, updateAudioSettings, visualSettings, updateVisualSettings, triggerRecalibration } = useGraphicsSettings();
   const { 
     isRunning: isBenchmarkRunning,
     progress: benchmarkProgress,
@@ -1387,6 +1387,7 @@ const Demo3D = () => {
                 setSelectedExtinguisher(newType);
               }}
               onPositionUpdate={handlePlayerPositionUpdate}
+              visualSettings={visualSettings}
             />
 
             {/* Contextual Hints System */}
@@ -1422,6 +1423,9 @@ const Demo3D = () => {
               }}
               audioSettings={audioSettings}
               onAudioSettingsChange={updateAudioSettings}
+              visualSettings={visualSettings}
+              onVisualSettingsChange={updateVisualSettings}
+              onRecalibrateExposure={triggerRecalibration}
               isOpen={showGraphicsSettings}
               onToggle={() => setShowGraphicsSettings(!showGraphicsSettings)}
               onRunBenchmark={() => {

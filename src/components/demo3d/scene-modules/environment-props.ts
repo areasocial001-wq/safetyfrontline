@@ -684,6 +684,13 @@ function addOfficeProps(
     { name: 'off_wall_e', w: 0.15, h: wallH, d: wallSpan, x: 15, y: wallY, z: 0 },
     { name: 'off_wall_w', w: 0.15, h: wallH, d: wallSpan, x: -15, y: wallY, z: 0 },
   ];
+  // Lighter accent strip just above the skirting — adds a discreet edge so
+  // walls visually separate from the carpet even with low/odd lighting.
+  const accentMat = new BABYLON.StandardMaterial('off_wallAccent', scene);
+  accentMat.diffuseColor = new BABYLON.Color3(0.85, 0.86, 0.9);
+  accentMat.emissiveColor = new BABYLON.Color3(0.18, 0.19, 0.22);
+  accentMat.specularColor = new BABYLON.Color3(0.05, 0.05, 0.05);
+
   wallConfigs.forEach(cfg => {
     const wall = BABYLON.MeshBuilder.CreateBox(cfg.name, { width: cfg.w, height: cfg.h, depth: cfg.d }, scene);
     wall.position = new BABYLON.Vector3(cfg.x, cfg.y, cfg.z);
@@ -700,6 +707,16 @@ function addOfficeProps(
     skirt.position = new BABYLON.Vector3(cfg.x, 0.06, cfg.z);
     skirt.material = skirtingMat;
     skirt.isPickable = false;
+
+    // Thin perimeter accent line right above the skirting
+    const accent = BABYLON.MeshBuilder.CreateBox(`${cfg.name}_accent`, {
+      width: cfg.w === 0.15 ? 0.16 : cfg.w,
+      height: 0.025,
+      depth: cfg.d === 0.15 ? 0.16 : cfg.d,
+    }, scene);
+    accent.position = new BABYLON.Vector3(cfg.x, 0.135, cfg.z);
+    accent.material = accentMat;
+    accent.isPickable = false;
   });
 
   // Drop ceiling with acoustic-tile texture (slightly emissive for soft fill)

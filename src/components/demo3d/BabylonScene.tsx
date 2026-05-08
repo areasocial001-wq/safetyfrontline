@@ -21,7 +21,7 @@ const TOOLTIP_ICONS: Record<string, LucideIcon> = {
   shelf: Library,
   emlight: Lightbulb,
 };
-import type { AudioSettings } from '@/hooks/useGraphicsSettings';
+import type { AudioSettings, VisualSettings } from '@/hooks/useGraphicsSettings';
 import { loadGLTFProps } from '@/lib/babylon-prop-loader';
 import { loadProceduralProps } from '@/lib/babylon-procedural-props';
 import { SCENARIO_PROPS, SCENARIO_PROCEDURAL_PROPS } from '@/types/prop-config';
@@ -52,6 +52,7 @@ interface BabylonSceneProps {
   onFireExtinguished?: (extinguished: number, total: number) => void;
   onExtinguisherSwap?: (newType: ExtinguisherType) => void;
   onPositionUpdate?: (position: [number, number, number], rotation: number) => void;
+  visualSettings?: VisualSettings;
 }
 
 export const BabylonScene = ({
@@ -69,6 +70,7 @@ export const BabylonScene = ({
   onFireExtinguished,
   onExtinguisherSwap,
   onPositionUpdate,
+  visualSettings,
 }: BabylonSceneProps) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const engineRef = useRef<BABYLON.Engine | null>(null);
@@ -88,6 +90,11 @@ export const BabylonScene = ({
     lightBurstMesh: BABYLON.Mesh | null;
     burstIntensity: number;
   } | null>(null);
+  const highlightLayerRef = useRef<BABYLON.HighlightLayer | null>(null);
+  const riskMeshMapRef = useRef<Map<string, BABYLON.Mesh[]>>(new Map());
+  const hoveredRiskRef = useRef<string | null>(null);
+  const baseImageProcRef = useRef<{ exposure: number; contrast: number } | null>(null);
+  const originalMatColorsRef = useRef<Map<string, BABYLON.Color3>>(new Map());
   const [isReady, setIsReady] = useState(false);
   const extChargeRef = useRef({ current: 100, max: 100 });
   const fireHitCountRef = useRef<Map<number, number>>(new Map());
@@ -181,6 +188,16 @@ export const BabylonScene = ({
     // 10. Create risk markers
     const riskGlow = new BABYLON.GlowLayer('riskGlow', scene);
     riskGlow.intensity = 1.5;
+
+    // Highlight layer for hover/click feedback on risk meshes
+    const highlightLayer = new BABYLON.HighlightLayer('riskHighlight', scene, {
+      blurHorizontalSize: 1.5,
+      blurVerticalSize: 1.5,
+    });
+    highlightLayer.innerGlow = false;
+    highlightLayer.outerGlow = true;
+    highlightLayerRef.current = highlightLayer;
+    riskMeshMapRef.current = new Map();
 
     const riskMeshes = scenario.risks.map((risk) => {
       const createContextualHazard = (): BABYLON.Mesh => {
@@ -290,6 +307,14 @@ export const BabylonScene = ({
       return { mesh: marker, risk };
     });
 
+    // Track risk meshes for hover-highlight (include marker + indicator)
+    riskMeshes.forEach(({ mesh, risk }) => {
+      const list: BABYLON.Mesh[] = [mesh as BABYLON.Mesh];
+      const ind = scene.getMeshByName(`${risk.id}_indicator`);
+      if (ind) list.push(ind as BABYLON.Mesh);
+      riskMeshMapRef.current.set(risk.id, list);
+    });
+
     // 10. Click detection
     scene.onPointerDown = (evt, pickResult) => {
       if (pickResult.hit && pickResult.pickedMesh) {
@@ -345,8 +370,37 @@ export const BabylonScene = ({
 
     // 11. Prop detection (raycast look-at) — supports metadata.tooltip for hazards
     const LOOK_DISTANCE = 6;
+    const RISK_HOVER_DISTANCE = 8;
     const detectLookedAtProp = () => {
       if (!camera) return;
+
+      // --- Risk hover highlight (longer distance) ---
+      const riskRay = camera.getForwardRay(RISK_HOVER_DISTANCE);
+      const riskHit = scene.pickWithRay(riskRay, (mesh) => !!mesh.metadata?.riskId);
+      const newHoverId = (riskHit && riskHit.pickedMesh && riskHit.distance <= RISK_HOVER_DISTANCE)
+        ? (riskHit.pickedMesh.metadata?.riskId as string)
+        : null;
+      if (newHoverId !== hoveredRiskRef.current) {
+        const hl = highlightLayerRef.current;
+        if (hl) {
+          // Clear previous
+          if (hoveredRiskRef.current) {
+            const prev = riskMeshMapRef.current.get(hoveredRiskRef.current) || [];
+            prev.forEach(m => { try { hl.removeMesh(m); } catch {} });
+          }
+          if (newHoverId) {
+            const next = riskMeshMapRef.current.get(newHoverId) || [];
+            const sev = scenario.risks.find(r => r.id === newHoverId)?.severity;
+            const color = sev === 'critical' ? new BABYLON.Color3(1, 0.15, 0.1)
+              : sev === 'high' ? new BABYLON.Color3(1, 0.55, 0.05)
+              : sev === 'medium' ? new BABYLON.Color3(1, 0.85, 0.1)
+              : new BABYLON.Color3(0.2, 0.85, 0.4);
+            next.forEach(m => { try { hl.addMesh(m, color); } catch {} });
+          }
+        }
+        hoveredRiskRef.current = newHoverId;
+      }
+
       const ray = camera.getForwardRay(LOOK_DISTANCE);
       const hit = scene.pickWithRay(ray, (mesh) => {
         if (mesh.metadata?.tooltip) return true;
@@ -439,6 +493,10 @@ export const BabylonScene = ({
     if (document.pointerLockElement) {
       window.addEventListener('mousemove', handleMouseMove);
     }
+
+    // Capture base imageProcessing values for visual settings to scale from
+    const ipc = scene.imageProcessingConfiguration;
+    baseImageProcRef.current = { exposure: ipc.exposure, contrast: ipc.contrast };
 
     setIsReady(true);
 
@@ -755,6 +813,84 @@ export const BabylonScene = ({
       camera.detachControl();
     }
   }, [isActive]);
+
+  // Apply brightness / contrast live to image processing pipeline
+  useEffect(() => {
+    const scene = sceneRef.current;
+    const base = baseImageProcRef.current;
+    if (!scene || !base || !visualSettings) return;
+    const ipc = scene.imageProcessingConfiguration;
+    ipc.exposure = base.exposure * visualSettings.brightness;
+    ipc.contrast = base.contrast * visualSettings.contrast;
+  }, [visualSettings?.brightness, visualSettings?.contrast, isReady]);
+
+  // Toggle high-contrast mode for office walls vs floor (and other scenarios)
+  useEffect(() => {
+    const scene = sceneRef.current;
+    if (!scene || !visualSettings) return;
+    const targets: Array<{ name: string; hc: BABYLON.Color3 }> = [
+      { name: 'off_carpetMat',     hc: new BABYLON.Color3(0.18, 0.16, 0.14) },
+      { name: 'off_interiorWall',  hc: new BABYLON.Color3(0.97, 0.97, 0.99) },
+      { name: 'off_skirting',      hc: new BABYLON.Color3(0.05, 0.05, 0.05) },
+      { name: 'groundMat',         hc: new BABYLON.Color3(0.18, 0.18, 0.20) },
+    ];
+    targets.forEach(({ name, hc }) => {
+      const mat = scene.getMaterialByName(name) as BABYLON.StandardMaterial | null;
+      if (!mat) return;
+      if (visualSettings.highContrast) {
+        if (!originalMatColorsRef.current.has(name)) {
+          originalMatColorsRef.current.set(name, mat.diffuseColor.clone());
+        }
+        // Reduce texture influence by tinting via diffuse
+        mat.diffuseColor = hc;
+      } else {
+        const orig = originalMatColorsRef.current.get(name);
+        if (orig) mat.diffuseColor = orig.clone();
+      }
+    });
+  }, [visualSettings?.highContrast, isReady]);
+
+  // Auto-exposure: recalibrate when scene ready, on nonce change, or autoExposure toggled on
+  useEffect(() => {
+    const scene = sceneRef.current;
+    const engine = engineRef.current;
+    const base = baseImageProcRef.current;
+    if (!scene || !engine || !base || !visualSettings) return;
+    if (!visualSettings.autoExposure && visualSettings.recalibrateNonce === 0) return;
+
+    const t = setTimeout(() => {
+      try {
+        const canvas = engine.getRenderingCanvas();
+        if (!canvas) return;
+        const w = 64, h = 64;
+        const cx = Math.floor(canvas.width / 2 - w / 2);
+        const cy = Math.floor(canvas.height / 2 - h / 2);
+        const pixels = engine.readPixels(cx, cy, w, h) as ArrayBufferView | Promise<ArrayBufferView>;
+        const apply = (buf: ArrayBufferView) => {
+          const arr = buf as unknown as Uint8Array;
+          let lum = 0;
+          let n = 0;
+          for (let i = 0; i < arr.length; i += 4) {
+            // Rec. 709 luminance
+            lum += (0.2126 * arr[i] + 0.7152 * arr[i + 1] + 0.0722 * arr[i + 2]) / 255;
+            n++;
+          }
+          if (n === 0) return;
+          const avg = lum / n; // 0..1
+          const target = 0.45;
+          // Clamp adjustment to a sensible range
+          const factor = Math.max(0.6, Math.min(1.6, target / Math.max(0.05, avg)));
+          const ipc = scene.imageProcessingConfiguration;
+          ipc.exposure = base.exposure * visualSettings.brightness * factor;
+          console.log('[AutoExposure] avg luminance', avg.toFixed(3), '→ factor', factor.toFixed(2));
+        };
+        if (pixels instanceof Promise) pixels.then(apply); else apply(pixels);
+      } catch (e) {
+        console.warn('[AutoExposure] failed', e);
+      }
+    }, 600);
+    return () => clearTimeout(t);
+  }, [visualSettings?.autoExposure, visualSettings?.recalibrateNonce, isReady]);
 
   return (
     <div className="relative w-full h-full">
