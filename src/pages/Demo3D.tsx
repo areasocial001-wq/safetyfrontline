@@ -1423,6 +1423,9 @@ const Demo3D = () => {
               }}
               audioSettings={audioSettings}
               onAudioSettingsChange={updateAudioSettings}
+              visualSettings={visualSettings}
+              onVisualSettingsChange={updateVisualSettings}
+              onRecalibrateExposure={triggerRecalibration}
               isOpen={showGraphicsSettings}
               onToggle={() => setShowGraphicsSettings(!showGraphicsSettings)}
               onRunBenchmark={() => {
