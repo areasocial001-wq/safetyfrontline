@@ -129,6 +129,8 @@ const Demo3D = () => {
     return localStorage.getItem('benchmark-completed') === 'true';
   });
   const [isPointerLocked, setIsPointerLocked] = useState(false);
+  const [briefingActive, setBriefingActive] = useState(false);
+  const [briefingIndex, setBriefingIndex] = useState(0);
   
   // Keyboard state for HUD indicator
   const [keysPressed, setKeysPressed] = useState({
