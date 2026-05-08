@@ -1140,30 +1140,30 @@ function addOfficeProps(
   waterTank.material = waterMat2;
 
   // Printer station — front-right corner
-  const printerCounter = BABYLON.MeshBuilder.CreateBox('off_printerCounterB', { width: 1.8, height: 0.05, depth: 0.7 }, scene);
-  printerCounter.position = new BABYLON.Vector3(12.5, 0.75, -12.5);
-  printerCounter.material = deskMat;
-  printerCounter.checkCollisions = true;
-  if (shadowGenerator) shadowGenerator.addShadowCaster(printerCounter);
+  const printerCounterB = BABYLON.MeshBuilder.CreateBox('off_printerCounterB', { width: 1.8, height: 0.05, depth: 0.7 }, scene);
+  printerCounterB.position = new BABYLON.Vector3(12.5, 0.75, -12.5);
+  printerCounterB.material = deskMat;
+  printerCounterB.checkCollisions = true;
+  if (shadowGenerator) shadowGenerator.addShadowCaster(printerCounterB);
 
   for (let l = 0; l < 4; l++) {
     const lx = l % 2 === 0 ? -0.8 : 0.8;
     const lz = l < 2 ? -0.3 : 0.3;
-    const leg = BABYLON.MeshBuilder.CreateBox(`off_printerLeg_${l}`, { width: 0.05, height: 0.75, depth: 0.05 }, scene);
+    const leg = BABYLON.MeshBuilder.CreateBox(`off_printerBLeg_${l}`, { width: 0.05, height: 0.75, depth: 0.05 }, scene);
     leg.position = new BABYLON.Vector3(12.5 + lx, 0.375, -12.5 + lz);
     leg.material = metalMat;
   }
 
-  const printer = BABYLON.MeshBuilder.CreateBox('off_printerB', { width: 0.7, height: 0.45, depth: 0.55 }, scene);
-  printer.position = new BABYLON.Vector3(12.5, 1.025, -12.5);
-  const printerMat = new BABYLON.StandardMaterial('off_printerMatB', scene);
-  printerMat.diffuseColor = new BABYLON.Color3(0.85, 0.85, 0.88);
-  printer.material = printerMat;
-  if (shadowGenerator) shadowGenerator.addShadowCaster(printer);
+  const printerB = BABYLON.MeshBuilder.CreateBox('off_printerB', { width: 0.7, height: 0.45, depth: 0.55 }, scene);
+  printerB.position = new BABYLON.Vector3(12.5, 1.025, -12.5);
+  const printerMatB = new BABYLON.StandardMaterial('off_printerMatB', scene);
+  printerMatB.diffuseColor = new BABYLON.Color3(0.85, 0.85, 0.88);
+  printerB.material = printerMatB;
+  if (shadowGenerator) shadowGenerator.addShadowCaster(printerB);
 
-  const printerTray = BABYLON.MeshBuilder.CreateBox('off_printerTrayB', { width: 0.55, height: 0.05, depth: 0.35 }, scene);
-  printerTray.position = new BABYLON.Vector3(12.5, 1.28, -12.3);
-  printerTray.material = whiteMat;
+  const printerTrayB = BABYLON.MeshBuilder.CreateBox('off_printerTrayB', { width: 0.55, height: 0.05, depth: 0.35 }, scene);
+  printerTrayB.position = new BABYLON.Vector3(12.5, 1.28, -12.3);
+  printerTrayB.material = whiteMat;
 
   // Tall plant — between desk rows on west side
   const tallPlantPot = BABYLON.MeshBuilder.CreateCylinder('off_tallPlantPot', { height: 0.5, diameterTop: 0.45, diameterBottom: 0.32, tessellation: 14 }, scene);
