@@ -22,6 +22,14 @@ export interface AudioSettings {
   mouseSensitivity: number; // 100-1000, lower = more sensitive
 }
 
+export interface VisualSettings {
+  brightness: number;   // 0.5 - 1.5 multiplier on exposure
+  contrast: number;     // 0.5 - 1.5 multiplier on contrast
+  highContrast: boolean; // Force high-contrast walls / floor
+  autoExposure: boolean; // Auto-recalibrate exposure on scene enter
+  recalibrateNonce: number; // Bump to trigger one-shot recalibration
+}
+
 const QUALITY_PRESETS: Record<GraphicsQuality, GraphicsSettings> = {
   low: {
     quality: 'low',
