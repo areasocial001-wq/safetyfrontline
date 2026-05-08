@@ -1230,8 +1230,29 @@ const Demo3D = () => {
               onChangeScenario={() => {
                 resetGame();
               }}
+              onReplayBriefing={() => {
+                setBriefingIndex(0);
+                setBriefingActive(true);
+              }}
             />
           </div>
+        )}
+
+        {/* Briefing 3D Overlay */}
+        {briefingActive && selectedScenario && selectedScenario.risks[briefingIndex] && (
+          <ScenarioBriefingOverlay
+            risk={selectedScenario.risks[briefingIndex]}
+            index={briefingIndex}
+            total={selectedScenario.risks.length}
+            onSkip={() => {
+              if (briefingIndex + 1 >= selectedScenario.risks.length) {
+                setBriefingActive(false);
+              } else {
+                setBriefingIndex(briefingIndex + 1);
+              }
+            }}
+            onClose={() => setBriefingActive(false)}
+          />
         )}
 
         {/* Achievements Panel */}
