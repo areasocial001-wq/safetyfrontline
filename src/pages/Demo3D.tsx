@@ -1514,7 +1514,7 @@ const Demo3D = () => {
 
             {/* Loading Overlay */}
             {isInitializing && !gameStarted && memoizedScenario && (
-              <LoadingOverlay scenarioTitle={memoizedScenario.title} />
+              <LoadingOverlay scenarioTitle={memoizedScenario.title} scenarioId={memoizedScenario.id} />
             )}
 
             {/* Mouse Calibration Overlay */}
