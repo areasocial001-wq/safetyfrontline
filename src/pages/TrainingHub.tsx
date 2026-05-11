@@ -848,10 +848,37 @@ const TrainingHub = () => {
         </div>
       </div>
 
-      {/* Training Paths */}
+      {/* Training Paths grouped by category */}
       <div className="container mx-auto px-4 py-8">
-        <div className="max-w-4xl mx-auto space-y-6">
-          {TRAINING_PATHS.map(path => renderPathCard(path))}
+        <div className="max-w-4xl mx-auto space-y-12">
+          {(Object.keys(CATEGORY_META) as PathCategory[]).map((cat) => {
+            const paths = TRAINING_PATHS.filter(p => p.category === cat);
+            if (paths.length === 0) return null;
+            const meta = CATEGORY_META[cat];
+            const activeCount = paths.filter(p => !p.comingSoon).length;
+            const comingCount = paths.filter(p => p.comingSoon).length;
+            return (
+              <section key={cat} className="space-y-4">
+                <div className="flex items-end justify-between flex-wrap gap-2 border-b-2 border-primary/10 pb-3">
+                  <div>
+                    <h2 className="text-2xl font-bold flex items-center gap-2">
+                      <span className="text-3xl">{meta.emoji}</span> {meta.title}
+                    </h2>
+                    <p className="text-sm text-muted-foreground mt-1">{meta.subtitle}</p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Badge variant="secondary" className="rounded-full">{activeCount} disponibili</Badge>
+                    {comingCount > 0 && (
+                      <Badge className="bg-amber-500 hover:bg-amber-500 text-white border-0 rounded-full">{comingCount} in rilascio</Badge>
+                    )}
+                  </div>
+                </div>
+                <div className="space-y-6">
+                  {paths.map(path => renderPathCard(path))}
+                </div>
+              </section>
+            );
+          })}
         </div>
 
         {/* Multiplayer */}
