@@ -31,7 +31,7 @@ import { NPCAmbientSoundSystem } from '@/lib/npc-ambient-sounds';
 import { createScene } from './scene-modules/scene-setup';
 import { loadEnvironmentOptimized } from './scene-modules/environment-loader';
 import { createParticleEffect, playRiskSound, fireAmbientContexts } from './scene-modules/audio-helpers';
-import { createFirstPersonExtinguisher, shootExtinguisherSpray } from './scene-modules/extinguisher-system';
+import { createFirstPersonExtinguisher, shootExtinguisherSpray, aimHasFire } from './scene-modules/extinguisher-system';
 import { addEnvironmentalProps } from './scene-modules/environment-props';
 import { addWorkerAvatars } from './scene-modules/worker-avatars';
 import { addSafetySignage } from './scene-modules/safety-signage';
