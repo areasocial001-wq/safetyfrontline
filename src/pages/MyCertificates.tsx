@@ -78,9 +78,14 @@ const MyCertificates = () => {
 
       // Fetch company settings
       let companyLogoUrl: string | null = null;
-      let certSettings = {
+      let certSettings: {
+        template: string; themeColor: string; font: string;
+        textLayout: string; logoPosition: string;
+        modulePrefix: string; orientation: 'portrait' | 'landscape';
+      } = {
         template: 'formale', themeColor: '#3B82F6', font: 'helvetica',
         textLayout: 'centered', logoPosition: 'top-left',
+        modulePrefix: 'Verifica della Ricaduta sulla', orientation: 'portrait',
       };
 
       const { data: companyUserData } = await supabase
