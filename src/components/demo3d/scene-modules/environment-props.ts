@@ -495,11 +495,86 @@ function addLaboratoryProps(
     if (shadowGenerator) shadowGenerator.addShadowCaster(bench);
   });
 
-  // Fire emitters for fire simulation
-  const fireData = [
-    { pos: new BABYLON.Vector3(-5, 0.3, -7), nearRiskId: 'lab_risk_1' },
-    { pos: new BABYLON.Vector3(3, 0.3, 8), nearRiskId: 'lab_risk_6' },
-    { pos: new BABYLON.Vector3(7, 0.3, -3), nearRiskId: 'lab_risk_9' },
+  // ---------- Extra furnishing so the room is not empty ----------
+  // Floor-standing storage racks along the walls
+  const rackMat = new BABYLON.StandardMaterial('lab_rack', scene);
+  rackMat.diffuseColor = new BABYLON.Color3(0.45, 0.45, 0.5);
+  rackMat.specularColor = new BABYLON.Color3(0.4, 0.4, 0.45);
+  const rackPositions = [
+    { x: -12, z: -10, rot: 0 }, { x: -12, z: 0, rot: 0 }, { x: -12, z: 10, rot: 0 },
+    { x: 12, z: -10, rot: Math.PI }, { x: 12, z: 0, rot: Math.PI }, { x: 12, z: 10, rot: Math.PI },
+  ];
+  rackPositions.forEach((rp, i) => {
+    const rack = BABYLON.MeshBuilder.CreateBox(`labRack_${i}`, { width: 1.2, height: 2.4, depth: 0.6 }, scene);
+    rack.position = new BABYLON.Vector3(rp.x, 1.2, rp.z);
+    rack.rotation.y = rp.rot;
+    rack.material = rackMat;
+    rack.checkCollisions = true;
+    if (shadowGenerator) shadowGenerator.addShadowCaster(rack);
+    // Three shelves (visible plates)
+    for (let s = 0; s < 3; s++) {
+      const shelf = BABYLON.MeshBuilder.CreateBox(`labRack_${i}_s${s}`, { width: 1.18, height: 0.05, depth: 0.58 }, scene);
+      shelf.position = new BABYLON.Vector3(rp.x, 0.5 + s * 0.7, rp.z);
+      shelf.material = rackMat;
+    }
+  });
+
+  // Cardboard boxes scattered (combustible material, story-relevant)
+  const boxMat = new BABYLON.StandardMaterial('lab_box', scene);
+  boxMat.diffuseColor = new BABYLON.Color3(0.62, 0.45, 0.28);
+  boxMat.specularColor = new BABYLON.Color3(0.1, 0.08, 0.05);
+  const boxPositions: Array<[number, number, number, number]> = [
+    [-4, 0.4, -10, 0.8], [-2, 0.4, -10, 0.8], [-3, 1.2, -10, 0.8],
+    [10, 0.4, 6, 0.7], [10, 1.1, 6, 0.7],
+    [-9, 0.4, 9, 0.6], [-9, 1.0, 9, 0.6],
+    [5, 0.4, -10, 0.7], [6.5, 0.4, -10, 0.7],
+  ];
+  boxPositions.forEach(([x, y, z, sz], i) => {
+    const box = BABYLON.MeshBuilder.CreateBox(`labBox_${i}`, { size: sz }, scene);
+    box.position = new BABYLON.Vector3(x, y, z);
+    box.material = boxMat;
+    box.checkCollisions = true;
+    if (shadowGenerator) shadowGenerator.addShadowCaster(box);
+  });
+
+  // Metal drums (chemical hazard)
+  const drumMat = new BABYLON.StandardMaterial('lab_drum', scene);
+  drumMat.diffuseColor = new BABYLON.Color3(0.75, 0.55, 0.15);
+  drumMat.specularColor = new BABYLON.Color3(0.5, 0.4, 0.2);
+  drumMat.specularPower = 96;
+  const drumPositions: Array<[number, number]> = [[7, -7], [9, -7], [-7, 6], [-9, 6]];
+  drumPositions.forEach(([x, z], i) => {
+    const drum = BABYLON.MeshBuilder.CreateCylinder(`labDrum_${i}`, { height: 1.0, diameter: 0.6 }, scene);
+    drum.position = new BABYLON.Vector3(x, 0.5, z);
+    drum.material = drumMat;
+    drum.checkCollisions = true;
+    if (shadowGenerator) shadowGenerator.addShadowCaster(drum);
+  });
+
+  // Ceiling lamps for visual fill
+  const lampMat = new BABYLON.StandardMaterial('lab_lamp', scene);
+  lampMat.diffuseColor = new BABYLON.Color3(0.95, 0.95, 0.9);
+  lampMat.emissiveColor = new BABYLON.Color3(0.55, 0.5, 0.4);
+  for (let i = 0; i < 4; i++) {
+    const lx = -8 + (i % 2) * 16;
+    const lz = -6 + Math.floor(i / 2) * 12;
+    const lamp = BABYLON.MeshBuilder.CreateBox(`labLamp_${i}`, { width: 1.6, height: 0.15, depth: 0.5 }, scene);
+    lamp.position = new BABYLON.Vector3(lx, 4.2, lz);
+    lamp.material = lampMat;
+  }
+
+  // Fire emitters for fire simulation — three distinct fire types
+  // Type A: classic orange (Class A – solid combustibles)
+  // Type B: dark red / smoldering (Class C – electrical, deeper hue)
+  // Type C: white-hot with very heavy smoke (Class D – metal/chemical)
+  const fireData: Array<{
+    pos: BABYLON.Vector3;
+    nearRiskId: string;
+    kind: 'orange' | 'darkRed' | 'whiteHot';
+  }> = [
+    { pos: new BABYLON.Vector3(-5, 0.3, -7), nearRiskId: 'lab_risk_1', kind: 'orange' },
+    { pos: new BABYLON.Vector3(3, 0.3, 8), nearRiskId: 'lab_risk_6', kind: 'darkRed' },
+    { pos: new BABYLON.Vector3(7, 0.3, -3), nearRiskId: 'lab_risk_9', kind: 'whiteHot' },
   ];
 
   fireData.forEach((fd, idx) => {
@@ -507,17 +582,9 @@ function addLaboratoryProps(
     fireEmitter.position = fd.pos;
     fireEmitter.isVisible = false;
 
-    const fire = new BABYLON.ParticleSystem(`fire_${idx}`, 150, scene);
+    const fire = new BABYLON.ParticleSystem(`fire_${idx}`, 180, scene);
     fire.emitter = fireEmitter;
     fire.particleTexture = new BABYLON.Texture('https://assets.babylonjs.com/textures/flare.png', scene);
-    fire.color1 = new BABYLON.Color4(1, 0.5, 0, 1);
-    fire.color2 = new BABYLON.Color4(1, 0.2, 0, 0.8);
-    fire.colorDead = new BABYLON.Color4(0.3, 0.1, 0, 0);
-    fire.minSize = 0.15;
-    fire.maxSize = 0.6;
-    fire.minLifeTime = 0.3;
-    fire.maxLifeTime = 0.8;
-    fire.emitRate = 120;
     fire.blendMode = BABYLON.ParticleSystem.BLENDMODE_ONEONE;
     fire.gravity = new BABYLON.Vector3(0, 2, 0);
     fire.direction1 = new BABYLON.Vector3(-0.3, 1, -0.3);
@@ -525,21 +592,91 @@ function addLaboratoryProps(
     fire.minEmitPower = 0.5;
     fire.maxEmitPower = 1.5;
     fire.updateSpeed = 0.008;
+
+    // Per-fire visual signature
+    let lightColor = new BABYLON.Color3(1, 0.5, 0.1);
+    let lightIntensityBase = 1.5;
+    let perFireSmokeRate = 12;
+    let smokeColor1 = new BABYLON.Color4(0.32, 0.30, 0.32, 0.22);
+    let smokeColor2 = new BABYLON.Color4(0.20, 0.18, 0.20, 0.10);
+
+    if (fd.kind === 'orange') {
+      fire.color1 = new BABYLON.Color4(1.0, 0.55, 0.05, 1);
+      fire.color2 = new BABYLON.Color4(1.0, 0.25, 0.0, 0.85);
+      fire.colorDead = new BABYLON.Color4(0.3, 0.1, 0, 0);
+      fire.minSize = 0.15; fire.maxSize = 0.6;
+      fire.minLifeTime = 0.3; fire.maxLifeTime = 0.8;
+      fire.emitRate = 130;
+    } else if (fd.kind === 'darkRed') {
+      // Darker, more saturated red (electrical / smoldering combustion)
+      fire.color1 = new BABYLON.Color4(0.65, 0.05, 0.02, 1);
+      fire.color2 = new BABYLON.Color4(0.40, 0.02, 0.0, 0.85);
+      fire.colorDead = new BABYLON.Color4(0.12, 0.0, 0.0, 0);
+      fire.minSize = 0.20; fire.maxSize = 0.7;
+      fire.minLifeTime = 0.45; fire.maxLifeTime = 1.0;
+      fire.emitRate = 110;
+      // Slower upward draft – smoldering character
+      fire.gravity = new BABYLON.Vector3(0, 1.3, 0);
+      lightColor = new BABYLON.Color3(0.9, 0.15, 0.05);
+      lightIntensityBase = 1.2;
+      perFireSmokeRate = 22;
+      smokeColor1 = new BABYLON.Color4(0.18, 0.10, 0.10, 0.35);
+      smokeColor2 = new BABYLON.Color4(0.10, 0.05, 0.05, 0.18);
+    } else {
+      // White-hot with very heavy smoke (metal / chemical fire)
+      fire.color1 = new BABYLON.Color4(1.0, 1.0, 0.95, 1);
+      fire.color2 = new BABYLON.Color4(0.95, 0.92, 0.85, 0.85);
+      fire.colorDead = new BABYLON.Color4(0.6, 0.6, 0.55, 0);
+      fire.minSize = 0.18; fire.maxSize = 0.55;
+      fire.minLifeTime = 0.25; fire.maxLifeTime = 0.7;
+      fire.emitRate = 160;
+      lightColor = new BABYLON.Color3(0.95, 0.95, 1.0);
+      lightIntensityBase = 2.2;
+      perFireSmokeRate = 55; // heavy smoke
+      smokeColor1 = new BABYLON.Color4(0.85, 0.85, 0.88, 0.55);
+      smokeColor2 = new BABYLON.Color4(0.65, 0.65, 0.70, 0.30);
+    }
     fire.start();
+
+    // Per-fire smoke (so each fire has its own smoke signature)
+    const perSmokeEmitter = BABYLON.MeshBuilder.CreateBox(`fireSmokeEmitter_${idx}`, { size: 0.1 }, scene);
+    perSmokeEmitter.position = fd.pos.add(new BABYLON.Vector3(0, 0.6, 0));
+    perSmokeEmitter.isVisible = false;
+    const perSmoke = new BABYLON.ParticleSystem(`fireSmoke_${idx}`, 100, scene);
+    perSmoke.emitter = perSmokeEmitter;
+    perSmoke.particleTexture = new BABYLON.Texture('https://assets.babylonjs.com/textures/flare.png', scene);
+    perSmoke.color1 = smokeColor1;
+    perSmoke.color2 = smokeColor2;
+    perSmoke.colorDead = new BABYLON.Color4(0.1, 0.1, 0.1, 0);
+    perSmoke.minSize = fd.kind === 'whiteHot' ? 1.2 : 0.8;
+    perSmoke.maxSize = fd.kind === 'whiteHot' ? 3.5 : 2.2;
+    perSmoke.minLifeTime = fd.kind === 'whiteHot' ? 4 : 2.5;
+    perSmoke.maxLifeTime = fd.kind === 'whiteHot' ? 8 : 5;
+    perSmoke.emitRate = perFireSmokeRate;
+    perSmoke.blendMode = BABYLON.ParticleSystem.BLENDMODE_STANDARD;
+    perSmoke.gravity = new BABYLON.Vector3(0, 0.3, 0);
+    perSmoke.direction1 = new BABYLON.Vector3(-0.5, 0.4, -0.5);
+    perSmoke.direction2 = new BABYLON.Vector3(0.5, 1.2, 0.5);
+    perSmoke.minEmitPower = 0.1;
+    perSmoke.maxEmitPower = 0.5;
+    perSmoke.updateSpeed = 0.005;
+    perSmoke.minEmitBox = new BABYLON.Vector3(-0.4, 0, -0.4);
+    perSmoke.maxEmitBox = new BABYLON.Vector3(0.4, 0, 0.4);
+    perSmoke.start();
 
     // Fire light
     const fireLight = new BABYLON.PointLight(`fireLight_${idx}`, fd.pos.add(new BABYLON.Vector3(0, 1, 0)), scene);
-    fireLight.diffuse = new BABYLON.Color3(1, 0.5, 0.1);
-    fireLight.intensity = 2;
-    fireLight.range = 8;
+    fireLight.diffuse = lightColor;
+    fireLight.intensity = lightIntensityBase;
+    fireLight.range = 9;
 
     // Flickering
     scene.registerBeforeRender(() => {
-      fireLight.intensity = 1.5 + Math.random() * 1.5;
+      fireLight.intensity = lightIntensityBase * (0.75 + Math.random() * 0.5);
     });
   });
 
-  // Smoke system
+  // Ambient room smoke (light overall haze)
   const smokeEmitter = BABYLON.MeshBuilder.CreateBox('smokeEmitter', { size: 0.1 }, scene);
   smokeEmitter.position = new BABYLON.Vector3(0, 1, 0);
   smokeEmitter.isVisible = false;
