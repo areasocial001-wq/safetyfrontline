@@ -409,7 +409,7 @@ export const BabylonScene = ({
       shootExtinguisherSpray(scene, camera, activeExt, fireHitCountRef.current, onFireExtinguished);
       extChargeRef.current.current = Math.max(0, extChargeRef.current.current - 10);
       onChargeChange?.(extChargeRef.current.current, extChargeRef.current.max);
-      const sprayCreated = !!scene.getParticleSystemByName('extSpray');
+      const sprayCreated = scene.particleSystems.some(p => p.name === 'extSpray');
       return { ok: sprayCreated, reason: sprayCreated ? 'spray-fired' : 'spray-not-created', chargeBefore, chargeAfter: extChargeRef.current.current, sprayCreated };
     };
 
