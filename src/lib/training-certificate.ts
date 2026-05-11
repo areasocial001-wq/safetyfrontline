@@ -22,7 +22,7 @@ export const generateTrainingCertificatePDF = async (data: TrainingCertificateDa
     color: { dark: '#1a1a1a', light: '#ffffff' },
   });
 
-  const pdf = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+  const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
   const w = pdf.internal.pageSize.getWidth();
   const h = pdf.internal.pageSize.getHeight();
 
