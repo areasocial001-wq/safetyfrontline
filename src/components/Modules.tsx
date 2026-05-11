@@ -32,7 +32,7 @@ export const Modules = () => {
     { key: 'figure', label: 'Figure Sicurezza', icon: Crown, badge: '8 percorsi' },
     { key: 'attrezzature', label: 'Attrezzature', icon: Truck, badge: '8 abilitazioni' },
     { key: 'cybersecurity', label: 'Cybersecurity', icon: Lock, badge: 'nuovo' },
-    { key: 'simulazioni', label: 'Simulazioni 3D', icon: Gamepad2, badge: '3 scenari' },
+    { key: 'simulazioni', label: 'Simulazioni 3D', icon: Gamepad2, badge: '5 scenari' },
     { key: 'minigame2d', label: 'Spot the Hazard 2D', icon: Target, badge: '5 livelli' },
     { key: 'piattaforma', label: 'Piattaforma', icon: Settings },
   ];
