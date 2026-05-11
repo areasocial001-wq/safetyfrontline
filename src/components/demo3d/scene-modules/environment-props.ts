@@ -2605,9 +2605,9 @@ export function addCyberSecurityOfficeEnvironment(
   floorMat.emissiveColor = new BABYLON.Color3(0.02, 0.03, 0.05);
 
   const wallMat = new BABYLON.StandardMaterial('cyo_wallMat', scene);
-  wallMat.diffuseColor = new BABYLON.Color3(0.10, 0.12, 0.16);
-  wallMat.specularColor = new BABYLON.Color3(0.05, 0.05, 0.08);
-  wallMat.emissiveColor = new BABYLON.Color3(0.015, 0.02, 0.035);
+  wallMat.diffuseColor = new BABYLON.Color3(0.32, 0.36, 0.44);
+  wallMat.specularColor = new BABYLON.Color3(0.08, 0.10, 0.14);
+  wallMat.emissiveColor = new BABYLON.Color3(0.10, 0.12, 0.18);
   wallMat.backFaceCulling = false;
 
   const accentMat = new BABYLON.StandardMaterial('cyo_accentMat', scene);
