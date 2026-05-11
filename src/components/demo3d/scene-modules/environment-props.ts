@@ -2426,15 +2426,30 @@ export function addCybersecurityProps(
   ];
 
   postItPositions.forEach((p, i) => {
-    const postIt = BABYLON.MeshBuilder.CreatePlane(`cyber_postit_${i}`, { width: 0.12, height: 0.12 }, scene);
-    postIt.position = new BABYLON.Vector3(p.x + 0.6, 0.79, p.z);
+    const postIt = BABYLON.MeshBuilder.CreatePlane(`cyber_postit_${i}`, { width: 0.18, height: 0.18 }, scene);
+    postIt.position = new BABYLON.Vector3(p.x + 0.6, 0.795, p.z);
     postIt.rotation.x = Math.PI / 2;
     postIt.rotation.y = seededRandom(i * 37) * 0.5 - 0.25;
     const postItMat = new BABYLON.StandardMaterial(`cyber_postitMat_${i}`, scene);
     postItMat.diffuseColor = p.color;
-    postItMat.emissiveColor = p.color.scale(0.15);
+    postItMat.emissiveColor = p.color.scale(0.85);
     postItMat.specularColor = BABYLON.Color3.Black();
+    postItMat.backFaceCulling = false;
     postIt.material = postItMat;
+    // Pulsing halo so the post-it pops out from the dark desk
+    const halo = BABYLON.MeshBuilder.CreatePlane(`cyber_postitHalo_${i}`, { width: 0.34, height: 0.34 }, scene);
+    halo.position = new BABYLON.Vector3(p.x + 0.6, 0.792, p.z);
+    halo.rotation.x = Math.PI / 2;
+    const haloMat = new BABYLON.StandardMaterial(`cyber_postitHaloMat_${i}`, scene);
+    haloMat.diffuseColor = BABYLON.Color3.Black();
+    haloMat.emissiveColor = p.color;
+    haloMat.alpha = 0.35;
+    haloMat.specularColor = BABYLON.Color3.Black();
+    halo.material = haloMat;
+    halo.isPickable = false;
+    scene.registerBeforeRender(() => {
+      haloMat.alpha = 0.25 + Math.sin(performance.now() * 0.003 + i) * 0.15;
+    });
   });
 
   // --- Unlocked screen glow (emissive screens showing "desktop") ---
