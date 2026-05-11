@@ -92,7 +92,7 @@ export const TrainingPackagesManager = () => {
         supabase.from("training_package_modules").select("*").order("module_order"),
         supabase
           .from("company_training_packages")
-          .select("*, companies(name)")
+          .select("*")
           .order("assigned_at", { ascending: false }),
         supabase.from("companies").select("id, name").order("name"),
       ]);
@@ -105,6 +105,8 @@ export const TrainingPackagesManager = () => {
       setPackages(pkgRes.data || []);
       setCompanies(compRes.data || []);
 
+      const companyMap = new Map((compRes.data || []).map((c: Company) => [c.id, c.name]));
+
       const modsByPkg: Record<string, PackageModule[]> = {};
       (modRes.data || []).forEach((m: PackageModule) => {
         if (!modsByPkg[m.package_id]) modsByPkg[m.package_id] = [];
@@ -114,8 +116,9 @@ export const TrainingPackagesManager = () => {
 
       const assignByPkg: Record<string, CompanyAssignment[]> = {};
       (assignRes.data || []).forEach((a: any) => {
+        const enriched = { ...a, companies: { name: companyMap.get(a.company_id) || "—" } };
         if (!assignByPkg[a.package_id]) assignByPkg[a.package_id] = [];
-        assignByPkg[a.package_id].push(a);
+        assignByPkg[a.package_id].push(enriched);
       });
       setAssignments(assignByPkg);
     } catch (e) {
