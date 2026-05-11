@@ -57,6 +57,7 @@ interface BabylonSceneProps {
   onBriefingStep?: (index: number, total: number) => void;
   onBriefingComplete?: () => void;
   uniformFillConfig?: Partial<import('./scene-modules/uniform-fill-config').UniformFillConfig>;
+  onAimAtFire?: (aiming: boolean) => void;
 }
 
 export const BabylonScene = ({
@@ -79,6 +80,7 @@ export const BabylonScene = ({
   onBriefingStep,
   onBriefingComplete,
   uniformFillConfig,
+  onAimAtFire,
 }: BabylonSceneProps) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const engineRef = useRef<BABYLON.Engine | null>(null);
@@ -328,9 +330,36 @@ export const BabylonScene = ({
     });
 
     // 10. Click detection
+    // Helper: pick up a spare extinguisher (refill charge + dispose pickup visuals)
+    const pickupSpareExtinguisher = (pickupRootName: string) => {
+      const root = scene.getTransformNodeByName(pickupRootName);
+      if (!root) return false;
+      // Already at full charge → no-op with friendly hint
+      if (extChargeRef.current.current >= extChargeRef.current.max) {
+        toast.info('🧯 Estintore già carico!');
+        return false;
+      }
+      extChargeRef.current.current = extChargeRef.current.max;
+      onChargeChange?.(extChargeRef.current.current, extChargeRef.current.max);
+      const meta = root.metadata as { halo?: BABYLON.Mesh; beam?: BABYLON.Mesh; pulseLight?: BABYLON.PointLight; labelPlane?: BABYLON.Mesh; pulseObserver?: BABYLON.Observer<BABYLON.Scene> } | null;
+      if (meta?.pulseObserver) scene.onBeforeRenderObservable.remove(meta.pulseObserver);
+      // Dispose all child meshes + the root itself
+      root.getChildMeshes().forEach(m => m.dispose());
+      meta?.pulseLight?.dispose();
+      root.dispose();
+      toast.success('🧯 Estintore ricaricato al 100%!');
+      return true;
+    };
+
     scene.onPointerDown = (evt, pickResult) => {
       if (pickResult.hit && pickResult.pickedMesh) {
         const pickedMesh = pickResult.pickedMesh;
+
+        // Spare extinguisher pickup (click)
+        if (pickedMesh.metadata?.extinguisherPickup && pickResult.distance < 4) {
+          pickupSpareExtinguisher(pickedMesh.metadata.pickupRoot);
+          return;
+        }
 
         if (pickedMesh.metadata?.safetyRole) {
           setActiveNPCRole(pickedMesh.metadata.safetyRole);
@@ -510,6 +539,9 @@ export const BabylonScene = ({
 
     // 14. Render loop
     let posUpdateCounter = 0;
+    let pickupCheckCounter = 0;
+    let aimCheckCounter = 0;
+    let lastAimState = false;
     engine.runRenderLoop(() => {
       updateDynamicOcclusion();
       detectLookedAtProp();
@@ -522,6 +554,27 @@ export const BabylonScene = ({
         posUpdateCounter = 0;
         const pos = camera.position;
         onPositionUpdate([pos.x, pos.y, pos.z], camera.rotation.y);
+      }
+      // Auto-pickup spare extinguisher when within 1.6m & charge not full
+      pickupCheckCounter++;
+      if (pickupCheckCounter >= 12 && scenario.type === 'laboratory' && camera && extChargeRef.current.current < extChargeRef.current.max) {
+        pickupCheckCounter = 0;
+        for (const m of scene.meshes) {
+          if (m.metadata?.extinguisherPickup && m.isEnabled() && BABYLON.Vector3.Distance(camera.position, m.absolutePosition) < 1.6) {
+            pickupSpareExtinguisher(m.metadata.pickupRoot);
+            break;
+          }
+        }
+      }
+      // Aim-at-fire detection (throttled)
+      aimCheckCounter++;
+      if (aimCheckCounter >= 6 && scenario.type === 'laboratory' && camera && onAimAtFire) {
+        aimCheckCounter = 0;
+        const aim = aimHasFire(scene, camera);
+        if (aim.hit !== lastAimState) {
+          lastAimState = aim.hit;
+          onAimAtFire(aim.hit);
+        }
       }
       scene.render();
     });

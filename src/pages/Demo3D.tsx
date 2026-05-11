@@ -64,6 +64,7 @@ import { FireVictoryOverlay } from "@/components/demo3d/FireVictoryOverlay";
 import { FireClassTutorial } from "@/components/demo3d/FireClassTutorial";
 import { FireClassQuiz } from "@/components/demo3d/FireClassQuiz";
 import { ExtinguisherTypeHUD } from "@/components/demo3d/ExtinguisherTypeHUD";
+import { Crosshair } from "@/components/demo3d/Crosshair";
 import { CyberRiskQuiz } from "@/components/demo3d/CyberRiskQuiz";
 import type { FirePerformanceData } from "@/components/demo3d/GameResults3D";
 import { 
@@ -180,6 +181,7 @@ const Demo3D = () => {
   const [showFireQuiz, setShowFireQuiz] = useState(false);
   const [extinguisherCharge, setExtinguisherCharge] = useState(100);
   const [extinguisherMaxCharge, setExtinguisherMaxCharge] = useState(100);
+  const [aimingAtFire, setAimingAtFire] = useState(false);
   const [firesExtinguished, setFiresExtinguished] = useState(0);
   const [totalFires, setTotalFires] = useState(0);
   const [allFiresOut, setAllFiresOut] = useState(false);
@@ -1435,6 +1437,7 @@ const Demo3D = () => {
               onBriefingStep={(idx) => setBriefingIndex(idx)}
               onBriefingComplete={() => setBriefingActive(false)}
               uniformFillConfig={{ preset: fillPreset, density: fillDensity, seed: fillSeed, perWall: fillPerWall }}
+              onAimAtFire={setAimingAtFire}
             />
 
             {gameStarted && memoizedScenario?.type === 'office' && (
@@ -1572,6 +1575,13 @@ const Demo3D = () => {
                 visible={selectedScenario.type === 'laboratory'}
               />
             )}
+
+            {/* Crosshair (precision aim) */}
+            <Crosshair
+              visible={gameStarted && selectedScenario.type === 'laboratory'}
+              aimingAtFire={aimingAtFire}
+              empty={extinguisherCharge <= 0}
+            />
 
             {/* Extinguisher Type HUD */}
             {gameStarted && selectedExtinguisher && (

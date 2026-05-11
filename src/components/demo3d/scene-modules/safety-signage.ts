@@ -51,12 +51,16 @@ export function addSafetySignage(
     }
   });
 
-  // === 2. FIRE EXTINGUISHERS ===
+  // === 2. FIRE EXTINGUISHERS (pickable spare units) ===
   const extinguisherPositions = getExtinguisherPositions(type);
   extinguisherPositions.forEach((data, i) => {
+    // Group all parts under a TransformNode so we can dispose on pickup
+    const root = new BABYLON.TransformNode(`extinguisherPickup_root_${i}`, scene);
+
     const bracket = BABYLON.MeshBuilder.CreateBox(`bracket_${i}`, { width: 0.35, height: 0.8, depth: 0.15 }, scene);
     bracket.position = data.pos;
     bracket.rotation = new BABYLON.Vector3(0, data.rotation, 0);
+    bracket.parent = root;
     const bracketMat = new BABYLON.StandardMaterial(`bracketMat_${i}`, scene);
     bracketMat.diffuseColor = new BABYLON.Color3(0.15, 0.15, 0.15);
     bracketMat.specularColor = new BABYLON.Color3(0.3, 0.3, 0.3);
@@ -65,20 +69,96 @@ export function addSafetySignage(
     const cylinder = BABYLON.MeshBuilder.CreateCylinder(`extinguisher_${i}`, { height: 0.7, diameter: 0.22 }, scene);
     cylinder.position = data.pos.clone().addInPlace(new BABYLON.Vector3(0, 0, 0.15));
     cylinder.rotation = new BABYLON.Vector3(0, data.rotation, 0);
+    cylinder.parent = root;
     const extMat = new BABYLON.StandardMaterial(`extMat_${i}`, scene);
-    extMat.diffuseColor = new BABYLON.Color3(0.85, 0.1, 0.1);
-    extMat.emissiveColor = new BABYLON.Color3(0.15, 0.02, 0.02);
-    extMat.specularColor = new BABYLON.Color3(0.6, 0.6, 0.6);
+    extMat.diffuseColor = new BABYLON.Color3(1.0, 0.15, 0.15);
+    extMat.emissiveColor = new BABYLON.Color3(0.55, 0.05, 0.05); // strong glow so it pops
+    extMat.specularColor = new BABYLON.Color3(0.8, 0.8, 0.8);
     extMat.specularPower = 64;
     cylinder.material = extMat;
+    cylinder.isPickable = true;
+    cylinder.metadata = { ...(cylinder.metadata || {}), extinguisherPickup: true, pickupRoot: root.name, pickupIndex: i };
 
     const nozzle = BABYLON.MeshBuilder.CreateCylinder(`nozzle_${i}`, { height: 0.15, diameter: 0.08 }, scene);
     nozzle.position = data.pos.clone().addInPlace(new BABYLON.Vector3(0, 0.42, 0.15));
     nozzle.rotation = new BABYLON.Vector3(0, data.rotation, 0);
+    nozzle.parent = root;
     const nozzleMat = new BABYLON.StandardMaterial(`nozzleMat_${i}`, scene);
     nozzleMat.diffuseColor = new BABYLON.Color3(0.2, 0.2, 0.2);
     nozzleMat.specularColor = new BABYLON.Color3(0.5, 0.5, 0.5);
     nozzle.material = nozzleMat;
+
+    // Halo glow ring at base (visible from far away)
+    const halo = BABYLON.MeshBuilder.CreateTorus(`extHalo_${i}`, { diameter: 1.0, thickness: 0.08, tessellation: 24 }, scene);
+    halo.position = data.pos.clone().addInPlace(new BABYLON.Vector3(0, -0.45, 0.15));
+    halo.rotation.x = Math.PI / 2;
+    halo.parent = root;
+    const haloMat = new BABYLON.StandardMaterial(`extHaloMat_${i}`, scene);
+    haloMat.diffuseColor = new BABYLON.Color3(0, 0, 0);
+    haloMat.emissiveColor = new BABYLON.Color3(1.0, 0.85, 0.1);
+    haloMat.disableLighting = true;
+    halo.material = haloMat;
+    halo.isPickable = false;
+
+    // Vertical light beam to mark location from a distance
+    const beam = BABYLON.MeshBuilder.CreateCylinder(`extBeam_${i}`, { height: 4, diameterTop: 0.05, diameterBottom: 0.5, tessellation: 12 }, scene);
+    beam.position = data.pos.clone().addInPlace(new BABYLON.Vector3(0, 1.8, 0.15));
+    beam.parent = root;
+    const beamMat = new BABYLON.StandardMaterial(`extBeamMat_${i}`, scene);
+    beamMat.diffuseColor = new BABYLON.Color3(0, 0, 0);
+    beamMat.emissiveColor = new BABYLON.Color3(1.0, 0.7, 0.05);
+    beamMat.alpha = 0.25;
+    beamMat.disableLighting = true;
+    beam.material = beamMat;
+    beam.isPickable = false;
+
+    // Pulsing point light
+    const pulseLight = new BABYLON.PointLight(`extPulse_${i}`, data.pos.clone().addInPlace(new BABYLON.Vector3(0, 0.3, 0.4)), scene);
+    pulseLight.diffuse = new BABYLON.Color3(1.0, 0.5, 0.1);
+    pulseLight.intensity = 0.6;
+    pulseLight.range = 4;
+
+    // Floating "PRENDI" label using DynamicTexture
+    const labelPlane = BABYLON.MeshBuilder.CreatePlane(`extLabel_${i}`, { width: 1.2, height: 0.35 }, scene);
+    labelPlane.position = data.pos.clone().addInPlace(new BABYLON.Vector3(0, 0.95, 0.15));
+    labelPlane.parent = root;
+    labelPlane.billboardMode = BABYLON.Mesh.BILLBOARDMODE_Y;
+    labelPlane.isPickable = false;
+    const labelTex = new BABYLON.DynamicTexture(`extLabelTex_${i}`, { width: 512, height: 128 }, scene, false);
+    labelTex.hasAlpha = true;
+    const ctx = labelTex.getContext() as unknown as CanvasRenderingContext2D;
+    ctx.clearRect(0, 0, 512, 128);
+    ctx.fillStyle = 'rgba(220,30,30,0.9)';
+    ctx.fillRect(0, 0, 512, 128);
+    ctx.strokeStyle = 'rgba(255,220,80,1)';
+    ctx.lineWidth = 8;
+    ctx.strokeRect(4, 4, 504, 120);
+    ctx.fillStyle = 'white';
+    ctx.font = 'bold 56px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('🧯 PRENDI', 256, 64);
+    labelTex.update();
+    const labelMat2 = new BABYLON.StandardMaterial(`extLabelMat_${i}`, scene);
+    labelMat2.diffuseTexture = labelTex;
+    labelMat2.emissiveTexture = labelTex;
+    labelMat2.useAlphaFromDiffuseTexture = true;
+    labelMat2.diffuseTexture.hasAlpha = true;
+    labelMat2.backFaceCulling = false;
+    labelPlane.material = labelMat2;
+
+    // Pulse animation (intensity + halo scale)
+    let pulseT = i * 0.6;
+    const pulseObserver = scene.onBeforeRenderObservable.add(() => {
+      pulseT += scene.getEngine().getDeltaTime() / 1000;
+      const s = 1 + Math.sin(pulseT * 3) * 0.15;
+      halo.scaling.set(s, s, 1);
+      pulseLight.intensity = 0.5 + Math.sin(pulseT * 3) * 0.3;
+      labelPlane.position.y = data.pos.y + 0.95 + Math.sin(pulseT * 2) * 0.05;
+    });
+
+    // Store cleanup data on root
+    root.metadata = { halo, beam, pulseLight, labelPlane, pulseObserver };
 
     if (shadowGenerator) {
       shadowGenerator.addShadowCaster(bracket);
