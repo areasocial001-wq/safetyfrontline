@@ -283,6 +283,7 @@ export const BabylonScene = ({
 
       const texSize = 256;
       const dynTex = new BABYLON.DynamicTexture(`${risk.id}_dynTex`, texSize, scene, true);
+      dynTex.hasAlpha = true;
       const dtCtx = dynTex.getContext();
       let icon: string, bgColor: string, glowColor: BABYLON.Color3;
       switch (risk.severity) {
