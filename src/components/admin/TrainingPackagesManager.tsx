@@ -228,11 +228,12 @@ export const TrainingPackagesManager = () => {
       }));
 
       if (rows.length > 0) {
-        // Use upsert-like behavior: delete existing then insert (ignore duplicates)
+        // Insert one-by-one, ignore duplicate-key errors so re-assigning is idempotent
         for (const row of rows) {
-          await supabase
-            .from("company_mandatory_modules")
-            .upsert(row, { onConflict: "company_id,module_id" } as any);
+          const { error } = await supabase.from("company_mandatory_modules").insert(row);
+          if (error && error.code !== "23505") {
+            console.warn("Module insert warning:", error);
+          }
         }
       }
 
