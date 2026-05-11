@@ -2616,7 +2616,8 @@ export function addCyberSecurityOfficeEnvironment(
   accentMat.specularColor = BABYLON.Color3.Black();
 
   const ceilingMat = new BABYLON.StandardMaterial('cyo_ceilMat', scene);
-  ceilingMat.diffuseColor = new BABYLON.Color3(0.07, 0.08, 0.10);
+  ceilingMat.diffuseColor = new BABYLON.Color3(0.18, 0.20, 0.24);
+  ceilingMat.emissiveColor = new BABYLON.Color3(0.08, 0.09, 0.11);
   ceilingMat.specularColor = BABYLON.Color3.Black();
   ceilingMat.backFaceCulling = false;
 
