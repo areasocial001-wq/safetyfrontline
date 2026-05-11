@@ -78,14 +78,19 @@ const MyCertificates = () => {
 
       // Fetch company settings
       let companyLogoUrl: string | null = null;
-      let certSettings = {
+      let certSettings: {
+        template: string; themeColor: string; font: string;
+        textLayout: string; logoPosition: string;
+        modulePrefix: string; orientation: 'portrait' | 'landscape';
+      } = {
         template: 'formale', themeColor: '#3B82F6', font: 'helvetica',
         textLayout: 'centered', logoPosition: 'top-left',
+        modulePrefix: 'Verifica della Ricaduta sulla', orientation: 'portrait',
       };
 
       const { data: companyUserData } = await supabase
         .from('company_users')
-        .select(`company_id, companies(logo_url, certificate_template, certificate_theme_color, certificate_font, certificate_text_layout, certificate_logo_position)`)
+        .select(`company_id, companies(logo_url, certificate_template, certificate_theme_color, certificate_font, certificate_text_layout, certificate_logo_position, certificate_module_prefix, certificate_orientation)`)
         .eq('user_id', user.id)
         .single();
 
@@ -98,6 +103,8 @@ const MyCertificates = () => {
           font: c.certificate_font || 'helvetica',
           textLayout: c.certificate_text_layout || 'centered',
           logoPosition: c.certificate_logo_position || 'top-left',
+          modulePrefix: c.certificate_module_prefix ?? 'Verifica della Ricaduta sulla',
+          orientation: (c.certificate_orientation || 'portrait') as 'portrait' | 'landscape',
         };
       }
 

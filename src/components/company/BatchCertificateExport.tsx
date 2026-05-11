@@ -90,18 +90,22 @@ export const BatchCertificateExport = ({ companyId }: BatchCertificateExportProp
           certificate_theme_color,
           certificate_font,
           certificate_text_layout,
-          certificate_logo_position
+          certificate_logo_position,
+          certificate_module_prefix,
+          certificate_orientation
         `)
         .eq('id', companyId)
         .single();
 
       const certificateSettings = companyData ? {
-        template: companyData.certificate_template || 'formale',
-        themeColor: companyData.certificate_theme_color || '#3B82F6',
-        font: companyData.certificate_font || 'helvetica',
-        textLayout: companyData.certificate_text_layout || 'centered',
-        logoPosition: companyData.certificate_logo_position || 'top-left',
-        logoUrl: companyData.logo_url,
+        template: (companyData as any).certificate_template || 'formale',
+        themeColor: (companyData as any).certificate_theme_color || '#3B82F6',
+        font: (companyData as any).certificate_font || 'helvetica',
+        textLayout: (companyData as any).certificate_text_layout || 'centered',
+        logoPosition: (companyData as any).certificate_logo_position || 'top-left',
+        modulePrefix: (companyData as any).certificate_module_prefix ?? 'Verifica della Ricaduta sulla',
+        orientation: ((companyData as any).certificate_orientation || 'portrait') as 'portrait' | 'landscape',
+        logoUrl: (companyData as any).logo_url,
       } : undefined;
 
       // Group sessions by user and scenario
@@ -174,6 +178,8 @@ export const BatchCertificateExport = ({ companyId }: BatchCertificateExportProp
               font: certificateSettings?.font,
               textLayout: certificateSettings?.textLayout,
               logoPosition: certificateSettings?.logoPosition,
+              modulePrefix: certificateSettings?.modulePrefix,
+              orientation: certificateSettings?.orientation,
             });
 
             // Sanitize filename
