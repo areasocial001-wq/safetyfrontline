@@ -2509,20 +2509,37 @@ export function addCybersecurityProps(
       doc.rotation.x = Math.PI / 2;
       doc.rotation.y = seededRandom(d * 53 + i) * 0.3 - 0.15;
       const docMat = new BABYLON.StandardMaterial(`cyber_docMat_${i}_${d}`, scene);
-      docMat.diffuseColor = new BABYLON.Color3(0.95, 0.95, 0.92);
+      docMat.diffuseColor = new BABYLON.Color3(1.0, 1.0, 0.98);
+      docMat.emissiveColor = new BABYLON.Color3(0.55, 0.55, 0.50);
       docMat.specularColor = BABYLON.Color3.Black();
+      docMat.backFaceCulling = false;
       doc.material = docMat;
     }
     // Red "CONFIDENZIALE" stamp overlay
-    const stamp = BABYLON.MeshBuilder.CreatePlane(`cyber_stamp_${i}`, { width: 0.15, height: 0.04 }, scene);
-    stamp.position = new BABYLON.Vector3(dp.x - 0.25, 0.80, dp.z + 0.2);
+    const stamp = BABYLON.MeshBuilder.CreatePlane(`cyber_stamp_${i}`, { width: 0.18, height: 0.05 }, scene);
+    stamp.position = new BABYLON.Vector3(dp.x - 0.25, 0.808, dp.z + 0.2);
     stamp.rotation.x = Math.PI / 2;
     stamp.rotation.z = -0.15;
     const stampMat = new BABYLON.StandardMaterial(`cyber_stampMat_${i}`, scene);
-    stampMat.diffuseColor = new BABYLON.Color3(0.9, 0.1, 0.1);
-    stampMat.emissiveColor = new BABYLON.Color3(0.3, 0, 0);
-    stampMat.alpha = 0.8;
+    stampMat.diffuseColor = new BABYLON.Color3(1.0, 0.15, 0.15);
+    stampMat.emissiveColor = new BABYLON.Color3(0.9, 0.1, 0.1);
+    stampMat.specularColor = BABYLON.Color3.Black();
+    stampMat.backFaceCulling = false;
     stamp.material = stampMat;
+    // Pulsing halo around docs
+    const docHalo = BABYLON.MeshBuilder.CreatePlane(`cyber_docHalo_${i}`, { width: 1.1, height: 0.7 }, scene);
+    docHalo.position = new BABYLON.Vector3(dp.x, 0.793, dp.z + 0.2);
+    docHalo.rotation.x = Math.PI / 2;
+    const docHaloMat = new BABYLON.StandardMaterial(`cyber_docHaloMat_${i}`, scene);
+    docHaloMat.diffuseColor = BABYLON.Color3.Black();
+    docHaloMat.emissiveColor = new BABYLON.Color3(1.0, 0.85, 0.3);
+    docHaloMat.alpha = 0.25;
+    docHaloMat.specularColor = BABYLON.Color3.Black();
+    docHalo.material = docHaloMat;
+    docHalo.isPickable = false;
+    scene.registerBeforeRender(() => {
+      docHaloMat.alpha = 0.18 + Math.sin(performance.now() * 0.0028 + i) * 0.12;
+    });
   });
 
   // --- Smartphone with hotspot (glowing phone on side table) ---
