@@ -230,9 +230,9 @@ export const Modules = () => {
           {/* Summary Stats */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-12 mb-8">
             {[
-              { value: "29+", label: "Moduli Formativi", icon: GraduationCap },
+              { value: "35+", label: "Moduli Formativi", icon: GraduationCap },
+              { value: "16", label: "Percorsi & Abilitazioni", icon: Crown },
               { value: "5", label: "Simulazioni 3D", icon: Gamepad2 },
-              { value: "3", label: "Settori di Rischio", icon: Shield },
               { value: "∞", label: "Personalizzazioni", icon: Settings },
             ].map((stat, i) => (
               <div key={i} className="text-center p-4 rounded-xl bg-background/50 border border-border">
