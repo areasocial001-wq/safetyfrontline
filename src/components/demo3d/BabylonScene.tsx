@@ -328,9 +328,36 @@ export const BabylonScene = ({
     });
 
     // 10. Click detection
+    // Helper: pick up a spare extinguisher (refill charge + dispose pickup visuals)
+    const pickupSpareExtinguisher = (pickupRootName: string) => {
+      const root = scene.getTransformNodeByName(pickupRootName);
+      if (!root) return false;
+      // Already at full charge → no-op with friendly hint
+      if (extChargeRef.current.current >= extChargeRef.current.max) {
+        toast.info('🧯 Estintore già carico!');
+        return false;
+      }
+      extChargeRef.current.current = extChargeRef.current.max;
+      onChargeChange?.(extChargeRef.current.current, extChargeRef.current.max);
+      const meta = root.metadata as { halo?: BABYLON.Mesh; beam?: BABYLON.Mesh; pulseLight?: BABYLON.PointLight; labelPlane?: BABYLON.Mesh; pulseObserver?: BABYLON.Observer<BABYLON.Scene> } | null;
+      if (meta?.pulseObserver) scene.onBeforeRenderObservable.remove(meta.pulseObserver);
+      // Dispose all child meshes + the root itself
+      root.getChildMeshes().forEach(m => m.dispose());
+      meta?.pulseLight?.dispose();
+      root.dispose();
+      toast.success('🧯 Estintore ricaricato al 100%!');
+      return true;
+    };
+
     scene.onPointerDown = (evt, pickResult) => {
       if (pickResult.hit && pickResult.pickedMesh) {
         const pickedMesh = pickResult.pickedMesh;
+
+        // Spare extinguisher pickup (click)
+        if (pickedMesh.metadata?.extinguisherPickup && pickResult.distance < 4) {
+          pickupSpareExtinguisher(pickedMesh.metadata.pickupRoot);
+          return;
+        }
 
         if (pickedMesh.metadata?.safetyRole) {
           setActiveNPCRole(pickedMesh.metadata.safetyRole);
