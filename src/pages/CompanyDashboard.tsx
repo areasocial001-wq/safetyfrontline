@@ -304,6 +304,8 @@ const CompanyDashboard = () => {
                 certificate_font: company.certificate_font || 'helvetica',
                 certificate_text_layout: company.certificate_text_layout || 'centered',
                 certificate_logo_position: company.certificate_logo_position || 'top-left',
+                certificate_module_prefix: (company as any).certificate_module_prefix ?? 'Verifica della Ricaduta sulla',
+                certificate_orientation: (company as any).certificate_orientation || 'portrait',
                 logo_url: company.logo_url,
               }}
               onUpdate={() => setRefreshKey((prev) => prev + 1)}

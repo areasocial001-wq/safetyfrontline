@@ -19,6 +19,8 @@ interface Company {
   certificate_font: string;
   certificate_text_layout: string;
   certificate_logo_position: string;
+  certificate_module_prefix: string;
+  certificate_orientation: string;
 }
 
 export const useCompany = () => {
@@ -58,7 +60,9 @@ export const useCompany = () => {
               certificate_theme_color,
               certificate_font,
               certificate_text_layout,
-              certificate_logo_position
+              certificate_logo_position,
+              certificate_module_prefix,
+              certificate_orientation
             )
           `)
           .eq('user_id', user.id)
