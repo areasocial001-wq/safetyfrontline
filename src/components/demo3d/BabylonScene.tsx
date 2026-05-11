@@ -80,6 +80,7 @@ export const BabylonScene = ({
   onBriefingStep,
   onBriefingComplete,
   uniformFillConfig,
+  onAimAtFire,
 }: BabylonSceneProps) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const engineRef = useRef<BABYLON.Engine | null>(null);
