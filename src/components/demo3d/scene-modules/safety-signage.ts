@@ -126,7 +126,7 @@ export function addSafetySignage(
     labelPlane.isPickable = false;
     const labelTex = new BABYLON.DynamicTexture(`extLabelTex_${i}`, { width: 512, height: 128 }, scene, false);
     labelTex.hasAlpha = true;
-    const ctx = labelTex.getContext();
+    const ctx = labelTex.getContext() as unknown as CanvasRenderingContext2D;
     ctx.clearRect(0, 0, 512, 128);
     ctx.fillStyle = 'rgba(220,30,30,0.9)';
     ctx.fillRect(0, 0, 512, 128);
