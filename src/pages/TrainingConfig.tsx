@@ -9,7 +9,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Shield, ArrowLeft, Settings, Calendar, Building2, Plus, Trash2, Save } from "lucide-react";
+import { Shield, ArrowLeft, Settings, Calendar, Building2, Plus, Trash2, Save, Package } from "lucide-react";
+import { TrainingPackagesManager } from "@/components/admin/TrainingPackagesManager";
 import { Link } from "react-router-dom";
 import { toast } from "sonner";
 import { Separator } from "@/components/ui/separator";
@@ -255,10 +256,14 @@ const TrainingConfig = () => {
       {/* Main Content */}
       <main className="container mx-auto px-4 py-8 max-w-6xl">
         <Tabs defaultValue="config" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-3">
+          <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="config">
               <Settings className="w-4 h-4 mr-2" />
               Configurazione
+            </TabsTrigger>
+            <TabsTrigger value="packages">
+              <Package className="w-4 h-4 mr-2" />
+              Pacchetti
             </TabsTrigger>
             <TabsTrigger value="times">
               <Calendar className="w-4 h-4 mr-2" />
@@ -269,6 +274,10 @@ const TrainingConfig = () => {
               Report Compliance
             </TabsTrigger>
           </TabsList>
+
+          <TabsContent value="packages">
+            <TrainingPackagesManager />
+          </TabsContent>
 
           <TabsContent value="config" className="space-y-8">
           {/* Global Reminder Configuration */}

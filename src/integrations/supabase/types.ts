@@ -251,6 +251,41 @@ export type Database = {
           },
         ]
       }
+      company_training_packages: {
+        Row: {
+          assigned_at: string
+          assigned_by: string | null
+          company_id: string
+          deadline_date: string | null
+          id: string
+          package_id: string
+        }
+        Insert: {
+          assigned_at?: string
+          assigned_by?: string | null
+          company_id: string
+          deadline_date?: string | null
+          id?: string
+          package_id: string
+        }
+        Update: {
+          assigned_at?: string
+          assigned_by?: string | null
+          company_id?: string
+          deadline_date?: string | null
+          id?: string
+          package_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "company_training_packages_package_id_fkey"
+            columns: ["package_id"]
+            isOneToOne: false
+            referencedRelation: "training_packages"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       company_users: {
         Row: {
           company_id: string
@@ -669,6 +704,71 @@ export type Database = {
           style?: string
           subtitle?: string | null
           title?: string
+        }
+        Relationships: []
+      }
+      training_package_modules: {
+        Row: {
+          created_at: string
+          deadline_offset_days: number | null
+          grace_period_days: number
+          id: string
+          module_id: string
+          module_order: number
+          package_id: string
+        }
+        Insert: {
+          created_at?: string
+          deadline_offset_days?: number | null
+          grace_period_days?: number
+          id?: string
+          module_id: string
+          module_order?: number
+          package_id: string
+        }
+        Update: {
+          created_at?: string
+          deadline_offset_days?: number | null
+          grace_period_days?: number
+          id?: string
+          module_id?: string
+          module_order?: number
+          package_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "training_package_modules_package_id_fkey"
+            columns: ["package_id"]
+            isOneToOne: false
+            referencedRelation: "training_packages"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      training_packages: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          description: string | null
+          id: string
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          name?: string
+          updated_at?: string
         }
         Relationships: []
       }
