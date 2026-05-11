@@ -73,10 +73,25 @@ export const Modules = () => {
       { icon: Truck, title: "Movimentazione Meccanica", subtitle: "Carrelli, Gru e Mezzi", description: "Conduzione sicura di carrelli elevatori, gru, piattaforme aeree. Segnaletica.", color: "accent" },
       { icon: Heart, title: "Primo Soccorso Avanzato", subtitle: "Emergenze Industriali", description: "Gestione emergenze in ambienti ad alto rischio, triage, decontaminazione e DAE.", color: "muted" },
     ],
-    ruolo: [
+    figure: [
       { icon: Crown, title: "RSPP Datore di Lavoro", subtitle: "Art. 34 D.Lgs 81/08", description: "Il DL come RSPP: responsabilità, DVR, gestione rischi, ciclo PDCA, near miss reporting. 16-48 ore per livello di rischio.", color: "destructive" },
       { icon: Users, title: "RLS", subtitle: "Rappresentante Lavoratori", description: "Corso 32 ore: elezione, attribuzioni art. 50, consultazione preventiva, accesso DVR, ricorso alle autorità competenti.", color: "accent" },
-      { icon: Eye, title: "Corso Preposto", subtitle: "Vigilanza e Intervento", description: "Obblighi aggiornati alla L. 215/2021: vigilanza, intervento diretto, interruzione attività, aggiornamento biennale.", color: "secondary" },
+      { icon: Eye, title: "Corso Preposto", subtitle: "L. 215/2021", description: "Vigilanza, intervento diretto, interruzione attività pericolose, aggiornamento biennale obbligatorio.", color: "secondary" },
+      { icon: Flame, title: "Addetto Antincendio", subtitle: "D.M. 2 Settembre 2021", description: "Prevenzione incendi, protezione attiva/passiva, esercitazioni pratiche con estintori in scenari 3D first-person.", color: "destructive" },
+      { icon: Heart, title: "Addetto Primo Soccorso", subtitle: "D.M. 388/2003", description: "Allertamento soccorsi, BLS-DAE, gestione traumi, emorragie, ustioni, intossicazioni. Gruppi A, B e C.", color: "accent" },
+      { icon: Shield, title: "ASPP Mod. A-B-C", subtitle: "Addetto SPP", description: "Supporto all'RSPP nelle attività di prevenzione: modulo base, specialistico per macrosettore e abilità relazionali.", color: "primary", comingSoon: true },
+      { icon: Crown, title: "Dirigente per la Sicurezza", subtitle: "Art. 37 D.Lgs 81/08", description: "Organizzazione e gestione dei processi in materia di salute e sicurezza, deleghe, modello 231, appalti.", color: "destructive", comingSoon: true },
+      { icon: Heart, title: "Lavoratrici Gestanti", subtitle: "D.Lgs 151/2001", description: "Tutela maternità: modifica mansioni, visite prenatali, divieto lavoro notturno, rischi specifici in gravidanza.", color: "accent", comingSoon: true },
+    ],
+    attrezzature: [
+      { icon: Truck, title: "Carrelli Elevatori", subtitle: "Abilitazione conduttore — 12h", description: "Uso in sicurezza di carrelli industriali semoventi, controlli pre-operativi, manovre e gestione del carico.", color: "secondary", comingSoon: true },
+      { icon: Box, title: "Carroponte", subtitle: "Operatore gru a ponte — 8h", description: "Imbracatura carichi, uso radiocomando, segnaletica gestuale, controllo aree di manovra.", color: "secondary", comingSoon: true },
+      { icon: ArrowUp, title: "PLE — Piattaforme Elevabili", subtitle: "Con e senza stabilizzatori — 10h", description: "Piattaforme di lavoro mobili elevabili: verifiche, posizionamento, uso in sicurezza, emergenze.", color: "primary", comingSoon: true },
+      { icon: ArrowUp, title: "Gru (Torre / Mobile)", subtitle: "Operatore gru — 14h", description: "Gru a torre e gru mobili: stabilità, calcolo carichi, ancoraggio, manovre con vento.", color: "destructive", comingSoon: true },
+      { icon: ArrowUp, title: "Scale e Trabattelli", subtitle: "Lavori in quota mobili — 4h", description: "Scale portatili, trabattelli, ponti su ruote: montaggio, uso e DPI anticaduta.", color: "primary", comingSoon: true },
+      { icon: Truck, title: "Trattori Agricoli e Forestali", subtitle: "Ruote e cingoli — 13h", description: "Conduzione in sicurezza di trattori, attrezzature accoppiate, prevenzione ribaltamento e cinture.", color: "secondary", comingSoon: true },
+      { icon: AlertTriangle, title: "Escavatori e MMT", subtitle: "Macchine Movimento Terra — 10-16h", description: "Escavatori idraulici, pale, terne, autoribaltabili: stabilità, manovre, lavori vicino reti.", color: "destructive", comingSoon: true },
+      { icon: Cog, title: "Pompe per Calcestruzzo", subtitle: "Autopompe e bracci — 14h", description: "Posizionamento, stabilizzatori, gestione braccio, comunicazione di cantiere e procedure di emergenza.", color: "secondary", comingSoon: true },
     ],
     cybersecurity: [
       { icon: Mail, title: "Phishing & Social Engineering", subtitle: "Riconoscere le Trappole", description: "Identificare email fraudolente, spear phishing, vishing e tecniche di manipolazione. Scenari interattivi realistici.", color: "destructive" },
