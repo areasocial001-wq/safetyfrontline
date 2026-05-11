@@ -58,6 +58,9 @@ interface BabylonSceneProps {
   onBriefingComplete?: () => void;
   uniformFillConfig?: Partial<import('./scene-modules/uniform-fill-config').UniformFillConfig>;
   onAimAtFire?: (aiming: boolean) => void;
+  onAimAtFireIndex?: (index: number | null) => void;
+  /** "readable" boosts visibility (less fog, less bloom, neutral exposure) */
+  readabilityMode?: boolean;
 }
 
 export const BabylonScene = ({
@@ -81,6 +84,8 @@ export const BabylonScene = ({
   onBriefingComplete,
   uniformFillConfig,
   onAimAtFire,
+  onAimAtFireIndex,
+  readabilityMode = false,
 }: BabylonSceneProps) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const engineRef = useRef<BABYLON.Engine | null>(null);
@@ -542,6 +547,7 @@ export const BabylonScene = ({
     let pickupCheckCounter = 0;
     let aimCheckCounter = 0;
     let lastAimState = false;
+    let lastAimIndex: number | null = null;
     engine.runRenderLoop(() => {
       updateDynamicOcclusion();
       detectLookedAtProp();
@@ -568,12 +574,17 @@ export const BabylonScene = ({
       }
       // Aim-at-fire detection (throttled)
       aimCheckCounter++;
-      if (aimCheckCounter >= 6 && scenario.type === 'laboratory' && camera && onAimAtFire) {
+      if (aimCheckCounter >= 6 && scenario.type === 'laboratory' && camera) {
         aimCheckCounter = 0;
         const aim = aimHasFire(scene, camera);
-        if (aim.hit !== lastAimState) {
+        if (onAimAtFire && aim.hit !== lastAimState) {
           lastAimState = aim.hit;
           onAimAtFire(aim.hit);
+        }
+        const idx = aim.hit ? aim.nearestIndex : null;
+        if (onAimAtFireIndex && idx !== lastAimIndex) {
+          lastAimIndex = idx;
+          onAimAtFireIndex(idx);
         }
       }
       scene.render();
@@ -1115,6 +1126,61 @@ export const BabylonScene = ({
     ipc.exposure = base.exposure * visualSettings.brightness;
     ipc.contrast = base.contrast * visualSettings.contrast;
   }, [visualSettings?.brightness, visualSettings?.contrast, isReady]);
+
+  // Readability mode: dynamically reduces fog & post-FX so smoke does not
+  // visually merge with the environment during the antincendio micro-challenge.
+  useEffect(() => {
+    const scene = sceneRef.current;
+    const base = baseImageProcRef.current;
+    if (!scene || !base) return;
+
+    // Cache scenario baseline fog values lazily on first run
+    const meta = scene.metadata || (scene.metadata = {});
+    if (meta.__readability_base === undefined) {
+      meta.__readability_base = {
+        fogDensity: scene.fogDensity,
+        fogColor: scene.fogColor.clone(),
+      };
+    }
+    const baseFog = meta.__readability_base as { fogDensity: number; fogColor: BABYLON.Color3 };
+
+    const pipeline = scene.postProcessRenderPipelineManager?.supportedPipelines?.find(
+      p => p.name === 'cinematicPipeline'
+    ) as BABYLON.DefaultRenderingPipeline | undefined;
+
+    if (readabilityMode) {
+      // Heavy reduction of fog + cooler/lighter fog tint so smoke stays distinct
+      scene.fogDensity = baseFog.fogDensity * 0.25;
+      scene.fogColor = new BABYLON.Color3(
+        Math.min(1, baseFog.fogColor.r + 0.25),
+        Math.min(1, baseFog.fogColor.g + 0.25),
+        Math.min(1, baseFog.fogColor.b + 0.25),
+      );
+      const ipc = scene.imageProcessingConfiguration;
+      ipc.exposure = base.exposure * 1.2;
+      ipc.contrast = base.contrast * 0.9;
+      if (pipeline) {
+        pipeline.bloomWeight = Math.min(pipeline.bloomWeight, 0.15);
+        pipeline.chromaticAberrationEnabled = false;
+        if (pipeline.imageProcessing) {
+          pipeline.imageProcessing.vignetteEnabled = false;
+        }
+      }
+    } else {
+      // Restore baseline
+      scene.fogDensity = baseFog.fogDensity;
+      scene.fogColor = baseFog.fogColor.clone();
+      const ipc = scene.imageProcessingConfiguration;
+      ipc.exposure = base.exposure * (visualSettings?.brightness ?? 1);
+      ipc.contrast = base.contrast * (visualSettings?.contrast ?? 1);
+      if (pipeline) {
+        pipeline.chromaticAberrationEnabled = true;
+        if (pipeline.imageProcessing) {
+          pipeline.imageProcessing.vignetteEnabled = true;
+        }
+      }
+    }
+  }, [readabilityMode, isReady, visualSettings?.brightness, visualSettings?.contrast]);
 
   // Toggle high-contrast mode for office walls vs floor (and other scenarios)
   useEffect(() => {

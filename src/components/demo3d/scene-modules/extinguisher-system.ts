@@ -234,13 +234,14 @@ export function aimHasFire(
   camera: BABYLON.UniversalCamera,
   maxDistance = 8,
   tolerance = 2.5
-): { hit: boolean; nearestDistance: number } {
+): { hit: boolean; nearestDistance: number; nearestIndex: number | null } {
   const fireEmitters = scene.meshes.filter(m => m.name.startsWith('fireEmitter_'));
-  if (fireEmitters.length === 0) return { hit: false, nearestDistance: Infinity };
+  if (fireEmitters.length === 0) return { hit: false, nearestDistance: Infinity, nearestIndex: null };
 
   const origin = camera.position;
   const forward = camera.getDirection(BABYLON.Vector3.Forward()).normalize();
   let nearest = Infinity;
+  let nearestIndex: number | null = null;
   let hit = false;
 
   for (const em of fireEmitters) {
@@ -249,10 +250,13 @@ export function aimHasFire(
     if (projLen < 0 || projLen > maxDistance) continue;
     const closestPoint = origin.add(forward.scale(projLen));
     const perpDist = BABYLON.Vector3.Distance(closestPoint, em.position);
-    if (perpDist < tolerance) {
+    if (perpDist < tolerance && perpDist < nearest) {
       hit = true;
-      nearest = Math.min(nearest, perpDist);
+      nearest = perpDist;
+      // Parse the trailing index from "fireEmitter_<n>"
+      const m = em.name.match(/fireEmitter_(\d+)/);
+      nearestIndex = m ? parseInt(m[1], 10) : null;
     }
   }
-  return { hit, nearestDistance: nearest };
+  return { hit, nearestDistance: nearest, nearestIndex };
 }

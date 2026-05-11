@@ -25,6 +25,8 @@ import { GameResults3D } from "@/components/demo3d/GameResults3D";
 import { ScenarioBriefingOverlay } from "@/components/demo3d/ScenarioBriefingOverlay";
 import { FireDangerBar } from "@/components/demo3d/FireDangerBar";
 import { FireVignetteOverlay } from "@/components/demo3d/FireVignetteOverlay";
+import { FireClassHUD } from "@/components/demo3d/FireClassHUD";
+import { ReadabilityToggle } from "@/components/demo3d/ReadabilityToggle";
 import { FireGameOver } from "@/components/demo3d/FireGameOver";
 import { EvacuationCountdown } from "@/components/demo3d/EvacuationCountdown";
 import { SprinklerStatusHUD } from "@/components/demo3d/SprinklerStatusHUD";
@@ -184,6 +186,8 @@ const Demo3D = () => {
   const [extinguisherCharge, setExtinguisherCharge] = useState(100);
   const [extinguisherMaxCharge, setExtinguisherMaxCharge] = useState(100);
   const [aimingAtFire, setAimingAtFire] = useState(false);
+  const [aimedFireIndex, setAimedFireIndex] = useState<number | null>(null);
+  const [readabilityMode, setReadabilityMode] = useState(false);
   const [firesExtinguished, setFiresExtinguished] = useState(0);
   const [totalFires, setTotalFires] = useState(0);
   const [allFiresOut, setAllFiresOut] = useState(false);
@@ -1450,6 +1454,8 @@ const Demo3D = () => {
               onBriefingComplete={() => setBriefingActive(false)}
               uniformFillConfig={{ preset: fillPreset, density: fillDensity, seed: fillSeed, perWall: fillPerWall }}
               onAimAtFire={setAimingAtFire}
+              onAimAtFireIndex={setAimedFireIndex}
+              readabilityMode={readabilityMode}
             />
 
             {gameStarted && memoizedScenario?.type === 'office' && (
@@ -1628,6 +1634,17 @@ const Demo3D = () => {
                 level={firePropagationLevel}
                 visible={selectedScenario.type === 'laboratory'}
               />
+            )}
+
+            {/* Fire Class HUD + Readability toggle (laboratory only) */}
+            {gameStarted && selectedScenario.type === 'laboratory' && (
+              <>
+                <FireClassHUD aimedFireIndex={aimedFireIndex} />
+                <ReadabilityToggle
+                  enabled={readabilityMode}
+                  onToggle={setReadabilityMode}
+                />
+              </>
             )}
 
             {/* Evacuation Countdown */}
