@@ -2580,17 +2580,17 @@ export function addCyberSecurityOfficeEnvironment(
   const floorMat = new BABYLON.StandardMaterial('cyo_floorMat', scene);
   const floorTex = new BABYLON.DynamicTexture('cyo_floorTex', { width: 512, height: 512 }, scene, false);
   const fctx = floorTex.getContext() as CanvasRenderingContext2D;
-  fctx.fillStyle = '#15171c';
+  fctx.fillStyle = '#2a2f38';
   fctx.fillRect(0, 0, 512, 512);
   // Raised access floor tile grid (datacenter look)
-  fctx.strokeStyle = '#2a2f3a';
+  fctx.strokeStyle = '#4a525e';
   fctx.lineWidth = 2;
   for (let i = 0; i <= 512; i += 64) {
     fctx.beginPath(); fctx.moveTo(i, 0); fctx.lineTo(i, 512); fctx.stroke();
     fctx.beginPath(); fctx.moveTo(0, i); fctx.lineTo(512, i); fctx.stroke();
   }
   // Subtle perforation dots
-  fctx.fillStyle = '#0a0c10';
+  fctx.fillStyle = '#1a1d24';
   for (let x = 16; x < 512; x += 64) {
     for (let y = 16; y < 512; y += 64) {
       fctx.beginPath(); fctx.arc(x, y, 1.2, 0, Math.PI * 2); fctx.fill();
@@ -2602,7 +2602,7 @@ export function addCyberSecurityOfficeEnvironment(
   floorMat.diffuseTexture = floorTex;
   floorMat.specularColor = new BABYLON.Color3(0.25, 0.3, 0.4);
   floorMat.specularPower = 96;
-  floorMat.emissiveColor = new BABYLON.Color3(0.02, 0.03, 0.05);
+  floorMat.emissiveColor = new BABYLON.Color3(0.10, 0.12, 0.16);
 
   const wallMat = new BABYLON.StandardMaterial('cyo_wallMat', scene);
   wallMat.diffuseColor = new BABYLON.Color3(0.32, 0.36, 0.44);
