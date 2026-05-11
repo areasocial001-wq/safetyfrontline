@@ -257,7 +257,7 @@ const TrainingConfig = () => {
       {/* Main Content */}
       <main className="container mx-auto px-4 py-8 max-w-6xl">
         <Tabs defaultValue="config" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4">
+          <TabsList className="grid w-full grid-cols-5">
             <TabsTrigger value="config">
               <Settings className="w-4 h-4 mr-2" />
               Configurazione
@@ -265,6 +265,10 @@ const TrainingConfig = () => {
             <TabsTrigger value="packages">
               <Package className="w-4 h-4 mr-2" />
               Pacchetti
+            </TabsTrigger>
+            <TabsTrigger value="facsimile">
+              <FileText className="w-4 h-4 mr-2" />
+              Fac-simile
             </TabsTrigger>
             <TabsTrigger value="times">
               <Calendar className="w-4 h-4 mr-2" />
@@ -278,6 +282,10 @@ const TrainingConfig = () => {
 
           <TabsContent value="packages">
             <TrainingPackagesManager />
+          </TabsContent>
+
+          <TabsContent value="facsimile">
+            <FacSimilePreview />
           </TabsContent>
 
           <TabsContent value="config" className="space-y-8">
