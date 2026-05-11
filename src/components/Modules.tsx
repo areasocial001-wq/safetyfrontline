@@ -18,7 +18,7 @@ import cartoonOffice from "@/assets/cartoon-office.jpg";
 import cartoonWarehouse from "@/assets/cartoon-warehouse.jpg";
 import { QuoteRequestDialog } from "@/components/QuoteRequestDialog";
 
-type TabKey = 'generale' | 'basso' | 'medio' | 'alto' | 'ruolo' | 'cybersecurity' | 'simulazioni' | 'minigame2d' | 'piattaforma';
+type TabKey = 'generale' | 'basso' | 'medio' | 'alto' | 'figure' | 'attrezzature' | 'cybersecurity' | 'simulazioni' | 'minigame2d' | 'piattaforma';
 
 export const Modules = () => {
   const [quoteDialogOpen, setQuoteDialogOpen] = useState(false);
@@ -29,7 +29,8 @@ export const Modules = () => {
     { key: 'basso', label: 'Rischio Basso', icon: Building2, badge: '4 moduli' },
     { key: 'medio', label: 'Rischio Medio', icon: Cog, badge: '8 moduli' },
     { key: 'alto', label: 'Rischio Alto', icon: AlertTriangle, badge: '8 moduli' },
-    { key: 'ruolo', label: 'Corsi di Ruolo', icon: Crown, badge: '3 corsi' },
+    { key: 'figure', label: 'Figure Sicurezza', icon: Crown, badge: '8 percorsi' },
+    { key: 'attrezzature', label: 'Attrezzature', icon: Truck, badge: '8 abilitazioni' },
     { key: 'cybersecurity', label: 'Cybersecurity', icon: Lock, badge: 'nuovo' },
     { key: 'simulazioni', label: 'Simulazioni 3D', icon: Gamepad2, badge: '5 scenari' },
     { key: 'minigame2d', label: 'Spot the Hazard 2D', icon: Target, badge: '3 livelli' },
