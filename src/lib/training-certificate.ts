@@ -73,12 +73,16 @@ export const generateTrainingCertificatePDF = async (data: TrainingCertificateDa
 
   pdf.setFontSize(14);
   pdf.setTextColor(255, 103, 31);
-  pdf.text('FORMAZIONE GENERALE LAVORATORI', w / 2, 62, { align: 'center' });
+  pdf.text('Verifica della Ricaduta sulla', w / 2, 60, { align: 'center' });
+
+  pdf.setFontSize(14);
+  pdf.setTextColor(255, 103, 31);
+  pdf.text('FORMAZIONE GENERALE LAVORATORI', w / 2, 68, { align: 'center' });
 
   pdf.setFontSize(10);
   pdf.setTextColor(100, 100, 100);
   pdf.setFont('helvetica', 'normal');
-  pdf.text('(Art. 37 D.Lgs 81/2008 - Durata 4 ore)', w / 2, 69, { align: 'center' });
+  pdf.text('(Art. 37 D.Lgs 81/2008 - Durata 4 ore)', w / 2, 75, { align: 'center' });
 
   // Separator
   pdf.setDrawColor(255, 103, 31);
