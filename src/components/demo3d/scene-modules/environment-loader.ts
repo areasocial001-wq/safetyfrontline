@@ -12,7 +12,7 @@ export async function loadEnvironmentOptimized(
 ) {
   let modelPath = '';
 
-  if (type === 'warehouse' || type === 'laboratory') {
+  if (type === 'warehouse') {
     modelPath = '/models/warehouse.glb';
   } else if (type === 'factory') {
     modelPath = '/models/factory.glb';
@@ -33,10 +33,22 @@ export async function loadEnvironmentOptimized(
       result.meshes.forEach((mesh) => {
         if (mesh.name === '__root__') return;
 
-        mesh.checkCollisions = true;
-        mesh.receiveShadows = quality !== 'low';
+        const meshName = mesh.name.toLowerCase();
+        const materialAlpha = mesh.material && 'alpha' in mesh.material ? Number(mesh.material.alpha ?? 1) : 1;
+        const isHiddenHelper =
+          mesh.isVisible === false ||
+          mesh.visibility <= 0.01 ||
+          materialAlpha <= 0.01 ||
+          meshName.includes('collision') ||
+          meshName.includes('collider') ||
+          meshName.includes('helper') ||
+          meshName.includes('occlud') ||
+          meshName.includes('trigger');
 
-        if ((quality === 'high' || quality === 'ultra') && shadowGenerator) {
+        mesh.checkCollisions = !isHiddenHelper;
+        mesh.receiveShadows = quality !== 'low' && !isHiddenHelper;
+
+        if (!isHiddenHelper && (quality === 'high' || quality === 'ultra') && shadowGenerator) {
           shadowGenerator.addShadowCaster(mesh);
         }
 
@@ -142,11 +154,94 @@ function createProceduralEnvironment(
     // Rendering a second office shell here creates overlapping floors/walls
     // that hide furniture clusters and make most of the room appear empty.
     console.log('[Office] Skipping duplicate procedural shell from environment-loader');
+  } else if (type === 'laboratory') {
+    createLaboratoryRoom(scene, quality, shadowGenerator);
   } else if (type === 'construction') {
     createConstructionSite(scene, quality, shadowGenerator);
   } else {
     createGenericRoom(scene, type, quality, shadowGenerator);
   }
+}
+
+function createLaboratoryRoom(
+  scene: BABYLON.Scene,
+  quality: string,
+  shadowGenerator: BABYLON.ShadowGenerator | null
+) {
+  const roomWidth = 32;
+  const roomDepth = 26;
+  const wallHeight = 4.6;
+
+  const floor = BABYLON.MeshBuilder.CreateGround('laboratoryFloor', { width: roomWidth, height: roomDepth }, scene);
+  floor.position.y = 0.02;
+  const floorMat = new BABYLON.StandardMaterial('laboratoryFloorMat', scene);
+  floorMat.diffuseColor = new BABYLON.Color3(0.28, 0.32, 0.36);
+  floorMat.specularColor = new BABYLON.Color3(0.18, 0.2, 0.22);
+  floorMat.specularPower = 48;
+  floor.material = floorMat;
+  floor.receiveShadows = quality !== 'low';
+  floor.checkCollisions = true;
+
+  const wallMat = new BABYLON.StandardMaterial('laboratoryWallMat', scene);
+  wallMat.diffuseColor = new BABYLON.Color3(0.78, 0.82, 0.86);
+  wallMat.specularColor = new BABYLON.Color3(0.08, 0.08, 0.08);
+
+  const lowerWallBandMat = new BABYLON.StandardMaterial('laboratoryLowerWallBandMat', scene);
+  lowerWallBandMat.diffuseColor = new BABYLON.Color3(0.62, 0.68, 0.74);
+  lowerWallBandMat.specularColor = new BABYLON.Color3(0.05, 0.05, 0.05);
+
+  const ceiling = BABYLON.MeshBuilder.CreateGround('laboratoryCeiling', { width: roomWidth, height: roomDepth }, scene);
+  ceiling.position.y = wallHeight;
+  ceiling.rotation.x = Math.PI;
+  const ceilingMat = new BABYLON.StandardMaterial('laboratoryCeilingMat', scene);
+  ceilingMat.diffuseColor = new BABYLON.Color3(0.92, 0.94, 0.96);
+  ceilingMat.emissiveColor = new BABYLON.Color3(0.06, 0.07, 0.08);
+  ceilingMat.specularColor = new BABYLON.Color3(0.04, 0.04, 0.04);
+  ceiling.material = ceilingMat;
+  ceiling.isPickable = false;
+
+  const wallConfigs = [
+    { name: 'laboratoryWallNorth', width: roomWidth, depth: 0.22, x: 0, z: -roomDepth / 2 },
+    { name: 'laboratoryWallSouth', width: roomWidth, depth: 0.22, x: 0, z: roomDepth / 2 },
+    { name: 'laboratoryWallEast', width: 0.22, depth: roomDepth, x: roomWidth / 2, z: 0 },
+    { name: 'laboratoryWallWest', width: 0.22, depth: roomDepth, x: -roomWidth / 2, z: 0 },
+  ];
+
+  wallConfigs.forEach((cfg) => {
+    const wall = BABYLON.MeshBuilder.CreateBox(cfg.name, {
+      width: cfg.width,
+      height: wallHeight,
+      depth: cfg.depth,
+    }, scene);
+    wall.position = new BABYLON.Vector3(cfg.x, wallHeight / 2, cfg.z);
+    wall.material = wallMat;
+    wall.receiveShadows = quality !== 'low';
+    wall.checkCollisions = true;
+
+    const lowerBand = BABYLON.MeshBuilder.CreateBox(`${cfg.name}_band`, {
+      width: cfg.width,
+      height: 1.2,
+      depth: cfg.depth + 0.01,
+    }, scene);
+    lowerBand.position = new BABYLON.Vector3(cfg.x, 0.6, cfg.z);
+    lowerBand.material = lowerWallBandMat;
+    lowerBand.isPickable = false;
+  });
+
+  const stripMat = new BABYLON.StandardMaterial('laboratoryCeilingStripMat', scene);
+  stripMat.diffuseColor = new BABYLON.Color3(0.78, 0.82, 0.76);
+  stripMat.emissiveColor = new BABYLON.Color3(0.18, 0.2, 0.18);
+  for (let i = 0; i < 3; i++) {
+    const strip = BABYLON.MeshBuilder.CreateBox(`laboratoryLightStrip_${i}`, { width: 1.8, height: 0.08, depth: 8 }, scene);
+    strip.position = new BABYLON.Vector3(-8 + i * 8, wallHeight - 0.12, 0);
+    strip.material = stripMat;
+    strip.isPickable = false;
+    if (shadowGenerator && quality !== 'low' && i === 1) {
+      shadowGenerator.addShadowCaster(strip);
+    }
+  }
+
+  console.log('[Laboratory] Procedural room shell created with distinct floor, wall and ceiling materials');
 }
 
 function createConstructionSite(
