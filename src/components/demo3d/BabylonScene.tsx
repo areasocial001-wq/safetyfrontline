@@ -539,6 +539,9 @@ export const BabylonScene = ({
 
     // 14. Render loop
     let posUpdateCounter = 0;
+    let pickupCheckCounter = 0;
+    let aimCheckCounter = 0;
+    let lastAimState = false;
     engine.runRenderLoop(() => {
       updateDynamicOcclusion();
       detectLookedAtProp();
@@ -551,6 +554,27 @@ export const BabylonScene = ({
         posUpdateCounter = 0;
         const pos = camera.position;
         onPositionUpdate([pos.x, pos.y, pos.z], camera.rotation.y);
+      }
+      // Auto-pickup spare extinguisher when within 1.6m & charge not full
+      pickupCheckCounter++;
+      if (pickupCheckCounter >= 12 && scenario.type === 'laboratory' && camera && extChargeRef.current.current < extChargeRef.current.max) {
+        pickupCheckCounter = 0;
+        for (const m of scene.meshes) {
+          if (m.metadata?.extinguisherPickup && m.isEnabled() && BABYLON.Vector3.Distance(camera.position, m.absolutePosition) < 1.6) {
+            pickupSpareExtinguisher(m.metadata.pickupRoot);
+            break;
+          }
+        }
+      }
+      // Aim-at-fire detection (throttled)
+      aimCheckCounter++;
+      if (aimCheckCounter >= 6 && scenario.type === 'laboratory' && camera && onAimAtFire) {
+        aimCheckCounter = 0;
+        const aim = aimHasFire(scene, camera);
+        if (aim.hit !== lastAimState) {
+          lastAimState = aim.hit;
+          onAimAtFire(aim.hit);
+        }
       }
       scene.render();
     });
