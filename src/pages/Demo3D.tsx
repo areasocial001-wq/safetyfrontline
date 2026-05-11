@@ -25,6 +25,8 @@ import { GameResults3D } from "@/components/demo3d/GameResults3D";
 import { ScenarioBriefingOverlay } from "@/components/demo3d/ScenarioBriefingOverlay";
 import { FireDangerBar } from "@/components/demo3d/FireDangerBar";
 import { FireVignetteOverlay } from "@/components/demo3d/FireVignetteOverlay";
+import { FireClassHUD } from "@/components/demo3d/FireClassHUD";
+import { ReadabilityToggle } from "@/components/demo3d/ReadabilityToggle";
 import { FireGameOver } from "@/components/demo3d/FireGameOver";
 import { EvacuationCountdown } from "@/components/demo3d/EvacuationCountdown";
 import { SprinklerStatusHUD } from "@/components/demo3d/SprinklerStatusHUD";
