@@ -49,6 +49,8 @@ import { PlayerLevelIndicator } from "@/components/demo3d/PlayerLevelIndicator";
 import { UserMenu } from "@/components/auth/UserMenu";
 import { Toaster } from "@/components/ui/toaster";
 import { scenarios3D, Scenario3D, getDifficultyColor, getDifficultyLabel } from "@/data/scenarios3d";
+import { getPreviewByScenarioId } from "@/data/sim3d-previews";
+import { Sim3dPreview } from "@/components/Sim3dPreview";
 import { achievements, GameStats } from "@/lib/achievements";
 import { useToast } from "@/hooks/use-toast";
 import { useTouchControls } from "@/hooks/useTouchControls";
@@ -896,13 +898,22 @@ const Demo3D = () => {
 
                 {/* Scenario Grid */}
                 <div className="grid md:grid-cols-2 gap-6">
-                  {scenarios3D.map((scenario, index) => (
+                  {scenarios3D.map((scenario, index) => {
+                    const preview = getPreviewByScenarioId(scenario.id);
+                    return (
                     <Card 
                       key={scenario.id}
                       className="overflow-hidden hover:shadow-xl transition-all duration-300 cursor-pointer group"
                       onClick={() => selectScenario(scenario)}
                       style={{ animationDelay: `${index * 100}ms` }}
                     >
+                      {preview && (
+                        <Sim3dPreview
+                          meta={preview}
+                          className="h-48 rounded-none"
+                          priority={index < 2}
+                        />
+                      )}
                       <div className="p-6 space-y-4">
                         <div className="flex items-start justify-between">
                           <div className="flex-1">
