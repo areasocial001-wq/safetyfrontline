@@ -43,11 +43,17 @@ export function addEnvironmentalProps(
   } else if (type === 'laboratory') {
     addLaboratoryProps(scene, quality, shadowGenerator, risksFoundIds, onFirePropagationChange, onSprinklerStatusChange, cameraRef);
   } else if (type === 'office') {
-    addOfficeProps(scene, quality, shadowGenerator);
+    const isCyber = scene.metadata?.scenarioId === 'cybersecurity';
+    if (isCyber) {
+      // Build a dedicated SOC / IT operations room instead of the
+      // standard administrative office so the two scenarios feel distinct.
+      addCyberSecurityOfficeEnvironment(scene, quality, shadowGenerator);
+    } else {
+      addOfficeProps(scene, quality, shadowGenerator);
+    }
   }
 
-  // Add cybersecurity-specific props if scenario ID matches
-  // The scenario ID is encoded in scene metadata
+  // Add cybersecurity-specific props (risk markers) if scenario ID matches
   const cyberMeta = scene.metadata?.scenarioId;
   if (cyberMeta === 'cybersecurity') {
     addCybersecurityProps(scene, quality, shadowGenerator);
