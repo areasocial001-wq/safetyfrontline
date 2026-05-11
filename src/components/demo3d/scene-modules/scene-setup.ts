@@ -52,10 +52,11 @@ export function createScene(
       fogColor: new BABYLON.Color3(0.18, 0.12, 0.08),
     },
     laboratory: {
-      // Brighter, less suffocating atmosphere — was too dark/empty
-      clearColor: new BABYLON.Color4(0.32, 0.26, 0.22, 1),
-      fogDensity: 0.005,
-      fogColor: new BABYLON.Color3(0.32, 0.26, 0.22),
+      // Cooler neutral atmosphere — warm brown was hiding floor/wall contrast
+      // and merging everything into a brown haze. Fire glow is added per-light.
+      clearColor: new BABYLON.Color4(0.42, 0.44, 0.48, 1),
+      fogDensity: 0.0015,
+      fogColor: new BABYLON.Color3(0.50, 0.52, 0.56),
     },
   };
   const atmo = atmospherePresets[scenario.type] || atmospherePresets.warehouse;
