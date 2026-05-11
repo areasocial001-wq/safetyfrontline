@@ -2894,15 +2894,29 @@ export function addCyberSecurityOfficeEnvironment(
   }
 
   // ---------- Lighting tweaks ----------
-  // Override hemispheric to a cooler tone
-  const hemi = scene.getLightByName('hemisphericLight') as BABYLON.HemisphericLight | null;
+  // Brighter cool fill so risk markers (post-its, documents, USB) remain readable
+  const hemi = scene.getLightByName('ambientLight') as BABYLON.HemisphericLight | null;
   if (hemi) {
-    hemi.diffuse = new BABYLON.Color3(0.55, 0.65, 0.85);
-    hemi.groundColor = new BABYLON.Color3(0.05, 0.08, 0.12);
-    hemi.intensity = 0.55;
+    hemi.diffuse = new BABYLON.Color3(0.85, 0.92, 1.0);
+    hemi.groundColor = new BABYLON.Color3(0.25, 0.30, 0.38);
+    hemi.intensity = 1.15;
   }
-  // Cool the clear color
-  scene.clearColor = new BABYLON.Color4(0.04, 0.06, 0.10, 1);
+  const dir = scene.getLightByName('directionalLight') as BABYLON.DirectionalLight | null;
+  if (dir) {
+    dir.intensity = 0.9;
+    dir.diffuse = new BABYLON.Color3(0.85, 0.92, 1.0);
+  }
+  // Add overhead fill lights along the ceiling for even illumination
+  if (quality !== 'low') {
+    [-8, 0, 8].forEach((zx, ix) => {
+      const fill = new BABYLON.PointLight(`cyo_fill_${ix}`, new BABYLON.Vector3(zx, ROOM_H - 0.4, 0), scene);
+      fill.diffuse = new BABYLON.Color3(0.75, 0.85, 1.0);
+      fill.intensity = 0.55;
+      fill.range = 14;
+    });
+  }
+  // Lift the clear color for less crushed blacks at the edges
+  scene.clearColor = new BABYLON.Color4(0.14, 0.17, 0.22, 1);
 
   console.log('[CyberSecurityOffice] SOC environment built — racks, NOC wall, triple-monitor desks');
 }
