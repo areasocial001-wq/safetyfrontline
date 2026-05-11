@@ -37,7 +37,7 @@ export const Modules = () => {
     { key: 'piattaforma', label: 'Piattaforma', icon: Settings },
   ];
 
-  const modules: Record<TabKey, { icon: typeof Shield; title: string; subtitle: string; description: string; color: string; image?: string | null }[]> = {
+  const modules: Record<TabKey, { icon: typeof Shield; title: string; subtitle: string; description: string; color: string; image?: string | null; comingSoon?: boolean }[]> = {
     generale: [
       { icon: Shield, title: "Concetti Base", subtitle: "Legislazione e Obblighi", description: "D.Lgs 81/08, diritti e doveri dei lavoratori, organigramma della sicurezza e figure chiave.", color: "primary" },
       { icon: AlertCircle, title: "Rischi e Prevenzione", subtitle: "Valutazione dei Rischi", description: "Identificazione dei pericoli, valutazione dei rischi, misure di prevenzione e protezione.", color: "secondary" },
