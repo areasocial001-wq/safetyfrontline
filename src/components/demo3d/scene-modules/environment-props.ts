@@ -2908,11 +2908,11 @@ export function addCyberSecurityOfficeEnvironment(
   }
   // Add overhead fill lights along the ceiling for even illumination
   if (quality !== 'low') {
-    [-8, 0, 8].forEach((zx, ix) => {
+    [-7, 7].forEach((zx, ix) => {
       const fill = new BABYLON.PointLight(`cyo_fill_${ix}`, new BABYLON.Vector3(zx, ROOM_H - 0.4, 0), scene);
       fill.diffuse = new BABYLON.Color3(0.75, 0.85, 1.0);
-      fill.intensity = 0.55;
-      fill.range = 14;
+      fill.intensity = 0.6;
+      fill.range = 16;
     });
   }
   // Lift the clear color for less crushed blacks at the edges
