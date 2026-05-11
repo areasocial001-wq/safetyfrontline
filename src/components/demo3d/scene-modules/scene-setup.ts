@@ -144,13 +144,13 @@ function setupLighting(scene: BABYLON.Scene, scenarioType: string, quality: stri
       dirDiffuse: new BABYLON.Color3(1.0, 0.70, 0.35),
     },
     laboratory: {
-      // Brighter ambient + cooler base so geometry is clearly readable
-      // (the warm fire glow is added per-light by individual fire emitters)
-      ambientIntensity: 0.75,
-      ambientDiffuse: new BABYLON.Color3(0.95, 0.88, 0.78),
-      ambientGround: new BABYLON.Color3(0.45, 0.38, 0.32),
-      dirIntensity: 1.6,
-      dirDiffuse: new BABYLON.Color3(1.0, 0.92, 0.80),
+      // Bright neutral fill so floor, walls, racks and boxes are clearly readable.
+      // The warm fire glow is added per-light by individual fire emitters.
+      ambientIntensity: 1.05,
+      ambientDiffuse: new BABYLON.Color3(0.92, 0.94, 1.0),
+      ambientGround: new BABYLON.Color3(0.40, 0.42, 0.46),
+      dirIntensity: 1.4,
+      dirDiffuse: new BABYLON.Color3(1.0, 0.96, 0.88),
     },
   };
   const lp = lightingPresets[scenarioType] || lightingPresets.warehouse;
