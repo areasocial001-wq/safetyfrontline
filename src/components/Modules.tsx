@@ -11,11 +11,11 @@ import {
   GraduationCap, Target, Lock, ShieldAlert, Wifi, KeyRound, Mail,
   Briefcase, Crown, Eye
 } from "lucide-react";
-import officeModule from "@/assets/office-module.jpg";
-import warehouseModule from "@/assets/warehouse-module.jpg";
 import cartoonConstruction from "@/assets/cartoon-construction.jpg";
 import cartoonOffice from "@/assets/cartoon-office.jpg";
 import cartoonWarehouse from "@/assets/cartoon-warehouse.jpg";
+import cartoonKitchen from "@/assets/cartoon-kitchen.jpg";
+import cartoonFactory from "@/assets/cartoon-factory.jpg";
 import { QuoteRequestDialog } from "@/components/QuoteRequestDialog";
 
 type TabKey = 'generale' | 'basso' | 'medio' | 'alto' | 'figure' | 'attrezzature' | 'cybersecurity' | 'simulazioni' | 'minigame2d' | 'piattaforma';
@@ -32,8 +32,8 @@ export const Modules = () => {
     { key: 'figure', label: 'Figure Sicurezza', icon: Crown, badge: '8 percorsi' },
     { key: 'attrezzature', label: 'Attrezzature', icon: Truck, badge: '8 abilitazioni' },
     { key: 'cybersecurity', label: 'Cybersecurity', icon: Lock, badge: 'nuovo' },
-    { key: 'simulazioni', label: 'Simulazioni 3D', icon: Gamepad2, badge: '5 scenari' },
-    { key: 'minigame2d', label: 'Spot the Hazard 2D', icon: Target, badge: '3 livelli' },
+    { key: 'simulazioni', label: 'Simulazioni 3D', icon: Gamepad2, badge: '3 scenari' },
+    { key: 'minigame2d', label: 'Spot the Hazard 2D', icon: Target, badge: '5 livelli' },
     { key: 'piattaforma', label: 'Piattaforma', icon: Settings },
   ];
 
@@ -102,8 +102,6 @@ export const Modules = () => {
       { icon: Trophy, title: "Boss Test Finale", subtitle: "Verifica Cybersecurity", description: "6 domande avanzate su scenari reali: CEO Fraud, baiting, data breach. Punteggio minimo 70% per il certificato.", color: "primary" },
     ],
     simulazioni: [
-      { icon: Building2, title: "Ufficio Amministrativo", subtitle: "Rischi VDT & Ergonomia", description: "Caccia ai rischi in prima persona in un ufficio 3D: cavi scoperti, estintori bloccati, uscite ostruite, pavimenti bagnati. 6 rischi critici da identificare.", color: "primary", image: officeModule },
-      { icon: Warehouse, title: "Magazzino Logistica", subtitle: "Carrelli & Movimentazione", description: "Magazzino industriale Babylon.js con muletti, bancali, materiali infiammabili e rischi procedurali generati dinamicamente. Modello GLTF realistico.", color: "secondary", image: warehouseModule },
       { icon: AlertTriangle, title: "Cantiere Edile", subtitle: "Lavori in Quota & DPI", description: "Scenario hard con macchinari pesanti, ponteggi, lavori in quota e rischi procedurali. Per formazione Rischio Alto.", color: "accent" },
       { icon: Flame, title: "Simulazione Antincendio", subtitle: "Estintore First-Person", description: "Esercitazione realistica con estintore in prima persona: classi di fuoco, particelle, quiz contestuali e procedure di evacuazione.", color: "destructive" },
       { icon: Lock, title: "Cyber Security Office", subtitle: "Rischi Informatici 3D", description: "8 rischi cyber da identificare in un ufficio 3D: post-it con password, schermi sbloccati, email di phishing, chiavette USB sospette.", color: "muted" },
@@ -112,6 +110,8 @@ export const Modules = () => {
       { icon: Building2, title: "Cantiere Cartoon", subtitle: "7 rischi · 3 vite", description: "Caccia ai rischi 2D in stile cartoon: imbracatura, carichi sospesi, ferri d'armatura, quadri elettrici. Spiegazione educativa con riferimenti normativi.", color: "destructive", image: cartoonConstruction },
       { icon: Monitor, title: "Ufficio Cartoon", subtitle: "8 rischi · 3 vite", description: "Cavi a terra, postura scorretta, uscite ostruite, ciabatte sovraccariche, ergonomia VDT. Modale didattico per ogni hotspot.", color: "primary", image: cartoonOffice },
       { icon: Warehouse, title: "Magazzino Cartoon", subtitle: "8 rischi · 3 vite", description: "Muletti, cataste instabili, pavimenti oleosi, cavi sospesi, sollevamento manuale errato. Punteggio e tentativi limitati.", color: "accent", image: cartoonWarehouse },
+      { icon: Flame, title: "Cucina Ristorante Cartoon", subtitle: "8 rischi · 3 vite", description: "Pentole in fiamme, affettatrici incustodite, pavimenti grassi, cavi vicino al lavello, estintori bloccati. HACCP e D.Lgs. 81/08.", color: "destructive", image: cartoonKitchen },
+      { icon: Cog, title: "Officina Meccanica Cartoon", subtitle: "8 rischi · 3 vite", description: "Carichi sospesi, saldatori senza maschera, torni senza protezione, oli sul pavimento, segnaletica usurata. Macchine utensili e carroponte.", color: "secondary", image: cartoonFactory },
     ],
     piattaforma: [
       { icon: Bell, title: "Notifiche Smart", subtitle: "In-App & Email", description: "Notifiche automatiche per completamento moduli, scadenze, assegnazione settori e promemoria giornalieri.", color: "primary" },
@@ -232,7 +232,7 @@ export const Modules = () => {
             {[
               { value: "35+", label: "Moduli Formativi", icon: GraduationCap },
               { value: "16", label: "Percorsi & Abilitazioni", icon: Crown },
-              { value: "5", label: "Simulazioni 3D", icon: Gamepad2 },
+              { value: "3", label: "Simulazioni 3D", icon: Gamepad2 },
               { value: "∞", label: "Personalizzazioni", icon: Settings },
             ].map((stat, i) => (
               <div key={i} className="text-center p-4 rounded-xl bg-background/50 border border-border">
