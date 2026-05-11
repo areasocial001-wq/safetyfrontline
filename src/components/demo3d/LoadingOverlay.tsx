@@ -2,9 +2,12 @@ import { useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Loader2, Map, Target, Brain, Zap, CheckCircle2 } from "lucide-react";
+import { getPreviewByScenarioId } from "@/data/sim3d-previews";
+import { Sim3dPreview } from "@/components/Sim3dPreview";
 
 interface LoadingOverlayProps {
   scenarioTitle: string;
+  scenarioId?: string;
 }
 
 interface LoadingStep {
@@ -21,7 +24,8 @@ const loadingSteps: LoadingStep[] = [
   { id: "stats", label: "Recupero statistiche giocatore", icon: Zap, duration: 700 },
 ];
 
-export const LoadingOverlay = ({ scenarioTitle }: LoadingOverlayProps) => {
+export const LoadingOverlay = ({ scenarioTitle, scenarioId }: LoadingOverlayProps) => {
+  const preview = scenarioId ? getPreviewByScenarioId(scenarioId) : undefined;
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
   const [completedSteps, setCompletedSteps] = useState<Set<string>>(new Set());
   const [progress, setProgress] = useState(0);
@@ -104,6 +108,11 @@ export const LoadingOverlay = ({ scenarioTitle }: LoadingOverlayProps) => {
             <Badge variant="outline" className="text-xs px-3 py-1 border-primary/30 bg-primary/5">
               Scenario: {scenarioTitle}
             </Badge>
+            {preview && (
+              <div className="mt-3 mx-auto max-w-sm">
+                <Sim3dPreview meta={preview} className="h-32" priority />
+              </div>
+            )}
             <h3 className="text-2xl font-black text-foreground tracking-tight">
               Inizializzazione
             </h3>
