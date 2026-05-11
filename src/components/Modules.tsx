@@ -210,8 +210,13 @@ export const Modules = () => {
                   <div className="p-2.5 rounded-lg bg-background/50 shrink-0">
                     <module.icon className={`w-6 h-6 ${getIconColor(module.color)}`} />
                   </div>
-                  <div className="min-w-0">
-                    <h3 className="text-lg font-bold leading-tight">{module.title}</h3>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-start gap-2 flex-wrap">
+                      <h3 className="text-lg font-bold leading-tight">{module.title}</h3>
+                      {module.comingSoon && (
+                        <Badge className="bg-amber-500 hover:bg-amber-500 text-white border-0 text-[10px] px-1.5 py-0">🚧 In rilascio</Badge>
+                      )}
+                    </div>
                     <p className="text-xs text-muted-foreground font-medium mt-0.5">{module.subtitle}</p>
                   </div>
                 </div>
