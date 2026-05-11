@@ -181,6 +181,7 @@ const Demo3D = () => {
   const [showFireQuiz, setShowFireQuiz] = useState(false);
   const [extinguisherCharge, setExtinguisherCharge] = useState(100);
   const [extinguisherMaxCharge, setExtinguisherMaxCharge] = useState(100);
+  const [aimingAtFire, setAimingAtFire] = useState(false);
   const [firesExtinguished, setFiresExtinguished] = useState(0);
   const [totalFires, setTotalFires] = useState(0);
   const [allFiresOut, setAllFiresOut] = useState(false);
