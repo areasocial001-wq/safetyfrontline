@@ -1435,6 +1435,7 @@ const Demo3D = () => {
               onBriefingStep={(idx) => setBriefingIndex(idx)}
               onBriefingComplete={() => setBriefingActive(false)}
               uniformFillConfig={{ preset: fillPreset, density: fillDensity, seed: fillSeed, perWall: fillPerWall }}
+              onAimAtFire={setAimingAtFire}
             />
 
             {gameStarted && memoizedScenario?.type === 'office' && (
