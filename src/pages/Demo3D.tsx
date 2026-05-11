@@ -961,7 +961,8 @@ const Demo3D = () => {
                         </Button>
                       </div>
                     </Card>
-                  ))}
+                    );
+                  })}
                 </div>
               </Card>
             </div>
