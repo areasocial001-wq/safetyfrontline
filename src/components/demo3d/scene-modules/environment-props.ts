@@ -607,40 +607,45 @@ function addLaboratoryProps(
     let smokeColor2 = new BABYLON.Color4(0.20, 0.18, 0.20, 0.10);
 
     if (fd.kind === 'orange') {
-      fire.color1 = new BABYLON.Color4(1.0, 0.55, 0.05, 1);
-      fire.color2 = new BABYLON.Color4(1.0, 0.25, 0.0, 0.85);
+      // Class A — bright orange flames
+      fire.color1 = new BABYLON.Color4(1.4, 0.75, 0.10, 1);
+      fire.color2 = new BABYLON.Color4(1.2, 0.40, 0.05, 0.9);
       fire.colorDead = new BABYLON.Color4(0.3, 0.1, 0, 0);
-      fire.minSize = 0.15; fire.maxSize = 0.6;
-      fire.minLifeTime = 0.3; fire.maxLifeTime = 0.8;
-      fire.emitRate = 130;
-    } else if (fd.kind === 'darkRed') {
-      // Darker, more saturated red (electrical / smoldering combustion)
-      fire.color1 = new BABYLON.Color4(0.65, 0.05, 0.02, 1);
-      fire.color2 = new BABYLON.Color4(0.40, 0.02, 0.0, 0.85);
-      fire.colorDead = new BABYLON.Color4(0.12, 0.0, 0.0, 0);
       fire.minSize = 0.20; fire.maxSize = 0.7;
+      fire.minLifeTime = 0.3; fire.maxLifeTime = 0.85;
+      fire.emitRate = 140;
+    } else if (fd.kind === 'darkRed') {
+      // Class C — deep red electrical/smoldering fire.
+      // Additive blending (BLENDMODE_ONEONE) requires HDR-bright values to
+      // actually glow; dark RGB values sum to near-black behind the smoke.
+      fire.color1 = new BABYLON.Color4(1.6, 0.18, 0.05, 1);
+      fire.color2 = new BABYLON.Color4(1.1, 0.06, 0.02, 0.9);
+      fire.colorDead = new BABYLON.Color4(0.25, 0.0, 0.0, 0);
+      fire.minSize = 0.22; fire.maxSize = 0.75;
       fire.minLifeTime = 0.45; fire.maxLifeTime = 1.0;
-      fire.emitRate = 110;
+      fire.emitRate = 120;
       // Slower upward draft – smoldering character
       fire.gravity = new BABYLON.Vector3(0, 1.3, 0);
-      lightColor = new BABYLON.Color3(0.9, 0.15, 0.05);
-      lightIntensityBase = 1.2;
-      perFireSmokeRate = 22;
-      smokeColor1 = new BABYLON.Color4(0.18, 0.10, 0.10, 0.35);
-      smokeColor2 = new BABYLON.Color4(0.10, 0.05, 0.05, 0.18);
+      lightColor = new BABYLON.Color3(1.0, 0.20, 0.08);
+      lightIntensityBase = 1.4;
+      perFireSmokeRate = 14;
+      smokeColor1 = new BABYLON.Color4(0.22, 0.14, 0.14, 0.30);
+      smokeColor2 = new BABYLON.Color4(0.12, 0.08, 0.08, 0.15);
     } else {
-      // White-hot with very heavy smoke (metal / chemical fire)
-      fire.color1 = new BABYLON.Color4(1.0, 1.0, 0.95, 1);
-      fire.color2 = new BABYLON.Color4(0.95, 0.92, 0.85, 0.85);
+      // Class D — white-hot metal/chemical fire
+      fire.color1 = new BABYLON.Color4(1.6, 1.6, 1.5, 1);
+      fire.color2 = new BABYLON.Color4(1.3, 1.25, 1.15, 0.9);
       fire.colorDead = new BABYLON.Color4(0.6, 0.6, 0.55, 0);
-      fire.minSize = 0.18; fire.maxSize = 0.55;
+      fire.minSize = 0.20; fire.maxSize = 0.6;
       fire.minLifeTime = 0.25; fire.maxLifeTime = 0.7;
-      fire.emitRate = 160;
+      fire.emitRate = 170;
       lightColor = new BABYLON.Color3(0.95, 0.95, 1.0);
       lightIntensityBase = 2.2;
-      perFireSmokeRate = 55; // heavy smoke
-      smokeColor1 = new BABYLON.Color4(0.85, 0.85, 0.88, 0.55);
-      smokeColor2 = new BABYLON.Color4(0.65, 0.65, 0.70, 0.30);
+      // Reduced from 55 — heavy smoke was filling the entire scene and
+      // visually merging floor/walls/objects into a single fog layer.
+      perFireSmokeRate = 24;
+      smokeColor1 = new BABYLON.Color4(0.85, 0.85, 0.88, 0.40);
+      smokeColor2 = new BABYLON.Color4(0.65, 0.65, 0.70, 0.20);
     }
     fire.start();
 

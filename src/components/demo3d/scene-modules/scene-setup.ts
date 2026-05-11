@@ -52,10 +52,11 @@ export function createScene(
       fogColor: new BABYLON.Color3(0.18, 0.12, 0.08),
     },
     laboratory: {
-      // Brighter, less suffocating atmosphere — was too dark/empty
-      clearColor: new BABYLON.Color4(0.32, 0.26, 0.22, 1),
-      fogDensity: 0.005,
-      fogColor: new BABYLON.Color3(0.32, 0.26, 0.22),
+      // Cooler neutral atmosphere — warm brown was hiding floor/wall contrast
+      // and merging everything into a brown haze. Fire glow is added per-light.
+      clearColor: new BABYLON.Color4(0.42, 0.44, 0.48, 1),
+      fogDensity: 0.0015,
+      fogColor: new BABYLON.Color3(0.50, 0.52, 0.56),
     },
   };
   const atmo = atmospherePresets[scenario.type] || atmospherePresets.warehouse;
@@ -143,13 +144,13 @@ function setupLighting(scene: BABYLON.Scene, scenarioType: string, quality: stri
       dirDiffuse: new BABYLON.Color3(1.0, 0.70, 0.35),
     },
     laboratory: {
-      // Brighter ambient + cooler base so geometry is clearly readable
-      // (the warm fire glow is added per-light by individual fire emitters)
-      ambientIntensity: 0.75,
-      ambientDiffuse: new BABYLON.Color3(0.95, 0.88, 0.78),
-      ambientGround: new BABYLON.Color3(0.45, 0.38, 0.32),
-      dirIntensity: 1.6,
-      dirDiffuse: new BABYLON.Color3(1.0, 0.92, 0.80),
+      // Bright neutral fill so floor, walls, racks and boxes are clearly readable.
+      // The warm fire glow is added per-light by individual fire emitters.
+      ambientIntensity: 1.05,
+      ambientDiffuse: new BABYLON.Color3(0.92, 0.94, 1.0),
+      ambientGround: new BABYLON.Color3(0.40, 0.42, 0.46),
+      dirIntensity: 1.4,
+      dirDiffuse: new BABYLON.Color3(1.0, 0.96, 0.88),
     },
   };
   const lp = lightingPresets[scenarioType] || lightingPresets.warehouse;
@@ -217,13 +218,13 @@ function setupPostProcessing(scene: BABYLON.Scene, camera: BABYLON.UniversalCame
       glowIntensity: 1.0,
     },
     laboratory: {
-      // Tamed bloom & vignette — was washing the scene out and amplifying darkness
-      bloomEnabled: true, bloomThreshold: 0.85, bloomWeight: 0.25, bloomKernel: 48, bloomScale: 0.4,
-      chromaticAberration: 2,
-      contrast: 1.15, exposure: 1.0,
-      vignetteEnabled: true, vignetteWeight: 1.0, vignetteFov: 0.85,
-      saturation: 12, globalExposure: 0.05,
-      glowIntensity: 1.2,
+      // Disabled vignette + reduced bloom: floor/walls were merging into a brown blob
+      bloomEnabled: true, bloomThreshold: 0.95, bloomWeight: 0.18, bloomKernel: 32, bloomScale: 0.4,
+      chromaticAberration: 0,
+      contrast: 1.05, exposure: 1.05,
+      vignetteEnabled: false, vignetteWeight: 0, vignetteFov: 0,
+      saturation: 8, globalExposure: 0.05,
+      glowIntensity: 1.0,
     },
   };
   const pp = ppPresets[scenarioType] || ppPresets.warehouse;
