@@ -2,9 +2,8 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Index from "./pages/Index";
-import Demo from "./pages/Demo";
 import Demo3D from "./pages/Demo3D";
 import Auth from "./pages/Auth";
 import Register from "./pages/Register";
@@ -37,7 +36,7 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />
-          <Route path="/demo" element={<Demo />} />
+          <Route path="/demo" element={<Navigate to="/spot-the-hazard" replace />} />
           <Route path="/demo-3d" element={<Demo3D />} />
           <Route path="/auth" element={<Auth />} />
           <Route path="/register" element={<Register />} />
