@@ -103,6 +103,8 @@ export const Certificates = ({ userId }: CertificatesProps) => {
         font: 'helvetica',
         textLayout: 'centered',
         logoPosition: 'top-left',
+        modulePrefix: 'Verifica della Ricaduta sulla',
+        orientation: 'portrait' as 'portrait' | 'landscape',
       };
       
       const { data: companyUserData } = await supabase
@@ -115,7 +117,9 @@ export const Certificates = ({ userId }: CertificatesProps) => {
             certificate_theme_color,
             certificate_font,
             certificate_text_layout,
-            certificate_logo_position
+            certificate_logo_position,
+            certificate_module_prefix,
+            certificate_orientation
           )
         `)
         .eq('user_id', userId)
@@ -130,6 +134,8 @@ export const Certificates = ({ userId }: CertificatesProps) => {
           font: company.certificate_font || 'helvetica',
           textLayout: company.certificate_text_layout || 'centered',
           logoPosition: company.certificate_logo_position || 'top-left',
+          modulePrefix: company.certificate_module_prefix ?? 'Verifica della Ricaduta sulla',
+          orientation: (company.certificate_orientation || 'portrait') as 'portrait' | 'landscape',
         };
       }
 
@@ -153,6 +159,8 @@ export const Certificates = ({ userId }: CertificatesProps) => {
         font: certificateSettings.font,
         textLayout: certificateSettings.textLayout,
         logoPosition: certificateSettings.logoPosition,
+        modulePrefix: certificateSettings.modulePrefix,
+        orientation: certificateSettings.orientation,
       });
 
       toast.dismiss();
