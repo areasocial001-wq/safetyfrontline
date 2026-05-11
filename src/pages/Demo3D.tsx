@@ -1636,6 +1636,17 @@ const Demo3D = () => {
               />
             )}
 
+            {/* Fire Class HUD + Readability toggle (laboratory only) */}
+            {gameStarted && selectedScenario.type === 'laboratory' && (
+              <>
+                <FireClassHUD aimedFireIndex={aimedFireIndex} />
+                <ReadabilityToggle
+                  enabled={readabilityMode}
+                  onToggle={setReadabilityMode}
+                />
+              </>
+            )}
+
             {/* Evacuation Countdown */}
             {gameStarted && (
               <EvacuationCountdown
