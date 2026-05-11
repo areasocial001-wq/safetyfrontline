@@ -16,6 +16,11 @@ import cartoonOffice from "@/assets/cartoon-office.jpg";
 import cartoonWarehouse from "@/assets/cartoon-warehouse.jpg";
 import cartoonKitchen from "@/assets/cartoon-kitchen.jpg";
 import cartoonFactory from "@/assets/cartoon-factory.jpg";
+import sim3dOffice from "@/assets/sim3d-office.jpg";
+import sim3dWarehouse from "@/assets/sim3d-warehouse.jpg";
+import sim3dConstruction from "@/assets/sim3d-construction.jpg";
+import sim3dFire from "@/assets/sim3d-fire.jpg";
+import sim3dCyber from "@/assets/sim3d-cyber.jpg";
 import { QuoteRequestDialog } from "@/components/QuoteRequestDialog";
 
 type TabKey = 'generale' | 'basso' | 'medio' | 'alto' | 'figure' | 'attrezzature' | 'cybersecurity' | 'simulazioni' | 'minigame2d' | 'piattaforma';
