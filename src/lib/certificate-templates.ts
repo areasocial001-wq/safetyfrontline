@@ -115,12 +115,15 @@ export const formaleTemplate: TemplateConfig = {
     pdf.setFontSize(12);
     pdf.setTextColor(26, 26, 26);
     pdf.setFont(data.font, 'normal');
-    pdf.text('ha completato con successo il modulo formativo', baseX, 105, { align: 'center' });
+    pdf.text('ha completato con successo', baseX, 102, { align: 'center' });
+    pdf.setFontSize(10);
+    pdf.setTextColor(100, 100, 100);
+    pdf.text('Verifica della Ricaduta sulla', baseX, 108, { align: 'center' });
 
     pdf.setFontSize(18);
     pdf.setTextColor(rgb.r, rgb.g, rgb.b);
     pdf.setFont(data.font, 'bold');
-    pdf.text(data.moduleName, baseX, 115, { align: 'center' });
+    pdf.text(data.moduleName, baseX, 118, { align: 'center' });
 
     pdf.setFontSize(12);
     pdf.setTextColor(26, 26, 26);
@@ -232,12 +235,15 @@ export const modernoTemplate: TemplateConfig = {
     pdf.setFontSize(11);
     pdf.setTextColor(100, 100, 100);
     pdf.setFont(data.font, 'normal');
-    pdf.text('Ha completato con successo', baseX, 107, { align: 'center' });
+    pdf.text('Ha completato con successo', baseX, 104, { align: 'center' });
+    pdf.setFontSize(9);
+    pdf.setTextColor(120, 120, 120);
+    pdf.text('Verifica della Ricaduta sulla', baseX, 110, { align: 'center' });
 
     pdf.setFontSize(16);
     pdf.setTextColor(rgb.r, rgb.g, rgb.b);
     pdf.setFont(data.font, 'bold');
-    pdf.text(data.moduleName, baseX, 118, { align: 'center' });
+    pdf.text(data.moduleName, baseX, 120, { align: 'center' });
 
     pdf.setFontSize(10);
     pdf.setTextColor(26, 26, 26);
@@ -326,12 +332,15 @@ export const minimalistaTemplate: TemplateConfig = {
     pdf.setFontSize(11);
     pdf.setTextColor(26, 26, 26);
     pdf.setFont(data.font, 'normal');
-    pdf.text('Ha completato', baseX, 110);
+    pdf.text('Ha completato', baseX, 107);
+    pdf.setFontSize(9);
+    pdf.setTextColor(120, 120, 120);
+    pdf.text('Verifica della Ricaduta sulla', baseX, 114);
 
     pdf.setFontSize(18);
     pdf.setTextColor(rgb.r, rgb.g, rgb.b);
     pdf.setFont(data.font, 'bold');
-    pdf.text(data.moduleName, baseX, 125);
+    pdf.text(data.moduleName, baseX, 128);
 
     // Stats in clean format
     pdf.setFontSize(10);
