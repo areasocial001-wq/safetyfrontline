@@ -411,6 +411,7 @@ export const BabylonScene = ({
       onChargeChange?.(extChargeRef.current.current, extChargeRef.current.max);
       const sprayCreated = !!scene.getParticleSystemByName('extSpray');
       return { ok: sprayCreated, reason: sprayCreated ? 'spray-fired' : 'spray-not-created', chargeBefore, chargeAfter: extChargeRef.current.current, sprayCreated };
+    };
 
     // 11. Prop detection (raycast look-at) — supports metadata.tooltip for hazards
     const LOOK_DISTANCE = 6;
