@@ -409,12 +409,15 @@ export const generateCertificatePDFBlob = async (data: Omit<CertificateData, 'sc
     pdf.setFontSize(12);
     pdf.setTextColor(26, 26, 26);
     pdf.setFont(font, 'normal');
-    pdf.text('ha completato con successo il modulo formativo', baseX, 105, { align: textAlign });
+    pdf.text('ha completato con successo il modulo formativo', baseX, 102, { align: textAlign });
+    pdf.setFontSize(10);
+    pdf.setTextColor(120, 120, 120);
+    pdf.text('Verifica della Ricaduta sulla', baseX, 108, { align: textAlign });
 
     pdf.setFontSize(18);
     pdf.setTextColor(rgb.r, rgb.g, rgb.b);
     pdf.setFont(font, 'bold');
-    pdf.text(data.moduleName, baseX, 115, { align: textAlign });
+    pdf.text(data.moduleName, baseX, 118, { align: textAlign });
 
     pdf.setFontSize(12);
     pdf.setTextColor(26, 26, 26);
