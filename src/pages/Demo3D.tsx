@@ -1576,6 +1576,13 @@ const Demo3D = () => {
               />
             )}
 
+            {/* Crosshair (precision aim) */}
+            <Crosshair
+              visible={gameStarted && selectedScenario.type === 'laboratory'}
+              aimingAtFire={aimingAtFire}
+              empty={extinguisherCharge <= 0}
+            />
+
             {/* Extinguisher Type HUD */}
             {gameStarted && selectedExtinguisher && (
               <ExtinguisherTypeHUD
