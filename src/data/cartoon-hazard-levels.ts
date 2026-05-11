@@ -2,6 +2,8 @@
 // Includes side-panel risk list, educational modal, lives system.
 
 import constructionImg from "@/assets/cartoon-construction.jpg";
+import officeImg from "@/assets/cartoon-office.jpg";
+import warehouseImg from "@/assets/cartoon-warehouse.jpg";
 import kitchenImg from "@/assets/cartoon-kitchen.jpg";
 import factoryImg from "@/assets/cartoon-factory.jpg";
 import type { RiskHuntLevel } from "@/data/risk-hunt-levels";
