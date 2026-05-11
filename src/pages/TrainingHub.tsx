@@ -562,9 +562,50 @@ const TrainingHub = () => {
     const isComplete = pathProgress.completed === pathProgress.total && pathProgress.total > 0;
 
     const PATH_EMOJIS: Record<string, string> = {
-      lavoratori: '🎓', rspp: '👑', rls: '🤝', preposto: '👁️',
+      lavoratori: '🎓', rispp: '👑', rls: '🤝', preposto: '👁️',
       cybersecurity: '🛡️', antincendio: '🔥', primo_soccorso: '❤️‍🩹',
+      rischio_basso: '🟢', rischio_medio: '🟡', rischio_alto: '🔴',
+      rspp: '👑', aspp: '🛡️', dirigente: '🏛️', lavoratrici_gestanti: '🤰',
+      attr_carrelli: '🚜', attr_carroponte: '🏗️', attr_ple: '🛗',
+      attr_gru: '🏗️', attr_scale: '🪜', attr_trattori: '🚜',
+      attr_mmt: '⛏️', attr_pompe: '🧱',
     };
+
+    if (path.comingSoon) {
+      return (
+        <div key={path.id} className="opacity-90">
+          <Card className="relative border-2 border-dashed border-amber-400/40 bg-amber-50/30 dark:bg-amber-950/10 rounded-2xl overflow-hidden">
+            <div className="h-2 bg-gradient-to-r from-amber-400 to-amber-500" />
+            <CardContent className="p-6">
+              <div className="flex items-start gap-4">
+                <div className="w-16 h-16 rounded-2xl flex items-center justify-center shrink-0 text-3xl bg-amber-100 dark:bg-amber-900/30 grayscale-[30%]">
+                  {PATH_EMOJIS[path.id] || '📚'}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 mb-1 flex-wrap">
+                    <h3 className="text-xl font-bold">{path.title}</h3>
+                    <Badge className="bg-amber-500 hover:bg-amber-500 text-white border-0">🚧 In rilascio</Badge>
+                  </div>
+                  <p className="text-sm font-medium text-muted-foreground">{path.subtitle}</p>
+                  <p className="text-sm text-muted-foreground mt-2 line-clamp-2">{path.description}</p>
+                  <div className="flex items-center gap-2 mt-3 flex-wrap">
+                    <span className="inline-flex items-center gap-1 text-xs px-2.5 py-1 rounded-full bg-muted text-muted-foreground">
+                      <Clock className="w-3 h-3" />{path.hours}
+                    </span>
+                    <span className="inline-flex items-center gap-1 text-xs px-2.5 py-1 rounded-full bg-amber-500/10 text-amber-700 dark:text-amber-400 font-semibold">
+                      {path.normativeRef}
+                    </span>
+                  </div>
+                  <Button variant="outline" size="sm" className="mt-3 w-full rounded-xl font-semibold" disabled title="Disponibile a breve">
+                    <Lock className="w-4 h-4 mr-2" /> Disponibile a breve
+                  </Button>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      );
+    }
 
     return (
       <div key={path.id} className="space-y-4">
