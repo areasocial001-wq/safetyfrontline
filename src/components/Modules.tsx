@@ -239,7 +239,7 @@ export const Modules = () => {
             {[
               { value: "35+", label: "Moduli Formativi", icon: GraduationCap },
               { value: "16", label: "Percorsi & Abilitazioni", icon: Crown },
-              { value: "3", label: "Simulazioni 3D", icon: Gamepad2 },
+              { value: "5", label: "Simulazioni 3D", icon: Gamepad2 },
               { value: "∞", label: "Personalizzazioni", icon: Settings },
             ].map((stat, i) => (
               <div key={i} className="text-center p-4 rounded-xl bg-background/50 border border-border">
