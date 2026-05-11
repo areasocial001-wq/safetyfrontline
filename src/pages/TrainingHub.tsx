@@ -50,6 +50,8 @@ const SECTION_COUNTS: Record<string, number> = {
 };
 
 // Training path definitions - all independent
+type PathCategory = 'generale' | 'figure' | 'attrezzature';
+
 interface TrainingPath {
   id: string;
   title: string;
@@ -61,7 +63,27 @@ interface TrainingPath {
   moduleIds: string[];
   requiresSector?: boolean;
   normativeRef: string;
+  category: PathCategory;
+  comingSoon?: boolean;
 }
+
+const CATEGORY_META: Record<PathCategory, { title: string; subtitle: string; emoji: string }> = {
+  generale: {
+    title: 'Formazione Generale & Specifica',
+    subtitle: 'Art. 37 D.Lgs 81/08 — Accordo Stato-Regioni 2025',
+    emoji: '📘',
+  },
+  figure: {
+    title: 'Figure della Sicurezza sul Lavoro',
+    subtitle: 'Ruoli con responsabilità formative dedicate',
+    emoji: '👥',
+  },
+  attrezzature: {
+    title: 'Attrezzature & Abilitazioni',
+    subtitle: 'Accordo Stato-Regioni — Abilitazioni operatore',
+    emoji: '🛠️',
+  },
+};
 
 const TRAINING_PATHS: TrainingPath[] = [
   {
