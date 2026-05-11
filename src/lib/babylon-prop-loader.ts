@@ -87,17 +87,29 @@ async function loadSingleProp(
     result.meshes.forEach(mesh => {
       if (mesh.name === '__root__') return;
 
+      const meshName = mesh.name.toLowerCase();
+      const materialAlpha = mesh.material && 'alpha' in mesh.material ? Number(mesh.material.alpha ?? 1) : 1;
+      const isHiddenHelper =
+        mesh.isVisible === false ||
+        mesh.visibility <= 0.01 ||
+        materialAlpha <= 0.01 ||
+        meshName.includes('collision') ||
+        meshName.includes('collider') ||
+        meshName.includes('helper') ||
+        meshName.includes('trigger') ||
+        meshName.includes('occlud');
+
       // Collision detection
-      if (prop.enableCollisions) {
+      if (prop.enableCollisions && !isHiddenHelper) {
         mesh.checkCollisions = true;
       }
 
       // Shadows (skip on low quality)
       if (quality !== 'low') {
-        if (prop.receiveShadows) {
+        if (prop.receiveShadows && !isHiddenHelper) {
           mesh.receiveShadows = true;
         }
-        if (prop.castShadows && shadowGenerator) {
+        if (prop.castShadows && shadowGenerator && !isHiddenHelper) {
           shadowGenerator.addShadowCaster(mesh);
         }
       }
