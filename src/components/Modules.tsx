@@ -16,6 +16,11 @@ import cartoonOffice from "@/assets/cartoon-office.jpg";
 import cartoonWarehouse from "@/assets/cartoon-warehouse.jpg";
 import cartoonKitchen from "@/assets/cartoon-kitchen.jpg";
 import cartoonFactory from "@/assets/cartoon-factory.jpg";
+import sim3dOffice from "@/assets/sim3d-office.jpg";
+import sim3dWarehouse from "@/assets/sim3d-warehouse.jpg";
+import sim3dConstruction from "@/assets/sim3d-construction.jpg";
+import sim3dFire from "@/assets/sim3d-fire.jpg";
+import sim3dCyber from "@/assets/sim3d-cyber.jpg";
 import { QuoteRequestDialog } from "@/components/QuoteRequestDialog";
 
 type TabKey = 'generale' | 'basso' | 'medio' | 'alto' | 'figure' | 'attrezzature' | 'cybersecurity' | 'simulazioni' | 'minigame2d' | 'piattaforma';
@@ -102,11 +107,11 @@ export const Modules = () => {
       { icon: Trophy, title: "Boss Test Finale", subtitle: "Verifica Cybersecurity", description: "6 domande avanzate su scenari reali: CEO Fraud, baiting, data breach. Punteggio minimo 70% per il certificato.", color: "primary" },
     ],
     simulazioni: [
-      { icon: Building2, title: "Ufficio Amministrativo", subtitle: "Rischi d'Ufficio 3D", description: "Scenario facile in ambiente office: cavi scoperti, estintori bloccati, uscite ostruite, scaffalature instabili. 6 rischi da identificare.", color: "primary" },
-      { icon: Warehouse, title: "Magazzino Logistica", subtitle: "Movimentazione & Stoccaggio", description: "Magazzino industriale con bancali, muletti, materiali infiammabili. Rischi manuali + procedurali generati dinamicamente.", color: "secondary" },
-      { icon: AlertTriangle, title: "Cantiere Edile", subtitle: "Lavori in Quota & DPI", description: "Scenario hard con macchinari pesanti, ponteggi, lavori in quota e rischi procedurali. Per formazione Rischio Alto.", color: "accent" },
-      { icon: Flame, title: "Simulazione Antincendio", subtitle: "Estintore First-Person", description: "Esercitazione realistica con estintore in prima persona: classi di fuoco, particelle, quiz contestuali e procedure di evacuazione.", color: "destructive" },
-      { icon: Lock, title: "Cyber Security Office", subtitle: "Rischi Informatici 3D", description: "8 rischi cyber da identificare in un ufficio 3D: post-it con password, schermi sbloccati, email di phishing, chiavette USB sospette.", color: "muted" },
+      { icon: Building2, title: "Ufficio Amministrativo", subtitle: "Rischi d'Ufficio 3D", description: "Scenario facile in ambiente office: cavi scoperti, estintori bloccati, uscite ostruite, scaffalature instabili. 6 rischi da identificare.", color: "primary", image: sim3dOffice },
+      { icon: Warehouse, title: "Magazzino Logistica", subtitle: "Movimentazione & Stoccaggio", description: "Magazzino industriale con bancali, muletti, materiali infiammabili. Rischi manuali + procedurali generati dinamicamente.", color: "secondary", image: sim3dWarehouse },
+      { icon: AlertTriangle, title: "Cantiere Edile", subtitle: "Lavori in Quota & DPI", description: "Scenario hard con macchinari pesanti, ponteggi, lavori in quota e rischi procedurali. Per formazione Rischio Alto.", color: "accent", image: sim3dConstruction },
+      { icon: Flame, title: "Simulazione Antincendio", subtitle: "Estintore First-Person", description: "Esercitazione realistica con estintore in prima persona: classi di fuoco, particelle, quiz contestuali e procedure di evacuazione.", color: "destructive", image: sim3dFire },
+      { icon: Lock, title: "Cyber Security Office", subtitle: "Rischi Informatici 3D", description: "8 rischi cyber da identificare in un ufficio 3D: post-it con password, schermi sbloccati, email di phishing, chiavette USB sospette.", color: "muted", image: sim3dCyber },
     ],
     minigame2d: [
       { icon: Building2, title: "Cantiere Cartoon", subtitle: "7 rischi · 3 vite", description: "Caccia ai rischi 2D in stile cartoon: imbracatura, carichi sospesi, ferri d'armatura, quadri elettrici. Spiegazione educativa con riferimenti normativi.", color: "destructive", image: cartoonConstruction },
@@ -234,7 +239,7 @@ export const Modules = () => {
             {[
               { value: "35+", label: "Moduli Formativi", icon: GraduationCap },
               { value: "16", label: "Percorsi & Abilitazioni", icon: Crown },
-              { value: "3", label: "Simulazioni 3D", icon: Gamepad2 },
+              { value: "5", label: "Simulazioni 3D", icon: Gamepad2 },
               { value: "∞", label: "Personalizzazioni", icon: Settings },
             ].map((stat, i) => (
               <div key={i} className="text-center p-4 rounded-xl bg-background/50 border border-border">
