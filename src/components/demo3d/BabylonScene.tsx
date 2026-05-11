@@ -31,7 +31,7 @@ import { NPCAmbientSoundSystem } from '@/lib/npc-ambient-sounds';
 import { createScene } from './scene-modules/scene-setup';
 import { loadEnvironmentOptimized } from './scene-modules/environment-loader';
 import { createParticleEffect, playRiskSound, fireAmbientContexts } from './scene-modules/audio-helpers';
-import { createFirstPersonExtinguisher, shootExtinguisherSpray } from './scene-modules/extinguisher-system';
+import { createFirstPersonExtinguisher, shootExtinguisherSpray, aimHasFire } from './scene-modules/extinguisher-system';
 import { addEnvironmentalProps } from './scene-modules/environment-props';
 import { addWorkerAvatars } from './scene-modules/worker-avatars';
 import { addSafetySignage } from './scene-modules/safety-signage';
@@ -368,17 +368,49 @@ export const BabylonScene = ({
         }
       }
 
-      // Extinguisher spray (laboratory)
-      const activeExt = extinguisherTypeRef.current;
-      if (scenario.type === 'laboratory' && activeExt) {
-        if (extChargeRef.current.current <= 0) {
-          toast.error('🔴 Estintore vuoto! Cercane uno nuovo.');
-          return;
-        }
-        extChargeRef.current.current = Math.max(0, extChargeRef.current.current - 10);
-        onChargeChange?.(extChargeRef.current.current, extChargeRef.current.max);
-        shootExtinguisherSpray(scene, camera, activeExt, fireHitCountRef.current, onFireExtinguished);
+      // Extinguisher spray (laboratory) — with aim-check, fallback retry, and miss feedback
+      if (scenario.type === 'laboratory') {
+        const tryFire = (attempt = 0) => {
+          const activeExt = extinguisherTypeRef.current;
+          if (!activeExt) {
+            // Fallback: extinguisher prop not yet propagated — retry once after a short delay
+            if (attempt === 0) {
+              setTimeout(() => tryFire(1), 120);
+            } else {
+              toast.warning('⚠️ Nessun estintore selezionato. Scegline uno per attivare lo spray.');
+            }
+            return;
+          }
+          if (extChargeRef.current.current <= 0) {
+            toast.error('🔴 Estintore vuoto! Cercane uno nuovo.');
+            return;
+          }
+          // Aim check: don't consume charge if not pointing at any fire
+          const aim = aimHasFire(scene, camera);
+          if (!aim.hit) {
+            toast.info('🎯 Mira verso il fuoco — nessuna carica consumata.');
+            return;
+          }
+          extChargeRef.current.current = Math.max(0, extChargeRef.current.current - 10);
+          onChargeChange?.(extChargeRef.current.current, extChargeRef.current.max);
+          shootExtinguisherSpray(scene, camera, activeExt, fireHitCountRef.current, onFireExtinguished);
+        };
+        tryFire();
       }
+    };
+
+    // Expose automated test hook (dev/QA): simulates extinguisher click & verifies spray
+    (window as unknown as { __extinguisherTest?: () => Promise<{ ok: boolean; reason: string; chargeBefore: number; chargeAfter: number; sprayCreated: boolean }> }).__extinguisherTest = async () => {
+      const chargeBefore = extChargeRef.current.current;
+      const activeExt = extinguisherTypeRef.current;
+      if (!activeExt) return { ok: false, reason: 'no-extinguisher-selected', chargeBefore, chargeAfter: chargeBefore, sprayCreated: false };
+      const aim = aimHasFire(scene, camera);
+      if (!aim.hit) return { ok: false, reason: 'aim-missed-fire', chargeBefore, chargeAfter: chargeBefore, sprayCreated: false };
+      shootExtinguisherSpray(scene, camera, activeExt, fireHitCountRef.current, onFireExtinguished);
+      extChargeRef.current.current = Math.max(0, extChargeRef.current.current - 10);
+      onChargeChange?.(extChargeRef.current.current, extChargeRef.current.max);
+      const sprayCreated = scene.particleSystems.some(p => p.name === 'extSpray');
+      return { ok: sprayCreated, reason: sprayCreated ? 'spray-fired' : 'spray-not-created', chargeBefore, chargeAfter: extChargeRef.current.current, sprayCreated };
     };
 
     // 11. Prop detection (raycast look-at) — supports metadata.tooltip for hazards

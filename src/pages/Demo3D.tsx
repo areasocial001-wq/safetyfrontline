@@ -1581,6 +1581,15 @@ const Demo3D = () => {
               />
             )}
 
+            {/* No-extinguisher warning (always visible when laboratory & none selected) */}
+            {gameStarted && !selectedExtinguisher && selectedScenario.type === 'laboratory' && (
+              <div className="absolute bottom-36 right-4 z-30 pointer-events-none">
+                <div className="px-3 py-2 rounded-lg bg-destructive/20 border-2 border-destructive backdrop-blur-md animate-pulse">
+                  <span className="text-xs font-bold text-destructive">⚠️ Nessun estintore selezionato</span>
+                </div>
+              </div>
+            )}
+
             {/* Extinguisher Charge HUD */}
             {gameStarted && selectedExtinguisher && (
               <ExtinguisherChargeHUD

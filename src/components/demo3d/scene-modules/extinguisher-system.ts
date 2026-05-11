@@ -220,4 +220,39 @@ export function shootExtinguisherSpray(
     spray.stop();
     setTimeout(() => { spray.dispose(); emitter.dispose(); }, 1500);
   }, 600);
+
+  const hits = fireEmitters.filter(em => BABYLON.Vector3.Distance(sprayHitPoint, em.position) < 3.0).length;
+  return { hitFire: hits > 0, hitsCount: hits };
+}
+
+/**
+ * Aim check: returns true if the camera forward ray points at (or near) any active fire emitter.
+ * Used BEFORE consuming charge so misses don't waste the extinguisher.
+ */
+export function aimHasFire(
+  scene: BABYLON.Scene,
+  camera: BABYLON.UniversalCamera,
+  maxDistance = 8,
+  tolerance = 2.5
+): { hit: boolean; nearestDistance: number } {
+  const fireEmitters = scene.meshes.filter(m => m.name.startsWith('fireEmitter_'));
+  if (fireEmitters.length === 0) return { hit: false, nearestDistance: Infinity };
+
+  const origin = camera.position;
+  const forward = camera.getDirection(BABYLON.Vector3.Forward()).normalize();
+  let nearest = Infinity;
+  let hit = false;
+
+  for (const em of fireEmitters) {
+    const toFire = em.position.subtract(origin);
+    const projLen = BABYLON.Vector3.Dot(toFire, forward);
+    if (projLen < 0 || projLen > maxDistance) continue;
+    const closestPoint = origin.add(forward.scale(projLen));
+    const perpDist = BABYLON.Vector3.Distance(closestPoint, em.position);
+    if (perpDist < tolerance) {
+      hit = true;
+      nearest = Math.min(nearest, perpDist);
+    }
+  }
+  return { hit, nearestDistance: nearest };
 }
