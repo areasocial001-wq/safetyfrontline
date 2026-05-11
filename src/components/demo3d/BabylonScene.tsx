@@ -547,6 +547,7 @@ export const BabylonScene = ({
     let pickupCheckCounter = 0;
     let aimCheckCounter = 0;
     let lastAimState = false;
+    let lastAimIndex: number | null = null;
     engine.runRenderLoop(() => {
       updateDynamicOcclusion();
       detectLookedAtProp();
@@ -573,12 +574,17 @@ export const BabylonScene = ({
       }
       // Aim-at-fire detection (throttled)
       aimCheckCounter++;
-      if (aimCheckCounter >= 6 && scenario.type === 'laboratory' && camera && onAimAtFire) {
+      if (aimCheckCounter >= 6 && scenario.type === 'laboratory' && camera) {
         aimCheckCounter = 0;
         const aim = aimHasFire(scene, camera);
-        if (aim.hit !== lastAimState) {
+        if (onAimAtFire && aim.hit !== lastAimState) {
           lastAimState = aim.hit;
           onAimAtFire(aim.hit);
+        }
+        const idx = aim.hit ? aim.nearestIndex : null;
+        if (onAimAtFireIndex && idx !== lastAimIndex) {
+          lastAimIndex = idx;
+          onAimAtFireIndex(idx);
         }
       }
       scene.render();
