@@ -159,7 +159,7 @@ export const Modules = () => {
               I Moduli del Sistema <span className="text-primary">Safety Frontline</span>
             </h2>
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-              35+ moduli formativi, 8 percorsi figura, 8 abilitazioni attrezzature, 5 simulazioni 3D e 3 mini-game 2D. Conforme Accordo Stato-Regioni 2025.
+              35+ moduli formativi, 8 percorsi figura, 8 abilitazioni attrezzature, 5 simulazioni 3D e 5 mini-game 2D. Conforme Accordo Stato-Regioni 2025.
             </p>
           </div>
 
