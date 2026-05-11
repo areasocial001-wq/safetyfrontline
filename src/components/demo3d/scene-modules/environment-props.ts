@@ -2555,3 +2555,348 @@ export function addCybersecurityProps(
 
   console.log('[Cybersecurity] Cyber risk visual props added — post-its, unlocked screens, phishing, USB, docs');
 }
+
+
+// ============================================================
+// CYBER SECURITY OFFICE — Dedicated SOC/IT operations room.
+// Built when scenarioId === 'cybersecurity' so it does NOT
+// reuse the warm administrative office geometry.
+// ============================================================
+export function addCyberSecurityOfficeEnvironment(
+  scene: BABYLON.Scene,
+  quality: string,
+  shadowGenerator: BABYLON.ShadowGenerator | null
+) {
+  const ROOM_W = 30;
+  const ROOM_D = 24;
+  const ROOM_H = 4.2;
+
+  // ---------- Materials ----------
+  const floorMat = new BABYLON.StandardMaterial('cyo_floorMat', scene);
+  const floorTex = new BABYLON.DynamicTexture('cyo_floorTex', { width: 512, height: 512 }, scene, false);
+  const fctx = floorTex.getContext() as CanvasRenderingContext2D;
+  fctx.fillStyle = '#15171c';
+  fctx.fillRect(0, 0, 512, 512);
+  // Raised access floor tile grid (datacenter look)
+  fctx.strokeStyle = '#2a2f3a';
+  fctx.lineWidth = 2;
+  for (let i = 0; i <= 512; i += 64) {
+    fctx.beginPath(); fctx.moveTo(i, 0); fctx.lineTo(i, 512); fctx.stroke();
+    fctx.beginPath(); fctx.moveTo(0, i); fctx.lineTo(512, i); fctx.stroke();
+  }
+  // Subtle perforation dots
+  fctx.fillStyle = '#0a0c10';
+  for (let x = 16; x < 512; x += 64) {
+    for (let y = 16; y < 512; y += 64) {
+      fctx.beginPath(); fctx.arc(x, y, 1.2, 0, Math.PI * 2); fctx.fill();
+      fctx.beginPath(); fctx.arc(x + 32, y + 32, 1.2, 0, Math.PI * 2); fctx.fill();
+    }
+  }
+  floorTex.update();
+  floorTex.uScale = 8; floorTex.vScale = 8;
+  floorMat.diffuseTexture = floorTex;
+  floorMat.specularColor = new BABYLON.Color3(0.25, 0.3, 0.4);
+  floorMat.specularPower = 96;
+  floorMat.emissiveColor = new BABYLON.Color3(0.02, 0.03, 0.05);
+
+  const wallMat = new BABYLON.StandardMaterial('cyo_wallMat', scene);
+  wallMat.diffuseColor = new BABYLON.Color3(0.10, 0.12, 0.16);
+  wallMat.specularColor = new BABYLON.Color3(0.05, 0.05, 0.08);
+  wallMat.emissiveColor = new BABYLON.Color3(0.015, 0.02, 0.035);
+  wallMat.backFaceCulling = false;
+
+  const accentMat = new BABYLON.StandardMaterial('cyo_accentMat', scene);
+  accentMat.diffuseColor = new BABYLON.Color3(0.05, 0.4, 0.8);
+  accentMat.emissiveColor = new BABYLON.Color3(0.1, 0.5, 1.0);
+  accentMat.specularColor = BABYLON.Color3.Black();
+
+  const ceilingMat = new BABYLON.StandardMaterial('cyo_ceilMat', scene);
+  ceilingMat.diffuseColor = new BABYLON.Color3(0.07, 0.08, 0.10);
+  ceilingMat.specularColor = BABYLON.Color3.Black();
+  ceilingMat.backFaceCulling = false;
+
+  const metalMat = new BABYLON.StandardMaterial('cyo_metalMat', scene);
+  metalMat.diffuseColor = new BABYLON.Color3(0.22, 0.24, 0.28);
+  metalMat.specularColor = new BABYLON.Color3(0.6, 0.6, 0.7);
+  metalMat.specularPower = 96;
+
+  const blackMat = new BABYLON.StandardMaterial('cyo_blackMat', scene);
+  blackMat.diffuseColor = new BABYLON.Color3(0.06, 0.06, 0.08);
+  blackMat.specularColor = new BABYLON.Color3(0.3, 0.3, 0.35);
+
+  const deskMat = new BABYLON.StandardMaterial('cyo_deskMat', scene);
+  deskMat.diffuseColor = new BABYLON.Color3(0.12, 0.13, 0.16);
+  deskMat.specularColor = new BABYLON.Color3(0.25, 0.25, 0.3);
+
+  // ---------- Floor ----------
+  const floor = BABYLON.MeshBuilder.CreateGround('cyo_floor', { width: ROOM_W, height: ROOM_D }, scene);
+  floor.position.y = 0.01;
+  floor.material = floorMat;
+  floor.receiveShadows = true;
+  floor.isPickable = false;
+
+  // ---------- Walls ----------
+  const makeWall = (name: string, w: number, h: number, pos: BABYLON.Vector3, rotY: number) => {
+    const wall = BABYLON.MeshBuilder.CreatePlane(name, { width: w, height: h }, scene);
+    wall.position = pos;
+    wall.rotation.y = rotY;
+    wall.material = wallMat;
+    wall.checkCollisions = true;
+    wall.receiveShadows = true;
+    return wall;
+  };
+  makeWall('cyo_wallN', ROOM_W, ROOM_H, new BABYLON.Vector3(0, ROOM_H / 2, ROOM_D / 2), Math.PI);
+  makeWall('cyo_wallS', ROOM_W, ROOM_H, new BABYLON.Vector3(0, ROOM_H / 2, -ROOM_D / 2), 0);
+  makeWall('cyo_wallE', ROOM_D, ROOM_H, new BABYLON.Vector3(ROOM_W / 2, ROOM_H / 2, 0), -Math.PI / 2);
+  makeWall('cyo_wallW', ROOM_D, ROOM_H, new BABYLON.Vector3(-ROOM_W / 2, ROOM_H / 2, 0), Math.PI / 2);
+
+  // ---------- Ceiling ----------
+  const ceil = BABYLON.MeshBuilder.CreatePlane('cyo_ceiling', { width: ROOM_W, height: ROOM_D }, scene);
+  ceil.position = new BABYLON.Vector3(0, ROOM_H, 0);
+  ceil.rotation.x = -Math.PI / 2;
+  ceil.material = ceilingMat;
+  ceil.isPickable = false;
+
+  // Cyan LED ceiling strips (3 long bars across the room)
+  for (let i = -1; i <= 1; i++) {
+    const strip = BABYLON.MeshBuilder.CreateBox(`cyo_ledStrip_${i}`, { width: ROOM_W - 2, height: 0.05, depth: 0.18 }, scene);
+    strip.position = new BABYLON.Vector3(0, ROOM_H - 0.06, i * 7);
+    strip.material = accentMat;
+    strip.isPickable = false;
+  }
+
+  // Cyan accent skirting along the long walls
+  const skirtN = BABYLON.MeshBuilder.CreateBox('cyo_skirtN', { width: ROOM_W, height: 0.04, depth: 0.05 }, scene);
+  skirtN.position = new BABYLON.Vector3(0, 0.04, ROOM_D / 2 - 0.06);
+  skirtN.material = accentMat;
+  const skirtS = skirtN.clone('cyo_skirtS');
+  skirtS.position.z = -ROOM_D / 2 + 0.06;
+
+  // ---------- Server rack wall (south wall) ----------
+  const rackCount = 7;
+  const rackSpacing = 1.2;
+  const rackStartX = -((rackCount - 1) * rackSpacing) / 2;
+  for (let r = 0; r < rackCount; r++) {
+    const rx = rackStartX + r * rackSpacing;
+    const rz = -ROOM_D / 2 + 0.55;
+
+    // Rack chassis
+    const rack = BABYLON.MeshBuilder.CreateBox(`cyo_rack_${r}`, { width: 1.0, height: 2.6, depth: 0.9 }, scene);
+    rack.position = new BABYLON.Vector3(rx, 1.3, rz);
+    rack.material = blackMat;
+    rack.checkCollisions = true;
+    if (shadowGenerator && quality !== 'low') shadowGenerator.addShadowCaster(rack);
+
+    // Front face with blinking LEDs
+    const front = BABYLON.MeshBuilder.CreatePlane(`cyo_rackFront_${r}`, { width: 0.95, height: 2.55 }, scene);
+    front.position = new BABYLON.Vector3(rx, 1.3, rz + 0.46);
+    const frontTex = new BABYLON.DynamicTexture(`cyo_rackTex_${r}`, { width: 256, height: 512 }, scene, false);
+    const rctx = frontTex.getContext() as CanvasRenderingContext2D;
+    rctx.fillStyle = '#0c0d10';
+    rctx.fillRect(0, 0, 256, 512);
+    // Server units (1U slots)
+    for (let u = 0; u < 16; u++) {
+      const yy = 20 + u * 30;
+      rctx.fillStyle = '#1a1c22';
+      rctx.fillRect(10, yy, 236, 24);
+      rctx.strokeStyle = '#2a2d35';
+      rctx.lineWidth = 1;
+      rctx.strokeRect(10, yy, 236, 24);
+      // Status LEDs
+      const colors = ['#22c55e', '#22c55e', '#0ea5e9', '#22c55e', '#f59e0b', '#22c55e'];
+      for (let l = 0; l < 6; l++) {
+        rctx.fillStyle = colors[(u + l + r) % colors.length];
+        rctx.fillRect(20 + l * 8, yy + 9, 4, 6);
+      }
+      // Drive bay slits
+      rctx.fillStyle = '#000';
+      rctx.fillRect(70, yy + 6, 160, 12);
+    }
+    frontTex.update();
+    const frontMat = new BABYLON.StandardMaterial(`cyo_rackFrontMat_${r}`, scene);
+    frontMat.diffuseTexture = frontTex;
+    frontMat.emissiveTexture = frontTex;
+    frontMat.emissiveColor = new BABYLON.Color3(0.4, 0.45, 0.5);
+    frontMat.specularColor = BABYLON.Color3.Black();
+    front.material = frontMat;
+    front.isPickable = false;
+  }
+
+  // Soft cyan light bathing the rack wall
+  if (quality !== 'low') {
+    const rackLight = new BABYLON.PointLight('cyo_rackLight', new BABYLON.Vector3(0, 1.6, -ROOM_D / 2 + 2.5), scene);
+    rackLight.diffuse = new BABYLON.Color3(0.2, 0.55, 1.0);
+    rackLight.intensity = 0.45;
+    rackLight.range = 14;
+  }
+
+  // ---------- Operator desks (2 rows of 3 = 6 stations) ----------
+  // Match risk positions used in addCybersecurityProps (x in {-7,0,7}, z in {-5,5})
+  const stations: { x: number; z: number; facing: number }[] = [
+    { x: -7, z: -5, facing: 1 },
+    { x:  0, z: -5, facing: 1 },
+    { x:  7, z: -5, facing: 1 },
+    { x: -7, z:  5, facing: -1 },
+    { x:  0, z:  5, facing: -1 },
+    { x:  7, z:  5, facing: -1 },
+  ];
+
+  stations.forEach((s, idx) => {
+    // Desk surface (dark, glass-like)
+    const desk = BABYLON.MeshBuilder.CreateBox(`cyo_desk_${idx}`, { width: 2.2, height: 0.06, depth: 1.1 }, scene);
+    desk.position = new BABYLON.Vector3(s.x, 0.75, s.z);
+    desk.material = deskMat;
+    desk.checkCollisions = true;
+    desk.receiveShadows = true;
+
+    // Desk legs
+    [[-1, -1], [1, -1], [-1, 1], [1, 1]].forEach(([dx, dz], li) => {
+      const leg = BABYLON.MeshBuilder.CreateBox(`cyo_leg_${idx}_${li}`, { width: 0.05, height: 0.74, depth: 0.05 }, scene);
+      leg.position = new BABYLON.Vector3(s.x + dx * 1.0, 0.37, s.z + dz * 0.5);
+      leg.material = metalMat;
+    });
+
+    // Triple curved monitor setup (3 monitors per station)
+    for (let m = -1; m <= 1; m++) {
+      const monX = s.x + m * 0.75;
+      const monZ = s.z + s.facing * 0.40;
+      const yaw = m * 0.25 * -s.facing;
+
+      const stand = BABYLON.MeshBuilder.CreateBox(`cyo_monStand_${idx}_${m}`, { width: 0.06, height: 0.35, depth: 0.06 }, scene);
+      stand.position = new BABYLON.Vector3(monX, 0.95, monZ);
+      stand.material = metalMat;
+
+      const monitor = BABYLON.MeshBuilder.CreateBox(`cyo_mon_${idx}_${m}`, { width: 0.72, height: 0.45, depth: 0.04 }, scene);
+      monitor.position = new BABYLON.Vector3(monX, 1.30, monZ);
+      monitor.rotation.y = yaw;
+      monitor.material = blackMat;
+      if (shadowGenerator && quality !== 'low' && quality !== 'medium') shadowGenerator.addShadowCaster(monitor);
+
+      // Emissive screen with terminal/code look
+      const screen = BABYLON.MeshBuilder.CreatePlane(`cyo_screen_${idx}_${m}`, { width: 0.68, height: 0.41 }, scene);
+      screen.position = new BABYLON.Vector3(
+        monX + s.facing * 0.022 * Math.cos(yaw),
+        1.30,
+        monZ + s.facing * 0.022 * Math.sin(yaw) + s.facing * 0.022 * (Math.cos(yaw) - 1) * 0
+      );
+      // Place screen slightly in front of monitor along facing direction with yaw
+      screen.position.x = monX + Math.sin(yaw) * 0.022 + s.facing * 0 ;
+      screen.position.z = monZ + s.facing * 0.022;
+      screen.rotation.y = yaw + (s.facing > 0 ? Math.PI : 0);
+
+      const screenTex = new BABYLON.DynamicTexture(`cyo_screenTex_${idx}_${m}`, { width: 256, height: 160 }, scene, false);
+      const sctx = screenTex.getContext() as CanvasRenderingContext2D;
+      // Variation: terminal green / dashboard blue / log amber
+      const variant = (idx + m + 3) % 3;
+      const bg = variant === 0 ? '#020a06' : variant === 1 ? '#04101e' : '#100a02';
+      const fg = variant === 0 ? '#22ff88' : variant === 1 ? '#5eb8ff' : '#ffb14a';
+      sctx.fillStyle = bg;
+      sctx.fillRect(0, 0, 256, 160);
+      sctx.font = '10px monospace';
+      sctx.fillStyle = fg;
+      const lines = variant === 0
+        ? ['$ ssh ops@srv-12', 'last login: ok', '> tail -f /var/log/auth', 'sshd: accepted', 'sshd: accepted', 'sshd: failed (3)', 'fail2ban: ban 10.0.', '> netstat -tlnp', 'tcp 0 *:22 LISTEN', 'tcp 0 *:443 LIST', '> _']
+        : variant === 1
+        ? ['SOC DASHBOARD', 'CPU  ████████ 78%', 'NET  ▆▇▆▆▇▅▆▇ 4.2G', 'IDS  alerts: 12', 'FW   blocks: 487', 'SIEM events: 9.2k', '────────────────', 'ALERT  HIGH', '  brute-force', '  src 45.12.0.0', 'STATUS  OK']
+        : ['LOG STREAM', '[WARN] cert expiring', '[INFO] backup done', '[INFO] sync 0/132', '[ERR ] tls handshake', '[INFO] user login', '[WARN] disk 82%', '[INFO] patch ready', '[INFO] vpn up', '[ERR ] db slow query', '[INFO] sync OK'];
+      lines.forEach((ln, li) => sctx.fillText(ln, 8, 14 + li * 12));
+      screenTex.update();
+
+      const screenMat = new BABYLON.StandardMaterial(`cyo_screenMat_${idx}_${m}`, scene);
+      screenMat.diffuseTexture = screenTex;
+      screenMat.emissiveTexture = screenTex;
+      screenMat.emissiveColor = new BABYLON.Color3(0.7, 0.85, 1.0);
+      screenMat.specularColor = BABYLON.Color3.Black();
+      screen.material = screenMat;
+      screen.isPickable = false;
+    }
+
+    // Mechanical keyboard
+    const kb = BABYLON.MeshBuilder.CreateBox(`cyo_kb_${idx}`, { width: 0.5, height: 0.025, depth: 0.16 }, scene);
+    kb.position = new BABYLON.Vector3(s.x, 0.79, s.z + s.facing * 0.05);
+    kb.material = blackMat;
+
+    // Gaming chair (simple)
+    const chairBase = BABYLON.MeshBuilder.CreateCylinder(`cyo_chairBase_${idx}`, { height: 0.05, diameter: 0.55 }, scene);
+    chairBase.position = new BABYLON.Vector3(s.x, 0.05, s.z - s.facing * 0.95);
+    chairBase.material = metalMat;
+    const chairSeat = BABYLON.MeshBuilder.CreateBox(`cyo_chairSeat_${idx}`, { width: 0.55, height: 0.1, depth: 0.55 }, scene);
+    chairSeat.position = new BABYLON.Vector3(s.x, 0.50, s.z - s.facing * 0.95);
+    chairSeat.material = blackMat;
+    const chairBack = BABYLON.MeshBuilder.CreateBox(`cyo_chairBack_${idx}`, { width: 0.55, height: 0.85, depth: 0.08 }, scene);
+    chairBack.position = new BABYLON.Vector3(s.x, 0.95, s.z - s.facing * 1.20);
+    chairBack.material = blackMat;
+
+    // Subtle blue desk under-glow
+    if (quality !== 'low' && idx % 2 === 0) {
+      const underGlow = new BABYLON.PointLight(`cyo_glow_${idx}`, new BABYLON.Vector3(s.x, 0.7, s.z), scene);
+      underGlow.diffuse = new BABYLON.Color3(0.1, 0.4, 0.9);
+      underGlow.intensity = 0.18;
+      underGlow.range = 3.5;
+    }
+  });
+
+  // ---------- NOC video wall (north wall) ----------
+  const wallScreenW = 8.5;
+  const wallScreenH = 2.4;
+  const wallScreen = BABYLON.MeshBuilder.CreatePlane('cyo_wallScreen', { width: wallScreenW, height: wallScreenH }, scene);
+  wallScreen.position = new BABYLON.Vector3(0, 2.0, ROOM_D / 2 - 0.05);
+  wallScreen.rotation.y = Math.PI;
+  const wsTex = new BABYLON.DynamicTexture('cyo_wallScreenTex', { width: 1024, height: 320 }, scene, false);
+  const wctx2 = wsTex.getContext() as CanvasRenderingContext2D;
+  wctx2.fillStyle = '#030814';
+  wctx2.fillRect(0, 0, 1024, 320);
+  // World map dots
+  wctx2.fillStyle = '#1e3a5f';
+  for (let i = 0; i < 600; i++) {
+    wctx2.fillRect(Math.random() * 1024, 40 + Math.random() * 220, 2, 2);
+  }
+  // Threat lines
+  wctx2.strokeStyle = '#ef4444';
+  wctx2.lineWidth = 1.5;
+  for (let i = 0; i < 18; i++) {
+    wctx2.beginPath();
+    wctx2.moveTo(Math.random() * 1024, 40 + Math.random() * 220);
+    wctx2.lineTo(Math.random() * 1024, 40 + Math.random() * 220);
+    wctx2.stroke();
+  }
+  // Header
+  wctx2.fillStyle = '#5eb8ff';
+  wctx2.font = 'bold 22px monospace';
+  wctx2.fillText('GLOBAL THREAT MAP — LIVE', 20, 28);
+  wctx2.fillStyle = '#22c55e';
+  wctx2.font = '14px monospace';
+  wctx2.fillText('ACTIVE: 12   BLOCKED: 487   ALERTS: 3', 20, 300);
+  wsTex.update();
+  const wsMat = new BABYLON.StandardMaterial('cyo_wallScreenMat', scene);
+  wsMat.diffuseTexture = wsTex;
+  wsMat.emissiveTexture = wsTex;
+  wsMat.emissiveColor = new BABYLON.Color3(0.6, 0.8, 1.0);
+  wsMat.specularColor = BABYLON.Color3.Black();
+  wallScreen.material = wsMat;
+
+  // Bezel around video wall
+  const bezel = BABYLON.MeshBuilder.CreateBox('cyo_bezel', { width: wallScreenW + 0.3, height: wallScreenH + 0.3, depth: 0.08 }, scene);
+  bezel.position = new BABYLON.Vector3(0, 2.0, ROOM_D / 2 - 0.02);
+  bezel.material = blackMat;
+
+  // ---------- Cable trays on ceiling ----------
+  for (let i = 0; i < 4; i++) {
+    const tray = BABYLON.MeshBuilder.CreateBox(`cyo_tray_${i}`, { width: 0.3, height: 0.08, depth: ROOM_D - 2 }, scene);
+    tray.position = new BABYLON.Vector3(-9 + i * 6, ROOM_H - 0.25, 0);
+    tray.material = metalMat;
+  }
+
+  // ---------- Lighting tweaks ----------
+  // Override hemispheric to a cooler tone
+  const hemi = scene.getLightByName('hemisphericLight') as BABYLON.HemisphericLight | null;
+  if (hemi) {
+    hemi.diffuse = new BABYLON.Color3(0.55, 0.65, 0.85);
+    hemi.groundColor = new BABYLON.Color3(0.05, 0.08, 0.12);
+    hemi.intensity = 0.55;
+  }
+  // Cool the clear color
+  scene.clearColor = new BABYLON.Color4(0.04, 0.06, 0.10, 1);
+
+  console.log('[CyberSecurityOffice] SOC environment built — racks, NOC wall, triple-monitor desks');
+}
