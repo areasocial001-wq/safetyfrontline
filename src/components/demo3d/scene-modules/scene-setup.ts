@@ -218,13 +218,13 @@ function setupPostProcessing(scene: BABYLON.Scene, camera: BABYLON.UniversalCame
       glowIntensity: 1.0,
     },
     laboratory: {
-      // Tamed bloom & vignette — was washing the scene out and amplifying darkness
-      bloomEnabled: true, bloomThreshold: 0.85, bloomWeight: 0.25, bloomKernel: 48, bloomScale: 0.4,
-      chromaticAberration: 2,
-      contrast: 1.15, exposure: 1.0,
-      vignetteEnabled: true, vignetteWeight: 1.0, vignetteFov: 0.85,
-      saturation: 12, globalExposure: 0.05,
-      glowIntensity: 1.2,
+      // Disabled vignette + reduced bloom: floor/walls were merging into a brown blob
+      bloomEnabled: true, bloomThreshold: 0.95, bloomWeight: 0.18, bloomKernel: 32, bloomScale: 0.4,
+      chromaticAberration: 0,
+      contrast: 1.05, exposure: 1.05,
+      vignetteEnabled: false, vignetteWeight: 0, vignetteFov: 0,
+      saturation: 8, globalExposure: 0.05,
+      glowIntensity: 1.0,
     },
   };
   const pp = ppPresets[scenarioType] || ppPresets.warehouse;
