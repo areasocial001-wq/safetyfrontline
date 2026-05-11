@@ -58,6 +58,9 @@ interface BabylonSceneProps {
   onBriefingComplete?: () => void;
   uniformFillConfig?: Partial<import('./scene-modules/uniform-fill-config').UniformFillConfig>;
   onAimAtFire?: (aiming: boolean) => void;
+  onAimAtFireIndex?: (index: number | null) => void;
+  /** "readable" boosts visibility (less fog, less bloom, neutral exposure) */
+  readabilityMode?: boolean;
 }
 
 export const BabylonScene = ({
@@ -81,6 +84,8 @@ export const BabylonScene = ({
   onBriefingComplete,
   uniformFillConfig,
   onAimAtFire,
+  onAimAtFireIndex,
+  readabilityMode = false,
 }: BabylonSceneProps) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const engineRef = useRef<BABYLON.Engine | null>(null);
