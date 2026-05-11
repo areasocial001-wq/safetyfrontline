@@ -52,9 +52,10 @@ export function createScene(
       fogColor: new BABYLON.Color3(0.18, 0.12, 0.08),
     },
     laboratory: {
-      clearColor: new BABYLON.Color4(0.14, 0.10, 0.08, 1),
-      fogDensity: 0.012,
-      fogColor: new BABYLON.Color3(0.14, 0.10, 0.08),
+      // Brighter, less suffocating atmosphere — was too dark/empty
+      clearColor: new BABYLON.Color4(0.32, 0.26, 0.22, 1),
+      fogDensity: 0.005,
+      fogColor: new BABYLON.Color3(0.32, 0.26, 0.22),
     },
   };
   const atmo = atmospherePresets[scenario.type] || atmospherePresets.warehouse;
@@ -142,11 +143,13 @@ function setupLighting(scene: BABYLON.Scene, scenarioType: string, quality: stri
       dirDiffuse: new BABYLON.Color3(1.0, 0.70, 0.35),
     },
     laboratory: {
-      ambientIntensity: 0.3,
-      ambientDiffuse: new BABYLON.Color3(1.0, 0.6, 0.3),
-      ambientGround: new BABYLON.Color3(0.25, 0.1, 0.05),
-      dirIntensity: 1.5,
-      dirDiffuse: new BABYLON.Color3(1.0, 0.65, 0.3),
+      // Brighter ambient + cooler base so geometry is clearly readable
+      // (the warm fire glow is added per-light by individual fire emitters)
+      ambientIntensity: 0.75,
+      ambientDiffuse: new BABYLON.Color3(0.95, 0.88, 0.78),
+      ambientGround: new BABYLON.Color3(0.45, 0.38, 0.32),
+      dirIntensity: 1.6,
+      dirDiffuse: new BABYLON.Color3(1.0, 0.92, 0.80),
     },
   };
   const lp = lightingPresets[scenarioType] || lightingPresets.warehouse;
@@ -214,12 +217,13 @@ function setupPostProcessing(scene: BABYLON.Scene, camera: BABYLON.UniversalCame
       glowIntensity: 1.0,
     },
     laboratory: {
-      bloomEnabled: true, bloomThreshold: 0.5, bloomWeight: 0.55, bloomKernel: 80, bloomScale: 0.6,
-      chromaticAberration: 5,
-      contrast: 1.3, exposure: 1.15,
-      vignetteEnabled: true, vignetteWeight: 1.8, vignetteFov: 0.75,
-      saturation: 30, globalExposure: 0.2,
-      glowIntensity: 2.0,
+      // Tamed bloom & vignette — was washing the scene out and amplifying darkness
+      bloomEnabled: true, bloomThreshold: 0.85, bloomWeight: 0.25, bloomKernel: 48, bloomScale: 0.4,
+      chromaticAberration: 2,
+      contrast: 1.15, exposure: 1.0,
+      vignetteEnabled: true, vignetteWeight: 1.0, vignetteFov: 0.85,
+      saturation: 12, globalExposure: 0.05,
+      glowIntensity: 1.2,
     },
   };
   const pp = ppPresets[scenarioType] || ppPresets.warehouse;

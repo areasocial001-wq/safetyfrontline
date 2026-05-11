@@ -963,10 +963,19 @@ export const BabylonScene = ({
       setKey(e.code, false);
     };
     const clearKeys = () => { state.w = state.a = state.s = state.d = false; };
-
-    window.addEventListener('keydown', onKeyDown);
-    window.addEventListener('keyup', onKeyUp);
+    const onVisibility = () => { if (document.hidden) clearKeys(); };
+    const onPointerLockChange = () => {
+      // When pointer lock is released (modal opened, ESC, alt-tab) keys can
+      // get "stuck" because keyup may be swallowed by overlays. Reset state.
+      if (!document.pointerLockElement) clearKeys();
+    };
+    // Listen in CAPTURE phase so overlays that stopPropagation() in bubble
+    // phase can no longer prevent us from clearing the key state.
+    window.addEventListener('keydown', onKeyDown, true);
+    window.addEventListener('keyup', onKeyUp, true);
     window.addEventListener('blur', clearKeys);
+    document.addEventListener('visibilitychange', onVisibility);
+    document.addEventListener('pointerlockchange', onPointerLockChange);
 
     // Drive camera each frame from our own state so movement works even if
     // Babylon's keyboard input lost the canvas focus.
@@ -982,9 +991,11 @@ export const BabylonScene = ({
     });
 
     return () => {
-      window.removeEventListener('keydown', onKeyDown);
-      window.removeEventListener('keyup', onKeyUp);
+      window.removeEventListener('keydown', onKeyDown, true);
+      window.removeEventListener('keyup', onKeyUp, true);
       window.removeEventListener('blur', clearKeys);
+      document.removeEventListener('visibilitychange', onVisibility);
+      document.removeEventListener('pointerlockchange', onPointerLockChange);
       if (obs && scene) scene.onBeforeRenderObservable.remove(obs);
     };
   }, [isActive]);
