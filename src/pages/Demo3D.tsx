@@ -184,6 +184,8 @@ const Demo3D = () => {
   const [extinguisherCharge, setExtinguisherCharge] = useState(100);
   const [extinguisherMaxCharge, setExtinguisherMaxCharge] = useState(100);
   const [aimingAtFire, setAimingAtFire] = useState(false);
+  const [aimedFireIndex, setAimedFireIndex] = useState<number | null>(null);
+  const [readabilityMode, setReadabilityMode] = useState(false);
   const [firesExtinguished, setFiresExtinguished] = useState(0);
   const [totalFires, setTotalFires] = useState(0);
   const [allFiresOut, setAllFiresOut] = useState(false);
@@ -1450,6 +1452,8 @@ const Demo3D = () => {
               onBriefingComplete={() => setBriefingActive(false)}
               uniformFillConfig={{ preset: fillPreset, density: fillDensity, seed: fillSeed, perWall: fillPerWall }}
               onAimAtFire={setAimingAtFire}
+              onAimAtFireIndex={setAimedFireIndex}
+              readabilityMode={readabilityMode}
             />
 
             {gameStarted && memoizedScenario?.type === 'office' && (
