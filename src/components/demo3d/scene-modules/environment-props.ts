@@ -2426,15 +2426,30 @@ export function addCybersecurityProps(
   ];
 
   postItPositions.forEach((p, i) => {
-    const postIt = BABYLON.MeshBuilder.CreatePlane(`cyber_postit_${i}`, { width: 0.12, height: 0.12 }, scene);
-    postIt.position = new BABYLON.Vector3(p.x + 0.6, 0.79, p.z);
+    const postIt = BABYLON.MeshBuilder.CreatePlane(`cyber_postit_${i}`, { width: 0.18, height: 0.18 }, scene);
+    postIt.position = new BABYLON.Vector3(p.x + 0.6, 0.795, p.z);
     postIt.rotation.x = Math.PI / 2;
     postIt.rotation.y = seededRandom(i * 37) * 0.5 - 0.25;
     const postItMat = new BABYLON.StandardMaterial(`cyber_postitMat_${i}`, scene);
     postItMat.diffuseColor = p.color;
-    postItMat.emissiveColor = p.color.scale(0.15);
+    postItMat.emissiveColor = p.color.scale(0.85);
     postItMat.specularColor = BABYLON.Color3.Black();
+    postItMat.backFaceCulling = false;
     postIt.material = postItMat;
+    // Pulsing halo so the post-it pops out from the dark desk
+    const halo = BABYLON.MeshBuilder.CreatePlane(`cyber_postitHalo_${i}`, { width: 0.34, height: 0.34 }, scene);
+    halo.position = new BABYLON.Vector3(p.x + 0.6, 0.792, p.z);
+    halo.rotation.x = Math.PI / 2;
+    const haloMat = new BABYLON.StandardMaterial(`cyber_postitHaloMat_${i}`, scene);
+    haloMat.diffuseColor = BABYLON.Color3.Black();
+    haloMat.emissiveColor = p.color;
+    haloMat.alpha = 0.35;
+    haloMat.specularColor = BABYLON.Color3.Black();
+    halo.material = haloMat;
+    halo.isPickable = false;
+    scene.registerBeforeRender(() => {
+      haloMat.alpha = 0.25 + Math.sin(performance.now() * 0.003 + i) * 0.15;
+    });
   });
 
   // --- Unlocked screen glow (emissive screens showing "desktop") ---
@@ -2494,20 +2509,37 @@ export function addCybersecurityProps(
       doc.rotation.x = Math.PI / 2;
       doc.rotation.y = seededRandom(d * 53 + i) * 0.3 - 0.15;
       const docMat = new BABYLON.StandardMaterial(`cyber_docMat_${i}_${d}`, scene);
-      docMat.diffuseColor = new BABYLON.Color3(0.95, 0.95, 0.92);
+      docMat.diffuseColor = new BABYLON.Color3(1.0, 1.0, 0.98);
+      docMat.emissiveColor = new BABYLON.Color3(0.55, 0.55, 0.50);
       docMat.specularColor = BABYLON.Color3.Black();
+      docMat.backFaceCulling = false;
       doc.material = docMat;
     }
     // Red "CONFIDENZIALE" stamp overlay
-    const stamp = BABYLON.MeshBuilder.CreatePlane(`cyber_stamp_${i}`, { width: 0.15, height: 0.04 }, scene);
-    stamp.position = new BABYLON.Vector3(dp.x - 0.25, 0.80, dp.z + 0.2);
+    const stamp = BABYLON.MeshBuilder.CreatePlane(`cyber_stamp_${i}`, { width: 0.18, height: 0.05 }, scene);
+    stamp.position = new BABYLON.Vector3(dp.x - 0.25, 0.808, dp.z + 0.2);
     stamp.rotation.x = Math.PI / 2;
     stamp.rotation.z = -0.15;
     const stampMat = new BABYLON.StandardMaterial(`cyber_stampMat_${i}`, scene);
-    stampMat.diffuseColor = new BABYLON.Color3(0.9, 0.1, 0.1);
-    stampMat.emissiveColor = new BABYLON.Color3(0.3, 0, 0);
-    stampMat.alpha = 0.8;
+    stampMat.diffuseColor = new BABYLON.Color3(1.0, 0.15, 0.15);
+    stampMat.emissiveColor = new BABYLON.Color3(0.9, 0.1, 0.1);
+    stampMat.specularColor = BABYLON.Color3.Black();
+    stampMat.backFaceCulling = false;
     stamp.material = stampMat;
+    // Pulsing halo around docs
+    const docHalo = BABYLON.MeshBuilder.CreatePlane(`cyber_docHalo_${i}`, { width: 1.1, height: 0.7 }, scene);
+    docHalo.position = new BABYLON.Vector3(dp.x, 0.793, dp.z + 0.2);
+    docHalo.rotation.x = Math.PI / 2;
+    const docHaloMat = new BABYLON.StandardMaterial(`cyber_docHaloMat_${i}`, scene);
+    docHaloMat.diffuseColor = BABYLON.Color3.Black();
+    docHaloMat.emissiveColor = new BABYLON.Color3(1.0, 0.85, 0.3);
+    docHaloMat.alpha = 0.25;
+    docHaloMat.specularColor = BABYLON.Color3.Black();
+    docHalo.material = docHaloMat;
+    docHalo.isPickable = false;
+    scene.registerBeforeRender(() => {
+      docHaloMat.alpha = 0.18 + Math.sin(performance.now() * 0.0028 + i) * 0.12;
+    });
   });
 
   // --- Smartphone with hotspot (glowing phone on side table) ---
@@ -2580,17 +2612,17 @@ export function addCyberSecurityOfficeEnvironment(
   const floorMat = new BABYLON.StandardMaterial('cyo_floorMat', scene);
   const floorTex = new BABYLON.DynamicTexture('cyo_floorTex', { width: 512, height: 512 }, scene, false);
   const fctx = floorTex.getContext() as CanvasRenderingContext2D;
-  fctx.fillStyle = '#15171c';
+  fctx.fillStyle = '#2a2f38';
   fctx.fillRect(0, 0, 512, 512);
   // Raised access floor tile grid (datacenter look)
-  fctx.strokeStyle = '#2a2f3a';
+  fctx.strokeStyle = '#4a525e';
   fctx.lineWidth = 2;
   for (let i = 0; i <= 512; i += 64) {
     fctx.beginPath(); fctx.moveTo(i, 0); fctx.lineTo(i, 512); fctx.stroke();
     fctx.beginPath(); fctx.moveTo(0, i); fctx.lineTo(512, i); fctx.stroke();
   }
   // Subtle perforation dots
-  fctx.fillStyle = '#0a0c10';
+  fctx.fillStyle = '#1a1d24';
   for (let x = 16; x < 512; x += 64) {
     for (let y = 16; y < 512; y += 64) {
       fctx.beginPath(); fctx.arc(x, y, 1.2, 0, Math.PI * 2); fctx.fill();
@@ -2602,12 +2634,12 @@ export function addCyberSecurityOfficeEnvironment(
   floorMat.diffuseTexture = floorTex;
   floorMat.specularColor = new BABYLON.Color3(0.25, 0.3, 0.4);
   floorMat.specularPower = 96;
-  floorMat.emissiveColor = new BABYLON.Color3(0.02, 0.03, 0.05);
+  floorMat.emissiveColor = new BABYLON.Color3(0.10, 0.12, 0.16);
 
   const wallMat = new BABYLON.StandardMaterial('cyo_wallMat', scene);
-  wallMat.diffuseColor = new BABYLON.Color3(0.10, 0.12, 0.16);
-  wallMat.specularColor = new BABYLON.Color3(0.05, 0.05, 0.08);
-  wallMat.emissiveColor = new BABYLON.Color3(0.015, 0.02, 0.035);
+  wallMat.diffuseColor = new BABYLON.Color3(0.32, 0.36, 0.44);
+  wallMat.specularColor = new BABYLON.Color3(0.08, 0.10, 0.14);
+  wallMat.emissiveColor = new BABYLON.Color3(0.10, 0.12, 0.18);
   wallMat.backFaceCulling = false;
 
   const accentMat = new BABYLON.StandardMaterial('cyo_accentMat', scene);
@@ -2616,7 +2648,8 @@ export function addCyberSecurityOfficeEnvironment(
   accentMat.specularColor = BABYLON.Color3.Black();
 
   const ceilingMat = new BABYLON.StandardMaterial('cyo_ceilMat', scene);
-  ceilingMat.diffuseColor = new BABYLON.Color3(0.07, 0.08, 0.10);
+  ceilingMat.diffuseColor = new BABYLON.Color3(0.18, 0.20, 0.24);
+  ceilingMat.emissiveColor = new BABYLON.Color3(0.08, 0.09, 0.11);
   ceilingMat.specularColor = BABYLON.Color3.Black();
   ceilingMat.backFaceCulling = false;
 
@@ -2893,15 +2926,29 @@ export function addCyberSecurityOfficeEnvironment(
   }
 
   // ---------- Lighting tweaks ----------
-  // Override hemispheric to a cooler tone
-  const hemi = scene.getLightByName('hemisphericLight') as BABYLON.HemisphericLight | null;
+  // Brighter cool fill so risk markers (post-its, documents, USB) remain readable
+  const hemi = scene.getLightByName('ambientLight') as BABYLON.HemisphericLight | null;
   if (hemi) {
-    hemi.diffuse = new BABYLON.Color3(0.55, 0.65, 0.85);
-    hemi.groundColor = new BABYLON.Color3(0.05, 0.08, 0.12);
-    hemi.intensity = 0.55;
+    hemi.diffuse = new BABYLON.Color3(0.85, 0.92, 1.0);
+    hemi.groundColor = new BABYLON.Color3(0.25, 0.30, 0.38);
+    hemi.intensity = 1.15;
   }
-  // Cool the clear color
-  scene.clearColor = new BABYLON.Color4(0.04, 0.06, 0.10, 1);
+  const dir = scene.getLightByName('directionalLight') as BABYLON.DirectionalLight | null;
+  if (dir) {
+    dir.intensity = 0.9;
+    dir.diffuse = new BABYLON.Color3(0.85, 0.92, 1.0);
+  }
+  // Add overhead fill lights along the ceiling for even illumination
+  if (quality !== 'low') {
+    [-7, 7].forEach((zx, ix) => {
+      const fill = new BABYLON.PointLight(`cyo_fill_${ix}`, new BABYLON.Vector3(zx, ROOM_H - 0.4, 0), scene);
+      fill.diffuse = new BABYLON.Color3(0.75, 0.85, 1.0);
+      fill.intensity = 0.6;
+      fill.range = 16;
+    });
+  }
+  // Lift the clear color for less crushed blacks at the edges
+  scene.clearColor = new BABYLON.Color4(0.14, 0.17, 0.22, 1);
 
   console.log('[CyberSecurityOffice] SOC environment built — racks, NOC wall, triple-monitor desks');
 }
