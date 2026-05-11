@@ -50,6 +50,8 @@ const SECTION_COUNTS: Record<string, number> = {
 };
 
 // Training path definitions - all independent
+type PathCategory = 'generale' | 'figure' | 'attrezzature';
+
 interface TrainingPath {
   id: string;
   title: string;
@@ -61,9 +63,30 @@ interface TrainingPath {
   moduleIds: string[];
   requiresSector?: boolean;
   normativeRef: string;
+  category: PathCategory;
+  comingSoon?: boolean;
 }
 
+const CATEGORY_META: Record<PathCategory, { title: string; subtitle: string; emoji: string }> = {
+  generale: {
+    title: 'Formazione Generale & Specifica',
+    subtitle: 'Art. 37 D.Lgs 81/08 — Accordo Stato-Regioni 2025',
+    emoji: '📘',
+  },
+  figure: {
+    title: 'Figure della Sicurezza sul Lavoro',
+    subtitle: 'Ruoli con responsabilità formative dedicate',
+    emoji: '👥',
+  },
+  attrezzature: {
+    title: 'Attrezzature & Abilitazioni',
+    subtitle: 'Accordo Stato-Regioni — Abilitazioni operatore',
+    emoji: '🛠️',
+  },
+};
+
 const TRAINING_PATHS: TrainingPath[] = [
+  // ===== 1) GENERALE & SPECIFICA =====
   {
     id: 'lavoratori',
     title: 'Formazione Lavoratori',
@@ -75,7 +98,46 @@ const TRAINING_PATHS: TrainingPath[] = [
     moduleIds: [...GENERAL_MODULES, 'ls_uffici', 'ls_aziende', 'ls_ristorazione'],
     requiresSector: false,
     normativeRef: 'Accordo Stato-Regioni 2025',
+    category: 'generale',
   },
+  {
+    id: 'rischio_basso',
+    title: 'Rischio Specifico Basso',
+    subtitle: 'Settori a basso rischio — 4h',
+    description: 'Videoterminali e postura, stress lavoro-correlato, rischio elettrico base, microclima ed ergonomia. Per uffici e attività amministrative.',
+    icon: Monitor,
+    hours: '4h',
+    color: 'primary',
+    moduleIds: ['rb_videoterminali', 'rb_stress_lavoro', 'rb_rischio_elettrico', 'rb_microclima_ergonomia'],
+    normativeRef: 'Accordo Stato-Regioni 2025 — Rischio Basso',
+    category: 'generale',
+  },
+  {
+    id: 'rischio_medio',
+    title: 'Rischio Specifico Medio',
+    subtitle: 'Settori a medio rischio — 8h',
+    description: 'Rischi meccanici, movimentazione manuale (NIOSH), agenti fisici, sostanze pericolose, cadute dall\'alto, incendio e primo soccorso.',
+    icon: Cog,
+    hours: '8h',
+    color: 'secondary',
+    moduleIds: ['rm_rischi_meccanici', 'rm_movimentazione', 'rm_rischio_elettrico', 'rm_agenti_fisici', 'rm_sostanze_pericolose', 'rm_cadute_alto', 'rm_incendio', 'rm_primo_soccorso'],
+    normativeRef: 'Accordo Stato-Regioni 2025 — Rischio Medio',
+    category: 'generale',
+  },
+  {
+    id: 'rischio_alto',
+    title: 'Rischio Specifico Alto',
+    subtitle: 'Settori ad alto rischio — 12h',
+    description: 'Rischi meccanici avanzati, chimico (REACH/CLP), biologico, amianto, spazi confinati, lavori in quota, atmosfere esplosive, cantieri.',
+    icon: HardHat,
+    hours: '12h',
+    color: 'destructive',
+    moduleIds: ['ra_rischi_meccanici_avanzati', 'ra_rischio_chimico', 'ra_rischio_biologico', 'ra_amianto', 'ra_spazi_confinati', 'ra_lavori_quota', 'ra_movimentazione_avanzata', 'ra_atmosfere_esplosive', 'ra_rumore_vibrazioni', 'ra_radiazioni', 'ra_emergenze_complesse', 'ra_cantiere'],
+    normativeRef: 'Accordo Stato-Regioni 2025 — Rischio Alto',
+    category: 'generale',
+  },
+
+  // ===== 2) FIGURE DELLA SICUREZZA =====
   {
     id: 'rspp',
     title: 'RSPP Datore di Lavoro',
@@ -86,6 +148,7 @@ const TRAINING_PATHS: TrainingPath[] = [
     color: 'destructive',
     moduleIds: ['rspp_dl_giuridico', 'rspp_dl_gestione_rischi', 'rspp_dl_tecnico', 'rspp_dl_relazionale'],
     normativeRef: 'Art. 34 D.Lgs 81/08',
+    category: 'figure',
   },
   {
     id: 'rls',
@@ -97,6 +160,7 @@ const TRAINING_PATHS: TrainingPath[] = [
     color: 'accent',
     moduleIds: ['rls_ruolo_compiti', 'rls_rischi_valutazione', 'rls_comunicazione'],
     normativeRef: 'Art. 37 comma 10-11 D.Lgs 81/08',
+    category: 'figure',
   },
   {
     id: 'preposto',
@@ -108,17 +172,7 @@ const TRAINING_PATHS: TrainingPath[] = [
     color: 'secondary',
     moduleIds: ['preposto_ruolo_obblighi', 'preposto_valutazione_dpi', 'preposto_emergenze'],
     normativeRef: 'Art. 37 D.Lgs 81/08 - L. 215/2021',
-  },
-  {
-    id: 'cybersecurity',
-    title: 'Cyber Security',
-    subtitle: 'Sicurezza Informatica Aziendale',
-    description: 'Phishing, ransomware, password, GDPR, incident response. Simulazioni 3D interattive.',
-    icon: ShieldAlert,
-    hours: '4h',
-    color: 'primary',
-    moduleIds: ['cybersecurity-awareness'],
-    normativeRef: 'Reg. UE 2016/679 (GDPR)',
+    category: 'figure',
   },
   {
     id: 'antincendio',
@@ -130,6 +184,7 @@ const TRAINING_PATHS: TrainingPath[] = [
     color: 'destructive',
     moduleIds: ['antincendio_prevenzione', 'antincendio_protezione', 'antincendio_esercitazioni'],
     normativeRef: 'D.M. 2 Settembre 2021',
+    category: 'figure',
   },
   {
     id: 'primo_soccorso',
@@ -141,6 +196,165 @@ const TRAINING_PATHS: TrainingPath[] = [
     color: 'accent',
     moduleIds: ['primo_soccorso_allertare', 'primo_soccorso_intervento', 'primo_soccorso_conoscenze'],
     normativeRef: 'D.M. 388/2003',
+    category: 'figure',
+  },
+  // --- Figure in rilascio ---
+  {
+    id: 'aspp',
+    title: 'ASPP Mod. A-B-C',
+    subtitle: 'Addetto SPP — Moduli A, B, C',
+    description: 'Supporto all\'RSPP nell\'attività di prevenzione e protezione dei rischi: modulo base, specialistico per macrosettore e abilità relazionali.',
+    icon: Shield,
+    hours: '28-100h',
+    color: 'primary',
+    moduleIds: [],
+    normativeRef: 'Art. 32 D.Lgs 81/08 — Accordo S-R 7/7/2016',
+    category: 'figure',
+    comingSoon: true,
+  },
+  {
+    id: 'dirigente',
+    title: 'Dirigente per la Sicurezza',
+    subtitle: 'Art. 37 D.Lgs 81/08',
+    description: 'Organizzazione e gestione dei processi in materia di salute e sicurezza, deleghe, modello 231, gestione contrattualistica e appalti.',
+    icon: Crown,
+    hours: '16h',
+    color: 'destructive',
+    moduleIds: [],
+    normativeRef: 'Art. 37 D.Lgs 81/08 — Accordo S-R 21/12/2011',
+    category: 'figure',
+    comingSoon: true,
+  },
+  {
+    id: 'lavoratrici_gestanti',
+    title: 'Lavoratrici Gestanti',
+    subtitle: 'Tutela maternità',
+    description: 'Modifica mansioni, visite prenatali, divieto lavoro notturno, rischi specifici in gravidanza e puerperio. D.Lgs 151/2001.',
+    icon: Heart,
+    hours: '2h',
+    color: 'accent',
+    moduleIds: [],
+    normativeRef: 'D.Lgs 151/2001 — Art. 28 D.Lgs 81/08',
+    category: 'figure',
+    comingSoon: true,
+  },
+
+  // ===== 3) ATTREZZATURE & ABILITAZIONI =====
+  {
+    id: 'cybersecurity',
+    title: 'Cyber Security',
+    subtitle: 'Sicurezza Informatica Aziendale',
+    description: 'Phishing, ransomware, password, GDPR, incident response. Simulazioni 3D interattive.',
+    icon: ShieldAlert,
+    hours: '4h',
+    color: 'primary',
+    moduleIds: ['cybersecurity-awareness'],
+    normativeRef: 'Reg. UE 2016/679 (GDPR)',
+    category: 'attrezzature',
+  },
+  {
+    id: 'attr_carrelli',
+    title: 'Carrelli Elevatori',
+    subtitle: 'Abilitazione conduttore',
+    description: 'Uso in sicurezza di carrelli industriali semoventi, controlli pre-operativi, manovre e gestione del carico.',
+    icon: Truck,
+    hours: '12h',
+    color: 'secondary',
+    moduleIds: [],
+    normativeRef: 'Accordo S-R 22/2/2012',
+    category: 'attrezzature',
+    comingSoon: true,
+  },
+  {
+    id: 'attr_carroponte',
+    title: 'Carroponte',
+    subtitle: 'Operatore gru a ponte',
+    description: 'Imbracatura carichi, uso radiocomando, segnaletica gestuale, controllo aree di manovra.',
+    icon: Box,
+    hours: '8h',
+    color: 'secondary',
+    moduleIds: [],
+    normativeRef: 'D.Lgs 81/08 Art. 73',
+    category: 'attrezzature',
+    comingSoon: true,
+  },
+  {
+    id: 'attr_ple',
+    title: 'PLE — Piattaforme Elevabili',
+    subtitle: 'Con e senza stabilizzatori',
+    description: 'Piattaforme di lavoro mobili elevabili: verifiche, posizionamento, uso in sicurezza, emergenze.',
+    icon: ArrowUp,
+    hours: '10h',
+    color: 'primary',
+    moduleIds: [],
+    normativeRef: 'Accordo S-R 22/2/2012',
+    category: 'attrezzature',
+    comingSoon: true,
+  },
+  {
+    id: 'attr_gru',
+    title: 'Gru (Torre / Mobile)',
+    subtitle: 'Operatore gru',
+    description: 'Gru a torre e gru mobili: stabilità, calcolo carichi, ancoraggio, manovre con vento.',
+    icon: ArrowUp,
+    hours: '14h',
+    color: 'destructive',
+    moduleIds: [],
+    normativeRef: 'Accordo S-R 22/2/2012',
+    category: 'attrezzature',
+    comingSoon: true,
+  },
+  {
+    id: 'attr_scale',
+    title: 'Scale e Trabattelli',
+    subtitle: 'Lavori in quota su attrezzature mobili',
+    description: 'Scale portatili, trabattelli, ponti su ruote: montaggio, uso e DPI anticaduta.',
+    icon: ArrowUp,
+    hours: '4h',
+    color: 'primary',
+    moduleIds: [],
+    normativeRef: 'D.Lgs 81/08 Titolo IV — Allegato XX',
+    category: 'attrezzature',
+    comingSoon: true,
+  },
+  {
+    id: 'attr_trattori',
+    title: 'Trattori Agricoli e Forestali',
+    subtitle: 'A ruote e a cingoli',
+    description: 'Conduzione in sicurezza di trattori, attrezzature accoppiate, ribaltamento e cinture.',
+    icon: Truck,
+    hours: '13h',
+    color: 'secondary',
+    moduleIds: [],
+    normativeRef: 'Accordo S-R 22/2/2012',
+    category: 'attrezzature',
+    comingSoon: true,
+  },
+  {
+    id: 'attr_mmt',
+    title: 'Escavatori e MMT',
+    subtitle: 'Macchine Movimento Terra',
+    description: 'Escavatori idraulici, pale caricatrici, terne, autoribaltabili: stabilità, manovre, lavori vicino reti.',
+    icon: HardHat,
+    hours: '10-16h',
+    color: 'destructive',
+    moduleIds: [],
+    normativeRef: 'Accordo S-R 22/2/2012',
+    category: 'attrezzature',
+    comingSoon: true,
+  },
+  {
+    id: 'attr_pompe',
+    title: 'Pompe per Calcestruzzo',
+    subtitle: 'Autopompe e bracci distributori',
+    description: 'Posizionamento, stabilizzatori, gestione braccio, comunicazione di cantiere e procedure di emergenza.',
+    icon: Cog,
+    hours: '14h',
+    color: 'secondary',
+    moduleIds: [],
+    normativeRef: 'Accordo S-R 22/2/2012',
+    category: 'attrezzature',
+    comingSoon: true,
   },
 ];
 
@@ -348,9 +562,50 @@ const TrainingHub = () => {
     const isComplete = pathProgress.completed === pathProgress.total && pathProgress.total > 0;
 
     const PATH_EMOJIS: Record<string, string> = {
-      lavoratori: '🎓', rspp: '👑', rls: '🤝', preposto: '👁️',
+      lavoratori: '🎓', rispp: '👑', rls: '🤝', preposto: '👁️',
       cybersecurity: '🛡️', antincendio: '🔥', primo_soccorso: '❤️‍🩹',
+      rischio_basso: '🟢', rischio_medio: '🟡', rischio_alto: '🔴',
+      rspp: '👑', aspp: '🛡️', dirigente: '🏛️', lavoratrici_gestanti: '🤰',
+      attr_carrelli: '🚜', attr_carroponte: '🏗️', attr_ple: '🛗',
+      attr_gru: '🏗️', attr_scale: '🪜', attr_trattori: '🚜',
+      attr_mmt: '⛏️', attr_pompe: '🧱',
     };
+
+    if (path.comingSoon) {
+      return (
+        <div key={path.id} className="opacity-90">
+          <Card className="relative border-2 border-dashed border-amber-400/40 bg-amber-50/30 dark:bg-amber-950/10 rounded-2xl overflow-hidden">
+            <div className="h-2 bg-gradient-to-r from-amber-400 to-amber-500" />
+            <CardContent className="p-6">
+              <div className="flex items-start gap-4">
+                <div className="w-16 h-16 rounded-2xl flex items-center justify-center shrink-0 text-3xl bg-amber-100 dark:bg-amber-900/30 grayscale-[30%]">
+                  {PATH_EMOJIS[path.id] || '📚'}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 mb-1 flex-wrap">
+                    <h3 className="text-xl font-bold">{path.title}</h3>
+                    <Badge className="bg-amber-500 hover:bg-amber-500 text-white border-0">🚧 In rilascio</Badge>
+                  </div>
+                  <p className="text-sm font-medium text-muted-foreground">{path.subtitle}</p>
+                  <p className="text-sm text-muted-foreground mt-2 line-clamp-2">{path.description}</p>
+                  <div className="flex items-center gap-2 mt-3 flex-wrap">
+                    <span className="inline-flex items-center gap-1 text-xs px-2.5 py-1 rounded-full bg-muted text-muted-foreground">
+                      <Clock className="w-3 h-3" />{path.hours}
+                    </span>
+                    <span className="inline-flex items-center gap-1 text-xs px-2.5 py-1 rounded-full bg-amber-500/10 text-amber-700 dark:text-amber-400 font-semibold">
+                      {path.normativeRef}
+                    </span>
+                  </div>
+                  <Button variant="outline" size="sm" className="mt-3 w-full rounded-xl font-semibold" disabled title="Disponibile a breve">
+                    <Lock className="w-4 h-4 mr-2" /> Disponibile a breve
+                  </Button>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      );
+    }
 
     return (
       <div key={path.id} className="space-y-4">
@@ -593,10 +848,37 @@ const TrainingHub = () => {
         </div>
       </div>
 
-      {/* Training Paths */}
+      {/* Training Paths grouped by category */}
       <div className="container mx-auto px-4 py-8">
-        <div className="max-w-4xl mx-auto space-y-6">
-          {TRAINING_PATHS.map(path => renderPathCard(path))}
+        <div className="max-w-4xl mx-auto space-y-12">
+          {(Object.keys(CATEGORY_META) as PathCategory[]).map((cat) => {
+            const paths = TRAINING_PATHS.filter(p => p.category === cat);
+            if (paths.length === 0) return null;
+            const meta = CATEGORY_META[cat];
+            const activeCount = paths.filter(p => !p.comingSoon).length;
+            const comingCount = paths.filter(p => p.comingSoon).length;
+            return (
+              <section key={cat} className="space-y-4">
+                <div className="flex items-end justify-between flex-wrap gap-2 border-b-2 border-primary/10 pb-3">
+                  <div>
+                    <h2 className="text-2xl font-bold flex items-center gap-2">
+                      <span className="text-3xl">{meta.emoji}</span> {meta.title}
+                    </h2>
+                    <p className="text-sm text-muted-foreground mt-1">{meta.subtitle}</p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Badge variant="secondary" className="rounded-full">{activeCount} disponibili</Badge>
+                    {comingCount > 0 && (
+                      <Badge className="bg-amber-500 hover:bg-amber-500 text-white border-0 rounded-full">{comingCount} in rilascio</Badge>
+                    )}
+                  </div>
+                </div>
+                <div className="space-y-6">
+                  {paths.map(path => renderPathCard(path))}
+                </div>
+              </section>
+            );
+          })}
         </div>
 
         {/* Multiplayer */}
