@@ -10,6 +10,8 @@ export interface TestFacsimileSettings {
   durationMinutes: number;
   instructions: string;
   footerNote: string;
+  version?: string;
+  certificateVerifyUrl?: string;
 }
 
 export interface CertificateFacsimileSettings {
@@ -26,6 +28,7 @@ export interface CertificateFacsimileSettings {
   scoreNote: string;
   signatureLine: string;
   footerNote: string;
+  version?: string;
 }
 
 export const DEFAULT_TEST_SETTINGS: TestFacsimileSettings = {
@@ -39,6 +42,9 @@ export const DEFAULT_TEST_SETTINGS: TestFacsimileSettings = {
     "Rispondere a tutte le domande. Una sola risposta è corretta per ciascun quesito. Il test si considera superato al raggiungimento della soglia minima.",
   footerNote:
     "Documento dimostrativo. Il test reale viene erogato in piattaforma con tracciamento dei tempi e delle risposte.",
+  version: "1.0",
+  certificateVerifyUrl:
+    "https://safetyfrontline.lovable.app/verify-certificate?code=FACSIMILE",
 };
 
 export const DEFAULT_CERTIFICATE_SETTINGS: CertificateFacsimileSettings = {
@@ -56,6 +62,7 @@ export const DEFAULT_CERTIFICATE_SETTINGS: CertificateFacsimileSettings = {
   scoreNote: "Punteggio: 92%",
   signatureLine: "Firma Digitale Verificata",
   footerNote: "Safety Frontline Platform",
+  version: "1.0",
 };
 
 const ORANGE: [number, number, number] = [255, 103, 31];
