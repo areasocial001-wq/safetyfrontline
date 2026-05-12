@@ -279,7 +279,7 @@ const TrainingModule = () => {
             </div>
             <h2 className="text-xl font-bold mb-2">Modulo non trovato</h2>
             <p className="text-muted-foreground mb-4">Questo modulo potrebbe non essere ancora disponibile.</p>
-            <Button onClick={() => navigate('/formazione')}>Torna alla Formazione</Button>
+            <Button onClick={() => navigate(isDemoMode ? '/demo-percorso' : '/formazione')}>Torna {isDemoMode ? 'al Percorso Demo' : 'alla Formazione'}</Button>
           </CardContent>
         </Card>
       </div>
