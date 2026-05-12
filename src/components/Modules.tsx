@@ -222,6 +222,11 @@ export const Modules = () => {
                   <div className="min-w-0 flex-1">
                     <div className="flex items-start gap-2 flex-wrap">
                       <h3 className="text-lg font-bold leading-tight">{module.title}</h3>
+                      {module.bonus && (
+                        <Badge className="bg-gradient-to-r from-fuchsia-500 to-purple-600 hover:from-fuchsia-500 hover:to-purple-600 text-white border-0 text-[10px] px-1.5 py-0 gap-1">
+                          <Sparkles className="w-2.5 h-2.5" /> Modulo Bonus
+                        </Badge>
+                      )}
                       {module.comingSoon && (
                         <Badge className="bg-amber-500 hover:bg-amber-500 text-white border-0 text-[10px] px-1.5 py-0">🚧 In rilascio</Badge>
                       )}
