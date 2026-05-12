@@ -119,11 +119,14 @@ const DemoPath = () => {
     setCompleted(new Set());
   };
 
-  const startModule = (moduleId: string) => {
-    navigate(`/formazione/${moduleId}?demo=1`);
+  const startModule = (macroId: string) => {
+    navigate(`/formazione/${resolveContentId(macroId)}?demo=1`);
   };
 
-  const completedCount = modules.filter((m) => completed.has(m.id)).length;
+  const isModuleCompleted = (macroId: string) =>
+    completed.has(macroId) || completed.has(resolveContentId(macroId));
+
+  const completedCount = modules.filter((m) => isModuleCompleted(m.id)).length;
   const totalCount = modules.length;
   const progressPercent = totalCount > 0 ? (completedCount / totalCount) * 100 : 0;
   const allDone = completedCount === totalCount && totalCount > 0;
