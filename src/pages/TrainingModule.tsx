@@ -229,6 +229,18 @@ const TrainingModule = () => {
       addXp(30);
     }
     if (nextIndex >= totalSections) {
+      // DEMO mode: skip all DB writes, persist completion to localStorage, return to demo path
+      if (isDemoMode) {
+        try {
+          const raw = localStorage.getItem(DEMO_STORAGE_KEY);
+          const arr: string[] = raw ? JSON.parse(raw) : [];
+          if (!arr.includes(moduleId)) arr.push(moduleId);
+          localStorage.setItem(DEMO_STORAGE_KEY, JSON.stringify(arr));
+        } catch {}
+        toast({ title: '🎉 Modulo Demo Completato!', description: 'Torno al percorso demo...' });
+        setTimeout(() => navigate('/demo-percorso'), 800);
+        return;
+      }
       await updateProgress(moduleId, { status: 'completed', current_section: totalSections, xp_earned: sessionXp, time_spent_seconds: totalTimeSpent, completed_at: new Date().toISOString() });
       toast({ title: '🎉 Modulo Completato!', description: `Hai guadagnato ${sessionXp} XP` });
       if (user) {
