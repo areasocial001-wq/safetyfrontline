@@ -94,10 +94,13 @@ export const GameResults3D = ({
   sprinklerRisksFound,
   cyberQuizStats,
   firePerformance,
+  risksFoundIds = [],
   onRestart,
   onChangeScenario,
   onReplayBriefing,
 }: GameResults3DProps) => {
+  const [lang] = useLang();
+  const rtl = isRTL(lang);
   // ... keep existing code (percentages and effectiveness calculation)
   const manualPercentage = totalManualRisks > 0 
     ? Math.round((manualRisksFound / totalManualRisks) * 100) 
