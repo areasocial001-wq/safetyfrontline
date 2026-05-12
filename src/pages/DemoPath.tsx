@@ -185,28 +185,77 @@ const DemoPath = () => {
           {/* Progress card */}
           <Card className="mt-6 border-2 border-primary/20 bg-gradient-to-br from-primary/5 to-secondary/5">
             <CardContent className="p-5">
-              <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center justify-between mb-3 flex-wrap gap-2">
                 <div className="flex items-center gap-2">
                   <Trophy className="w-5 h-5 text-game-xp" />
                   <span className="font-bold">
-                    {completedCount} / {totalCount} moduli completati
+                    {completedCount} / {totalCount} moduli · {Math.round(progressPercent)}%
                   </span>
                 </div>
-                {completedCount > 0 && (
-                  <Button size="sm" variant="ghost" onClick={resetProgress} className="text-xs">
-                    Resetta progressi
-                  </Button>
-                )}
+                <div className="flex items-center gap-2">
+                  {demoLevel && (
+                    <Badge className={`${demoLevel.bg} ${demoLevel.color} border-0 font-bold`}>
+                      <demoLevel.icon className="w-3 h-3 mr-1" /> Livello: {demoLevel.label}
+                    </Badge>
+                  )}
+                  {completedCount > 0 && (
+                    <Button size="sm" variant="ghost" onClick={resetProgress} className="text-xs">
+                      Reset
+                    </Button>
+                  )}
+                </div>
               </div>
               <Progress value={progressPercent} className="h-3" />
-              {allDone && (
-                <div className="mt-4 p-3 rounded-lg bg-game-xp/10 border border-game-xp/30 text-sm font-semibold text-game-xp text-center">
-                  🎉 Hai completato tutto il percorso DEMO! Contattaci per attivare la versione reale.
-                </div>
-              )}
             </CardContent>
           </Card>
         </div>
+
+        {/* Final Summary Screen — when all modules done */}
+        {allDone && !loading && (
+          <Card className="mb-8 border-2 border-game-xp/40 bg-gradient-to-br from-game-xp/10 via-accent/5 to-primary/5 shadow-2xl overflow-hidden animate-scale-in">
+            <div className="h-2 bg-gradient-to-r from-game-xp via-accent to-primary" />
+            <CardContent className="p-8 text-center">
+              <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-game-xp/20 mb-4">
+                <PartyPopper className="w-10 h-10 text-game-xp" />
+              </div>
+              <h2 className="text-3xl md:text-4xl font-black tracking-tight mb-2">
+                Percorso DEMO completato!
+              </h2>
+              <p className="text-muted-foreground mb-6 max-w-lg mx-auto">
+                Hai completato tutti i {totalCount} moduli del pacchetto <strong>{packageName}</strong> al 100%.
+                Ottimo lavoro! Ecco un attestato fac-simile in ricordo della tua anteprima.
+              </p>
+
+              {/* Module recap */}
+              <div className="bg-card/60 border rounded-2xl p-4 mb-6 text-left max-w-md mx-auto">
+                <div className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-3 flex items-center gap-2">
+                  <Award className="w-4 h-4" /> Moduli completati
+                </div>
+                <ul className="space-y-2">
+                  {modules.map((m, i) => (
+                    <li key={m.id} className="flex items-center gap-2 text-sm">
+                      <CheckCircle className="w-4 h-4 text-accent shrink-0" />
+                      <span className="font-medium truncate">{i + 1}. {m.name}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              <div className="flex flex-wrap gap-3 justify-center">
+                <Button size="lg" onClick={downloadCertificate} className="rounded-xl font-bold shadow-lg">
+                  <Download className="w-4 h-4 mr-2" />
+                  Scarica Attestato Demo (PDF)
+                </Button>
+                <Button asChild size="lg" variant="outline" className="rounded-xl">
+                  <Link to="/">
+                    <Home className="w-4 h-4 mr-2" />
+                    Torna alla Home
+                  </Link>
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Vertical path */}
         {loading ? (
