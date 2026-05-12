@@ -1420,6 +1420,40 @@ const Demo3D = () => {
           />
         )}
 
+        {/* Machinery Contextual Quiz Overlay (construction scenario) */}
+        {machineryQuizRiskId && (
+          <MachineryRiskQuiz
+            riskId={machineryQuizRiskId}
+            riskLabel={machineryQuizRiskLabel}
+            onClose={(bonusPoints, isCorrect) => {
+              if (bonusPoints !== 0) {
+                setScore((s) => Math.max(0, s + bonusPoints));
+                if (isCorrect) {
+                  setQuizCorrectAnswers((p) => p + 1);
+                  setQuizBonusPoints((p) => p + bonusPoints);
+                }
+              }
+              setMachineryQuizRiskId(null);
+              setMachineryQuizRiskLabel("");
+            }}
+          />
+        )}
+
+        {/* Camera presets — only for the construction scenario, only while playing */}
+        {selectedScenario?.id === "construction" && gameStarted && !gameCompleted && (
+          <div className="hidden sm:block absolute bottom-4 right-4 z-40 w-44">
+            <CameraPresetsPanel
+              active={cameraPreset}
+              onChange={(name) => {
+                setCameraPreset(name);
+                window.dispatchEvent(
+                  new CustomEvent("babylon-camera-preset", { detail: { name } })
+                );
+              }}
+            />
+          </div>
+        )}
+
 
             <BabylonScene
               scenario={memoizedScenario}
