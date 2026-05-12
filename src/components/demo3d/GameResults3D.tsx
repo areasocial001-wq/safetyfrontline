@@ -24,6 +24,9 @@ import {
 import { Link } from "react-router-dom";
 import { Scenario3D } from "@/data/scenarios3d";
 import type { ExtinguisherType } from "./ExtinguisherSelection";
+import { useLang, t, isRTL } from "@/lib/risk-i18n";
+import { getNormative } from "@/lib/risk-normative";
+import { BookOpen, XCircle } from "lucide-react";
 
 export interface FirePerformanceData {
   extinguisherType: ExtinguisherType;
@@ -58,6 +61,7 @@ interface GameResults3DProps {
   sprinklerRisksFound: number;
   cyberQuizStats?: CyberQuizStats;
   firePerformance?: FirePerformanceData;
+  risksFoundIds?: string[];
   onRestart: () => void;
   onChangeScenario: () => void;
   onReplayBriefing?: () => void;
@@ -90,10 +94,13 @@ export const GameResults3D = ({
   sprinklerRisksFound,
   cyberQuizStats,
   firePerformance,
+  risksFoundIds = [],
   onRestart,
   onChangeScenario,
   onReplayBriefing,
 }: GameResults3DProps) => {
+  const [lang] = useLang();
+  const rtl = isRTL(lang);
   // ... keep existing code (percentages and effectiveness calculation)
   const manualPercentage = totalManualRisks > 0 
     ? Math.round((manualRisksFound / totalManualRisks) * 100) 
@@ -481,6 +488,147 @@ export const GameResults3D = ({
           )}
         </div>
       </Card>
+
+      {/* Riepilogo formativo finale per rischio */}
+      {(() => {
+        const allRisks = scenario.risks || [];
+        const foundSet = new Set(risksFoundIds);
+        const found = allRisks.filter(r => foundSet.has(r.id));
+        const missed = allRisks.filter(r => !foundSet.has(r.id));
+        const severityBadge = (s: string) => {
+          const map: Record<string, string> = {
+            critical: 'border-red-600 text-red-700 bg-red-50',
+            high: 'border-orange-500 text-orange-700 bg-orange-50',
+            medium: 'border-yellow-500 text-yellow-700 bg-yellow-50',
+            low: 'border-blue-400 text-blue-700 bg-blue-50',
+          };
+          return map[s] || 'border-muted-foreground text-muted-foreground';
+        };
+        const missReason = (sev: string) => {
+          if (sev === 'critical') return lang === 'en'
+            ? 'Critical hazard not detected: directly compromises the training learning objective.'
+            : lang === 'ro'
+              ? 'Risc critic neidentificat: compromite direct obiectivul didactic al formării.'
+              : lang === 'ar'
+                ? 'خطر حرج لم يُكتشف: يُخل مباشرة بالهدف التعليمي للتدريب.'
+                : 'Rischio critico non rilevato: compromette direttamente l\'obiettivo didattico del training.';
+          if (sev === 'high') return lang === 'en'
+            ? 'High-severity hazard missed: requires more careful environmental scanning.'
+            : lang === 'ro'
+              ? 'Risc cu severitate mare ratat: necesită o analiză mai atentă a mediului.'
+              : lang === 'ar'
+                ? 'خطر بدرجة خطورة عالية فات: يتطلب فحصًا أكثر دقة للبيئة.'
+                : 'Rischio ad alta gravità mancato: richiede un\'analisi più attenta dell\'ambiente.';
+          return lang === 'en'
+            ? 'Hazard not identified — review training material to recognise this category.'
+            : lang === 'ro'
+              ? 'Risc neidentificat — revezi materialul pentru a recunoaște această categorie.'
+              : lang === 'ar'
+                ? 'لم يتم تحديد الخطر — راجع المادة التدريبية للتعرف على هذه الفئة.'
+                : 'Rischio non identificato — ripassa il materiale per riconoscere questa categoria.';
+        };
+        return (
+          <Card className="p-6 border-2 border-primary/30" dir={rtl ? 'rtl' : 'ltr'}>
+            <div className="flex items-center gap-2 mb-4">
+              <BookOpen className="w-5 h-5 text-primary" />
+              <h4 className="text-lg font-black text-primary">{t(lang, 'summaryTitle')}</h4>
+            </div>
+
+            {/* Identificati */}
+            <div className="mb-6">
+              <div className="flex items-center gap-2 mb-3">
+                <CheckCircle2 className="w-4 h-4 text-green-600" />
+                <h5 className="font-black text-green-700">
+                  {t(lang, 'identifiedRisks')} ({found.length}/{allRisks.length})
+                </h5>
+              </div>
+              {found.length === 0 ? (
+                <p className="text-sm text-muted-foreground italic">—</p>
+              ) : (
+                <div className="space-y-3">
+                  {found.map(r => {
+                    const norm = getNormative(lang, r.label, r.description, r.severity);
+                    return (
+                      <div key={r.id} className="p-4 rounded-lg border border-green-200 bg-green-50/50 dark:bg-green-950/10">
+                        <div className="flex items-start justify-between gap-3 mb-2">
+                          <div className="flex-1">
+                            <p className="font-bold text-sm">{r.label}</p>
+                            <p className="text-xs text-muted-foreground mt-0.5">{r.description}</p>
+                          </div>
+                          <Badge variant="outline" className={`text-[10px] uppercase ${severityBadge(r.severity)}`}>
+                            {r.severity}
+                          </Badge>
+                        </div>
+                        <div className="mt-2 pl-3 border-l-2 border-primary/40 space-y-1">
+                          <p className="text-xs font-semibold text-primary">
+                            📖 {t(lang, 'normativeRef')}: {norm.title}
+                          </p>
+                          <p className="text-[11px] text-muted-foreground">
+                            <span className="font-semibold">{norm.articles}</span>
+                          </p>
+                          <p className="text-xs text-foreground/80">{norm.obligation}</p>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+
+            {/* Mancati */}
+            <div>
+              <div className="flex items-center gap-2 mb-3">
+                <XCircle className="w-4 h-4 text-red-600" />
+                <h5 className="font-black text-red-700">
+                  {t(lang, 'missedRisks')} ({missed.length}/{allRisks.length})
+                </h5>
+              </div>
+              {missed.length === 0 ? (
+                <p className="text-sm text-green-700 font-semibold italic">{t(lang, 'noErrors')}</p>
+              ) : (
+                <div className="space-y-3">
+                  {missed.map(r => {
+                    const norm = getNormative(lang, r.label, r.description, r.severity);
+                    return (
+                      <div key={r.id} className="p-4 rounded-lg border border-red-200 bg-red-50/50 dark:bg-red-950/10">
+                        <div className="flex items-start justify-between gap-3 mb-2">
+                          <div className="flex-1">
+                            <p className="font-bold text-sm">{r.label}</p>
+                            <p className="text-xs text-muted-foreground mt-0.5">{r.description}</p>
+                          </div>
+                          <Badge variant="outline" className={`text-[10px] uppercase ${severityBadge(r.severity)}`}>
+                            {r.severity}
+                          </Badge>
+                        </div>
+                        <div className="mt-2 p-2 rounded bg-red-100/60 dark:bg-red-950/20 border border-red-200">
+                          <p className="text-xs">
+                            <span className="font-bold text-red-700">⚠️ {t(lang, 'errorReason')}:</span>{' '}
+                            <span className="text-foreground/80">{missReason(r.severity)}</span>
+                          </p>
+                        </div>
+                        <div className="mt-2 pl-3 border-l-2 border-red-400/50 space-y-1">
+                          <p className="text-xs font-semibold text-red-700">
+                            📖 {t(lang, 'normativeRef')}: {norm.title}
+                          </p>
+                          <p className="text-[11px] text-muted-foreground">
+                            <span className="font-semibold">{norm.articles}</span>
+                          </p>
+                          <p className="text-xs text-foreground/80">{norm.obligation}</p>
+                          {norm.nextSteps?.length > 0 && (
+                            <ul className="text-xs list-disc pl-4 mt-1 space-y-0.5 text-foreground/80">
+                              {norm.nextSteps.slice(0, 3).map((s, i) => <li key={i}>{s}</li>)}
+                            </ul>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          </Card>
+        );
+      })()}
 
       {/* Action Buttons */}
       <div className="flex flex-col gap-4">
