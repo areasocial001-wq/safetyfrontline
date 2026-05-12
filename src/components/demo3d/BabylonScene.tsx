@@ -659,7 +659,7 @@ export const BabylonScene = ({
             });
           }
         }
-      } else if (!guideOverlay) {
+      } else if (!guideOverlayActiveRef.current && !newHoverId) {
         setHoverLabel((prev) => (prev ? null : prev));
       }
 
