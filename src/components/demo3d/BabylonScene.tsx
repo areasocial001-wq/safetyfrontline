@@ -129,49 +129,24 @@ export const BabylonScene = ({
   const [activeNPCRole, setActiveNPCRole] = useState<string | null>(null);
   const [quizRole, setQuizRole] = useState<string | null>(null);
   const [hoverLabel, setHoverLabel] = useState<{ label: string; severity: string; x: number; y: number } | null>(null);
-  const [guideOverlay, setGuideOverlay] = useState<{ label: string; description: string; normative: string; severity: string } | null>(null);
+  const [guideOverlay, setGuideOverlay] = useState<{
+    label: string; description: string; severity: string;
+    normTitle: string; normArticles: string; normObligation: string;
+    nextSteps: string[]; tip: string; startedAt: number;
+  } | null>(null);
   const [guideMode, setGuideMode] = useState(true);
   const guideModeRef = useRef(true);
   const guideOverlayActiveRef = useRef(false);
   useEffect(() => { guideModeRef.current = guideMode; }, [guideMode]);
-
-  // Derive normative reference from risk content
-  const deriveNormative = (label: string, description: string, severity: string): string => {
-    const text = (label + ' ' + description).toLowerCase();
-    if (text.includes('estintore') || text.includes('antincend') || text.includes('incendio') || text.includes('fuoco')) {
-      return 'D.M. 10/03/1998 e D.Lgs. 81/08 art. 46 — gli estintori devono essere accessibili, segnalati, controllati periodicamente e mai ostruiti.';
-    }
-    if (text.includes('uscita') || text.includes('via di fuga') || text.includes('evacuaz') || text.includes('emergenza')) {
-      return 'D.Lgs. 81/08 Allegato IV §1.5 — le vie e uscite di emergenza devono restare sgombre e consentire l\'evacuazione rapida e sicura.';
-    }
-    if (text.includes('cavo') || text.includes('elettric') || text.includes('multipresa') || text.includes('folgoraz')) {
-      return 'D.Lgs. 81/08 Titolo III Capo III + CEI 64-8 — impianti e cavi devono essere protetti da contatti diretti/indiretti e mantenuti in efficienza.';
-    }
-    if (text.includes('scaffal') || text.includes('instabil') || text.includes('ribalt') || text.includes('crollo')) {
-      return 'D.Lgs. 81/08 art. 64 e Allegato IV — strutture e scaffalature devono essere stabili, ancorate e di portata adeguata al carico.';
-    }
-    if (text.includes('dpi') || text.includes('casco') || text.includes('protezione individuale')) {
-      return 'D.Lgs. 81/08 Titolo III Capo II artt. 74-79 — obbligo di uso dei DPI conformi al rischio specifico della mansione.';
-    }
-    if (text.includes('ponteggio') || text.includes('lavoro in quota') || text.includes('quota')) {
-      return 'D.Lgs. 81/08 Titolo IV Capo II — ponteggi e lavori in quota richiedono progetto, montaggio Pi.M.U.S. e parapetti normati.';
-    }
-    if (text.includes('scavo') || text.includes('trincea')) {
-      return 'D.Lgs. 81/08 artt. 118-121 — scavi e trincee oltre 1,5 m devono avere armature/parapetti e segnalazione perimetrale.';
-    }
-    if (text.includes('carrello') || text.includes('mulett') || text.includes('escavator') || text.includes('bulldozer') || text.includes('dumper') || text.includes('betoniera') || text.includes('macchin')) {
-      return 'D.Lgs. 81/08 artt. 71-73 + Allegato VI — attrezzature di lavoro: abilitazione operatore, segnalazione zone di manovra e moviere a terra.';
-    }
-    if (text.includes('pavimento') || text.includes('scivol') || text.includes('liquido') || text.includes('bagnat')) {
-      return 'D.Lgs. 81/08 Allegato IV §1.3 — i pavimenti devono essere asciutti, antiscivolo e segnalati se temporaneamente pericolosi.';
-    }
-    if (text.includes('password') || text.includes('phishing') || text.includes('usb') || text.includes('schermo') || text.includes('cyber') || text.includes('gdpr')) {
-      return 'GDPR Reg. UE 2016/679 art. 32 + ISO/IEC 27001 — misure tecniche e organizzative per proteggere dati e credenziali da accessi non autorizzati.';
-    }
-    return severity === 'critical'
-      ? 'D.Lgs. 81/08 art. 15 — misure generali di tutela: eliminazione del rischio alla fonte e priorità alla protezione collettiva.'
-      : 'D.Lgs. 81/08 art. 28 — il rischio va valutato e ridotto attraverso il DVR e procedure operative aggiornate.';
-  };
+  const [lang, setLangState] = useLang();
+  const langRef = useRef<Lang>(lang);
+  useEffect(() => { langRef.current = lang; }, [lang]);
+  const [tickNow, setTickNow] = useState(0);
+  useEffect(() => {
+    if (!guideOverlay) return;
+    const id = setInterval(() => setTickNow(Date.now()), 200);
+    return () => clearInterval(id);
+  }, [guideOverlay]);
 
   // Close NPC dialog with ESC key
   useEffect(() => {
