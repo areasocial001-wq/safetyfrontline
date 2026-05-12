@@ -862,6 +862,7 @@ function addLaboratoryProps(
     perSmoke.updateSpeed = 0.005;
     perSmoke.minEmitBox = new BABYLON.Vector3(-0.4, 0, -0.4);
     perSmoke.maxEmitBox = new BABYLON.Vector3(0.4, 0, 0.4);
+    perSmoke.renderingGroupId = 1;
     perSmoke.start();
 
     // Fire light
