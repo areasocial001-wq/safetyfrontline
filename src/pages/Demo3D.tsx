@@ -881,7 +881,8 @@ const Demo3D = () => {
       {/* Main Content */}
       <main className="relative w-full h-[calc(100vh-80px)]">
         {showScenarioSelect && (
-          <div className="absolute inset-0 z-10 flex items-center justify-center bg-background/95 overflow-y-auto py-8">
+          <div className="absolute inset-0 z-10 overflow-y-auto bg-background/95">
+            <div className="min-h-full flex items-center justify-center py-8">
             <div className="max-w-6xl mx-4 w-full">
               <Card className="p-8">
                 <div className="text-center space-y-6 mb-8">
