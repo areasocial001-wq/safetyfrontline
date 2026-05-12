@@ -20,7 +20,7 @@ import { SIM3D_PREVIEWS } from "@/data/sim3d-previews";
 import { Sim3dPreview } from "@/components/Sim3dPreview";
 import { QuoteRequestDialog } from "@/components/QuoteRequestDialog";
 
-type TabKey = 'generale' | 'basso' | 'medio' | 'alto' | 'figure' | 'attrezzature' | 'cybersecurity' | 'simulazioni' | 'minigame2d' | 'piattaforma';
+type TabKey = 'generale' | 'basso' | 'medio' | 'alto' | 'figure' | 'attrezzature' | 'simulazioni' | 'minigame2d' | 'piattaforma';
 
 export const Modules = () => {
   const [quoteDialogOpen, setQuoteDialogOpen] = useState(false);
