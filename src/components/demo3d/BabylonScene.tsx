@@ -466,15 +466,91 @@ export const BabylonScene = ({
             setCurrentSubtitle({ text: result.text, severity });
           }
 
-          pickedMesh.dispose();
+          // === Blinking outline + semi-transparent zone (3s guida highlight) ===
+          const sevColor = riskData.risk.severity === 'critical' ? new BABYLON.Color3(1, 0.15, 0.1)
+            : riskData.risk.severity === 'high' ? new BABYLON.Color3(1, 0.55, 0.05)
+            : riskData.risk.severity === 'medium' ? new BABYLON.Color3(1, 0.85, 0.1)
+            : new BABYLON.Color3(0.2, 0.85, 0.4);
+
+          // Disable picking but keep visible during 3s highlight
+          pickedMesh.isPickable = false;
+          const groupMeshes = riskMeshMapRef.current.get(riskData.risk.id) || [pickedMesh as BABYLON.Mesh];
+          const hl = highlightLayerRef.current;
+          groupMeshes.forEach(m => { try { hl?.addMesh(m, sevColor); } catch {} });
+
+          // Transparent highlight zone (sphere) around the picked point
+          const anchor = pickedMesh.getAbsolutePosition().clone();
+          const bRadius = (pickedMesh.getBoundingInfo()?.boundingSphere.radiusWorld) || 0.8;
+          const zone = BABYLON.MeshBuilder.CreateSphere(`${riskData.risk.id}_zone`, { diameter: Math.max(2.2, bRadius * 2.6), segments: 16 }, scene);
+          zone.position = anchor.clone();
+          zone.isPickable = false;
+          const zoneMat = new BABYLON.StandardMaterial(`${riskData.risk.id}_zoneMat`, scene);
+          zoneMat.emissiveColor = sevColor;
+          zoneMat.diffuseColor = sevColor;
+          zoneMat.alpha = 0.22;
+          zoneMat.backFaceCulling = false;
+          zone.material = zoneMat;
+          zone.renderingGroupId = 1;
+
+          // Pulsing animation
+          const pulseObs = scene.onBeforeRenderObservable.add(() => {
+            const t = performance.now() * 0.006;
+            const p = 0.5 + 0.5 * Math.sin(t);
+            zoneMat.alpha = 0.15 + p * 0.30;
+            const s = 1 + p * 0.18;
+            zone.scaling.setAll(s);
+            // Blink highlight color brightness
+            const k = 0.55 + p * 0.45;
+            zoneMat.emissiveColor = sevColor.scale(k);
+          });
+
           onRiskFound(riskData.risk.id, isCritical);
-          toast.success(
-            `${isCritical ? '🚨' : '⚠️'} ${riskData.risk.label}`,
-            {
+
+          // Anchored 2D label (briefly) before the popup
+          const cam = cameraRef.current;
+          const cnv = canvasRef.current;
+          if (cam && cnv) {
+            const rect = cnv.getBoundingClientRect();
+            const w = scene.getEngine().getRenderWidth();
+            const h = scene.getEngine().getRenderHeight();
+            const proj = BABYLON.Vector3.Project(
+              anchor.add(new BABYLON.Vector3(0, bRadius + 0.6, 0)),
+              BABYLON.Matrix.Identity(),
+              scene.getTransformMatrix(),
+              new BABYLON.Viewport(0, 0, w, h)
+            );
+            setHoverLabel({
+              label: riskData.risk.label,
+              severity: riskData.risk.severity,
+              x: rect.left + (proj.x / w) * rect.width,
+              y: rect.top + (proj.y / h) * rect.height,
+            });
+            setTimeout(() => setHoverLabel(null), 1400);
+          }
+
+          // Guida overlay with normative reference
+          if (guideModeRef.current) {
+            setGuideOverlay({
+              label: riskData.risk.label,
               description: riskData.risk.description,
-              duration: 6000,
-            }
-          );
+              normative: deriveNormative(riskData.risk.label, riskData.risk.description, riskData.risk.severity),
+              severity: riskData.risk.severity,
+            });
+            setTimeout(() => setGuideOverlay(null), 6000);
+          } else {
+            toast.success(
+              `${isCritical ? '🚨' : '⚠️'} ${riskData.risk.label}`,
+              { description: riskData.risk.description, duration: 6000 }
+            );
+          }
+
+          // Cleanup after 3s highlight
+          setTimeout(() => {
+            try { scene.onBeforeRenderObservable.remove(pulseObs); } catch {}
+            groupMeshes.forEach(m => { try { hl?.removeMesh(m); } catch {} });
+            try { zone.dispose(); zoneMat.dispose(); } catch {}
+            try { pickedMesh.dispose(); } catch {}
+          }, 3000);
           return;
         }
       }
