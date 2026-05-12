@@ -60,8 +60,6 @@ import { useTouchControls } from "@/hooks/useTouchControls";
 import { useGyroscope } from "@/hooks/useGyroscope";
 import { useGraphicsSettings } from "@/hooks/useGraphicsSettings";
 import { usePerformanceBenchmark } from "@/hooks/usePerformanceBenchmark";
-import { useMouseCalibration } from "@/hooks/useMouseCalibration";
-import { MouseCalibrationOverlay } from "@/components/demo3d/MouseCalibrationOverlay";
 import { CollisionSystem } from "@/lib/collision-system";
 import { ExtinguisherSelection, ExtinguisherType } from "@/components/demo3d/ExtinguisherSelection";
 import { ExtinguisherChargeHUD } from "@/components/demo3d/ExtinguisherChargeHUD";
@@ -118,15 +116,6 @@ const Demo3D = () => {
     runBenchmark,
     reset: resetBenchmark
   } = usePerformanceBenchmark();
-  const {
-    isCalibrating,
-    progress: calibrationProgress,
-    data: calibrationData,
-    isComplete: isCalibrationComplete,
-    startCalibration,
-    skipCalibration,
-    trackMouseMovement,
-  } = useMouseCalibration();
   
   const [selectedScenario, setSelectedScenario] = useState<Scenario3D | null>(null);
 
@@ -722,11 +711,6 @@ const Demo3D = () => {
       collisionSystem.current.resetCollisionCount();
     }
 
-    // Start mouse calibration if not completed
-    if (!isCalibrationComplete && !isCalibrating) {
-      console.log('[Demo3D] Starting mouse calibration automatically');
-      startCalibration();
-    }
   };
 
   const resetGame = () => {
@@ -1464,7 +1448,7 @@ const Demo3D = () => {
               quality={quality}
               isActive={gameStarted}
               audioSettings={audioSettings}
-              onMouseMove={trackMouseMovement}
+              
               extinguisherType={selectedExtinguisher || undefined}
               onFirePropagationChange={(level: number) => {
                 setFirePropagationLevel(level);
@@ -1577,18 +1561,7 @@ const Demo3D = () => {
               <LoadingOverlay scenarioTitle={memoizedScenario.title} scenarioId={memoizedScenario.id} />
             )}
 
-            {/* Mouse Calibration Overlay */}
-            {(isCalibrating || (calibrationData && !isCalibrationComplete)) && (
-              <MouseCalibrationOverlay
-                isCalibrating={isCalibrating}
-                progress={calibrationProgress}
-                data={calibrationData}
-                isComplete={isCalibrationComplete}
-                onApply={handleApplyCalibration}
-                onSkip={skipCalibration}
-                onClose={handleCloseCalibration}
-              />
-            )}
+
 
             {/* Picture-in-Picture Replay Overlays (Split-Screen) */}
             {pipReplay1 && gameStarted && (
