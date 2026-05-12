@@ -169,7 +169,7 @@ export const BabylonScene = ({
       const ps = scene.particleSystems.map(p => ({
         name: p.name,
         group: (p as unknown as { renderingGroupId: number }).renderingGroupId ?? 0,
-        active: p.isStarted() && !p.isStopped(),
+        active: p.isStarted(),
         blendMode: (p as BABYLON.ParticleSystem).blendMode ?? 0,
       }));
       const groupCounts: Record<number, number> = {};
