@@ -1443,6 +1443,91 @@ export const BabylonScene = ({
         tabIndex={1}
       />
 
+      {/* Anchored 2D label for hovered/clicked risk */}
+      {hoverLabel && (
+        <div
+          className="fixed z-50 pointer-events-none -translate-x-1/2 -translate-y-full transition-opacity"
+          style={{ left: hoverLabel.x, top: hoverLabel.y - 8 }}
+        >
+          <div
+            className="px-3 py-1.5 rounded-md text-xs font-bold text-white shadow-lg backdrop-blur-md border whitespace-nowrap animate-fade-in"
+            style={{
+              backgroundColor:
+                hoverLabel.severity === 'critical' ? 'rgba(220,38,38,0.92)'
+                : hoverLabel.severity === 'high' ? 'rgba(234,88,12,0.92)'
+                : hoverLabel.severity === 'medium' ? 'rgba(202,138,4,0.92)'
+                : 'rgba(34,197,94,0.92)',
+              borderColor: 'rgba(255,255,255,0.4)',
+            }}
+          >
+            {hoverLabel.label}
+          </div>
+          <div
+            className="w-2 h-2 mx-auto rotate-45 -mt-1"
+            style={{
+              backgroundColor:
+                hoverLabel.severity === 'critical' ? 'rgba(220,38,38,0.92)'
+                : hoverLabel.severity === 'high' ? 'rgba(234,88,12,0.92)'
+                : hoverLabel.severity === 'medium' ? 'rgba(202,138,4,0.92)'
+                : 'rgba(34,197,94,0.92)',
+            }}
+          />
+        </div>
+      )}
+
+      {/* Guida toggle */}
+      <button
+        type="button"
+        onClick={() => setGuideMode(v => !v)}
+        className={`fixed top-4 right-4 z-40 px-3 py-1.5 rounded-full text-xs font-semibold shadow-lg backdrop-blur-md border transition-colors ${
+          guideMode
+            ? 'bg-emerald-500/90 text-white border-emerald-300'
+            : 'bg-background/80 text-foreground border-border'
+        }`}
+        title="Modalità Guida: evidenzia l'area e mostra la spiegazione normativa"
+      >
+        🎓 Guida: {guideMode ? 'ON' : 'OFF'}
+      </button>
+
+      {/* Guida overlay with normative explanation */}
+      {guideOverlay && (
+        <div className="fixed bottom-24 left-1/2 -translate-x-1/2 z-50 max-w-xl w-[90%] animate-fade-in pointer-events-none">
+          <div
+            className="rounded-xl border-2 shadow-2xl backdrop-blur-md overflow-hidden"
+            style={{
+              borderColor:
+                guideOverlay.severity === 'critical' ? '#dc2626'
+                : guideOverlay.severity === 'high' ? '#ea580c'
+                : guideOverlay.severity === 'medium' ? '#ca8a04'
+                : '#22c55e',
+              backgroundColor: 'rgba(15,23,42,0.92)',
+            }}
+          >
+            <div
+              className="px-4 py-2 text-sm font-bold text-white flex items-center gap-2"
+              style={{
+                backgroundColor:
+                  guideOverlay.severity === 'critical' ? 'rgba(220,38,38,0.95)'
+                  : guideOverlay.severity === 'high' ? 'rgba(234,88,12,0.95)'
+                  : guideOverlay.severity === 'medium' ? 'rgba(202,138,4,0.95)'
+                  : 'rgba(34,197,94,0.95)',
+              }}
+            >
+              <span>🎯 Rischio individuato</span>
+              <span className="opacity-70 font-normal text-xs">— Modalità Guida</span>
+            </div>
+            <div className="px-4 py-3 space-y-2 text-white">
+              <div className="text-base font-bold leading-snug">{guideOverlay.label}</div>
+              <div className="text-sm text-white/85 leading-snug">{guideOverlay.description}</div>
+              <div className="mt-2 pt-2 border-t border-white/20 text-xs text-white/90">
+                <span className="font-semibold uppercase tracking-wide text-white/70 block mb-1">📖 Riferimento normativo</span>
+                {guideOverlay.normative}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {lookedAtProp && (
         <PropLabel
           propName={lookedAtProp.name}
