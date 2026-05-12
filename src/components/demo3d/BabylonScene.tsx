@@ -128,6 +128,50 @@ export const BabylonScene = ({
   } | null>(null);
   const [activeNPCRole, setActiveNPCRole] = useState<string | null>(null);
   const [quizRole, setQuizRole] = useState<string | null>(null);
+  const [hoverLabel, setHoverLabel] = useState<{ label: string; severity: string; x: number; y: number } | null>(null);
+  const [guideOverlay, setGuideOverlay] = useState<{ label: string; description: string; normative: string; severity: string } | null>(null);
+  const [guideMode, setGuideMode] = useState(true);
+  const guideModeRef = useRef(true);
+  const guideOverlayActiveRef = useRef(false);
+  useEffect(() => { guideModeRef.current = guideMode; }, [guideMode]);
+
+  // Derive normative reference from risk content
+  const deriveNormative = (label: string, description: string, severity: string): string => {
+    const text = (label + ' ' + description).toLowerCase();
+    if (text.includes('estintore') || text.includes('antincend') || text.includes('incendio') || text.includes('fuoco')) {
+      return 'D.M. 10/03/1998 e D.Lgs. 81/08 art. 46 — gli estintori devono essere accessibili, segnalati, controllati periodicamente e mai ostruiti.';
+    }
+    if (text.includes('uscita') || text.includes('via di fuga') || text.includes('evacuaz') || text.includes('emergenza')) {
+      return 'D.Lgs. 81/08 Allegato IV §1.5 — le vie e uscite di emergenza devono restare sgombre e consentire l\'evacuazione rapida e sicura.';
+    }
+    if (text.includes('cavo') || text.includes('elettric') || text.includes('multipresa') || text.includes('folgoraz')) {
+      return 'D.Lgs. 81/08 Titolo III Capo III + CEI 64-8 — impianti e cavi devono essere protetti da contatti diretti/indiretti e mantenuti in efficienza.';
+    }
+    if (text.includes('scaffal') || text.includes('instabil') || text.includes('ribalt') || text.includes('crollo')) {
+      return 'D.Lgs. 81/08 art. 64 e Allegato IV — strutture e scaffalature devono essere stabili, ancorate e di portata adeguata al carico.';
+    }
+    if (text.includes('dpi') || text.includes('casco') || text.includes('protezione individuale')) {
+      return 'D.Lgs. 81/08 Titolo III Capo II artt. 74-79 — obbligo di uso dei DPI conformi al rischio specifico della mansione.';
+    }
+    if (text.includes('ponteggio') || text.includes('lavoro in quota') || text.includes('quota')) {
+      return 'D.Lgs. 81/08 Titolo IV Capo II — ponteggi e lavori in quota richiedono progetto, montaggio Pi.M.U.S. e parapetti normati.';
+    }
+    if (text.includes('scavo') || text.includes('trincea')) {
+      return 'D.Lgs. 81/08 artt. 118-121 — scavi e trincee oltre 1,5 m devono avere armature/parapetti e segnalazione perimetrale.';
+    }
+    if (text.includes('carrello') || text.includes('mulett') || text.includes('escavator') || text.includes('bulldozer') || text.includes('dumper') || text.includes('betoniera') || text.includes('macchin')) {
+      return 'D.Lgs. 81/08 artt. 71-73 + Allegato VI — attrezzature di lavoro: abilitazione operatore, segnalazione zone di manovra e moviere a terra.';
+    }
+    if (text.includes('pavimento') || text.includes('scivol') || text.includes('liquido') || text.includes('bagnat')) {
+      return 'D.Lgs. 81/08 Allegato IV §1.3 — i pavimenti devono essere asciutti, antiscivolo e segnalati se temporaneamente pericolosi.';
+    }
+    if (text.includes('password') || text.includes('phishing') || text.includes('usb') || text.includes('schermo') || text.includes('cyber') || text.includes('gdpr')) {
+      return 'GDPR Reg. UE 2016/679 art. 32 + ISO/IEC 27001 — misure tecniche e organizzative per proteggere dati e credenziali da accessi non autorizzati.';
+    }
+    return severity === 'critical'
+      ? 'D.Lgs. 81/08 art. 15 — misure generali di tutela: eliminazione del rischio alla fonte e priorità alla protezione collettiva.'
+      : 'D.Lgs. 81/08 art. 28 — il rischio va valutato e ridotto attraverso il DVR e procedure operative aggiornate.';
+  };
 
   // Close NPC dialog with ESC key
   useEffect(() => {
@@ -423,15 +467,92 @@ export const BabylonScene = ({
             setCurrentSubtitle({ text: result.text, severity });
           }
 
-          pickedMesh.dispose();
+          // === Blinking outline + semi-transparent zone (3s guida highlight) ===
+          const sevColor = riskData.risk.severity === 'critical' ? new BABYLON.Color3(1, 0.15, 0.1)
+            : riskData.risk.severity === 'high' ? new BABYLON.Color3(1, 0.55, 0.05)
+            : riskData.risk.severity === 'medium' ? new BABYLON.Color3(1, 0.85, 0.1)
+            : new BABYLON.Color3(0.2, 0.85, 0.4);
+
+          // Disable picking but keep visible during 3s highlight
+          pickedMesh.isPickable = false;
+          const groupMeshes = riskMeshMapRef.current.get(riskData.risk.id) || [pickedMesh as BABYLON.Mesh];
+          const hl = highlightLayerRef.current;
+          groupMeshes.forEach(m => { try { hl?.addMesh(m, sevColor); } catch {} });
+
+          // Transparent highlight zone (sphere) around the picked point
+          const anchor = pickedMesh.getAbsolutePosition().clone();
+          const bRadius = (pickedMesh.getBoundingInfo()?.boundingSphere.radiusWorld) || 0.8;
+          const zone = BABYLON.MeshBuilder.CreateSphere(`${riskData.risk.id}_zone`, { diameter: Math.max(2.2, bRadius * 2.6), segments: 16 }, scene);
+          zone.position = anchor.clone();
+          zone.isPickable = false;
+          const zoneMat = new BABYLON.StandardMaterial(`${riskData.risk.id}_zoneMat`, scene);
+          zoneMat.emissiveColor = sevColor;
+          zoneMat.diffuseColor = sevColor;
+          zoneMat.alpha = 0.22;
+          zoneMat.backFaceCulling = false;
+          zone.material = zoneMat;
+          zone.renderingGroupId = 1;
+
+          // Pulsing animation
+          const pulseObs = scene.onBeforeRenderObservable.add(() => {
+            const t = performance.now() * 0.006;
+            const p = 0.5 + 0.5 * Math.sin(t);
+            zoneMat.alpha = 0.15 + p * 0.30;
+            const s = 1 + p * 0.18;
+            zone.scaling.setAll(s);
+            // Blink highlight color brightness
+            const k = 0.55 + p * 0.45;
+            zoneMat.emissiveColor = sevColor.scale(k);
+          });
+
           onRiskFound(riskData.risk.id, isCritical);
-          toast.success(
-            `${isCritical ? '🚨' : '⚠️'} ${riskData.risk.label}`,
-            {
+
+          // Anchored 2D label (briefly) before the popup
+          const cam = cameraRef.current;
+          const cnv = canvasRef.current;
+          if (cam && cnv) {
+            const rect = cnv.getBoundingClientRect();
+            const w = scene.getEngine().getRenderWidth();
+            const h = scene.getEngine().getRenderHeight();
+            const proj = BABYLON.Vector3.Project(
+              anchor.add(new BABYLON.Vector3(0, bRadius + 0.6, 0)),
+              BABYLON.Matrix.Identity(),
+              scene.getTransformMatrix(),
+              new BABYLON.Viewport(0, 0, w, h)
+            );
+            setHoverLabel({
+              label: riskData.risk.label,
+              severity: riskData.risk.severity,
+              x: rect.left + (proj.x / w) * rect.width,
+              y: rect.top + (proj.y / h) * rect.height,
+            });
+            setTimeout(() => setHoverLabel(null), 1400);
+          }
+
+          // Guida overlay with normative reference
+          if (guideModeRef.current) {
+            guideOverlayActiveRef.current = true;
+            setGuideOverlay({
+              label: riskData.risk.label,
               description: riskData.risk.description,
-              duration: 6000,
-            }
-          );
+              normative: deriveNormative(riskData.risk.label, riskData.risk.description, riskData.risk.severity),
+              severity: riskData.risk.severity,
+            });
+            setTimeout(() => { guideOverlayActiveRef.current = false; setGuideOverlay(null); }, 6000);
+          } else {
+            toast.success(
+              `${isCritical ? '🚨' : '⚠️'} ${riskData.risk.label}`,
+              { description: riskData.risk.description, duration: 6000 }
+            );
+          }
+
+          // Cleanup after 3s highlight
+          setTimeout(() => {
+            try { scene.onBeforeRenderObservable.remove(pulseObs); } catch {}
+            groupMeshes.forEach(m => { try { hl?.removeMesh(m); } catch {} });
+            try { zone.dispose(); zoneMat.dispose(); } catch {}
+            try { pickedMesh.dispose(); } catch {}
+          }, 3000);
           return;
         }
       }
@@ -512,6 +633,35 @@ export const BabylonScene = ({
           }
         }
         hoveredRiskRef.current = newHoverId;
+      }
+
+      // Update anchored 2D label for the currently-hovered risk (skip if a click-guide label is showing)
+      if (newHoverId && riskHit?.pickedMesh) {
+        const cnv = canvasRef.current;
+        if (cnv) {
+          const sev = scenario.risks.find(r => r.id === newHoverId);
+          const anchorPos = riskHit.pickedMesh.getAbsolutePosition().clone();
+          anchorPos.y += 1.0;
+          const rect = cnv.getBoundingClientRect();
+          const w = scene.getEngine().getRenderWidth();
+          const h = scene.getEngine().getRenderHeight();
+          const proj = BABYLON.Vector3.Project(
+            anchorPos,
+            BABYLON.Matrix.Identity(),
+            scene.getTransformMatrix(),
+            new BABYLON.Viewport(0, 0, w, h)
+          );
+          if (sev) {
+            setHoverLabel({
+              label: sev.label,
+              severity: sev.severity,
+              x: rect.left + (proj.x / w) * rect.width,
+              y: rect.top + (proj.y / h) * rect.height,
+            });
+          }
+        }
+      } else if (!guideOverlayActiveRef.current && !newHoverId) {
+        setHoverLabel((prev) => (prev ? null : prev));
       }
 
       const ray = camera.getForwardRay(LOOK_DISTANCE);
@@ -1292,6 +1442,91 @@ export const BabylonScene = ({
         className="w-full h-full outline-none"
         tabIndex={1}
       />
+
+      {/* Anchored 2D label for hovered/clicked risk */}
+      {hoverLabel && (
+        <div
+          className="fixed z-50 pointer-events-none -translate-x-1/2 -translate-y-full transition-opacity"
+          style={{ left: hoverLabel.x, top: hoverLabel.y - 8 }}
+        >
+          <div
+            className="px-3 py-1.5 rounded-md text-xs font-bold text-white shadow-lg backdrop-blur-md border whitespace-nowrap animate-fade-in"
+            style={{
+              backgroundColor:
+                hoverLabel.severity === 'critical' ? 'rgba(220,38,38,0.92)'
+                : hoverLabel.severity === 'high' ? 'rgba(234,88,12,0.92)'
+                : hoverLabel.severity === 'medium' ? 'rgba(202,138,4,0.92)'
+                : 'rgba(34,197,94,0.92)',
+              borderColor: 'rgba(255,255,255,0.4)',
+            }}
+          >
+            {hoverLabel.label}
+          </div>
+          <div
+            className="w-2 h-2 mx-auto rotate-45 -mt-1"
+            style={{
+              backgroundColor:
+                hoverLabel.severity === 'critical' ? 'rgba(220,38,38,0.92)'
+                : hoverLabel.severity === 'high' ? 'rgba(234,88,12,0.92)'
+                : hoverLabel.severity === 'medium' ? 'rgba(202,138,4,0.92)'
+                : 'rgba(34,197,94,0.92)',
+            }}
+          />
+        </div>
+      )}
+
+      {/* Guida toggle */}
+      <button
+        type="button"
+        onClick={() => setGuideMode(v => !v)}
+        className={`fixed top-4 right-4 z-40 px-3 py-1.5 rounded-full text-xs font-semibold shadow-lg backdrop-blur-md border transition-colors ${
+          guideMode
+            ? 'bg-emerald-500/90 text-white border-emerald-300'
+            : 'bg-background/80 text-foreground border-border'
+        }`}
+        title="Modalità Guida: evidenzia l'area e mostra la spiegazione normativa"
+      >
+        🎓 Guida: {guideMode ? 'ON' : 'OFF'}
+      </button>
+
+      {/* Guida overlay with normative explanation */}
+      {guideOverlay && (
+        <div className="fixed bottom-24 left-1/2 -translate-x-1/2 z-50 max-w-xl w-[90%] animate-fade-in pointer-events-none">
+          <div
+            className="rounded-xl border-2 shadow-2xl backdrop-blur-md overflow-hidden"
+            style={{
+              borderColor:
+                guideOverlay.severity === 'critical' ? '#dc2626'
+                : guideOverlay.severity === 'high' ? '#ea580c'
+                : guideOverlay.severity === 'medium' ? '#ca8a04'
+                : '#22c55e',
+              backgroundColor: 'rgba(15,23,42,0.92)',
+            }}
+          >
+            <div
+              className="px-4 py-2 text-sm font-bold text-white flex items-center gap-2"
+              style={{
+                backgroundColor:
+                  guideOverlay.severity === 'critical' ? 'rgba(220,38,38,0.95)'
+                  : guideOverlay.severity === 'high' ? 'rgba(234,88,12,0.95)'
+                  : guideOverlay.severity === 'medium' ? 'rgba(202,138,4,0.95)'
+                  : 'rgba(34,197,94,0.95)',
+              }}
+            >
+              <span>🎯 Rischio individuato</span>
+              <span className="opacity-70 font-normal text-xs">— Modalità Guida</span>
+            </div>
+            <div className="px-4 py-3 space-y-2 text-white">
+              <div className="text-base font-bold leading-snug">{guideOverlay.label}</div>
+              <div className="text-sm text-white/85 leading-snug">{guideOverlay.description}</div>
+              <div className="mt-2 pt-2 border-t border-white/20 text-xs text-white/90">
+                <span className="font-semibold uppercase tracking-wide text-white/70 block mb-1">📖 Riferimento normativo</span>
+                {guideOverlay.normative}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {lookedAtProp && (
         <PropLabel
