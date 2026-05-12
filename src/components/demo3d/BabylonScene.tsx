@@ -144,6 +144,48 @@ export const BabylonScene = ({
   const langRef = useRef<Lang>(lang);
   useEffect(() => { langRef.current = lang; }, [lang]);
   const [tickNow, setTickNow] = useState(0);
+  // Fire-scenario rendering controls
+  const isFireScenario = scenario.type === 'laboratory';
+  const [highlightEnabled, setHighlightEnabled] = useState(true);
+  const [showLayerDebug, setShowLayerDebug] = useState(false);
+  const [layerDebugInfo, setLayerDebugInfo] = useState<{
+    highlight: boolean;
+    particleSystems: { name: string; group: number; active: boolean; blendMode: number }[];
+    groupCounts: Record<number, number>;
+  } | null>(null);
+
+  // Toggle highlight layer enable state
+  useEffect(() => {
+    const hl = highlightLayerRef.current;
+    if (hl) hl.isEnabled = highlightEnabled;
+  }, [highlightEnabled, isReady]);
+
+  // Sample rendering layer info for debug panel
+  useEffect(() => {
+    if (!showLayerDebug) return;
+    const id = setInterval(() => {
+      const scene = sceneRef.current;
+      if (!scene) return;
+      const ps = scene.particleSystems.map(p => ({
+        name: p.name,
+        group: (p as unknown as { renderingGroupId: number }).renderingGroupId ?? 0,
+        active: p.isStarted() && !p.isStopped(),
+        blendMode: (p as BABYLON.ParticleSystem).blendMode ?? 0,
+      }));
+      const groupCounts: Record<number, number> = {};
+      scene.meshes.forEach(m => {
+        const g = m.renderingGroupId ?? 0;
+        groupCounts[g] = (groupCounts[g] ?? 0) + 1;
+      });
+      setLayerDebugInfo({
+        highlight: !!highlightLayerRef.current?.isEnabled,
+        particleSystems: ps,
+        groupCounts,
+      });
+    }, 500);
+    return () => clearInterval(id);
+  }, [showLayerDebug]);
+
   useEffect(() => {
     if (!guideOverlay) return;
     const id = setInterval(() => setTickNow(Date.now()), 200);
