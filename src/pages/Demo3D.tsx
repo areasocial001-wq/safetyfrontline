@@ -254,7 +254,23 @@ const Demo3D = () => {
       return () => clearTimeout(timer);
     }
   }, [benchmarkCompleted, showBenchmark, selectedScenario]);
-
+  // Auto-select scenario from query string (e.g. ?scenario=cybersecurity for bonus modules)
+  useEffect(() => {
+    if (hasAutoSelected.current) return;
+    const scenarioId = searchParams.get('scenario');
+    if (!scenarioId) return;
+    const scenario = getScenarioById(scenarioId);
+    if (scenario) {
+      hasAutoSelected.current = true;
+      setIsInitializing(true);
+      setSelectedScenario(scenario);
+      setShowScenarioSelect(false);
+      if (scenario.type === 'laboratory') {
+        setShowFireTutorial(true);
+      }
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   // Handle benchmark completion
   const handleApplyRecommended = () => {
     if (benchmarkResults) {
