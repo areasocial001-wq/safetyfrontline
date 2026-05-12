@@ -833,6 +833,9 @@ function addLaboratoryProps(
       smokeColor1 = new BABYLON.Color4(0.85, 0.85, 0.88, 0.40);
       smokeColor2 = new BABYLON.Color4(0.65, 0.65, 0.70, 0.20);
     }
+    // Render after HighlightLayer composite (group 0) so additive flames
+    // are not eaten by the highlight effect's alpha pass.
+    fire.renderingGroupId = 1;
     fire.start();
 
     // Per-fire smoke (so each fire has its own smoke signature)
@@ -859,6 +862,7 @@ function addLaboratoryProps(
     perSmoke.updateSpeed = 0.005;
     perSmoke.minEmitBox = new BABYLON.Vector3(-0.4, 0, -0.4);
     perSmoke.maxEmitBox = new BABYLON.Vector3(0.4, 0, 0.4);
+    perSmoke.renderingGroupId = 1;
     perSmoke.start();
 
     // Fire light
