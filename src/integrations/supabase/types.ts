@@ -153,8 +153,6 @@ export type Database = {
           ateco_code: string | null
           certificate_font: string | null
           certificate_logo_position: string | null
-          certificate_module_prefix: string
-          certificate_orientation: string
           certificate_template: string | null
           certificate_text_layout: string | null
           certificate_theme_color: string | null
@@ -175,8 +173,6 @@ export type Database = {
           ateco_code?: string | null
           certificate_font?: string | null
           certificate_logo_position?: string | null
-          certificate_module_prefix?: string
-          certificate_orientation?: string
           certificate_template?: string | null
           certificate_text_layout?: string | null
           certificate_theme_color?: string | null
@@ -197,8 +193,6 @@ export type Database = {
           ateco_code?: string | null
           certificate_font?: string | null
           certificate_logo_position?: string | null
-          certificate_module_prefix?: string
-          certificate_orientation?: string
           certificate_template?: string | null
           certificate_text_layout?: string | null
           certificate_theme_color?: string | null
