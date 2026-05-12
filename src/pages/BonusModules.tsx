@@ -45,16 +45,12 @@ const BONUS_MODULES: BonusModule[] = [
 const BonusModules = () => {
   const [quoteDialogOpen, setQuoteDialogOpen] = useState(false);
 
+  useEffect(() => {
+    document.title = "Moduli Bonus — Safety Frontline";
+  }, []);
+
   return (
     <div className="min-h-screen bg-background">
-      <Helmet>
-        <title>Moduli Bonus — Safety Frontline</title>
-        <meta
-          name="description"
-          content="Moduli formativi extra opzionali di Safety Frontline: Cyber Security Office e altri contenuti aggiuntivi non inclusi nel piano standard."
-        />
-        <link rel="canonical" href="https://safetyfrontline.com/moduli-bonus" />
-      </Helmet>
 
       {/* Header */}
       <section className="relative overflow-hidden border-b border-border bg-gradient-to-br from-fuchsia-500/10 via-purple-500/5 to-primary/10">
