@@ -61,6 +61,7 @@ interface GameResults3DProps {
   sprinklerRisksFound: number;
   cyberQuizStats?: CyberQuizStats;
   firePerformance?: FirePerformanceData;
+  risksFoundIds?: string[];
   onRestart: () => void;
   onChangeScenario: () => void;
   onReplayBriefing?: () => void;
