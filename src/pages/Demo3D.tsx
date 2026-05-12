@@ -70,6 +70,9 @@ import { FireClassQuiz } from "@/components/demo3d/FireClassQuiz";
 import { ExtinguisherTypeHUD } from "@/components/demo3d/ExtinguisherTypeHUD";
 import { Crosshair } from "@/components/demo3d/Crosshair";
 import { CyberRiskQuiz } from "@/components/demo3d/CyberRiskQuiz";
+import { MachineryRiskQuiz } from "@/components/demo3d/MachineryRiskQuiz";
+import { isMachineryRisk } from "@/data/machinery-quizzes";
+import { CameraPresetsPanel, type CameraPresetName } from "@/components/demo3d/CameraPresetsPanel";
 import type { FirePerformanceData } from "@/components/demo3d/GameResults3D";
 import { 
   loadUserAchievements, 
