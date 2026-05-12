@@ -306,7 +306,16 @@ export const BabylonScene = ({
     highlightLayer.innerGlow = false;
     highlightLayer.outerGlow = true;
     highlightLayerRef.current = highlightLayer;
+    highlightLayer.isEnabled = highlightEnabled;
     riskMeshMapRef.current = new Map();
+
+    // Rendering-group priority: keep depth/stencil of group 0 (scene + highlight
+    // composite) so groups 1 (fire/smoke particles) and 2/3 (UI billboards) draw
+    // on top without being clipped or eaten by the highlight alpha pass.
+    // Cross-browser safe: works the same way on Chrome/Firefox/Safari.
+    scene.setRenderingAutoClearDepthStencil(1, false, false, false);
+    scene.setRenderingAutoClearDepthStencil(2, false, false, false);
+    scene.setRenderingAutoClearDepthStencil(3, false, false, false);
 
     const riskMeshes = scenario.risks.map((risk) => {
       const createContextualHazard = (): BABYLON.Mesh => {
