@@ -214,6 +214,7 @@ export function startFireAmbientSound(
 ) {
   try {
     const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
+    registerAudioContext(ctx);
     fireAmbientContexts.push(ctx);
 
     const panner = ctx.createPanner();
