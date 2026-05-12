@@ -51,7 +51,7 @@ import { ContextualHints } from "@/components/demo3d/ContextualHints";
 import { PlayerLevelIndicator } from "@/components/demo3d/PlayerLevelIndicator";
 import { UserMenu } from "@/components/auth/UserMenu";
 import { Toaster } from "@/components/ui/toaster";
-import { scenarios3D, Scenario3D, getDifficultyColor, getDifficultyLabel } from "@/data/scenarios3d";
+import { scenarios3D, getScenarioById, Scenario3D, getDifficultyColor, getDifficultyLabel } from "@/data/scenarios3d";
 import { getPreviewByScenarioId } from "@/data/sim3d-previews";
 import { Sim3dPreview } from "@/components/Sim3dPreview";
 import { achievements, GameStats } from "@/lib/achievements";
