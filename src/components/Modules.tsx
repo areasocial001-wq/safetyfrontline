@@ -102,7 +102,7 @@ export const Modules = () => {
       { icon: Warehouse, title: "Magazzino Logistica", subtitle: "Movimentazione & Stoccaggio", description: "Magazzino industriale con bancali, muletti, materiali infiammabili. Rischi manuali + procedurali generati dinamicamente.", color: "secondary", previewKey: "warehouse" },
       { icon: AlertTriangle, title: "Cantiere Edile", subtitle: "Lavori in Quota & DPI", description: "Scenario hard con macchinari pesanti, ponteggi, lavori in quota e rischi procedurali. Per formazione Rischio Alto.", color: "accent", previewKey: "construction" },
       { icon: Flame, title: "Simulazione Antincendio", subtitle: "Estintore First-Person", description: "Esercitazione realistica con estintore in prima persona: classi di fuoco, particelle, quiz contestuali e procedure di evacuazione.", color: "destructive", previewKey: "laboratory" },
-      { icon: Lock, title: "Cyber Security Office", subtitle: "Rischi Informatici 3D", description: "8 rischi cyber da identificare in un ufficio 3D: post-it con password, schermi sbloccati, email di phishing, chiavette USB sospette.", color: "muted", previewKey: "cybersecurity" },
+      
     ],
     minigame2d: [
       { icon: Building2, title: "Cantiere Cartoon", subtitle: "7 rischi · 3 vite", description: "Caccia ai rischi 2D in stile cartoon: imbracatura, carichi sospesi, ferri d'armatura, quadri elettrici. Spiegazione educativa con riferimenti normativi.", color: "destructive", image: cartoonConstruction },
