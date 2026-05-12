@@ -38,46 +38,13 @@ export const ROICalculator = () => {
   const calc = useMemo(() => {
     const sector = getSector(sectorId)!;
     const tier = getTier(tierId)!;
-
-    // Costi piattaforma
-    const pricePerEmp = Math.round(sector.pricePerEmployee * tier.multiplier);
-    const platformCost = pricePerEmp * employees;
-
-    // Costi formazione tradizionale
-    // Ore totali x (costo orario dipendente + costo orario aula/docente)
-    const tradCostPerEmp = sector.totalHours * (hourlyCost + sector.tradAvgHourCost);
-    const tradTotal = tradCostPerEmp * employees;
-
-    // Risparmi indiretti
-    // -60% errori comportamentali → stima incidenti evitati
-    // Costo medio infortunio lieve PMI: ~1.500€ (giornate perse + pratiche INAIL)
-    const baselineIncidentRate = sector.riskLevel === "alto" ? 0.08 : sector.riskLevel === "medio" ? 0.04 : 0.015;
-    const incidentsAvoided = Math.max(0, Math.round(employees * baselineIncidentRate * 0.6));
-    const incidentSavings = incidentsAvoided * 1500;
-
-    // Tempo recuperato: micro-learning vs aula (5 min vs 60 min/sessione)
-    const hoursSaved = sector.totalHours * 0.55 * employees; // ~55% del tempo aula
-    const timeSavings = hoursSaved * hourlyCost;
-
-    const totalSavings = tradTotal - platformCost + incidentSavings + timeSavings;
-    const roi = platformCost > 0 ? (totalSavings / platformCost) * 100 : 0;
-    const paybackMonths = totalSavings > 0 ? Math.max(1, Math.round((platformCost / (totalSavings / 12)) * 10) / 10) : 12;
-
-    return {
-      sector,
-      tier,
-      pricePerEmp,
-      platformCost,
-      tradTotal,
-      incidentsAvoided,
-      incidentSavings,
-      hoursSaved: Math.round(hoursSaved),
-      timeSavings,
-      totalSavings,
-      roi,
-      paybackMonths,
-    };
+    return { sector, tier, ...computeROI(sector, tier, employees, hourlyCost) };
   }, [employees, sectorId, tierId, hourlyCost]);
+
+  const comparison = useMemo(() => {
+    const sector = getSector(sectorId)!;
+    return PLAN_TIERS.map((t) => ({ tier: t, ...computeROI(sector, t, employees, hourlyCost) }));
+  }, [sectorId, employees, hourlyCost]);
 
   return (
     <section className="py-16 bg-background">
