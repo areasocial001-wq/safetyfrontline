@@ -27,7 +27,7 @@ const ALL_ICONS: Record<string, any> = {
   Scale, Users, Search, Shield, Monitor, Brain, Thermometer, Zap,
   Cog, Package, Volume2, FlaskConical, ArrowDown, Flame, Heart,
   AlertTriangle, Box, ArrowUp, Truck, Bomb, Bug, Radiation, Siren, HardHat,
-  GraduationCap, Crown, Eye, KeyRound, ShieldAlert, Cross,
+  GraduationCap, Crown, Eye, KeyRound, Cross,
 };
 
 const GENERAL_MODULES = ['giuridico_normativo', 'gestione_organizzazione', 'valutazione_rischi', 'dpi_protezione'];
