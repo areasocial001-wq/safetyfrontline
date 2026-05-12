@@ -1,7 +1,9 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Sparkles, ArrowRight } from "lucide-react";
 import {
   Package, Building2, Warehouse, AlertCircle, Settings,
   Shield, Monitor, Brain, Zap, Thermometer,
