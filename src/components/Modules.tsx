@@ -8,7 +8,7 @@ import {
   Cog, FlaskConical, Volume2, Truck, Flame, Heart,
   Box, ArrowUp, Bug, AlertTriangle,
   Bell, Bot, Trophy, Users, FileCheck, Gamepad2,
-  GraduationCap, Target, Lock, ShieldAlert, Wifi, KeyRound, Mail,
+  GraduationCap, Target, Lock,
   Briefcase, Crown, Eye
 } from "lucide-react";
 import cartoonConstruction from "@/assets/cartoon-construction.jpg";
