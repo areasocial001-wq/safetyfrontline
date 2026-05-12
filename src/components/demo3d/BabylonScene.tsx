@@ -916,6 +916,7 @@ export const BabylonScene = ({
     const playLockSound = () => {
       try {
         const ctx = new AudioContext();
+        registerAudioContext(ctx);
         const now = ctx.currentTime;
         const osc = ctx.createOscillator();
         const g = ctx.createGain();
