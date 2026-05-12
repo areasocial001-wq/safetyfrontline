@@ -64,7 +64,7 @@ export const Hero = () => {
       video.removeEventListener('play', handlePlay);
       video.removeEventListener('pause', handlePause);
     };
-  }, []);
+  }, [audioElement]);
 
   // Fullscreen change detection
   useEffect(() => {
