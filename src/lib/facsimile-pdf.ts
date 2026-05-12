@@ -243,6 +243,24 @@ export async function generateCertificatePdf(
   pdf.setTextColor(...GREY);
   pdf.text(settings.footerNote, w - 18, h - 22, { align: "right" });
 
+  // Version + generation date (bottom center)
+  pdf.setFont("helvetica", "normal");
+  pdf.setFontSize(7);
+  pdf.setTextColor(...GREY);
+  const genStr = new Date().toLocaleString("it-IT", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+  pdf.text(
+    `Fac-simile v${settings.version ?? "1.0"} · Generato il ${genStr}`,
+    w / 2,
+    h - 8,
+    { align: "center" }
+  );
+
   return pdf.output("blob");
 }
 
