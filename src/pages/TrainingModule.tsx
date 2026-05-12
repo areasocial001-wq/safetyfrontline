@@ -50,9 +50,13 @@ const SECTION_ICONS: Record<string, { emoji: string; label: string; gradient: st
   lesson: { emoji: '📖', label: 'Lezione', gradient: 'from-accent/20 to-accent/5' },
 };
 
+const DEMO_STORAGE_KEY = 'demo-completed-modules';
+
 const TrainingModule = () => {
   const { moduleId } = useParams<{ moduleId: string }>();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const isDemoMode = searchParams.get('demo') === '1';
   const { user } = useAuth();
   const { initializeProgress, updateProgress, addXp, getModuleProgress } = useTrainingProgress();
 
