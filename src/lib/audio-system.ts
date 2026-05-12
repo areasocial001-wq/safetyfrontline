@@ -380,8 +380,8 @@ export class AmbientAudioPlayer {
   private panicActive = false;
 
   async initialize() {
-    import('./audio-context-unlock').then(m => m.registerAudioContext(this.audioContext)).catch(() => {});
     this.audioContext = new AudioContext();
+    import('./audio-context-unlock').then(m => m.registerAudioContext(this.audioContext)).catch(() => {});
     this.gainNode = this.audioContext.createGain();
     
     // Create dynamic filter for collision effects
