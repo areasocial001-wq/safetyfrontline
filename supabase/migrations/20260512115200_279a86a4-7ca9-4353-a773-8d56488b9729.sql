@@ -1,0 +1,2 @@
+CREATE POLICY "Public can view training packages" ON public.training_packages FOR SELECT TO anon USING (true);
+CREATE POLICY "Public can view training package modules" ON public.training_package_modules FOR SELECT TO anon USING (true);
