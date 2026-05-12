@@ -364,6 +364,7 @@ export const FirstPersonScene = ({
           
           // Play dramatic sound effect based on severity
           const audioContext = new AudioContext();
+          import('@/lib/audio-context-unlock').then(m => m.registerAudioContext(audioContext)).catch(() => {});
           const oscillator = audioContext.createOscillator();
           const gainNode = audioContext.createGain();
           
