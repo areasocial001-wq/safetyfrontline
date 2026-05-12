@@ -28,7 +28,7 @@ import {
   ScenarioStats,
 } from "@/lib/achievements-db";
 import { getUserReplays, GameReplay } from "@/lib/replay-db";
-import { scenarios3D } from "@/data/scenarios3d";
+import { ALL_SCENARIOS_3D } from "@/data/scenarios3d";
 import { toast } from "@/hooks/use-toast";
 
 interface LevelInfo {
