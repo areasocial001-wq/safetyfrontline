@@ -26,6 +26,8 @@ import { loadGLTFProps } from '@/lib/babylon-prop-loader';
 import { loadProceduralProps } from '@/lib/babylon-procedural-props';
 import { SCENARIO_PROPS, SCENARIO_PROCEDURAL_PROPS } from '@/types/prop-config';
 import { NPCAmbientSoundSystem } from '@/lib/npc-ambient-sounds';
+import { useLang, t, isRTL, LANGUAGES, type Lang } from '@/lib/risk-i18n';
+import { getNormative } from '@/lib/risk-normative';
 
 // Scene modules
 import { createScene } from './scene-modules/scene-setup';
