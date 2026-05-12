@@ -302,9 +302,11 @@ export const Hero = () => {
               */}
               <video
                 ref={videoRef}
+                autoPlay
                 loop
                 muted={isMuted}
                 playsInline
+                preload="auto"
                 className="w-full aspect-video object-cover bg-black"
                 poster={heroImage}
               >
