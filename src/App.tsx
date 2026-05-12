@@ -26,6 +26,7 @@ import NotFound from "./pages/NotFound";
 import PresetTestPage from "./pages/PresetTestPage";
 import SpotTheHazardPage from "./pages/SpotTheHazardPage";
 import DemoPath from "./pages/DemoPath";
+import BonusModules from "./pages/BonusModules";
 
 const queryClient = new QueryClient();
 
