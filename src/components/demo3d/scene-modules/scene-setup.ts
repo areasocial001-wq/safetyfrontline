@@ -111,10 +111,36 @@ export function createScene(
   // Create ground
   createGround(scene);
 
+  // Open-sky dome for outdoor scenarios (construction)
+  if (scenario.type === 'construction') {
+    createSkyDome(scene);
+  }
+
   // Create boundary walls
   createBoundaries(scene);
 
   return { engine, scene, camera, shadowGenerator };
+}
+
+function createSkyDome(scene: BABYLON.Scene) {
+  const skyMaterial = new SkyMaterial('skyMaterial', scene);
+  skyMaterial.backFaceCulling = false;
+  // Mid-morning sun, clear sky
+  skyMaterial.turbidity = 8;
+  skyMaterial.luminance = 0.4;
+  skyMaterial.rayleigh = 2;
+  skyMaterial.mieDirectionalG = 0.85;
+  skyMaterial.mieCoefficient = 0.005;
+  skyMaterial.useSunPosition = false;
+  skyMaterial.inclination = 0.35;
+  skyMaterial.azimuth = 0.25;
+
+  const skybox = BABYLON.MeshBuilder.CreateBox('skybox', { size: 800 }, scene);
+  skybox.material = skyMaterial;
+  skybox.infiniteDistance = true;
+  skybox.isPickable = false;
+  skybox.checkCollisions = false;
+  skybox.applyFog = false;
 }
 
 function setupLighting(scene: BABYLON.Scene, scenarioType: string, quality: string) {
