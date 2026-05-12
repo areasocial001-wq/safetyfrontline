@@ -1,5 +1,5 @@
 import { useState, Suspense, useEffect, useRef, useMemo, useCallback } from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { BabylonScene } from "@/components/demo3d/BabylonScene";
 import { SceneDebugOverlay } from "@/components/demo3d/SceneDebugOverlay";
 import { AudioDiagnosticsHUD } from "@/components/demo3d/AudioDiagnosticsHUD";
@@ -51,7 +51,7 @@ import { ContextualHints } from "@/components/demo3d/ContextualHints";
 import { PlayerLevelIndicator } from "@/components/demo3d/PlayerLevelIndicator";
 import { UserMenu } from "@/components/auth/UserMenu";
 import { Toaster } from "@/components/ui/toaster";
-import { scenarios3D, Scenario3D, getDifficultyColor, getDifficultyLabel } from "@/data/scenarios3d";
+import { scenarios3D, getScenarioById, Scenario3D, getDifficultyColor, getDifficultyLabel } from "@/data/scenarios3d";
 import { getPreviewByScenarioId } from "@/data/sim3d-previews";
 import { Sim3dPreview } from "@/components/Sim3dPreview";
 import { achievements, GameStats } from "@/lib/achievements";
@@ -117,6 +117,7 @@ const Demo3D = () => {
     reset: resetBenchmark
   } = usePerformanceBenchmark();
   
+  const [searchParams] = useSearchParams();
   const [selectedScenario, setSelectedScenario] = useState<Scenario3D | null>(null);
 
   // Load persisted per-scenario fill settings when scenario changes
@@ -195,6 +196,7 @@ const Demo3D = () => {
   const [machineryQuizRiskLabel, setMachineryQuizRiskLabel] = useState('');
   const [cameraPreset, setCameraPreset] = useState<import("@/components/demo3d/CameraPresetsPanel").CameraPresetName>("pedestrian");
   const prevChargeRef = useRef(100);
+  const hasAutoSelected = useRef(false);
   // Picture-in-Picture replay (two replays for split-screen comparison)
   const [pipReplay1, setPipReplay1] = useState<GameReplay | null>(null);
   const [pipReplay2, setPipReplay2] = useState<GameReplay | null>(null);
@@ -252,7 +254,23 @@ const Demo3D = () => {
       return () => clearTimeout(timer);
     }
   }, [benchmarkCompleted, showBenchmark, selectedScenario]);
-
+  // Auto-select scenario from query string (e.g. ?scenario=cybersecurity for bonus modules)
+  useEffect(() => {
+    if (hasAutoSelected.current) return;
+    const scenarioId = searchParams.get('scenario');
+    if (!scenarioId) return;
+    const scenario = getScenarioById(scenarioId);
+    if (scenario) {
+      hasAutoSelected.current = true;
+      setIsInitializing(true);
+      setSelectedScenario(scenario);
+      setShowScenarioSelect(false);
+      if (scenario.type === 'laboratory') {
+        setShowFireTutorial(true);
+      }
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   // Handle benchmark completion
   const handleApplyRecommended = () => {
     if (benchmarkResults) {

@@ -410,6 +410,9 @@ export const scenarios3D: Scenario3D[] = [
       },
     ],
   },
+];
+
+export const BONUS_SCENARIOS_3D: Scenario3D[] = [
   {
     id: 'cybersecurity',
     type: 'office',
@@ -505,6 +508,10 @@ export const scenarios3D: Scenario3D[] = [
   },
 ];
 
+export const ALL_SCENARIOS_3D: Scenario3D[] = [...scenarios3D, ...BONUS_SCENARIOS_3D];
+
+export const getScenarioById = (id: string): Scenario3D | undefined =>
+  ALL_SCENARIOS_3D.find((s) => s.id === id);
 export const getDifficultyColor = (difficulty: Scenario3D['difficulty']) => {
   switch (difficulty) {
     case 'easy':

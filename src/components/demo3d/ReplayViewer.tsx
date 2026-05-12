@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Play, Download, Trophy, Clock, Target, Shield, Award, Trash2, ArrowLeftRight } from "lucide-react";
 import { getUserReplays, downloadReplay, GameReplay, getTopReplays } from "@/lib/replay-db";
-import { scenarios3D } from "@/data/scenarios3d";
+import { ALL_SCENARIOS_3D } from "@/data/scenarios3d";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -16,7 +16,7 @@ import { ReplayComparison } from "./ReplayComparison";
 export const ReplayViewer = () => {
   const { user } = useAuth();
   const { toast } = useToast();
-  const [selectedScenario, setSelectedScenario] = useState<string>(scenarios3D[0].id);
+  const [selectedScenario, setSelectedScenario] = useState<string>(ALL_SCENARIOS_3D[0].id);
   const [replays, setReplays] = useState<GameReplay[]>([]);
   const [topReplays, setTopReplays] = useState<GameReplay[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -131,7 +131,7 @@ export const ReplayViewer = () => {
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
-  const selectedScenarioData = scenarios3D.find(s => s.id === selectedScenario);
+  const selectedScenarioData = ALL_SCENARIOS_3D.find(s => s.id === selectedScenario);
 
   if (!user) {
     return (
@@ -189,7 +189,7 @@ export const ReplayViewer = () => {
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              {scenarios3D.map((scenario) => (
+              {ALL_SCENARIOS_3D.map((scenario) => (
                 <SelectItem key={scenario.id} value={scenario.id}>
                   {scenario.title}
                 </SelectItem>

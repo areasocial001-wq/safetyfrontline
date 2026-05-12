@@ -28,7 +28,7 @@ import {
   ScenarioStats,
 } from "@/lib/achievements-db";
 import { getUserReplays, GameReplay } from "@/lib/replay-db";
-import { scenarios3D } from "@/data/scenarios3d";
+import { ALL_SCENARIOS_3D } from "@/data/scenarios3d";
 import { toast } from "@/hooks/use-toast";
 
 interface LevelInfo {
@@ -141,7 +141,7 @@ export default function PlayerProfile() {
         setAllStats(stats);
 
         // Load all achievements from all scenarios
-        const achievementPromises = scenarios3D.map((scenario) =>
+        const achievementPromises = ALL_SCENARIOS_3D.map((scenario) =>
           loadUserAchievements(scenario.id)
         );
         const achievementArrays = await Promise.all(achievementPromises);
@@ -149,7 +149,7 @@ export default function PlayerProfile() {
         setAllAchievements(uniqueAchievements);
 
         // Load best replays from all scenarios
-        const replayPromises = scenarios3D.map((scenario) =>
+        const replayPromises = ALL_SCENARIOS_3D.map((scenario) =>
           getUserReplays(scenario.id).catch(() => [])
         );
         const replayArrays = await Promise.all(replayPromises);
@@ -384,7 +384,7 @@ export default function PlayerProfile() {
                   </h3>
                   <div className="space-y-4">
                     {allStats.map((stat) => {
-                      const scenario = scenarios3D.find((s) => s.id === stat.scenario_id);
+                      const scenario = ALL_SCENARIOS_3D.find((s) => s.id === stat.scenario_id);
                       if (!scenario) return null;
 
                       return (
@@ -446,7 +446,7 @@ export default function PlayerProfile() {
                   ) : (
                     <div className="space-y-4">
                       {bestReplays.map((replay, index) => {
-                        const scenario = scenarios3D.find((s) => s.id === replay.scenario_id);
+                        const scenario = ALL_SCENARIOS_3D.find((s) => s.id === replay.scenario_id);
                         return (
                           <div
                             key={replay.id}
@@ -516,7 +516,7 @@ export default function PlayerProfile() {
 
                         {/* Best scores per scenario */}
                         {allStats.slice(0, 5).map((stat, index) => {
-                          const scenario = scenarios3D.find((s) => s.id === stat.scenario_id);
+                          const scenario = ALL_SCENARIOS_3D.find((s) => s.id === stat.scenario_id);
                           if (!scenario) return null;
 
                           return (
