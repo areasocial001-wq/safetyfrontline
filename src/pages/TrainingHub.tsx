@@ -10,7 +10,7 @@ import {
   Building2, Factory, HardHat, Monitor, Brain, Thermometer,
   Cog, Package, Volume2, FlaskConical, ArrowDown, Flame, Heart,
   AlertTriangle, Box, ArrowUp, Truck, Bomb, Bug, Radiation, Siren,
-  GraduationCap, Crown, Eye, KeyRound, ShieldAlert, Cross
+  GraduationCap, Crown, Eye, KeyRound, Cross
 } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useTrainingProgress } from '@/hooks/useTrainingProgress';
@@ -27,7 +27,7 @@ const ALL_ICONS: Record<string, any> = {
   Scale, Users, Search, Shield, Monitor, Brain, Thermometer, Zap,
   Cog, Package, Volume2, FlaskConical, ArrowDown, Flame, Heart,
   AlertTriangle, Box, ArrowUp, Truck, Bomb, Bug, Radiation, Siren, HardHat,
-  GraduationCap, Crown, Eye, KeyRound, ShieldAlert, Cross,
+  GraduationCap, Crown, Eye, KeyRound, Cross,
 };
 
 const GENERAL_MODULES = ['giuridico_normativo', 'gestione_organizzazione', 'valutazione_rischi', 'dpi_protezione'];
@@ -240,18 +240,6 @@ const TRAINING_PATHS: TrainingPath[] = [
   },
 
   // ===== 3) ATTREZZATURE & ABILITAZIONI =====
-  {
-    id: 'cybersecurity',
-    title: 'Cyber Security',
-    subtitle: 'Sicurezza Informatica Aziendale',
-    description: 'Phishing, ransomware, password, GDPR, incident response. Simulazioni 3D interattive.',
-    icon: ShieldAlert,
-    hours: '4h',
-    color: 'primary',
-    moduleIds: ['cybersecurity-awareness'],
-    normativeRef: 'Reg. UE 2016/679 (GDPR)',
-    category: 'attrezzature',
-  },
   {
     id: 'attr_carrelli',
     title: 'Carrelli Elevatori',

@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import {
   ArrowLeft, Play, CheckCircle, Lock, Sparkles, Trophy,
-  Flame, Heart, Shield, Monitor, Cross, Building2, Clock,
+  Flame, Heart, Shield, Cross, Building2, Clock,
   Award, Download, Home, PartyPopper, Star, Zap,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -23,7 +23,6 @@ const MODULE_ICONS: Record<string, any> = {
   antincendio_m2: Flame,
   primo_soccorso_m2: Cross,
   rls_m2: Heart,
-  cybersecurity: Monitor,
 };
 
 const MODULE_DURATIONS: Record<string, number> = {
@@ -32,7 +31,6 @@ const MODULE_DURATIONS: Record<string, number> = {
   antincendio_m2: 12,
   primo_soccorso_m2: 12,
   rls_m2: 10,
-  cybersecurity: 8,
 };
 
 // Map "macro" package module IDs to the actual content moduleId used by TrainingModule
@@ -42,7 +40,6 @@ const MACRO_TO_CONTENT_ID: Record<string, string> = {
   antincendio_m2: "antincendio_protezione",
   primo_soccorso_m2: "primo_soccorso_intervento",
   rls_m2: "rls_rischi_valutazione",
-  cybersecurity: "cybersecurity-awareness",
   // fallback / extra package entries
   office: "ls_uffici",
   warehouse: "ls_aziende",
