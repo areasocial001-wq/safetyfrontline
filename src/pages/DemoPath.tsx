@@ -35,6 +35,22 @@ const MODULE_DURATIONS: Record<string, number> = {
   cybersecurity: 8,
 };
 
+// Map "macro" package module IDs to the actual content moduleId used by TrainingModule
+const MACRO_TO_CONTENT_ID: Record<string, string> = {
+  formazione_alto: "ra_rischi_meccanici_avanzati",
+  specifica_aziende: "ls_aziende",
+  antincendio_m2: "antincendio_protezione",
+  primo_soccorso_m2: "primo_soccorso_intervento",
+  rls_m2: "rls_rischi_valutazione",
+  cybersecurity: "cybersecurity-awareness",
+  // fallback / extra package entries
+  office: "ls_uffici",
+  warehouse: "ls_aziende",
+  general: "giuridico_normativo",
+};
+
+const resolveContentId = (macroId: string) => MACRO_TO_CONTENT_ID[macroId] || macroId;
+
 interface DemoModule {
   id: string;
   order: number;
