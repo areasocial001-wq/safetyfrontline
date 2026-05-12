@@ -196,6 +196,7 @@ const Demo3D = () => {
   const [machineryQuizRiskLabel, setMachineryQuizRiskLabel] = useState('');
   const [cameraPreset, setCameraPreset] = useState<import("@/components/demo3d/CameraPresetsPanel").CameraPresetName>("pedestrian");
   const prevChargeRef = useRef(100);
+  const hasAutoSelected = useRef(false);
   // Picture-in-Picture replay (two replays for split-screen comparison)
   const [pipReplay1, setPipReplay1] = useState<GameReplay | null>(null);
   const [pipReplay2, setPipReplay2] = useState<GameReplay | null>(null);
