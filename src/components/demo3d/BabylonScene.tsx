@@ -509,13 +509,20 @@ export const BabylonScene = ({
           // Guida overlay with normative reference
           if (guideModeRef.current) {
             guideOverlayActiveRef.current = true;
+            const norm = getNormative(langRef.current, riskData.risk.label, riskData.risk.description, riskData.risk.severity);
             setGuideOverlay({
               label: riskData.risk.label,
               description: riskData.risk.description,
-              normative: deriveNormative(riskData.risk.label, riskData.risk.description, riskData.risk.severity),
               severity: riskData.risk.severity,
+              normTitle: norm.title,
+              normArticles: norm.articles,
+              normObligation: norm.obligation,
+              nextSteps: norm.nextSteps,
+              tip: norm.tip,
+              startedAt: Date.now(),
             });
-            setTimeout(() => { guideOverlayActiveRef.current = false; setGuideOverlay(null); }, 6000);
+            setTimeout(() => { guideOverlayActiveRef.current = false; setGuideOverlay(null); }, 7000);
+          } else {
           } else {
             toast.success(
               `${isCritical ? '🚨' : '⚠️'} ${riskData.risk.label}`,
