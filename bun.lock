@@ -7,6 +7,7 @@
       "dependencies": {
         "@babylonjs/core": "^8.39.0",
         "@babylonjs/loaders": "^8.39.0",
+        "@babylonjs/materials": "^9.6.2",
         "@hookform/resolvers": "^3.10.0",
         "@radix-ui/react-accordion": "^1.2.11",
         "@radix-ui/react-alert-dialog": "^1.1.14",
@@ -104,6 +105,8 @@
     "@babylonjs/core": ["@babylonjs/core@8.39.0", "", {}, "sha512-ohOpd3Cb+q59bgFdMaumxSgFSb9h4FeiY8vNFIkHwOCWGxvh8zbDnQEU5UJ5w7LgjIhbsm2IxVB2oKZ9/4Pb5w=="],
 
     "@babylonjs/loaders": ["@babylonjs/loaders@8.39.0", "", { "peerDependencies": { "@babylonjs/core": "^8.0.0" } }, "sha512-szL/el9fMw/Cfw7QtN9ckG8IrWdqQpLlTeGcK4g1rtCae+Bq0z13nakrxHqVBEVzmZ4J4rNLPfvLrkKIL+Q9vA=="],
+
+    "@babylonjs/materials": ["@babylonjs/materials@9.6.2", "https://europe-west4-npm.pkg.dev/lovable-core-prod/sandbox-npm-cache/@babylonjs/materials/-/materials-9.6.2.tgz", { "peerDependencies": { "@babylonjs/core": "^9.0.0" } }, "sha512-zJYnxUqR/G1bd86i6knEWnDNSaI44n2yUNplDYvnLybvTf8ikoE1VJEEbIbOpqZs4REni1HFceu9wSH1nY1Hnw=="],
 
     "@dimforge/rapier3d-compat": ["@dimforge/rapier3d-compat@0.12.0", "", {}, "sha512-uekIGetywIgopfD97oDL5PfeezkFpNhwlzlaEYNOA0N6ghdsOvh/HYjSMek5Q2O1PYvRSDFcqFVJl4r4ZBwOow=="],
 

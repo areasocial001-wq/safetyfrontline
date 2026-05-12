@@ -190,7 +190,11 @@ export class LODSystem {
       const { mesh } = entry;
       if (mesh.isDisposed()) continue;
 
-      const dist = BABYLON.Vector3.Distance(cameraPosition, mesh.position);
+      // Use absolute (world) position so parented meshes (e.g. machinery
+      // children of a TransformNode at the construction site) are evaluated
+      // against their actual world location, not their local offset.
+      const worldPos = mesh.getAbsolutePosition();
+      const dist = BABYLON.Vector3.Distance(cameraPosition, worldPos);
 
       // For meshes without native LOD, use simple enable/disable
       if (!(mesh instanceof BABYLON.Mesh) || entry.lodLevels.length === 0) {

@@ -1,5 +1,6 @@
 import * as BABYLON from '@babylonjs/core';
 import '@babylonjs/loaders/glTF';
+import { SkyMaterial } from '@babylonjs/materials/sky';
 import { Scenario3D } from '@/data/scenarios3d';
 import type { AudioSettings } from '@/hooks/useGraphicsSettings';
 
@@ -47,9 +48,11 @@ export function createScene(
       fogColor: new BABYLON.Color3(0.12, 0.15, 0.22),
     },
     construction: {
-      clearColor: new BABYLON.Color4(0.18, 0.12, 0.08, 1),
-      fogDensity: 0.010,
-      fogColor: new BABYLON.Color3(0.18, 0.12, 0.08),
+      // Open-air sky atmosphere — replaces the old brown haze.
+      // The actual sky dome is built below via SkyMaterial.
+      clearColor: new BABYLON.Color4(0.55, 0.72, 0.88, 1),
+      fogDensity: 0.0035,
+      fogColor: new BABYLON.Color3(0.78, 0.84, 0.92),
     },
     laboratory: {
       // Cooler neutral atmosphere — warm brown was hiding floor/wall contrast
@@ -108,10 +111,36 @@ export function createScene(
   // Create ground
   createGround(scene);
 
+  // Open-sky dome for outdoor scenarios (construction)
+  if (scenario.type === 'construction') {
+    createSkyDome(scene);
+  }
+
   // Create boundary walls
   createBoundaries(scene);
 
   return { engine, scene, camera, shadowGenerator };
+}
+
+function createSkyDome(scene: BABYLON.Scene) {
+  const skyMaterial = new SkyMaterial('skyMaterial', scene);
+  skyMaterial.backFaceCulling = false;
+  // Mid-morning sun, clear sky
+  skyMaterial.turbidity = 8;
+  skyMaterial.luminance = 0.4;
+  skyMaterial.rayleigh = 2;
+  skyMaterial.mieDirectionalG = 0.85;
+  skyMaterial.mieCoefficient = 0.005;
+  skyMaterial.useSunPosition = false;
+  skyMaterial.inclination = 0.35;
+  skyMaterial.azimuth = 0.25;
+
+  const skybox = BABYLON.MeshBuilder.CreateBox('skybox', { size: 800 }, scene);
+  skybox.material = skyMaterial;
+  skybox.infiniteDistance = true;
+  skybox.isPickable = false;
+  skybox.checkCollisions = false;
+  skybox.applyFog = false;
 }
 
 function setupLighting(scene: BABYLON.Scene, scenarioType: string, quality: string) {
@@ -137,11 +166,12 @@ function setupLighting(scene: BABYLON.Scene, scenarioType: string, quality: stri
       dirDiffuse: new BABYLON.Color3(0.85, 0.88, 0.95),
     },
     construction: {
-      ambientIntensity: 0.35,
-      ambientDiffuse: new BABYLON.Color3(1.0, 0.75, 0.45),
-      ambientGround: new BABYLON.Color3(0.3, 0.15, 0.05),
-      dirIntensity: 2.2,
-      dirDiffuse: new BABYLON.Color3(1.0, 0.70, 0.35),
+      // Open-sky daylight: bright neutral fill + slightly warm sun
+      ambientIntensity: 0.85,
+      ambientDiffuse: new BABYLON.Color3(0.85, 0.90, 1.0),
+      ambientGround: new BABYLON.Color3(0.45, 0.42, 0.38),
+      dirIntensity: 1.6,
+      dirDiffuse: new BABYLON.Color3(1.0, 0.95, 0.86),
     },
     laboratory: {
       // Bright neutral fill so floor, walls, racks and boxes are clearly readable.
@@ -210,12 +240,14 @@ function setupPostProcessing(scene: BABYLON.Scene, camera: BABYLON.UniversalCame
       glowIntensity: 0.3,
     },
     construction: {
-      bloomEnabled: true, bloomThreshold: 0.65, bloomWeight: 0.35, bloomKernel: 64, bloomScale: 0.5,
-      chromaticAberration: 10,
-      contrast: 1.5, exposure: 1.05,
-      vignetteEnabled: true, vignetteWeight: 2.5, vignetteFov: 0.7,
-      saturation: 25, globalExposure: 0.25,
-      glowIntensity: 1.0,
+      // Open-sky daylight: soften saturation, vignette and chromatic aberration
+      // so the blue sky reads natural and not orange-saturated.
+      bloomEnabled: true, bloomThreshold: 0.9, bloomWeight: 0.2, bloomKernel: 48, bloomScale: 0.4,
+      chromaticAberration: 1,
+      contrast: 1.1, exposure: 1.0,
+      vignetteEnabled: false, vignetteWeight: 0, vignetteFov: 0,
+      saturation: 8, globalExposure: 0.05,
+      glowIntensity: 0.4,
     },
     laboratory: {
       // Disabled vignette + reduced bloom: floor/walls were merging into a brown blob
