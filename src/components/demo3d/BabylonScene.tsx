@@ -263,6 +263,8 @@ export const BabylonScene = ({
       return cam ? { x: cam.position.x, y: cam.position.y, z: cam.position.z } : { x: 0, y: 0, z: 0 };
     });
     npcSoundSystemRef.current = npcSounds;
+    // Ensure all WebAudio contexts get resumed on the next user gesture
+    unlockAllAudioContexts();
 
     // 5. Add environmental props (shelving, forklifts, construction, lab fire sim)
     addEnvironmentalProps(scene, scenario.type, quality, shadowGenerator, risksFoundIds, onFirePropagationChange, ambientAudioRef, onSprinklerStatusChange, cameraRef, npcSoundSystemRef);
