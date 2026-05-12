@@ -321,7 +321,7 @@ const TrainingModule = () => {
         <div className="container mx-auto px-4 py-3">
           <div className="flex items-center justify-between gap-3">
             {/* Exit */}
-            <Button variant="ghost" size="icon" onClick={() => navigate('/formazione')} className="shrink-0">
+            <Button variant="ghost" size="icon" onClick={() => navigate(isDemoMode ? '/demo-percorso' : '/formazione')} className="shrink-0">
               <XCircle className="w-5 h-5 text-muted-foreground" />
             </Button>
 
