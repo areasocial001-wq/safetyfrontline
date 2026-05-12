@@ -411,18 +411,186 @@ function addConstructionProps(
   hook.material = darkMetalMat;
   hook.parent = cranePivot;
 
-  // Excavator
-  const excBody = BABYLON.MeshBuilder.CreateBox('exc_body', { width: 3, height: 1.5, depth: 2.2 }, scene);
-  excBody.position = new BABYLON.Vector3(12, 1.2, -15);
-  excBody.rotation.y = -0.4;
+  // ============ EXCAVATOR (full: tracks + body + cab + arm + bucket) ============
+  const excRoot = new BABYLON.TransformNode('excavator_root', scene);
+  excRoot.position = new BABYLON.Vector3(12, 0, -15);
+  excRoot.rotation.y = -0.4;
+
+  const trackMat = darkMetalMat;
+  for (const side of [-1, 1]) {
+    const track = BABYLON.MeshBuilder.CreateBox(`exc_track_${side}`, { width: 0.7, height: 0.7, depth: 3.4 }, scene);
+    track.position = new BABYLON.Vector3(side * 1.2, 0.35, 0);
+    track.material = trackMat;
+    track.parent = excRoot;
+    track.checkCollisions = true;
+    if (shadowGenerator) shadowGenerator.addShadowCaster(track);
+    // Wheels along the track
+    for (let w = 0; w < 5; w++) {
+      const wheel = BABYLON.MeshBuilder.CreateCylinder(`exc_wheel_${side}_${w}`, { height: 0.75, diameter: 0.55, tessellation: 12 }, scene);
+      wheel.rotation.z = Math.PI / 2;
+      wheel.position = new BABYLON.Vector3(side * 1.2, 0.3, -1.4 + w * 0.7);
+      wheel.material = trackMat;
+      wheel.parent = excRoot;
+    }
+  }
+
+  const excBody = BABYLON.MeshBuilder.CreateBox('exc_body', { width: 3, height: 1.2, depth: 2.6 }, scene);
+  excBody.position = new BABYLON.Vector3(0, 1.3, 0);
   excBody.material = yellowMat;
+  excBody.parent = excRoot;
   excBody.checkCollisions = true;
   if (shadowGenerator) shadowGenerator.addShadowCaster(excBody);
 
-  const excCab = BABYLON.MeshBuilder.CreateBox('exc_cab', { width: 1.8, height: 1.2, depth: 1.6 }, scene);
-  excCab.position = new BABYLON.Vector3(12.3, 2.5, -14.8);
-  excCab.rotation.y = -0.4;
+  const excCab = BABYLON.MeshBuilder.CreateBox('exc_cab', { width: 1.6, height: 1.4, depth: 1.6 }, scene);
+  excCab.position = new BABYLON.Vector3(-0.4, 2.6, 0.3);
   excCab.material = yellowMat;
+  excCab.parent = excRoot;
+  if (shadowGenerator) shadowGenerator.addShadowCaster(excCab);
+
+  // Cab window (dark glass look)
+  const cabGlassMat = new BABYLON.StandardMaterial('exc_glass', scene);
+  cabGlassMat.diffuseColor = new BABYLON.Color3(0.1, 0.15, 0.2);
+  cabGlassMat.alpha = 0.7;
+  cabGlassMat.specularColor = new BABYLON.Color3(0.9, 0.9, 0.9);
+  const cabWindow = BABYLON.MeshBuilder.CreateBox('exc_cab_window', { width: 1.5, height: 0.9, depth: 0.05 }, scene);
+  cabWindow.position = new BABYLON.Vector3(-0.4, 2.7, 1.13);
+  cabWindow.material = cabGlassMat;
+  cabWindow.parent = excRoot;
+
+  // Boom (upper arm)
+  const boom = BABYLON.MeshBuilder.CreateBox('exc_boom', { width: 0.5, height: 0.6, depth: 4.2 }, scene);
+  boom.position = new BABYLON.Vector3(1.0, 2.4, 2.0);
+  boom.rotation.x = -0.6;
+  boom.material = yellowMat;
+  boom.parent = excRoot;
+  if (shadowGenerator) shadowGenerator.addShadowCaster(boom);
+
+  // Stick (lower arm)
+  const stick = BABYLON.MeshBuilder.CreateBox('exc_stick', { width: 0.4, height: 0.5, depth: 3.0 }, scene);
+  stick.position = new BABYLON.Vector3(1.0, 3.4, 4.4);
+  stick.rotation.x = 0.7;
+  stick.material = yellowMat;
+  stick.parent = excRoot;
+  if (shadowGenerator) shadowGenerator.addShadowCaster(stick);
+
+  // Bucket
+  const bucket = BABYLON.MeshBuilder.CreateBox('exc_bucket', { width: 1.0, height: 0.9, depth: 1.1 }, scene);
+  bucket.position = new BABYLON.Vector3(1.0, 1.5, 5.6);
+  bucket.material = darkMetalMat;
+  bucket.parent = excRoot;
+  if (shadowGenerator) shadowGenerator.addShadowCaster(bucket);
+
+  // ============ BULLDOZER ============
+  const dozerRoot = new BABYLON.TransformNode('dozer_root', scene);
+  dozerRoot.position = new BABYLON.Vector3(8, 0, 8);
+  dozerRoot.rotation.y = 1.2;
+
+  for (const side of [-1, 1]) {
+    const track = BABYLON.MeshBuilder.CreateBox(`dozer_track_${side}`, { width: 0.65, height: 0.7, depth: 3.6 }, scene);
+    track.position = new BABYLON.Vector3(side * 1.1, 0.35, 0);
+    track.material = trackMat;
+    track.parent = dozerRoot;
+    track.checkCollisions = true;
+    if (shadowGenerator) shadowGenerator.addShadowCaster(track);
+  }
+  const dozerBody = BABYLON.MeshBuilder.CreateBox('dozer_body', { width: 2.6, height: 1.3, depth: 2.8 }, scene);
+  dozerBody.position = new BABYLON.Vector3(0, 1.35, -0.2);
+  dozerBody.material = yellowMat;
+  dozerBody.parent = dozerRoot;
+  dozerBody.checkCollisions = true;
+  if (shadowGenerator) shadowGenerator.addShadowCaster(dozerBody);
+  const dozerCab = BABYLON.MeshBuilder.CreateBox('dozer_cab', { width: 1.6, height: 1.3, depth: 1.4 }, scene);
+  dozerCab.position = new BABYLON.Vector3(0, 2.65, -0.4);
+  dozerCab.material = yellowMat;
+  dozerCab.parent = dozerRoot;
+  if (shadowGenerator) shadowGenerator.addShadowCaster(dozerCab);
+  const blade = BABYLON.MeshBuilder.CreateBox('dozer_blade', { width: 3.4, height: 1.2, depth: 0.25 }, scene);
+  blade.position = new BABYLON.Vector3(0, 0.9, 2.1);
+  blade.material = orangeMat;
+  blade.parent = dozerRoot;
+  if (shadowGenerator) shadowGenerator.addShadowCaster(blade);
+  // Blade arms
+  for (const side of [-1, 1]) {
+    const arm = BABYLON.MeshBuilder.CreateBox(`dozer_arm_${side}`, { width: 0.2, height: 0.2, depth: 2.4 }, scene);
+    arm.position = new BABYLON.Vector3(side * 1.4, 1.0, 0.9);
+    arm.material = darkMetalMat;
+    arm.parent = dozerRoot;
+  }
+
+  // ============ DUMP TRUCK ============
+  const truckRoot = new BABYLON.TransformNode('truck_root', scene);
+  truckRoot.position = new BABYLON.Vector3(-6, 0, 12);
+  truckRoot.rotation.y = -0.8;
+
+  const truckCab = BABYLON.MeshBuilder.CreateBox('truck_cab', { width: 2.3, height: 2.2, depth: 2.0 }, scene);
+  truckCab.position = new BABYLON.Vector3(0, 1.7, -2.2);
+  truckCab.material = yellowMat;
+  truckCab.parent = truckRoot;
+  truckCab.checkCollisions = true;
+  if (shadowGenerator) shadowGenerator.addShadowCaster(truckCab);
+
+  const truckBed = BABYLON.MeshBuilder.CreateBox('truck_bed', { width: 2.5, height: 1.6, depth: 4.5 }, scene);
+  truckBed.position = new BABYLON.Vector3(0, 1.9, 1.5);
+  truckBed.material = darkMetalMat;
+  truckBed.parent = truckRoot;
+  truckBed.checkCollisions = true;
+  if (shadowGenerator) shadowGenerator.addShadowCaster(truckBed);
+
+  // Truck wheels
+  for (const side of [-1, 1]) {
+    for (let w = 0; w < 3; w++) {
+      const wheel = BABYLON.MeshBuilder.CreateCylinder(`truck_wheel_${side}_${w}`, { height: 0.5, diameter: 1.1, tessellation: 14 }, scene);
+      wheel.rotation.z = Math.PI / 2;
+      wheel.position = new BABYLON.Vector3(side * 1.3, 0.55, -2.4 + w * 1.6);
+      wheel.material = trackMat;
+      wheel.parent = truckRoot;
+    }
+  }
+
+  // ============ CEMENT MIXER TRUCK ============
+  const mixerRoot = new BABYLON.TransformNode('mixer_root', scene);
+  mixerRoot.position = new BABYLON.Vector3(-2, 0, -10);
+  mixerRoot.rotation.y = 0.4;
+
+  const mixerCab = BABYLON.MeshBuilder.CreateBox('mixer_cab', { width: 2.2, height: 2.0, depth: 1.8 }, scene);
+  mixerCab.position = new BABYLON.Vector3(0, 1.6, -2.2);
+  mixerCab.material = orangeMat;
+  mixerCab.parent = mixerRoot;
+  mixerCab.checkCollisions = true;
+  if (shadowGenerator) shadowGenerator.addShadowCaster(mixerCab);
+
+  const mixerDrum = BABYLON.MeshBuilder.CreateCylinder('mixer_drum', { height: 3.4, diameter: 2.0, tessellation: 16 }, scene);
+  mixerDrum.rotation.x = Math.PI / 2;
+  mixerDrum.rotation.y = -0.2;
+  mixerDrum.position = new BABYLON.Vector3(0, 2.2, 1.0);
+  mixerDrum.material = concreteMat;
+  mixerDrum.parent = mixerRoot;
+  mixerDrum.checkCollisions = true;
+  if (shadowGenerator) shadowGenerator.addShadowCaster(mixerDrum);
+
+  // Mixer wheels
+  for (const side of [-1, 1]) {
+    for (let w = 0; w < 3; w++) {
+      const wheel = BABYLON.MeshBuilder.CreateCylinder(`mixer_wheel_${side}_${w}`, { height: 0.5, diameter: 1.0, tessellation: 14 }, scene);
+      wheel.rotation.z = Math.PI / 2;
+      wheel.position = new BABYLON.Vector3(side * 1.2, 0.5, -2.4 + w * 1.5);
+      wheel.material = trackMat;
+      wheel.parent = mixerRoot;
+    }
+  }
+
+  // ============ STACKED MATERIAL PALLETS (bricks/cement bags) ============
+  for (let i = 0; i < 3; i++) {
+    const pallet = BABYLON.MeshBuilder.CreateBox(`mat_pallet_${i}`, { width: 1.4, height: 0.15, depth: 1.0 }, scene);
+    pallet.position = new BABYLON.Vector3(15 + i * 0.1, 0.075, 5 + i * 1.6);
+    pallet.material = woodMat;
+    if (shadowGenerator) shadowGenerator.addShadowCaster(pallet);
+    const stack = BABYLON.MeshBuilder.CreateBox(`mat_stack_${i}`, { width: 1.3, height: 0.9, depth: 0.95 }, scene);
+    stack.position = new BABYLON.Vector3(15 + i * 0.1, 0.6, 5 + i * 1.6);
+    stack.material = i % 2 === 0 ? concreteMat : orangeMat;
+    stack.checkCollisions = true;
+    if (shadowGenerator) shadowGenerator.addShadowCaster(stack);
+  }
 
   // Scaffolding
   [{ x: 5, z: -6 }, { x: -14, z: 5 }].forEach((sp, si) => {
