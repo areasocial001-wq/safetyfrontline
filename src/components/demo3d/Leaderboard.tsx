@@ -5,12 +5,12 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Trophy, Clock, Target, Shield, TrendingUp } from "lucide-react";
 import { getLeaderboard, getUserRank, LeaderboardEntry, LeaderboardCategory } from "@/lib/leaderboard-db";
-import { scenarios3D } from "@/data/scenarios3d";
+import { ALL_SCENARIOS_3D } from "@/data/scenarios3d";
 import { useAuth } from "@/hooks/useAuth";
 
 export const Leaderboard = () => {
   const { user } = useAuth();
-  const [selectedScenario, setSelectedScenario] = useState<string>(scenarios3D[0].id);
+  const [selectedScenario, setSelectedScenario] = useState<string>(ALL_SCENARIOS_3D[0].id);
   const [timeLeaderboard, setTimeLeaderboard] = useState<LeaderboardEntry[]>([]);
   const [scoreLeaderboard, setScoreLeaderboard] = useState<LeaderboardEntry[]>([]);
   const [collisionsLeaderboard, setCollisionsLeaderboard] = useState<LeaderboardEntry[]>([]);
@@ -140,7 +140,7 @@ export const Leaderboard = () => {
     );
   };
 
-  const selectedScenarioData = scenarios3D.find(s => s.id === selectedScenario);
+  const selectedScenarioData = ALL_SCENARIOS_3D.find(s => s.id === selectedScenario);
 
   return (
     <div className="space-y-6">
@@ -158,7 +158,7 @@ export const Leaderboard = () => {
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            {scenarios3D.map((scenario) => (
+            {ALL_SCENARIOS_3D.map((scenario) => (
               <SelectItem key={scenario.id} value={scenario.id}>
                 {scenario.title}
               </SelectItem>
