@@ -24,6 +24,7 @@ export class AtmosphericSoundtrack {
 
   async initialize() {
     this.audioContext = new AudioContext();
+    import('./audio-context-unlock').then(m => m.registerAudioContext(this.audioContext)).catch(() => {});
     this.masterGain = this.audioContext.createGain();
     this.masterGain.gain.value = 0.4; // Volume generale soundtrack
     this.masterGain.connect(this.audioContext.destination);
@@ -380,6 +381,7 @@ export class AmbientAudioPlayer {
 
   async initialize() {
     this.audioContext = new AudioContext();
+    import('./audio-context-unlock').then(m => m.registerAudioContext(this.audioContext)).catch(() => {});
     this.gainNode = this.audioContext.createGain();
     
     // Create dynamic filter for collision effects
@@ -1593,6 +1595,7 @@ export class SpatialAudioManager {
 
   async initialize() {
     this.audioContext = new AudioContext();
+    import('./audio-context-unlock').then(m => m.registerAudioContext(this.audioContext)).catch(() => {});
     this.listener = this.audioContext.listener;
     this.masterGain = this.audioContext.createGain();
     this.masterGain.gain.value = 0.4;

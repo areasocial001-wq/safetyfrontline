@@ -1,4 +1,5 @@
 import * as BABYLON from '@babylonjs/core';
+import { registerAudioContext } from '@/lib/audio-context-unlock';
 
 /**
  * Create particle burst effect at a position (risk found feedback)
@@ -79,6 +80,7 @@ export function triggerHapticFeedback(extType: string) {
 export function playExtinguisherSound(type: string) {
   try {
     const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
+    registerAudioContext(ctx);
     const masterGain = ctx.createGain();
     masterGain.connect(ctx.destination);
 
@@ -212,6 +214,7 @@ export function startFireAmbientSound(
 ) {
   try {
     const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
+    registerAudioContext(ctx);
     fireAmbientContexts.push(ctx);
 
     const panner = ctx.createPanner();

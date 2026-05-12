@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { NavLink } from "react-router-dom";
-import { Gamepad2, Play, Pause, Shield, Sparkles, Zap, Target, Trophy, Volume2, VolumeX, Maximize, Minimize, Volume, GraduationCap } from "lucide-react";
+import { Gamepad2, Play, Pause, Shield, Sparkles, Zap, Target, Trophy, Volume2, VolumeX, Maximize, Minimize, Volume, GraduationCap, RotateCcw } from "lucide-react";
 import { Slider } from "@/components/ui/slider";
 import heroImage from "@/assets/hero-game-corridor.jpg";
 import { UserMenu } from "@/components/auth/UserMenu";
@@ -113,6 +113,13 @@ export const Hero = () => {
     } else {
       video.play();
     }
+  };
+
+  const restartVideo = () => {
+    const video = videoRef.current;
+    if (!video) return;
+    video.currentTime = 0;
+    video.play().catch(() => {});
   };
 
   const toggleMute = () => {
@@ -386,6 +393,17 @@ export const Hero = () => {
                       ) : (
                         <Play className="w-5 h-5 ml-0.5" />
                       )}
+                    </Button>
+
+                    {/* Restart from beginning */}
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      onClick={restartVideo}
+                      className="h-10 w-10 rounded-lg bg-primary/10 hover:bg-primary/20 border border-primary/30 text-primary"
+                      title="Riavvia dall'inizio"
+                    >
+                      <RotateCcw className="w-5 h-5" />
                     </Button>
 
                     {/* Volume Control */}

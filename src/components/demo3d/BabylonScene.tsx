@@ -26,6 +26,7 @@ import { loadGLTFProps } from '@/lib/babylon-prop-loader';
 import { loadProceduralProps } from '@/lib/babylon-procedural-props';
 import { SCENARIO_PROPS, SCENARIO_PROCEDURAL_PROPS } from '@/types/prop-config';
 import { NPCAmbientSoundSystem } from '@/lib/npc-ambient-sounds';
+import { registerAudioContext, unlockAllAudioContexts } from '@/lib/audio-context-unlock';
 import { useLang, t, isRTL, LANGUAGES, type Lang } from '@/lib/risk-i18n';
 import { getNormative } from '@/lib/risk-normative';
 
@@ -262,6 +263,8 @@ export const BabylonScene = ({
       return cam ? { x: cam.position.x, y: cam.position.y, z: cam.position.z } : { x: 0, y: 0, z: 0 };
     });
     npcSoundSystemRef.current = npcSounds;
+    // Ensure all WebAudio contexts get resumed on the next user gesture
+    unlockAllAudioContexts();
 
     // 5. Add environmental props (shelving, forklifts, construction, lab fire sim)
     addEnvironmentalProps(scene, scenario.type, quality, shadowGenerator, risksFoundIds, onFirePropagationChange, ambientAudioRef, onSprinklerStatusChange, cameraRef, npcSoundSystemRef);
@@ -859,6 +862,7 @@ export const BabylonScene = ({
     const playSwapSound = () => {
       try {
         const ctx = new AudioContext();
+        registerAudioContext(ctx);
         const now = ctx.currentTime;
 
         // Layer 1: metallic clank (short high-freq burst)
@@ -914,6 +918,7 @@ export const BabylonScene = ({
     const playLockSound = () => {
       try {
         const ctx = new AudioContext();
+        registerAudioContext(ctx);
         const now = ctx.currentTime;
         const osc = ctx.createOscillator();
         const g = ctx.createGain();

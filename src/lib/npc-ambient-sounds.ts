@@ -30,6 +30,8 @@ export class NPCAmbientSoundSystem {
   init(getCameraPosition: () => { x: number; y: number; z: number }) {
     if (this.disposed) return;
     this.ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
+    // Register for unlock-on-gesture (Chrome/Safari autoplay policy)
+    import('./audio-context-unlock').then(m => m.registerAudioContext(this.ctx)).catch(() => {});
     this.masterGain = this.ctx.createGain();
     this.masterGain.gain.value = 0.4;
     this.masterGain.connect(this.ctx.destination);
