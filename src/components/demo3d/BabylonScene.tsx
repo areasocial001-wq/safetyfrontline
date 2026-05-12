@@ -860,6 +860,7 @@ export const BabylonScene = ({
     const playSwapSound = () => {
       try {
         const ctx = new AudioContext();
+        registerAudioContext(ctx);
         const now = ctx.currentTime;
 
         // Layer 1: metallic clank (short high-freq burst)
