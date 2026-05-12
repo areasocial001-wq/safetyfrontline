@@ -425,7 +425,13 @@ export const BabylonScene = ({
 
           pickedMesh.dispose();
           onRiskFound(riskData.risk.id, isCritical);
-          toast.success(isCritical ? '🚨 Rischio critico trovato!' : '⚠️ Rischio identificato!');
+          toast.success(
+            `${isCritical ? '🚨' : '⚠️'} ${riskData.risk.label}`,
+            {
+              description: riskData.risk.description,
+              duration: 6000,
+            }
+          );
           return;
         }
       }
