@@ -188,6 +188,86 @@ export const ROICalculator = () => {
           </div>
         </div>
 
+        {/* Tier Comparison */}
+        <div className="mt-14">
+          <div className="text-center mb-6">
+            <h3 className="text-2xl md:text-3xl font-bold mb-2">
+              Confronta i 3 piani per <span className="text-primary">{calc.sector.name}</span>
+            </h3>
+            <p className="text-sm text-muted-foreground">
+              Stesso settore e {employees} dipendenti — vedi ROI e payback per ogni piano.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-5">
+            {comparison.map(({ tier, pricePerEmp, platformCost, totalSavings, roi, paybackMonths }) => {
+              const isSelected = tier.id === tierId;
+              const isBest = tier.id === "professional";
+              return (
+                <Card
+                  key={tier.id}
+                  onClick={() => setTierId(tier.id)}
+                  className={`p-5 cursor-pointer transition-all hover:shadow-lg ${
+                    isSelected ? "border-primary ring-2 ring-primary/30 bg-primary/5" : "hover:border-primary/40"
+                  }`}
+                >
+                  <div className="flex items-center justify-between mb-3">
+                    <h4 className="text-xl font-bold">{tier.name}</h4>
+                    {isBest && (
+                      <Badge className="bg-primary text-primary-foreground">
+                        <Sparkles className="w-3 h-3 mr-1" /> Più scelto
+                      </Badge>
+                    )}
+                  </div>
+
+                  <div className="mb-4 pb-4 border-b border-border">
+                    <p className="text-3xl font-black text-primary tabular-nums">{fmt(pricePerEmp)}</p>
+                    <p className="text-xs text-muted-foreground">per dipendente / anno</p>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Totale: <span className="font-semibold tabular-nums">{fmt(platformCost)}</span>/anno
+                    </p>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-3 mb-4">
+                    <div>
+                      <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">ROI</p>
+                      <p className="text-2xl font-bold text-accent tabular-nums">{Math.round(roi)}%</p>
+                    </div>
+                    <div>
+                      <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Payback</p>
+                      <p className="text-2xl font-bold tabular-nums">
+                        {paybackMonths} <span className="text-sm font-normal text-muted-foreground">mesi</span>
+                      </p>
+                    </div>
+                    <div className="col-span-2">
+                      <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Risparmio annuo netto</p>
+                      <p className="text-xl font-bold text-primary tabular-nums">{fmt(totalSavings)}</p>
+                    </div>
+                  </div>
+
+                  <ul className="space-y-1.5 text-xs text-muted-foreground mb-4">
+                    {tier.perks.slice(0, 4).map((p, i) => (
+                      <li key={i} className="flex items-start gap-2">
+                        <Check className="w-3.5 h-3.5 text-accent mt-0.5 shrink-0" />
+                        <span>{p}</span>
+                      </li>
+                    ))}
+                  </ul>
+
+                  <Button
+                    variant={isSelected ? "hero" : "outline"}
+                    size="sm"
+                    className="w-full"
+                    onClick={(e) => { e.stopPropagation(); setTierId(tier.id); }}
+                  >
+                    {isSelected ? "Piano selezionato" : `Scegli ${tier.name}`}
+                  </Button>
+                </Card>
+              );
+            })}
+          </div>
+        </div>
+
         <QuoteRequestDialog open={quoteOpen} onOpenChange={setQuoteOpen} />
       </div>
     </section>
