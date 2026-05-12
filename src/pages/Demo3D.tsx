@@ -117,6 +117,7 @@ const Demo3D = () => {
     reset: resetBenchmark
   } = usePerformanceBenchmark();
   
+  const [searchParams] = useSearchParams();
   const [selectedScenario, setSelectedScenario] = useState<Scenario3D | null>(null);
 
   // Load persisted per-scenario fill settings when scenario changes
