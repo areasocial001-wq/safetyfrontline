@@ -1523,6 +1523,10 @@ const Demo3D = () => {
                 }}
               />
             )}
+
+            {/* WebAudio diagnostics chip — verifies scenario sound effects */}
+            <AudioDiagnosticsHUD />
+
             {/* Contextual Hints System */}
             {gameStarted && !gameCompleted && memoizedScenario && (
               <ContextualHints
