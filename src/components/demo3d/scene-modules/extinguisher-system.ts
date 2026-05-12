@@ -162,6 +162,7 @@ export function shootExtinguisherSpray(
   // Spray sound
   try {
     const audioCtx = new AudioContext();
+    import('@/lib/audio-context-unlock').then(m => m.registerAudioContext(audioCtx)).catch(() => {});
     const noiseBuffer = audioCtx.createBuffer(1, audioCtx.sampleRate, audioCtx.sampleRate);
     const noiseData = noiseBuffer.getChannelData(0);
     for (let i = 0; i < noiseData.length; i++) noiseData[i] = Math.random() * 2 - 1;
