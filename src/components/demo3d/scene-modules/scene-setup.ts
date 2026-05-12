@@ -166,11 +166,12 @@ function setupLighting(scene: BABYLON.Scene, scenarioType: string, quality: stri
       dirDiffuse: new BABYLON.Color3(0.85, 0.88, 0.95),
     },
     construction: {
-      ambientIntensity: 0.35,
-      ambientDiffuse: new BABYLON.Color3(1.0, 0.75, 0.45),
-      ambientGround: new BABYLON.Color3(0.3, 0.15, 0.05),
-      dirIntensity: 2.2,
-      dirDiffuse: new BABYLON.Color3(1.0, 0.70, 0.35),
+      // Open-sky daylight: bright neutral fill + slightly warm sun
+      ambientIntensity: 0.85,
+      ambientDiffuse: new BABYLON.Color3(0.85, 0.90, 1.0),
+      ambientGround: new BABYLON.Color3(0.45, 0.42, 0.38),
+      dirIntensity: 1.6,
+      dirDiffuse: new BABYLON.Color3(1.0, 0.95, 0.86),
     },
     laboratory: {
       // Bright neutral fill so floor, walls, racks and boxes are clearly readable.
