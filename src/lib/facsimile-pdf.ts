@@ -459,12 +459,131 @@ export async function generateTestPdf(
     y += 3;
   });
 
+  // ====== Closing section: scoring, answer key, signatures ======
+  const ensureSpace = (need: number) => {
+    if (y + need > h - 22) {
+      pdf.addPage();
+      pdf.setFillColor(...ORANGE);
+      pdf.rect(0, 0, w, 3, "F");
+      pdf.setFillColor(...GREEN);
+      pdf.rect(0, h - 3, w, 3, "F");
+      pdf.setDrawColor(...ORANGE);
+      pdf.setLineWidth(0.6);
+      pdf.rect(8, 8, w - 16, h - 16);
+      drawWatermark(pdf, w, h);
+      y = 22;
+    }
+  };
+
+  // Scoring box
+  ensureSpace(34);
+  y += 4;
+  pdf.setFillColor(247, 254, 247);
+  pdf.setDrawColor(...GREEN);
+  pdf.setLineWidth(0.4);
+  pdf.roundedRect(18, y, w - 36, 26, 2, 2, "FD");
+  pdf.setFont("helvetica", "bold");
+  pdf.setFontSize(10);
+  pdf.setTextColor(...DARK);
+  pdf.text("PUNTEGGIO FINALE", 24, y + 7);
+  pdf.setFont("helvetica", "normal");
+  pdf.setFontSize(9);
+  pdf.setTextColor(...GREY);
+  pdf.text(`Risposte corrette: ______ / ${sampleQs.length}`, 24, y + 14);
+  pdf.text(
+    `Percentuale: ______ %   (Soglia minima: ${settings.passingScorePercent}%)`,
+    24,
+    y + 21
+  );
+  pdf.setFont("helvetica", "bold");
+  pdf.setFontSize(10);
+  pdf.setTextColor(...GREEN);
+  pdf.text("ESITO:", w - 70, y + 9);
+  pdf.setDrawColor(...GREY);
+  pdf.rect(w - 55, y + 6, 4, 4);
+  pdf.setTextColor(...DARK);
+  pdf.setFont("helvetica", "normal");
+  pdf.setFontSize(9);
+  pdf.text("SUPERATO", w - 49, y + 9);
+  pdf.rect(w - 55, y + 14, 4, 4);
+  pdf.text("NON SUPERATO", w - 49, y + 17);
+  y += 32;
+
+  // Answer key
+  ensureSpace(20 + Math.ceil(sampleQs.length / 5) * 5);
+  pdf.setFont("helvetica", "bold");
+  pdf.setFontSize(10);
+  pdf.setTextColor(...ORANGE);
+  pdf.text("CORRETTORE PER DOCENTE", 18, y);
+  y += 5;
+  pdf.setDrawColor(...ORANGE);
+  pdf.setLineWidth(0.2);
+  pdf.line(18, y - 2, w - 18, y - 2);
+  pdf.setFont("helvetica", "normal");
+  pdf.setFontSize(9);
+  pdf.setTextColor(...DARK);
+  const cols = 5;
+  const colW = (w - 36) / cols;
+  sampleQs.forEach((item, i) => {
+    const col = i % cols;
+    const row = Math.floor(i / cols);
+    const cx = 18 + col * colW;
+    const cy = y + row * 5;
+    pdf.text(
+      `Q${i + 1}: ${String.fromCharCode(65 + item.correct)}`,
+      cx,
+      cy
+    );
+  });
+  y += Math.ceil(sampleQs.length / cols) * 5 + 4;
+
+  // Signatures
+  ensureSpace(34);
+  y += 4;
+  const colWidth = (w - 36 - 8) / 2;
+  // Candidate
+  pdf.setFont("helvetica", "bold");
+  pdf.setFontSize(9);
+  pdf.setTextColor(...GREY);
+  pdf.text("DATI CANDIDATO", 18, y);
+  pdf.setFont("helvetica", "normal");
+  pdf.setTextColor(...DARK);
+  pdf.text("Cognome e Nome: ____________________________", 18, y + 7);
+  pdf.text("Azienda: ____________________________________", 18, y + 13);
+  pdf.text("Data: ____ / ____ / ________", 18, y + 19);
+  pdf.setDrawColor(...GREY);
+  pdf.setLineWidth(0.2);
+  pdf.line(18, y + 28, 18 + colWidth, y + 28);
+  pdf.setFont("helvetica", "italic");
+  pdf.setFontSize(8);
+  pdf.setTextColor(...GREY);
+  pdf.text("Firma del candidato", 18, y + 32);
+
+  // Examiner
+  const ex = 18 + colWidth + 8;
+  pdf.setFont("helvetica", "bold");
+  pdf.setFontSize(9);
+  pdf.setTextColor(...GREY);
+  pdf.text("ESAMINATORE / DOCENTE", ex, y);
+  pdf.setFont("helvetica", "normal");
+  pdf.setTextColor(...DARK);
+  pdf.text("Cognome e Nome: ____________________________", ex, y + 7);
+  pdf.text("Qualifica: __________________________________", ex, y + 13);
+  pdf.text("Data correzione: ____ / ____ / ________", ex, y + 19);
+  pdf.setDrawColor(...GREY);
+  pdf.line(ex, y + 28, ex + colWidth, y + 28);
+  pdf.setFont("helvetica", "italic");
+  pdf.setFontSize(8);
+  pdf.setTextColor(...GREY);
+  pdf.text("Firma e timbro esaminatore", ex, y + 32);
+  y += 38;
+
   // Footer note
   pdf.setFont("helvetica", "italic");
   pdf.setFontSize(8);
   pdf.setTextColor(...GREY);
   const footerLines = pdf.splitTextToSize(settings.footerNote, w - 36) as string[];
-  let fy = h - 18 - footerLines.length * 4;
+  let fy = Math.max(y + 4, h - 18 - footerLines.length * 4);
   footerLines.forEach((l) => {
     pdf.text(l, w / 2, fy, { align: "center" });
     fy += 4;
