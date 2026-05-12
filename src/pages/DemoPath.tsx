@@ -112,6 +112,47 @@ const DemoPath = () => {
   const progressPercent = totalCount > 0 ? (completedCount / totalCount) * 100 : 0;
   const allDone = completedCount === totalCount && totalCount > 0;
 
+  // Demo level: 1 module = Bronze, 3+ = Silver, all = Gold
+  const demoLevel =
+    completedCount === 0 ? null :
+    allDone ? { label: "Esperto", color: "text-game-xp", bg: "bg-game-xp/10", icon: Trophy } :
+    completedCount >= Math.ceil(totalCount / 2) ? { label: "Avanzato", color: "text-secondary", bg: "bg-secondary/10", icon: Star } :
+    { label: "Principiante", color: "text-primary", bg: "bg-primary/10", icon: Zap };
+
+  const downloadCertificate = async () => {
+    try {
+      toast.info("📄 Generazione attestato in corso...");
+      const moduleListText = modules.map((m, i) => `${i + 1}. ${m.name}`).join(" • ");
+      const blob = await generateCertificatePdf({
+        ...DEFAULT_CERTIFICATE_SETTINGS,
+        title: "ATTESTATO DEMO DI COMPLETAMENTO",
+        subtitle: packageName,
+        legalReference: "(Anteprima dimostrativa - non valida ai fini normativi)",
+        moduleName: packageName,
+        completionPhrase: `ha completato con esito positivo l'anteprima del percorso "{module}" composto da ${totalCount} moduli formativi`,
+        hoursValue: `${modules.reduce((acc, m) => acc + (MODULE_DURATIONS[m.id] || 10), 0)} minuti totali stimati`,
+        trackedNote: `Moduli inclusi: ${moduleListText}`,
+        outcomeValue: "PERCORSO DEMO COMPLETATO",
+        scoreNote: `${completedCount}/${totalCount} moduli (100%)`,
+        signatureLine: "Safety Frontline — Demo Pubblica",
+        footerNote: "Documento dimostrativo. L'attestato ufficiale viene rilasciato al termine del percorso reale autenticato in piattaforma.",
+        version: "DEMO 1.0",
+      });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `attestato-demo-${packageName.toLowerCase().replace(/\s+/g, "-")}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      toast.success("✅ Attestato fac-simile scaricato!");
+    } catch (err) {
+      console.error(err);
+      toast.error("Errore nella generazione del PDF");
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-background via-background to-primary/5">
       {/* Header */}
