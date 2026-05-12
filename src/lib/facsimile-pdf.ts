@@ -321,9 +321,9 @@ export async function generateTestPdf(
     y += 4.5;
   });
 
-  // Sample questions
+  // Sample questions bank
   y += 4;
-  const sampleQs = [
+  const questionBank = [
     {
       q: "Quale è la durata minima della formazione generale dei lavoratori (D.Lgs 81/08)?",
       a: ["2 ore", "4 ore", "6 ore", "8 ore"],
@@ -349,17 +349,101 @@ export async function generateTestPdf(
       ],
       correct: 1,
     },
+    {
+      q: "Cosa indica il pittogramma triangolare giallo con bordo nero?",
+      a: ["Divieto", "Obbligo", "Avvertimento/Pericolo", "Salvataggio"],
+      correct: 2,
+    },
+    {
+      q: "In caso di incendio, quale è la prima azione da compiere?",
+      a: [
+        "Tentare di spegnerlo da soli",
+        "Allertare i presenti e attivare la procedura di emergenza",
+        "Continuare il lavoro",
+        "Prendere effetti personali",
+      ],
+      correct: 1,
+    },
+    {
+      q: "Il Documento di Valutazione dei Rischi (DVR) deve essere redatto da:",
+      a: ["Il lavoratore", "Il datore di lavoro", "Il medico competente", "Il RLS"],
+      correct: 1,
+    },
+    {
+      q: "Il Preposto ha il compito di:",
+      a: [
+        "Redigere il DVR",
+        "Sovrintendere e vigilare sull'osservanza delle disposizioni",
+        "Nominare il RSPP",
+        "Erogare la formazione",
+      ],
+      correct: 1,
+    },
+    {
+      q: "La segnaletica di sicurezza di colore verde indica:",
+      a: ["Divieto", "Pericolo", "Salvataggio o soccorso", "Obbligo"],
+      correct: 2,
+    },
+    {
+      q: "Ogni quanti anni va aggiornata la formazione del lavoratore?",
+      a: ["Ogni anno", "Ogni 3 anni", "Ogni 5 anni", "Mai"],
+      correct: 2,
+    },
+    {
+      q: "Il Medico Competente è obbligatorio quando:",
+      a: [
+        "L'azienda ha più di 100 dipendenti",
+        "È prevista la sorveglianza sanitaria",
+        "Solo se richiesto dai lavoratori",
+        "Mai",
+      ],
+      correct: 1,
+    },
+    {
+      q: "Cosa significa la sigla RSPP?",
+      a: [
+        "Responsabile Servizio Prevenzione e Protezione",
+        "Rappresentante Sicurezza Pubblica Privata",
+        "Responsabile Sanitario Pronto Pericolo",
+        "Referente Sicurezza Posto di lavoro",
+      ],
+      correct: 0,
+    },
+    {
+      q: "Il rischio è definito come:",
+      a: [
+        "Probabilità per magnitudo del danno",
+        "Solo la probabilità di un evento",
+        "Solo la gravità dell'evento",
+        "Un sinonimo di pericolo",
+      ],
+      correct: 0,
+    },
   ];
 
+  const count = Math.max(1, Math.min(settings.questionsCount, questionBank.length));
+  const sampleQs = questionBank.slice(0, count);
+
   sampleQs.forEach((item, i) => {
-    if (y > h - 50) {
+    // estimate space needed for this question
+    const qLines = pdf.splitTextToSize(`${i + 1}. ${item.q}`, w - 36) as string[];
+    const needed = qLines.length * 5 + item.a.length * 4.5 + 6;
+    if (y + needed > h - 22) {
       pdf.addPage();
-      y = 20;
+      // top decorations on new page
+      pdf.setFillColor(...ORANGE);
+      pdf.rect(0, 0, w, 3, "F");
+      pdf.setFillColor(...GREEN);
+      pdf.rect(0, h - 3, w, 3, "F");
+      pdf.setDrawColor(...ORANGE);
+      pdf.setLineWidth(0.6);
+      pdf.rect(8, 8, w - 16, h - 16);
+      drawWatermark(pdf, w, h);
+      y = 22;
     }
     pdf.setFont("helvetica", "bold");
     pdf.setFontSize(10);
     pdf.setTextColor(...DARK);
-    const qLines = pdf.splitTextToSize(`${i + 1}. ${item.q}`, w - 36) as string[];
     qLines.forEach((l) => {
       pdf.text(l, 18, y);
       y += 5;
