@@ -1593,9 +1593,9 @@ export class SpatialAudioManager {
   private sources: Map<string, SpatialAudioSource> = new Map();
   private masterGain: GainNode | null = null;
 
-    import('./audio-context-unlock').then(m => m.registerAudioContext(this.audioContext)).catch(() => {});
   async initialize() {
     this.audioContext = new AudioContext();
+    import('./audio-context-unlock').then(m => m.registerAudioContext(this.audioContext)).catch(() => {});
     this.listener = this.audioContext.listener;
     this.masterGain = this.audioContext.createGain();
     this.masterGain.gain.value = 0.4;
