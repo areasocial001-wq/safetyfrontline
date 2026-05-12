@@ -1,5 +1,5 @@
 import { useState, Suspense, useEffect, useRef, useMemo, useCallback } from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { BabylonScene } from "@/components/demo3d/BabylonScene";
 import { SceneDebugOverlay } from "@/components/demo3d/SceneDebugOverlay";
 import { AudioDiagnosticsHUD } from "@/components/demo3d/AudioDiagnosticsHUD";
