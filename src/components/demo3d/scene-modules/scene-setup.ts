@@ -240,12 +240,14 @@ function setupPostProcessing(scene: BABYLON.Scene, camera: BABYLON.UniversalCame
       glowIntensity: 0.3,
     },
     construction: {
-      bloomEnabled: true, bloomThreshold: 0.65, bloomWeight: 0.35, bloomKernel: 64, bloomScale: 0.5,
-      chromaticAberration: 10,
-      contrast: 1.5, exposure: 1.05,
-      vignetteEnabled: true, vignetteWeight: 2.5, vignetteFov: 0.7,
-      saturation: 25, globalExposure: 0.25,
-      glowIntensity: 1.0,
+      // Open-sky daylight: soften saturation, vignette and chromatic aberration
+      // so the blue sky reads natural and not orange-saturated.
+      bloomEnabled: true, bloomThreshold: 0.9, bloomWeight: 0.2, bloomKernel: 48, bloomScale: 0.4,
+      chromaticAberration: 1,
+      contrast: 1.1, exposure: 1.0,
+      vignetteEnabled: false, vignetteWeight: 0, vignetteFov: 0,
+      saturation: 8, globalExposure: 0.05,
+      glowIntensity: 0.4,
     },
     laboratory: {
       // Disabled vignette + reduced bloom: floor/walls were merging into a brown blob
