@@ -43,10 +43,12 @@ export const ALL_TRAINING_MODULES: TrainingModuleInfo[] = [
   { id: "preposto", name: "Preposto - Modulo 1", icon: "📋", category: "Ruoli" },
   { id: "preposto_m2", name: "Preposto - Modulo 2", icon: "📋", category: "Ruoli" },
   { id: "preposto_m3", name: "Preposto - Modulo 3", icon: "📋", category: "Ruoli" },
+];
 
-  // Specialistici
-  { id: "cybersecurity", name: "Cybersecurity Office", icon: "💻", category: "Specialistici" },
+// Moduli bonus / extra non inclusi nel piano formativo standard
+export const BONUS_TRAINING_MODULES: TrainingModuleInfo[] = [
+  { id: "cybersecurity", name: "Cybersecurity Office", icon: "💻", category: "Bonus" },
 ];
 
 export const getModuleInfo = (id: string): TrainingModuleInfo | undefined =>
-  ALL_TRAINING_MODULES.find((m) => m.id === id);
+  ALL_TRAINING_MODULES.find((m) => m.id === id) || BONUS_TRAINING_MODULES.find((m) => m.id === id);
