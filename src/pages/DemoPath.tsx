@@ -310,10 +310,17 @@ const DemoPath = () => {
                         </div>
 
                         <div className="flex-1 min-w-0">
-                          <h4 className="font-bold text-base mb-1 flex items-center gap-2">
-                            <span>{mod.icon}</span>
-                            <span className="truncate">{mod.name}</span>
-                          </h4>
+                          <div className="flex items-start justify-between gap-2 mb-1">
+                            <h4 className="font-bold text-base flex items-center gap-2 min-w-0">
+                              <span>{mod.icon}</span>
+                              <span className="truncate">{mod.name}</span>
+                            </h4>
+                            {isCompleted && (
+                              <Badge className="bg-accent/20 text-accent border-accent/40 shrink-0 font-bold">
+                                <CheckCircle className="w-3 h-3 mr-1" /> Completato
+                              </Badge>
+                            )}
+                          </div>
                           <div className="flex items-center gap-2 flex-wrap mb-3">
                             <span className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-muted text-muted-foreground">
                               <Clock className="w-3 h-3" />~{duration} min
@@ -321,6 +328,11 @@ const DemoPath = () => {
                             <span className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-game-xp/10 text-game-xp">
                               <Sparkles className="w-3 h-3" /> Demo libera
                             </span>
+                            {isCompleted && (
+                              <span className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-accent/15 text-accent font-semibold">
+                                <Award className="w-3 h-3" /> +XP
+                              </span>
+                            )}
                           </div>
 
                           <Button
