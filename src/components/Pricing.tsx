@@ -27,7 +27,7 @@ export const Pricing = () => {
     {
       name: "Versione Individuale",
       icon: Building,
-      price: "Abbonamento",
+      price: "Pacchetto completo",
       description: "Formazione in azienda con accesso individuale",
       features: [
         "Accesso multi-utente per l'azienda",
@@ -39,6 +39,7 @@ export const Pricing = () => {
         "Personalizzazioni aziendali disponibili",
         "Supporto dedicato"
       ],
+      priceSubtitle: "Standard o personalizzato",
       highlight: true
     }
   ];
@@ -94,7 +95,7 @@ export const Pricing = () => {
                 <div className="mb-6">
                   <div className="text-4xl font-bold mb-2">{plan.price}</div>
                   <p className="text-muted-foreground text-sm">
-                    Contattaci per un preventivo personalizzato
+                    {plan.priceSubtitle ?? "Contattaci per un preventivo personalizzato"}
                   </p>
                 </div>
 
