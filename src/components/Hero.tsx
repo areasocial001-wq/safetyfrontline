@@ -46,7 +46,13 @@ export const Hero = () => {
       setProgress(progress);
     };
 
-    const handlePlay = () => setIsPlaying(true);
+    const handlePlay = () => {
+      setIsPlaying(true);
+      // Stop background intro music when the demo video starts
+      if (audioElement && !audioElement.paused) {
+        audioElement.pause();
+      }
+    };
     const handlePause = () => setIsPlaying(false);
 
     video.addEventListener('timeupdate', handleTimeUpdate);
