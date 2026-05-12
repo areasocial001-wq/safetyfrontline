@@ -195,6 +195,7 @@ export const FacSimilePreview = () => {
                 <Field label="Nota punteggio" value={cert.scoreNote} onChange={(v) => setCert({ ...cert, scoreNote: v })} disabled={!isAdmin} />
                 <Field label="Riga firma" value={cert.signatureLine} onChange={(v) => setCert({ ...cert, signatureLine: v })} disabled={!isAdmin} />
                 <Field label="Footer" value={cert.footerNote} onChange={(v) => setCert({ ...cert, footerNote: v })} disabled={!isAdmin} />
+                <Field label="Versione fac-simile" value={cert.version ?? "1.0"} onChange={(v) => setCert({ ...cert, version: v })} disabled={!isAdmin} />
               </CardContent>
             </Card>
 
@@ -232,6 +233,10 @@ export const FacSimilePreview = () => {
                 <div className="space-y-1">
                   <Label className="text-xs">Nota footer</Label>
                   <Textarea rows={2} value={test.footerNote} onChange={(e) => setTest({ ...test, footerNote: e.target.value })} disabled={!isAdmin} />
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <Field label="Versione fac-simile" value={test.version ?? "1.0"} onChange={(v) => setTest({ ...test, version: v })} disabled={!isAdmin} />
+                  <Field label="URL verifica certificato" value={test.certificateVerifyUrl ?? ""} onChange={(v) => setTest({ ...test, certificateVerifyUrl: v })} disabled={!isAdmin} />
                 </div>
               </CardContent>
             </Card>

@@ -10,6 +10,8 @@ export interface TestFacsimileSettings {
   durationMinutes: number;
   instructions: string;
   footerNote: string;
+  version?: string;
+  certificateVerifyUrl?: string;
 }
 
 export interface CertificateFacsimileSettings {
@@ -26,6 +28,7 @@ export interface CertificateFacsimileSettings {
   scoreNote: string;
   signatureLine: string;
   footerNote: string;
+  version?: string;
 }
 
 export const DEFAULT_TEST_SETTINGS: TestFacsimileSettings = {
@@ -39,6 +42,9 @@ export const DEFAULT_TEST_SETTINGS: TestFacsimileSettings = {
     "Rispondere a tutte le domande. Una sola risposta è corretta per ciascun quesito. Il test si considera superato al raggiungimento della soglia minima.",
   footerNote:
     "Documento dimostrativo. Il test reale viene erogato in piattaforma con tracciamento dei tempi e delle risposte.",
+  version: "1.0",
+  certificateVerifyUrl:
+    "https://safetyfrontline.lovable.app/verify-certificate?code=FACSIMILE",
 };
 
 export const DEFAULT_CERTIFICATE_SETTINGS: CertificateFacsimileSettings = {
@@ -56,6 +62,7 @@ export const DEFAULT_CERTIFICATE_SETTINGS: CertificateFacsimileSettings = {
   scoreNote: "Punteggio: 92%",
   signatureLine: "Firma Digitale Verificata",
   footerNote: "Safety Frontline Platform",
+  version: "1.0",
 };
 
 const ORANGE: [number, number, number] = [255, 103, 31];
@@ -235,6 +242,24 @@ export async function generateCertificatePdf(
   pdf.setFontSize(7);
   pdf.setTextColor(...GREY);
   pdf.text(settings.footerNote, w - 18, h - 22, { align: "right" });
+
+  // Version + generation date (bottom center)
+  pdf.setFont("helvetica", "normal");
+  pdf.setFontSize(7);
+  pdf.setTextColor(...GREY);
+  const genStr = new Date().toLocaleString("it-IT", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+  pdf.text(
+    `Fac-simile v${settings.version ?? "1.0"} · Generato il ${genStr}`,
+    w / 2,
+    h - 8,
+    { align: "center" }
+  );
 
   return pdf.output("blob");
 }
@@ -475,13 +500,35 @@ export async function generateTestPdf(
     }
   };
 
-  // Scoring box
-  ensureSpace(34);
+  // Auto-computed demo score: simulate ~92% correct, capped at total
+  const demoTargetPct = 92;
+  const correctCount = Math.max(
+    1,
+    Math.min(sampleQs.length, Math.round((sampleQs.length * demoTargetPct) / 100))
+  );
+  const actualPct = Math.round((correctCount / sampleQs.length) * 100);
+  const passed = actualPct >= settings.passingScorePercent;
+
+  // Pre-generate QR for esito section (links to certificate verification)
+  const verifyUrl =
+    settings.certificateVerifyUrl ||
+    "https://safetyfrontline.lovable.app/verify-certificate?code=FACSIMILE";
+  const esitoQr = await QRCode.toDataURL(verifyUrl, {
+    margin: 1,
+    width: 160,
+    color: { dark: "#1a1a1a", light: "#ffffff" },
+  });
+
+  // ===== Scoring box (auto-filled) =====
+  const scoreBoxH = 36;
+  ensureSpace(scoreBoxH + 4);
   y += 4;
   pdf.setFillColor(247, 254, 247);
   pdf.setDrawColor(...GREEN);
   pdf.setLineWidth(0.4);
-  pdf.roundedRect(18, y, w - 36, 26, 2, 2, "FD");
+  pdf.roundedRect(18, y, w - 36, scoreBoxH, 2, 2, "FD");
+
+  // Left: title + score values
   pdf.setFont("helvetica", "bold");
   pdf.setFontSize(10);
   pdf.setTextColor(...DARK);
@@ -489,59 +536,122 @@ export async function generateTestPdf(
   pdf.setFont("helvetica", "normal");
   pdf.setFontSize(9);
   pdf.setTextColor(...GREY);
-  pdf.text(`Risposte corrette: ______ / ${sampleQs.length}`, 24, y + 14);
-  pdf.text(
-    `Percentuale: ______ %   (Soglia minima: ${settings.passingScorePercent}%)`,
-    24,
-    y + 21
-  );
+  pdf.text("Risposte corrette:", 24, y + 14);
   pdf.setFont("helvetica", "bold");
-  pdf.setFontSize(10);
-  pdf.setTextColor(...GREEN);
-  pdf.text("ESITO:", w - 70, y + 9);
-  pdf.setDrawColor(...GREY);
-  pdf.rect(w - 55, y + 6, 4, 4);
   pdf.setTextColor(...DARK);
-  pdf.setFont("helvetica", "normal");
-  pdf.setFontSize(9);
-  pdf.text("SUPERATO", w - 49, y + 9);
-  pdf.rect(w - 55, y + 14, 4, 4);
-  pdf.text("NON SUPERATO", w - 49, y + 17);
-  y += 32;
+  pdf.text(`${correctCount} / ${sampleQs.length}`, 60, y + 14);
 
-  // Answer key
-  ensureSpace(20 + Math.ceil(sampleQs.length / 5) * 5);
+  pdf.setFont("helvetica", "normal");
+  pdf.setTextColor(...GREY);
+  pdf.text("Percentuale:", 24, y + 21);
+  pdf.setFont("helvetica", "bold");
+  pdf.setTextColor(...(passed ? GREEN : ORANGE));
+  pdf.text(`${actualPct}%`, 60, y + 21);
+
+  pdf.setFont("helvetica", "normal");
+  pdf.setFontSize(8);
+  pdf.setTextColor(...GREY);
+  pdf.text(`(Soglia minima: ${settings.passingScorePercent}%)`, 24, y + 28);
+
+  // Center: outcome with check
+  const cx = w / 2 + 8;
+  pdf.setFont("helvetica", "bold");
+  pdf.setFontSize(9);
+  pdf.setTextColor(...GREY);
+  pdf.text("ESITO:", cx, y + 9);
+
+  pdf.setDrawColor(...GREY);
+  pdf.setLineWidth(0.3);
+  pdf.rect(cx, y + 13, 4, 4);
+  pdf.rect(cx, y + 21, 4, 4);
+  if (passed) {
+    pdf.setDrawColor(...GREEN);
+    pdf.setLineWidth(0.6);
+    pdf.line(cx + 0.7, y + 15, cx + 1.8, y + 16.4);
+    pdf.line(cx + 1.8, y + 16.4, cx + 3.5, y + 13.6);
+  } else {
+    pdf.setDrawColor(...ORANGE);
+    pdf.setLineWidth(0.6);
+    pdf.line(cx + 0.7, y + 22.7, cx + 3.5, y + 24.7);
+    pdf.line(cx + 0.7, y + 24.7, cx + 3.5, y + 22.7);
+  }
+  pdf.setFont("helvetica", passed ? "bold" : "normal");
+  pdf.setFontSize(9);
+  pdf.setTextColor(...(passed ? GREEN : DARK));
+  pdf.text("SUPERATO", cx + 6, y + 16.5);
+  pdf.setFont("helvetica", passed ? "normal" : "bold");
+  pdf.setTextColor(...(passed ? DARK : ORANGE));
+  pdf.text("NON SUPERATO", cx + 6, y + 24.5);
+
+  // Right: QR
+  const qrSize = 24;
+  const qrX = w - 18 - qrSize;
+  const qrY = y + (scoreBoxH - qrSize) / 2;
+  pdf.addImage(esitoQr, "PNG", qrX, qrY, qrSize, qrSize);
+  pdf.setFont("helvetica", "normal");
+  pdf.setFontSize(6.5);
+  pdf.setTextColor(...GREY);
+  pdf.text("Verifica attestato", qrX + qrSize / 2, qrY + qrSize + 3, {
+    align: "center",
+  });
+
+  y += scoreBoxH + 6;
+
+  // ===== Extended answer key (one row per question) =====
   pdf.setFont("helvetica", "bold");
   pdf.setFontSize(10);
   pdf.setTextColor(...ORANGE);
+  ensureSpace(8);
   pdf.text("CORRETTORE PER DOCENTE", 18, y);
-  y += 5;
+  y += 2;
   pdf.setDrawColor(...ORANGE);
   pdf.setLineWidth(0.2);
-  pdf.line(18, y - 2, w - 18, y - 2);
-  pdf.setFont("helvetica", "normal");
-  pdf.setFontSize(9);
-  pdf.setTextColor(...DARK);
-  const cols = 5;
-  const colW = (w - 36) / cols;
-  sampleQs.forEach((item, i) => {
-    const col = i % cols;
-    const row = Math.floor(i / cols);
-    const cx = 18 + col * colW;
-    const cy = y + row * 5;
-    pdf.text(
-      `Q${i + 1}: ${String.fromCharCode(65 + item.correct)}`,
-      cx,
-      cy
-    );
-  });
-  y += Math.ceil(sampleQs.length / cols) * 5 + 4;
+  pdf.line(18, y, w - 18, y);
+  y += 5;
 
-  // Signatures
-  ensureSpace(34);
+  pdf.setFontSize(8);
+  pdf.setFont("helvetica", "italic");
+  pdf.setTextColor(...GREY);
+  pdf.text(
+    "Risposta corretta evidenziata per ciascun quesito. Da utilizzare in fase di correzione.",
+    18,
+    y
+  );
+  y += 6;
+
+  sampleQs.forEach((item, i) => {
+    const letter = String.fromCharCode(65 + item.correct);
+    const optionText = item.a[item.correct];
+    const line = `Q${i + 1}.  ${letter})  ${optionText}`;
+    const wrapped = pdf.splitTextToSize(line, w - 44) as string[];
+    const rowH = wrapped.length * 4.5 + 2;
+    ensureSpace(rowH + 2);
+
+    // green dot indicator
+    pdf.setFillColor(...GREEN);
+    pdf.circle(20, y - 1.2, 1.1, "F");
+
+    pdf.setFont("helvetica", "bold");
+    pdf.setFontSize(9);
+    pdf.setTextColor(...DARK);
+    pdf.text(`Q${i + 1}.`, 24, y);
+    pdf.setTextColor(...GREEN);
+    pdf.text(`${letter})`, 33, y);
+    pdf.setFont("helvetica", "normal");
+    pdf.setTextColor(...DARK);
+    const optWrap = pdf.splitTextToSize(optionText, w - 60) as string[];
+    optWrap.forEach((l, idx) => {
+      pdf.text(l, 41, y + idx * 4.5);
+    });
+    y += Math.max(rowH, optWrap.length * 4.5 + 2);
+  });
   y += 4;
+
+  // ===== Signatures =====
+  ensureSpace(38);
+  y += 2;
   const colWidth = (w - 36 - 8) / 2;
-  // Candidate
+
   pdf.setFont("helvetica", "bold");
   pdf.setFontSize(9);
   pdf.setTextColor(...GREY);
@@ -559,7 +669,6 @@ export async function generateTestPdf(
   pdf.setTextColor(...GREY);
   pdf.text("Firma del candidato", 18, y + 32);
 
-  // Examiner
   const ex = 18 + colWidth + 8;
   pdf.setFont("helvetica", "bold");
   pdf.setFontSize(9);
@@ -578,16 +687,36 @@ export async function generateTestPdf(
   pdf.text("Firma e timbro esaminatore", ex, y + 32);
   y += 38;
 
-  // Footer note
+  // ===== Footer note + version + generation date =====
+  ensureSpace(16);
   pdf.setFont("helvetica", "italic");
   pdf.setFontSize(8);
   pdf.setTextColor(...GREY);
   const footerLines = pdf.splitTextToSize(settings.footerNote, w - 36) as string[];
-  let fy = Math.max(y + 4, h - 18 - footerLines.length * 4);
+  let fy = Math.max(y + 4, h - 14 - footerLines.length * 4);
   footerLines.forEach((l) => {
     pdf.text(l, w / 2, fy, { align: "center" });
     fy += 4;
   });
+
+  // Version + generation date — drawn on every page bottom-center
+  const genStr = new Date().toLocaleString("it-IT", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+  const versionLine = `Fac-simile v${settings.version ?? "1.0"} · Generato il ${genStr}`;
+  const totalPages = pdf.getNumberOfPages();
+  for (let p = 1; p <= totalPages; p++) {
+    pdf.setPage(p);
+    pdf.setFont("helvetica", "normal");
+    pdf.setFontSize(7);
+    pdf.setTextColor(...GREY);
+    pdf.text(versionLine, w / 2, h - 8, { align: "center" });
+    pdf.text(`Pag. ${p} / ${totalPages}`, w - 18, h - 8, { align: "right" });
+  }
 
   return pdf.output("blob");
 }
