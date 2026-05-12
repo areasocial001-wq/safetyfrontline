@@ -1472,44 +1472,69 @@ export const BabylonScene = ({
         🎓 Guida: {guideMode ? 'ON' : 'OFF'}
       </button>
 
-      {/* Guida overlay with normative explanation */}
-      {guideOverlay && (
-        <div className="fixed bottom-24 left-1/2 -translate-x-1/2 z-50 max-w-xl w-[90%] animate-fade-in pointer-events-none">
-          <div
-            className="rounded-xl border-2 shadow-2xl backdrop-blur-md overflow-hidden"
-            style={{
-              borderColor:
-                guideOverlay.severity === 'critical' ? '#dc2626'
-                : guideOverlay.severity === 'high' ? '#ea580c'
-                : guideOverlay.severity === 'medium' ? '#ca8a04'
-                : '#22c55e',
-              backgroundColor: 'rgba(15,23,42,0.92)',
-            }}
-          >
-            <div
-              className="px-4 py-2 text-sm font-bold text-white flex items-center gap-2"
-              style={{
-                backgroundColor:
-                  guideOverlay.severity === 'critical' ? 'rgba(220,38,38,0.95)'
-                  : guideOverlay.severity === 'high' ? 'rgba(234,88,12,0.95)'
-                  : guideOverlay.severity === 'medium' ? 'rgba(202,138,4,0.95)'
-                  : 'rgba(34,197,94,0.95)',
-              }}
-            >
-              <span>🎯 Rischio individuato</span>
-              <span className="opacity-70 font-normal text-xs">— Modalità Guida</span>
-            </div>
-            <div className="px-4 py-3 space-y-2 text-white">
-              <div className="text-base font-bold leading-snug">{guideOverlay.label}</div>
-              <div className="text-sm text-white/85 leading-snug">{guideOverlay.description}</div>
-              <div className="mt-2 pt-2 border-t border-white/20 text-xs text-white/90">
-                <span className="font-semibold uppercase tracking-wide text-white/70 block mb-1">📖 Riferimento normativo</span>
-                {guideOverlay.normative}
+      {/* Language selector */}
+      <div className="fixed top-4 right-32 z-40 flex gap-1 bg-background/80 backdrop-blur-md rounded-full px-1 py-1 border border-border shadow-lg">
+        {LANGUAGES.map(l => (
+          <button key={l.code} type="button" onClick={() => setLangState(l.code)}
+            className={`px-2 py-1 rounded-full text-xs font-semibold transition-colors ${lang === l.code ? 'bg-primary text-primary-foreground' : 'text-foreground hover:bg-muted'}`}
+            title={l.label}>
+            {l.flag}
+          </button>
+        ))}
+      </div>
+
+      {/* Guida overlay with normative explanation, countdown, next steps & tip */}
+      {guideOverlay && (() => {
+        const elapsed = Math.max(0, tickNow - guideOverlay.startedAt);
+        const total = 7000;
+        const remainingSec = Math.max(0, Math.ceil((total - elapsed) / 1000));
+        const progress = Math.min(100, (elapsed / total) * 100);
+        const sevColor = guideOverlay.severity === 'critical' ? '#dc2626'
+          : guideOverlay.severity === 'high' ? '#ea580c'
+          : guideOverlay.severity === 'medium' ? '#ca8a04' : '#22c55e';
+        const sevBg = guideOverlay.severity === 'critical' ? 'rgba(220,38,38,0.95)'
+          : guideOverlay.severity === 'high' ? 'rgba(234,88,12,0.95)'
+          : guideOverlay.severity === 'medium' ? 'rgba(202,138,4,0.95)' : 'rgba(34,197,94,0.95)';
+        return (
+          <div className="fixed bottom-24 left-1/2 -translate-x-1/2 z-50 max-w-2xl w-[92%] animate-fade-in pointer-events-none"
+            dir={isRTL(lang) ? 'rtl' : 'ltr'}>
+            <div className="rounded-xl border-2 shadow-2xl backdrop-blur-md overflow-hidden"
+              style={{ borderColor: sevColor, backgroundColor: 'rgba(15,23,42,0.94)' }}>
+              <div className="px-4 py-2 text-sm font-bold text-white flex items-center justify-between gap-2" style={{ backgroundColor: sevBg }}>
+                <span className="flex items-center gap-2">
+                  <span>🎯 {t(lang, 'riskFound')}</span>
+                  <span className="opacity-70 font-normal text-xs">— {t(lang, 'guideMode')}</span>
+                </span>
+                <span className="text-xs font-mono bg-black/30 px-2 py-0.5 rounded">⏱ {remainingSec}{t(lang, 'seconds')}</span>
+              </div>
+              <div className="h-1 bg-white/10">
+                <div className="h-full transition-all" style={{ width: `${100 - progress}%`, backgroundColor: sevColor }} />
+              </div>
+              <div className="px-4 py-3 space-y-3 text-white">
+                <div>
+                  <div className="text-base font-bold leading-snug">{guideOverlay.label}</div>
+                  <div className="text-sm text-white/85 leading-snug mt-1">{guideOverlay.description}</div>
+                </div>
+                <div className="pt-2 border-t border-white/20 text-xs text-white/90">
+                  <div className="font-semibold uppercase tracking-wide text-white/70 mb-1">📖 {t(lang, 'normativeRef')}</div>
+                  <div className="font-semibold text-white">{guideOverlay.normTitle}</div>
+                  <div className="text-white/70 italic">{guideOverlay.normArticles}</div>
+                  <div className="mt-1">{guideOverlay.normObligation}</div>
+                </div>
+                <div className="pt-2 border-t border-white/20 text-xs">
+                  <div className="font-semibold uppercase tracking-wide text-white/70 mb-1">✅ {t(lang, 'nextSteps')}</div>
+                  <ol className={`list-decimal space-y-0.5 text-white/90 ${isRTL(lang) ? 'pr-5' : 'pl-5'}`}>
+                    {guideOverlay.nextSteps.map((s, i) => <li key={i}>{s}</li>)}
+                  </ol>
+                </div>
+                <div className="pt-2 border-t border-white/20 text-xs italic text-white/85">
+                  💡 <span className="font-semibold not-italic">{t(lang, 'tip')}:</span> {guideOverlay.tip}
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      )}
+        );
+      })()}
 
       {lookedAtProp && (
         <PropLabel
