@@ -1,4 +1,5 @@
 import { Hero } from "@/components/Hero";
+import { DemoCTA } from "@/components/DemoCTA";
 import { Demo3DShowcase } from "@/components/Demo3DShowcase";
 import { SpotTheHazardShowcase } from "@/components/SpotTheHazardShowcase";
 import { ProblemSolution } from "@/components/ProblemSolution";
