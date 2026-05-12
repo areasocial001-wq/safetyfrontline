@@ -267,7 +267,7 @@ const TrainingModule = () => {
     setBossTestMaxScore(0);
     setPerfectQuiz(true);
     setStreak(0);
-  }, [moduleId, moduleContent, currentSectionIndex, totalSections, sessionXp, totalTimeSpent, updateProgress, navigate, currentSection, perfectQuiz, healthBar, achievementPopup, addXp]);
+  }, [moduleId, moduleContent, currentSectionIndex, totalSections, sessionXp, totalTimeSpent, updateProgress, navigate, currentSection, perfectQuiz, healthBar, achievementPopup, addXp, isDemoMode, user, bossTestScore, bossTestMaxScore, getModuleProgress]);
 
   if (!moduleContent || !currentSection) {
     return (
