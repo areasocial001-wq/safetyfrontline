@@ -234,6 +234,10 @@ export const FacSimilePreview = () => {
                   <Label className="text-xs">Nota footer</Label>
                   <Textarea rows={2} value={test.footerNote} onChange={(e) => setTest({ ...test, footerNote: e.target.value })} disabled={!isAdmin} />
                 </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <Field label="Versione fac-simile" value={test.version ?? "1.0"} onChange={(v) => setTest({ ...test, version: v })} disabled={!isAdmin} />
+                  <Field label="URL verifica certificato" value={test.certificateVerifyUrl ?? ""} onChange={(v) => setTest({ ...test, certificateVerifyUrl: v })} disabled={!isAdmin} />
+                </div>
               </CardContent>
             </Card>
 
