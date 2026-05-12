@@ -1,7 +1,8 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Check, Users, Building, GraduationCap } from "lucide-react";
+import { Check, Users, Building, GraduationCap, Calculator, ArrowRight } from "lucide-react";
 import { QuoteRequestDialog } from "@/components/QuoteRequestDialog";
 
 export const Pricing = () => {
