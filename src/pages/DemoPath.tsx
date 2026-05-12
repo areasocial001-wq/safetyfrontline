@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import {
   ArrowLeft, Play, CheckCircle, Lock, Sparkles, Trophy,
-  Flame, Heart, Shield, Monitor, Cross, Building2, Clock,
+  Flame, Heart, Shield, Cross, Building2, Clock,
   Award, Download, Home, PartyPopper, Star, Zap,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
