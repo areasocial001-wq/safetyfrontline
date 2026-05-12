@@ -405,6 +405,33 @@ export type Database = {
         }
         Relationships: []
       }
+      facsimile_settings: {
+        Row: {
+          certificate_settings: Json
+          id: string
+          singleton: boolean
+          test_settings: Json
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          certificate_settings?: Json
+          id?: string
+          singleton?: boolean
+          test_settings?: Json
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          certificate_settings?: Json
+          id?: string
+          singleton?: boolean
+          test_settings?: Json
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
       game_replays: {
         Row: {
           achievements_unlocked: string[] | null
