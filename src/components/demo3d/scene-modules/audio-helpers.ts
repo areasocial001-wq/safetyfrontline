@@ -80,6 +80,7 @@ export function triggerHapticFeedback(extType: string) {
 export function playExtinguisherSound(type: string) {
   try {
     const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
+    registerAudioContext(ctx);
     const masterGain = ctx.createGain();
     masterGain.connect(ctx.destination);
 
