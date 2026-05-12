@@ -1,7 +1,8 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Check, Users, Building, GraduationCap } from "lucide-react";
+import { Check, Users, Building, GraduationCap, Calculator, ArrowRight } from "lucide-react";
 import { QuoteRequestDialog } from "@/components/QuoteRequestDialog";
 
 export const Pricing = () => {
@@ -125,6 +126,27 @@ export const Pricing = () => {
           </div>
 
           <QuoteRequestDialog open={quoteDialogOpen} onOpenChange={setQuoteDialogOpen} />
+
+          {/* ROI Calculator CTA */}
+          <Card className="p-6 md:p-8 mb-12 bg-gradient-to-br from-primary/10 via-accent/5 to-secondary/10 border-primary/20">
+            <div className="flex flex-col md:flex-row items-center gap-6">
+              <div className="w-16 h-16 rounded-2xl bg-primary/15 flex items-center justify-center shrink-0">
+                <Calculator className="w-8 h-8 text-primary" />
+              </div>
+              <div className="flex-1 text-center md:text-left">
+                <h3 className="text-xl md:text-2xl font-bold mb-1">Calcola il tuo risparmio</h3>
+                <p className="text-sm text-muted-foreground">
+                  Stima ROI, payback e pacchetto consigliato per il tuo settore in 30 secondi.
+                </p>
+              </div>
+              <Button asChild variant="hero" size="lg" className="group">
+                <Link to="/roi">
+                  Apri calcolatore ROI
+                  <ArrowRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
+                </Link>
+              </Button>
+            </div>
+          </Card>
 
           {/* Additional Info */}
           <div className="grid md:grid-cols-3 gap-6 text-center">

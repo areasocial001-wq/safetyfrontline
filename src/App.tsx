@@ -27,6 +27,7 @@ import PresetTestPage from "./pages/PresetTestPage";
 import SpotTheHazardPage from "./pages/SpotTheHazardPage";
 import DemoPath from "./pages/DemoPath";
 import BonusModules from "./pages/BonusModules";
+import ROICalculatorPage from "./pages/ROICalculatorPage";
 
 const queryClient = new QueryClient();
 
@@ -61,6 +62,7 @@ const App = () => (
           <Route path="/spot-the-hazard" element={<SpotTheHazardPage />} />
           <Route path="/demo-percorso" element={<DemoPath />} />
           <Route path="/moduli-bonus" element={<BonusModules />} />
+          <Route path="/roi" element={<ROICalculatorPage />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
