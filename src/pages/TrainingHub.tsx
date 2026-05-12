@@ -241,18 +241,6 @@ const TRAINING_PATHS: TrainingPath[] = [
 
   // ===== 3) ATTREZZATURE & ABILITAZIONI =====
   {
-    id: 'cybersecurity',
-    title: 'Cyber Security',
-    subtitle: 'Sicurezza Informatica Aziendale',
-    description: 'Phishing, ransomware, password, GDPR, incident response. Simulazioni 3D interattive.',
-    icon: ShieldAlert,
-    hours: '4h',
-    color: 'primary',
-    moduleIds: ['cybersecurity-awareness'],
-    normativeRef: 'Reg. UE 2016/679 (GDPR)',
-    category: 'attrezzature',
-  },
-  {
     id: 'attr_carrelli',
     title: 'Carrelli Elevatori',
     subtitle: 'Abilitazione conduttore',
