@@ -94,14 +94,6 @@ export const Modules = () => {
       { icon: AlertTriangle, title: "Escavatori e MMT", subtitle: "Macchine Movimento Terra — 10-16h", description: "Escavatori idraulici, pale, terne, autoribaltabili: stabilità, manovre, lavori vicino reti.", color: "destructive", comingSoon: true },
       { icon: Cog, title: "Pompe per Calcestruzzo", subtitle: "Autopompe e bracci — 14h", description: "Posizionamento, stabilizzatori, gestione braccio, comunicazione di cantiere e procedure di emergenza.", color: "secondary", comingSoon: true },
     ],
-    cybersecurity: [
-      { icon: Mail, title: "Phishing & Social Engineering", subtitle: "Riconoscere le Trappole", description: "Identificare email fraudolente, spear phishing, vishing e tecniche di manipolazione. Scenari interattivi realistici.", color: "destructive" },
-      { icon: KeyRound, title: "Password & Autenticazione", subtitle: "Credenziali Sicure", description: "Creare password robuste, usare password manager e autenticazione a due fattori (2FA). Best practice quotidiane.", color: "primary" },
-      { icon: ShieldAlert, title: "Ransomware & Malware", subtitle: "Difesa e Reazione", description: "Come si viene infettati, prevenzione, procedure di emergenza. Numeri e impatto economico sulle PMI italiane.", color: "accent" },
-      { icon: Wifi, title: "Protezione Dati & GDPR", subtitle: "Smart Working Sicuro", description: "Classificazione dati, clean desk policy, VPN, WiFi pubbliche. Obblighi GDPR e sanzioni per le aziende.", color: "secondary" },
-      { icon: Shield, title: "Incident Response", subtitle: "Reagire agli Attacchi", description: "Catena di segnalazione, cosa fare (e non fare) in caso di incidente. Scenari con dialoghi NPC realistici.", color: "muted" },
-      { icon: Trophy, title: "Boss Test Finale", subtitle: "Verifica Cybersecurity", description: "6 domande avanzate su scenari reali: CEO Fraud, baiting, data breach. Punteggio minimo 70% per il certificato.", color: "primary" },
-    ],
     simulazioni: [
       { icon: Building2, title: "Ufficio Amministrativo", subtitle: "Rischi d'Ufficio 3D", description: "Scenario facile in ambiente office: cavi scoperti, estintori bloccati, uscite ostruite, scaffalature instabili. 6 rischi da identificare.", color: "primary", previewKey: "office" },
       { icon: Warehouse, title: "Magazzino Logistica", subtitle: "Movimentazione & Stoccaggio", description: "Magazzino industriale con bancali, muletti, materiali infiammabili. Rischi manuali + procedurali generati dinamicamente.", color: "secondary", previewKey: "warehouse" },
