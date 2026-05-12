@@ -115,6 +115,13 @@ export const Hero = () => {
     }
   };
 
+  const restartVideo = () => {
+    const video = videoRef.current;
+    if (!video) return;
+    video.currentTime = 0;
+    video.play().catch(() => {});
+  };
+
   const toggleMute = () => {
     const video = videoRef.current;
     if (!video) return;
