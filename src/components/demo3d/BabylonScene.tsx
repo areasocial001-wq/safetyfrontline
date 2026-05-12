@@ -523,7 +523,6 @@ export const BabylonScene = ({
             });
             setTimeout(() => { guideOverlayActiveRef.current = false; setGuideOverlay(null); }, 7000);
           } else {
-          } else {
             toast.success(
               `${isCritical ? '🚨' : '⚠️'} ${riskData.risk.label}`,
               { description: riskData.risk.description, duration: 6000 }
