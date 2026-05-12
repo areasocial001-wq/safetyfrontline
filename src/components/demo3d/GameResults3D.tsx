@@ -24,6 +24,9 @@ import {
 import { Link } from "react-router-dom";
 import { Scenario3D } from "@/data/scenarios3d";
 import type { ExtinguisherType } from "./ExtinguisherSelection";
+import { useLang, t, isRTL } from "@/lib/risk-i18n";
+import { getNormative } from "@/lib/risk-normative";
+import { BookOpen, XCircle } from "lucide-react";
 
 export interface FirePerformanceData {
   extinguisherType: ExtinguisherType;
