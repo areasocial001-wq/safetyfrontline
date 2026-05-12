@@ -22,7 +22,7 @@ import { SIM3D_PREVIEWS } from "@/data/sim3d-previews";
 import { Sim3dPreview } from "@/components/Sim3dPreview";
 import { QuoteRequestDialog } from "@/components/QuoteRequestDialog";
 
-type TabKey = 'generale' | 'basso' | 'medio' | 'alto' | 'figure' | 'attrezzature' | 'simulazioni' | 'minigame2d' | 'piattaforma';
+type TabKey = 'generale' | 'basso' | 'medio' | 'alto' | 'figure' | 'attrezzature' | 'simulazioni' | 'minigame2d' | 'bonus' | 'piattaforma';
 
 export const Modules = () => {
   const [quoteDialogOpen, setQuoteDialogOpen] = useState(false);
@@ -35,12 +35,13 @@ export const Modules = () => {
     { key: 'alto', label: 'Rischio Alto', icon: AlertTriangle, badge: '8 moduli' },
     { key: 'figure', label: 'Figure Sicurezza', icon: Crown, badge: '8 percorsi' },
     { key: 'attrezzature', label: 'Attrezzature', icon: Truck, badge: '8 abilitazioni' },
-    { key: 'simulazioni', label: 'Simulazioni 3D', icon: Gamepad2, badge: '5 scenari' },
+    { key: 'simulazioni', label: 'Simulazioni 3D', icon: Gamepad2, badge: '4 scenari' },
     { key: 'minigame2d', label: 'Spot the Hazard 2D', icon: Target, badge: '5 livelli' },
+    { key: 'bonus', label: 'Moduli Bonus', icon: Sparkles, badge: 'Extra' },
     { key: 'piattaforma', label: 'Piattaforma', icon: Settings },
   ];
 
-  const modules: Record<TabKey, { icon: typeof Shield; title: string; subtitle: string; description: string; color: string; image?: string | null; previewKey?: keyof typeof SIM3D_PREVIEWS; comingSoon?: boolean }[]> = {
+  const modules: Record<TabKey, { icon: typeof Shield; title: string; subtitle: string; description: string; color: string; image?: string | null; previewKey?: keyof typeof SIM3D_PREVIEWS; comingSoon?: boolean; bonus?: boolean }[]> = {
     generale: [
       { icon: Shield, title: "Concetti Base", subtitle: "Legislazione e Obblighi", description: "D.Lgs 81/08, diritti e doveri dei lavoratori, organigramma della sicurezza e figure chiave.", color: "primary" },
       { icon: AlertCircle, title: "Rischi e Prevenzione", subtitle: "Valutazione dei Rischi", description: "Identificazione dei pericoli, valutazione dei rischi, misure di prevenzione e protezione.", color: "secondary" },
