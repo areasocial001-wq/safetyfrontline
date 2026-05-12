@@ -633,6 +633,35 @@ export const BabylonScene = ({
         hoveredRiskRef.current = newHoverId;
       }
 
+      // Update anchored 2D label for the currently-hovered risk (skip if a click-guide label is showing)
+      if (newHoverId && riskHit?.pickedMesh) {
+        const cnv = canvasRef.current;
+        if (cnv) {
+          const sev = scenario.risks.find(r => r.id === newHoverId);
+          const anchorPos = riskHit.pickedMesh.getAbsolutePosition().clone();
+          anchorPos.y += 1.0;
+          const rect = cnv.getBoundingClientRect();
+          const w = scene.getEngine().getRenderWidth();
+          const h = scene.getEngine().getRenderHeight();
+          const proj = BABYLON.Vector3.Project(
+            anchorPos,
+            BABYLON.Matrix.Identity(),
+            scene.getTransformMatrix(),
+            new BABYLON.Viewport(0, 0, w, h)
+          );
+          if (sev) {
+            setHoverLabel({
+              label: sev.label,
+              severity: sev.severity,
+              x: rect.left + (proj.x / w) * rect.width,
+              y: rect.top + (proj.y / h) * rect.height,
+            });
+          }
+        }
+      } else if (!guideOverlay) {
+        setHoverLabel((prev) => (prev ? null : prev));
+      }
+
       const ray = camera.getForwardRay(LOOK_DISTANCE);
       const hit = scene.pickWithRay(ray, (mesh) => {
         if (mesh.metadata?.tooltip) return true;
