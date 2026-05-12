@@ -48,9 +48,11 @@ export function createScene(
       fogColor: new BABYLON.Color3(0.12, 0.15, 0.22),
     },
     construction: {
-      clearColor: new BABYLON.Color4(0.18, 0.12, 0.08, 1),
-      fogDensity: 0.010,
-      fogColor: new BABYLON.Color3(0.18, 0.12, 0.08),
+      // Open-air sky atmosphere — replaces the old brown haze.
+      // The actual sky dome is built below via SkyMaterial.
+      clearColor: new BABYLON.Color4(0.55, 0.72, 0.88, 1),
+      fogDensity: 0.0035,
+      fogColor: new BABYLON.Color3(0.78, 0.84, 0.92),
     },
     laboratory: {
       // Cooler neutral atmosphere — warm brown was hiding floor/wall contrast
