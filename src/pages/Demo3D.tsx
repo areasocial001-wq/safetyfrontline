@@ -635,6 +635,12 @@ const Demo3D = () => {
           setCyberQuizRiskId(riskId);
           setCyberQuizRiskLabel(risk.label);
         }
+
+        // Trigger machinery quiz for construction-specific machinery risks
+        if (selectedScenario?.id === 'construction' && risk && isMachineryRisk(riskId)) {
+          setMachineryQuizRiskId(riskId);
+          setMachineryQuizRiskLabel(risk.label);
+        }
       }
 
       // Check achievements after each risk found
