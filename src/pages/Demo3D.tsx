@@ -2,6 +2,7 @@ import { useState, Suspense, useEffect, useRef, useMemo, useCallback } from "rea
 import { Link } from "react-router-dom";
 import { BabylonScene } from "@/components/demo3d/BabylonScene";
 import { SceneDebugOverlay } from "@/components/demo3d/SceneDebugOverlay";
+import { AudioDiagnosticsHUD } from "@/components/demo3d/AudioDiagnosticsHUD";
 import {
   loadPersistedSettings,
   DEFAULT_PER_WALL,
@@ -1522,6 +1523,10 @@ const Demo3D = () => {
                 }}
               />
             )}
+
+            {/* WebAudio diagnostics chip — verifies scenario sound effects */}
+            <AudioDiagnosticsHUD />
+
             {/* Contextual Hints System */}
             {gameStarted && !gameCompleted && memoizedScenario && (
               <ContextualHints
