@@ -7,9 +7,12 @@ import { Progress } from "@/components/ui/progress";
 import {
   ArrowLeft, Play, CheckCircle, Lock, Sparkles, Trophy,
   Flame, Heart, Shield, Monitor, Cross, Building2, Clock,
+  Award, Download, Home, PartyPopper, Star, Zap,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { getModuleInfo } from "@/data/all-training-modules";
+import { generateCertificatePdf, DEFAULT_CERTIFICATE_SETTINGS } from "@/lib/facsimile-pdf";
+import { toast } from "sonner";
 
 const DEFAULT_DEMO_PACKAGE_ID = "8829ce9f-3bd3-4322-9f5a-1b29237076a2"; // IRM
 const STORAGE_KEY = "demo-completed-modules";
