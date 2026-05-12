@@ -471,6 +471,33 @@ export type Database = {
         }
         Relationships: []
       }
+      platform_settings: {
+        Row: {
+          bypass_min_times: boolean
+          demo_package_id: string | null
+          id: string
+          singleton: boolean
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          bypass_min_times?: boolean
+          demo_package_id?: string | null
+          id?: string
+          singleton?: boolean
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          bypass_min_times?: boolean
+          demo_package_id?: string | null
+          id?: string
+          singleton?: boolean
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
       point_click_progress: {
         Row: {
           completed: boolean
