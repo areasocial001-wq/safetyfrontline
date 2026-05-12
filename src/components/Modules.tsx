@@ -241,6 +241,19 @@ export const Modules = () => {
             ))}
           </div>
 
+          {activeTab === 'bonus' && (
+            <div className="mt-8 text-center p-6 rounded-xl bg-gradient-to-r from-fuchsia-500/10 via-purple-500/10 to-primary/10 border border-purple-500/20">
+              <p className="text-sm text-muted-foreground mb-4">
+                I moduli bonus sono extra opzionali, attivabili separatamente rispetto al piano formativo standard.
+              </p>
+              <Button asChild variant="hero" size="lg">
+                <Link to="/moduli-bonus" className="gap-2">
+                  Scopri i Moduli Bonus <ArrowRight className="w-4 h-4" />
+                </Link>
+              </Button>
+            </div>
+          )}
+
           {/* Summary Stats */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-12 mb-8">
             {[
