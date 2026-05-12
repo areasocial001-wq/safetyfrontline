@@ -170,7 +170,7 @@ export async function generateCertificatePdf(
   pdf.setFillColor(255, 247, 242);
   pdf.setDrawColor(...ORANGE);
   pdf.setLineWidth(0.4);
-  pdf.roundRect(boxX, y, boxW, boxH, 3, 3, "FD");
+  pdf.roundedRect(boxX, y, boxW, boxH, 3, 3, "FD");
 
   pdf.setFontSize(9);
   pdf.setTextColor(...GREY);
@@ -292,7 +292,7 @@ export async function generateTestPdf(
   pdf.setFillColor(255, 247, 242);
   pdf.setDrawColor(...ORANGE);
   pdf.setLineWidth(0.3);
-  pdf.roundRect(18, y, w - 36, 14, 2, 2, "FD");
+  pdf.roundedRect(18, y, w - 36, 14, 2, 2, "FD");
   pdf.setTextColor(...DARK);
   pdf.setFont("helvetica", "bold");
   pdf.setFontSize(9);
