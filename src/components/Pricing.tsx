@@ -95,7 +95,7 @@ export const Pricing = () => {
                 <div className="mb-6">
                   <div className="text-4xl font-bold mb-2">{plan.price}</div>
                   <p className="text-muted-foreground text-sm">
-                    Contattaci per un preventivo personalizzato
+                    {plan.priceSubtitle ?? "Contattaci per un preventivo personalizzato"}
                   </p>
                 </div>
 
