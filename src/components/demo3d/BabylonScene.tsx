@@ -26,6 +26,8 @@ import { loadGLTFProps } from '@/lib/babylon-prop-loader';
 import { loadProceduralProps } from '@/lib/babylon-procedural-props';
 import { SCENARIO_PROPS, SCENARIO_PROCEDURAL_PROPS } from '@/types/prop-config';
 import { NPCAmbientSoundSystem } from '@/lib/npc-ambient-sounds';
+import { useLang, t, isRTL, LANGUAGES, type Lang } from '@/lib/risk-i18n';
+import { getNormative } from '@/lib/risk-normative';
 
 // Scene modules
 import { createScene } from './scene-modules/scene-setup';
@@ -129,49 +131,24 @@ export const BabylonScene = ({
   const [activeNPCRole, setActiveNPCRole] = useState<string | null>(null);
   const [quizRole, setQuizRole] = useState<string | null>(null);
   const [hoverLabel, setHoverLabel] = useState<{ label: string; severity: string; x: number; y: number } | null>(null);
-  const [guideOverlay, setGuideOverlay] = useState<{ label: string; description: string; normative: string; severity: string } | null>(null);
+  const [guideOverlay, setGuideOverlay] = useState<{
+    label: string; description: string; severity: string;
+    normTitle: string; normArticles: string; normObligation: string;
+    nextSteps: string[]; tip: string; startedAt: number;
+  } | null>(null);
   const [guideMode, setGuideMode] = useState(true);
   const guideModeRef = useRef(true);
   const guideOverlayActiveRef = useRef(false);
   useEffect(() => { guideModeRef.current = guideMode; }, [guideMode]);
-
-  // Derive normative reference from risk content
-  const deriveNormative = (label: string, description: string, severity: string): string => {
-    const text = (label + ' ' + description).toLowerCase();
-    if (text.includes('estintore') || text.includes('antincend') || text.includes('incendio') || text.includes('fuoco')) {
-      return 'D.M. 10/03/1998 e D.Lgs. 81/08 art. 46 — gli estintori devono essere accessibili, segnalati, controllati periodicamente e mai ostruiti.';
-    }
-    if (text.includes('uscita') || text.includes('via di fuga') || text.includes('evacuaz') || text.includes('emergenza')) {
-      return 'D.Lgs. 81/08 Allegato IV §1.5 — le vie e uscite di emergenza devono restare sgombre e consentire l\'evacuazione rapida e sicura.';
-    }
-    if (text.includes('cavo') || text.includes('elettric') || text.includes('multipresa') || text.includes('folgoraz')) {
-      return 'D.Lgs. 81/08 Titolo III Capo III + CEI 64-8 — impianti e cavi devono essere protetti da contatti diretti/indiretti e mantenuti in efficienza.';
-    }
-    if (text.includes('scaffal') || text.includes('instabil') || text.includes('ribalt') || text.includes('crollo')) {
-      return 'D.Lgs. 81/08 art. 64 e Allegato IV — strutture e scaffalature devono essere stabili, ancorate e di portata adeguata al carico.';
-    }
-    if (text.includes('dpi') || text.includes('casco') || text.includes('protezione individuale')) {
-      return 'D.Lgs. 81/08 Titolo III Capo II artt. 74-79 — obbligo di uso dei DPI conformi al rischio specifico della mansione.';
-    }
-    if (text.includes('ponteggio') || text.includes('lavoro in quota') || text.includes('quota')) {
-      return 'D.Lgs. 81/08 Titolo IV Capo II — ponteggi e lavori in quota richiedono progetto, montaggio Pi.M.U.S. e parapetti normati.';
-    }
-    if (text.includes('scavo') || text.includes('trincea')) {
-      return 'D.Lgs. 81/08 artt. 118-121 — scavi e trincee oltre 1,5 m devono avere armature/parapetti e segnalazione perimetrale.';
-    }
-    if (text.includes('carrello') || text.includes('mulett') || text.includes('escavator') || text.includes('bulldozer') || text.includes('dumper') || text.includes('betoniera') || text.includes('macchin')) {
-      return 'D.Lgs. 81/08 artt. 71-73 + Allegato VI — attrezzature di lavoro: abilitazione operatore, segnalazione zone di manovra e moviere a terra.';
-    }
-    if (text.includes('pavimento') || text.includes('scivol') || text.includes('liquido') || text.includes('bagnat')) {
-      return 'D.Lgs. 81/08 Allegato IV §1.3 — i pavimenti devono essere asciutti, antiscivolo e segnalati se temporaneamente pericolosi.';
-    }
-    if (text.includes('password') || text.includes('phishing') || text.includes('usb') || text.includes('schermo') || text.includes('cyber') || text.includes('gdpr')) {
-      return 'GDPR Reg. UE 2016/679 art. 32 + ISO/IEC 27001 — misure tecniche e organizzative per proteggere dati e credenziali da accessi non autorizzati.';
-    }
-    return severity === 'critical'
-      ? 'D.Lgs. 81/08 art. 15 — misure generali di tutela: eliminazione del rischio alla fonte e priorità alla protezione collettiva.'
-      : 'D.Lgs. 81/08 art. 28 — il rischio va valutato e ridotto attraverso il DVR e procedure operative aggiornate.';
-  };
+  const [lang, setLangState] = useLang();
+  const langRef = useRef<Lang>(lang);
+  useEffect(() => { langRef.current = lang; }, [lang]);
+  const [tickNow, setTickNow] = useState(0);
+  useEffect(() => {
+    if (!guideOverlay) return;
+    const id = setInterval(() => setTickNow(Date.now()), 200);
+    return () => clearInterval(id);
+  }, [guideOverlay]);
 
   // Close NPC dialog with ESC key
   useEffect(() => {
@@ -532,13 +509,19 @@ export const BabylonScene = ({
           // Guida overlay with normative reference
           if (guideModeRef.current) {
             guideOverlayActiveRef.current = true;
+            const norm = getNormative(langRef.current, riskData.risk.label, riskData.risk.description, riskData.risk.severity);
             setGuideOverlay({
               label: riskData.risk.label,
               description: riskData.risk.description,
-              normative: deriveNormative(riskData.risk.label, riskData.risk.description, riskData.risk.severity),
               severity: riskData.risk.severity,
+              normTitle: norm.title,
+              normArticles: norm.articles,
+              normObligation: norm.obligation,
+              nextSteps: norm.nextSteps,
+              tip: norm.tip,
+              startedAt: Date.now(),
             });
-            setTimeout(() => { guideOverlayActiveRef.current = false; setGuideOverlay(null); }, 6000);
+            setTimeout(() => { guideOverlayActiveRef.current = false; setGuideOverlay(null); }, 7000);
           } else {
             toast.success(
               `${isCritical ? '🚨' : '⚠️'} ${riskData.risk.label}`,
@@ -1489,44 +1472,69 @@ export const BabylonScene = ({
         🎓 Guida: {guideMode ? 'ON' : 'OFF'}
       </button>
 
-      {/* Guida overlay with normative explanation */}
-      {guideOverlay && (
-        <div className="fixed bottom-24 left-1/2 -translate-x-1/2 z-50 max-w-xl w-[90%] animate-fade-in pointer-events-none">
-          <div
-            className="rounded-xl border-2 shadow-2xl backdrop-blur-md overflow-hidden"
-            style={{
-              borderColor:
-                guideOverlay.severity === 'critical' ? '#dc2626'
-                : guideOverlay.severity === 'high' ? '#ea580c'
-                : guideOverlay.severity === 'medium' ? '#ca8a04'
-                : '#22c55e',
-              backgroundColor: 'rgba(15,23,42,0.92)',
-            }}
-          >
-            <div
-              className="px-4 py-2 text-sm font-bold text-white flex items-center gap-2"
-              style={{
-                backgroundColor:
-                  guideOverlay.severity === 'critical' ? 'rgba(220,38,38,0.95)'
-                  : guideOverlay.severity === 'high' ? 'rgba(234,88,12,0.95)'
-                  : guideOverlay.severity === 'medium' ? 'rgba(202,138,4,0.95)'
-                  : 'rgba(34,197,94,0.95)',
-              }}
-            >
-              <span>🎯 Rischio individuato</span>
-              <span className="opacity-70 font-normal text-xs">— Modalità Guida</span>
-            </div>
-            <div className="px-4 py-3 space-y-2 text-white">
-              <div className="text-base font-bold leading-snug">{guideOverlay.label}</div>
-              <div className="text-sm text-white/85 leading-snug">{guideOverlay.description}</div>
-              <div className="mt-2 pt-2 border-t border-white/20 text-xs text-white/90">
-                <span className="font-semibold uppercase tracking-wide text-white/70 block mb-1">📖 Riferimento normativo</span>
-                {guideOverlay.normative}
+      {/* Language selector */}
+      <div className="fixed top-4 right-32 z-40 flex gap-1 bg-background/80 backdrop-blur-md rounded-full px-1 py-1 border border-border shadow-lg">
+        {LANGUAGES.map(l => (
+          <button key={l.code} type="button" onClick={() => setLangState(l.code)}
+            className={`px-2 py-1 rounded-full text-xs font-semibold transition-colors ${lang === l.code ? 'bg-primary text-primary-foreground' : 'text-foreground hover:bg-muted'}`}
+            title={l.label}>
+            {l.flag}
+          </button>
+        ))}
+      </div>
+
+      {/* Guida overlay with normative explanation, countdown, next steps & tip */}
+      {guideOverlay && (() => {
+        const elapsed = Math.max(0, tickNow - guideOverlay.startedAt);
+        const total = 7000;
+        const remainingSec = Math.max(0, Math.ceil((total - elapsed) / 1000));
+        const progress = Math.min(100, (elapsed / total) * 100);
+        const sevColor = guideOverlay.severity === 'critical' ? '#dc2626'
+          : guideOverlay.severity === 'high' ? '#ea580c'
+          : guideOverlay.severity === 'medium' ? '#ca8a04' : '#22c55e';
+        const sevBg = guideOverlay.severity === 'critical' ? 'rgba(220,38,38,0.95)'
+          : guideOverlay.severity === 'high' ? 'rgba(234,88,12,0.95)'
+          : guideOverlay.severity === 'medium' ? 'rgba(202,138,4,0.95)' : 'rgba(34,197,94,0.95)';
+        return (
+          <div className="fixed bottom-24 left-1/2 -translate-x-1/2 z-50 max-w-2xl w-[92%] animate-fade-in pointer-events-none"
+            dir={isRTL(lang) ? 'rtl' : 'ltr'}>
+            <div className="rounded-xl border-2 shadow-2xl backdrop-blur-md overflow-hidden"
+              style={{ borderColor: sevColor, backgroundColor: 'rgba(15,23,42,0.94)' }}>
+              <div className="px-4 py-2 text-sm font-bold text-white flex items-center justify-between gap-2" style={{ backgroundColor: sevBg }}>
+                <span className="flex items-center gap-2">
+                  <span>🎯 {t(lang, 'riskFound')}</span>
+                  <span className="opacity-70 font-normal text-xs">— {t(lang, 'guideMode')}</span>
+                </span>
+                <span className="text-xs font-mono bg-black/30 px-2 py-0.5 rounded">⏱ {remainingSec}{t(lang, 'seconds')}</span>
+              </div>
+              <div className="h-1 bg-white/10">
+                <div className="h-full transition-all" style={{ width: `${100 - progress}%`, backgroundColor: sevColor }} />
+              </div>
+              <div className="px-4 py-3 space-y-3 text-white">
+                <div>
+                  <div className="text-base font-bold leading-snug">{guideOverlay.label}</div>
+                  <div className="text-sm text-white/85 leading-snug mt-1">{guideOverlay.description}</div>
+                </div>
+                <div className="pt-2 border-t border-white/20 text-xs text-white/90">
+                  <div className="font-semibold uppercase tracking-wide text-white/70 mb-1">📖 {t(lang, 'normativeRef')}</div>
+                  <div className="font-semibold text-white">{guideOverlay.normTitle}</div>
+                  <div className="text-white/70 italic">{guideOverlay.normArticles}</div>
+                  <div className="mt-1">{guideOverlay.normObligation}</div>
+                </div>
+                <div className="pt-2 border-t border-white/20 text-xs">
+                  <div className="font-semibold uppercase tracking-wide text-white/70 mb-1">✅ {t(lang, 'nextSteps')}</div>
+                  <ol className={`list-decimal space-y-0.5 text-white/90 ${isRTL(lang) ? 'pr-5' : 'pl-5'}`}>
+                    {guideOverlay.nextSteps.map((s, i) => <li key={i}>{s}</li>)}
+                  </ol>
+                </div>
+                <div className="pt-2 border-t border-white/20 text-xs italic text-white/85">
+                  💡 <span className="font-semibold not-italic">{t(lang, 'tip')}:</span> {guideOverlay.tip}
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      )}
+        );
+      })()}
 
       {lookedAtProp && (
         <PropLabel
