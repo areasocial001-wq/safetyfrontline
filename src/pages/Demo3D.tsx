@@ -198,6 +198,9 @@ const Demo3D = () => {
   const [cyberQuizRiskLabel, setCyberQuizRiskLabel] = useState('');
   const [cyberQuizCorrect, setCyberQuizCorrect] = useState(0);
   const [cyberQuizTotal, setCyberQuizTotal] = useState(0);
+  const [machineryQuizRiskId, setMachineryQuizRiskId] = useState<string | null>(null);
+  const [machineryQuizRiskLabel, setMachineryQuizRiskLabel] = useState('');
+  const [cameraPreset, setCameraPreset] = useState<import("@/components/demo3d/CameraPresetsPanel").CameraPresetName>("pedestrian");
   const prevChargeRef = useRef(100);
   // Picture-in-Picture replay (two replays for split-screen comparison)
   const [pipReplay1, setPipReplay1] = useState<GameReplay | null>(null);
