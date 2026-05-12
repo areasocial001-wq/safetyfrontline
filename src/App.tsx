@@ -26,6 +26,7 @@ import NotFound from "./pages/NotFound";
 import PresetTestPage from "./pages/PresetTestPage";
 import SpotTheHazardPage from "./pages/SpotTheHazardPage";
 import DemoPath from "./pages/DemoPath";
+import BonusModules from "./pages/BonusModules";
 
 const queryClient = new QueryClient();
 
@@ -59,6 +60,7 @@ const App = () => (
           <Route path="/preset-test" element={<PresetTestPage />} />
           <Route path="/spot-the-hazard" element={<SpotTheHazardPage />} />
           <Route path="/demo-percorso" element={<DemoPath />} />
+          <Route path="/moduli-bonus" element={<BonusModules />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

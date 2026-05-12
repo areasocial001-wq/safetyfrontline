@@ -1,7 +1,9 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Sparkles, ArrowRight } from "lucide-react";
 import {
   Package, Building2, Warehouse, AlertCircle, Settings,
   Shield, Monitor, Brain, Zap, Thermometer,
@@ -20,7 +22,7 @@ import { SIM3D_PREVIEWS } from "@/data/sim3d-previews";
 import { Sim3dPreview } from "@/components/Sim3dPreview";
 import { QuoteRequestDialog } from "@/components/QuoteRequestDialog";
 
-type TabKey = 'generale' | 'basso' | 'medio' | 'alto' | 'figure' | 'attrezzature' | 'simulazioni' | 'minigame2d' | 'piattaforma';
+type TabKey = 'generale' | 'basso' | 'medio' | 'alto' | 'figure' | 'attrezzature' | 'simulazioni' | 'minigame2d' | 'bonus' | 'piattaforma';
 
 export const Modules = () => {
   const [quoteDialogOpen, setQuoteDialogOpen] = useState(false);
@@ -33,12 +35,13 @@ export const Modules = () => {
     { key: 'alto', label: 'Rischio Alto', icon: AlertTriangle, badge: '8 moduli' },
     { key: 'figure', label: 'Figure Sicurezza', icon: Crown, badge: '8 percorsi' },
     { key: 'attrezzature', label: 'Attrezzature', icon: Truck, badge: '8 abilitazioni' },
-    { key: 'simulazioni', label: 'Simulazioni 3D', icon: Gamepad2, badge: '5 scenari' },
+    { key: 'simulazioni', label: 'Simulazioni 3D', icon: Gamepad2, badge: '4 scenari' },
     { key: 'minigame2d', label: 'Spot the Hazard 2D', icon: Target, badge: '5 livelli' },
+    { key: 'bonus', label: 'Moduli Bonus', icon: Sparkles, badge: 'Extra' },
     { key: 'piattaforma', label: 'Piattaforma', icon: Settings },
   ];
 
-  const modules: Record<TabKey, { icon: typeof Shield; title: string; subtitle: string; description: string; color: string; image?: string | null; previewKey?: keyof typeof SIM3D_PREVIEWS; comingSoon?: boolean }[]> = {
+  const modules: Record<TabKey, { icon: typeof Shield; title: string; subtitle: string; description: string; color: string; image?: string | null; previewKey?: keyof typeof SIM3D_PREVIEWS; comingSoon?: boolean; bonus?: boolean }[]> = {
     generale: [
       { icon: Shield, title: "Concetti Base", subtitle: "Legislazione e Obblighi", description: "D.Lgs 81/08, diritti e doveri dei lavoratori, organigramma della sicurezza e figure chiave.", color: "primary" },
       { icon: AlertCircle, title: "Rischi e Prevenzione", subtitle: "Valutazione dei Rischi", description: "Identificazione dei pericoli, valutazione dei rischi, misure di prevenzione e protezione.", color: "secondary" },
@@ -99,7 +102,7 @@ export const Modules = () => {
       { icon: Warehouse, title: "Magazzino Logistica", subtitle: "Movimentazione & Stoccaggio", description: "Magazzino industriale con bancali, muletti, materiali infiammabili. Rischi manuali + procedurali generati dinamicamente.", color: "secondary", previewKey: "warehouse" },
       { icon: AlertTriangle, title: "Cantiere Edile", subtitle: "Lavori in Quota & DPI", description: "Scenario hard con macchinari pesanti, ponteggi, lavori in quota e rischi procedurali. Per formazione Rischio Alto.", color: "accent", previewKey: "construction" },
       { icon: Flame, title: "Simulazione Antincendio", subtitle: "Estintore First-Person", description: "Esercitazione realistica con estintore in prima persona: classi di fuoco, particelle, quiz contestuali e procedure di evacuazione.", color: "destructive", previewKey: "laboratory" },
-      { icon: Lock, title: "Cyber Security Office", subtitle: "Rischi Informatici 3D", description: "8 rischi cyber da identificare in un ufficio 3D: post-it con password, schermi sbloccati, email di phishing, chiavette USB sospette.", color: "muted", previewKey: "cybersecurity" },
+      
     ],
     minigame2d: [
       { icon: Building2, title: "Cantiere Cartoon", subtitle: "7 rischi · 3 vite", description: "Caccia ai rischi 2D in stile cartoon: imbracatura, carichi sospesi, ferri d'armatura, quadri elettrici. Spiegazione educativa con riferimenti normativi.", color: "destructive", image: cartoonConstruction },
@@ -107,6 +110,9 @@ export const Modules = () => {
       { icon: Warehouse, title: "Magazzino Cartoon", subtitle: "8 rischi · 3 vite", description: "Muletti, cataste instabili, pavimenti oleosi, cavi sospesi, sollevamento manuale errato. Punteggio e tentativi limitati.", color: "accent", image: cartoonWarehouse },
       { icon: Flame, title: "Cucina Ristorante Cartoon", subtitle: "8 rischi · 3 vite", description: "Pentole in fiamme, affettatrici incustodite, pavimenti grassi, cavi vicino al lavello, estintori bloccati. HACCP e D.Lgs. 81/08.", color: "destructive", image: cartoonKitchen },
       { icon: Cog, title: "Officina Meccanica Cartoon", subtitle: "8 rischi · 3 vite", description: "Carichi sospesi, saldatori senza maschera, torni senza protezione, oli sul pavimento, segnaletica usurata. Macchine utensili e carroponte.", color: "secondary", image: cartoonFactory },
+    ],
+    bonus: [
+      { icon: Lock, title: "Cyber Security Office", subtitle: "Simulazione 3D · 8 rischi informatici", description: "Modulo extra non incluso nel piano standard. Identifica 8 rischi cyber in un ufficio 3D: post-it con password, schermi sbloccati, email di phishing, chiavette USB sospette. Durata 30-45 min.", color: "primary", previewKey: "cybersecurity", bonus: true },
     ],
     piattaforma: [
       { icon: Bell, title: "Notifiche Smart", subtitle: "In-App & Email", description: "Notifiche automatiche per completamento moduli, scadenze, assegnazione settori e promemoria giornalieri.", color: "primary" },
@@ -216,6 +222,11 @@ export const Modules = () => {
                   <div className="min-w-0 flex-1">
                     <div className="flex items-start gap-2 flex-wrap">
                       <h3 className="text-lg font-bold leading-tight">{module.title}</h3>
+                      {module.bonus && (
+                        <Badge className="bg-gradient-to-r from-fuchsia-500 to-purple-600 hover:from-fuchsia-500 hover:to-purple-600 text-white border-0 text-[10px] px-1.5 py-0 gap-1">
+                          <Sparkles className="w-2.5 h-2.5" /> Modulo Bonus
+                        </Badge>
+                      )}
                       {module.comingSoon && (
                         <Badge className="bg-amber-500 hover:bg-amber-500 text-white border-0 text-[10px] px-1.5 py-0">🚧 In rilascio</Badge>
                       )}
@@ -230,12 +241,25 @@ export const Modules = () => {
             ))}
           </div>
 
+          {activeTab === 'bonus' && (
+            <div className="mt-8 text-center p-6 rounded-xl bg-gradient-to-r from-fuchsia-500/10 via-purple-500/10 to-primary/10 border border-purple-500/20">
+              <p className="text-sm text-muted-foreground mb-4">
+                I moduli bonus sono extra opzionali, attivabili separatamente rispetto al piano formativo standard.
+              </p>
+              <Button asChild variant="hero" size="lg">
+                <Link to="/moduli-bonus" className="gap-2">
+                  Scopri i Moduli Bonus <ArrowRight className="w-4 h-4" />
+                </Link>
+              </Button>
+            </div>
+          )}
+
           {/* Summary Stats */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-12 mb-8">
             {[
               { value: "35+", label: "Moduli Formativi", icon: GraduationCap },
               { value: "16", label: "Percorsi & Abilitazioni", icon: Crown },
-              { value: "5", label: "Simulazioni 3D", icon: Gamepad2 },
+              { value: "4", label: "Simulazioni 3D", icon: Gamepad2 },
               { value: "∞", label: "Personalizzazioni", icon: Settings },
             ].map((stat, i) => (
               <div key={i} className="text-center p-4 rounded-xl bg-background/50 border border-border">
