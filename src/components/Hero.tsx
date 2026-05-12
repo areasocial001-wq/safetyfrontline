@@ -20,7 +20,7 @@ export const Hero = () => {
   const [isMuted, setIsMuted] = useState(true);
   const [volume, setVolume] = useState(50);
   const [isFullscreen, setIsFullscreen] = useState(false);
-  const [showControls, setShowControls] = useState(false);
+  const [showControls, setShowControls] = useState(true);
   const [progress, setProgress] = useState(0);
 
   // Ripple effects for titles
@@ -302,9 +302,11 @@ export const Hero = () => {
               */}
               <video
                 ref={videoRef}
+                autoPlay
                 loop
                 muted={isMuted}
                 playsInline
+                preload="auto"
                 className="w-full aspect-video object-cover bg-black"
                 poster={heroImage}
               >
