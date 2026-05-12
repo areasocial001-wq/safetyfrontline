@@ -1561,18 +1561,7 @@ const Demo3D = () => {
               <LoadingOverlay scenarioTitle={memoizedScenario.title} scenarioId={memoizedScenario.id} />
             )}
 
-            {/* Mouse Calibration Overlay */}
-            {(isCalibrating || (calibrationData && !isCalibrationComplete)) && (
-              <MouseCalibrationOverlay
-                isCalibrating={isCalibrating}
-                progress={calibrationProgress}
-                data={calibrationData}
-                isComplete={isCalibrationComplete}
-                onApply={handleApplyCalibration}
-                onSkip={skipCalibration}
-                onClose={handleCloseCalibration}
-              />
-            )}
+
 
             {/* Picture-in-Picture Replay Overlays (Split-Screen) */}
             {pipReplay1 && gameStarted && (
