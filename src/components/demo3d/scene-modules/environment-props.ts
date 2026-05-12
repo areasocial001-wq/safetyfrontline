@@ -637,7 +637,25 @@ function addConstructionProps(
   gen.checkCollisions = true;
   if (shadowGenerator) shadowGenerator.addShadowCaster(gen);
 
-  console.log('[Construction] Construction site props added');
+  // Performance: machinery and static props don't move — freeze world matrices
+  // and skip per-frame active-mesh selection so the LOD/culling system can
+  // do its job without redundant matrix recomputes on low-end PCs.
+  const staticPrefixes = [
+    'exc_', 'dozer_', 'truck_', 'mixer_',
+    'mat_pallet', 'mat_stack', 'scaff_', 'tcone',
+    'port_toilet', 'generator', 'crane_',
+  ];
+  scene.meshes.forEach(m => {
+    if (!(m instanceof BABYLON.Mesh)) return;
+    if (!staticPrefixes.some(p => m.name.startsWith(p))) return;
+    try {
+      m.freezeWorldMatrix();
+      m.doNotSyncBoundingInfo = true;
+      m.alwaysSelectAsActiveMesh = false;
+    } catch { /* ignore */ }
+  });
+
+  console.log('[Construction] Construction site props added (machinery frozen for perf)');
 }
 
 // ============================================================
