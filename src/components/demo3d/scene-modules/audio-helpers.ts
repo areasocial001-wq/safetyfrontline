@@ -1,4 +1,5 @@
 import * as BABYLON from '@babylonjs/core';
+import { registerAudioContext } from '@/lib/audio-context-unlock';
 
 /**
  * Create particle burst effect at a position (risk found feedback)
