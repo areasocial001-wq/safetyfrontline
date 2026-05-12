@@ -1,26 +1,26 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Check, Users, Building } from "lucide-react";
+import { Check, Users, Building, GraduationCap } from "lucide-react";
 import { QuoteRequestDialog } from "@/components/QuoteRequestDialog";
 
 export const Pricing = () => {
   const [quoteDialogOpen, setQuoteDialogOpen] = useState(false);
   const plans = [
     {
-      name: "Versione Aula",
-      icon: Users,
-      price: "Su Richiesta",
-      description: "Modulo aggiuntivo per la formazione classica in aula",
+      name: "Modalità Prova",
+      icon: GraduationCap,
+      price: "Per singolo corso",
+      description: "Prova la piattaforma con un singolo corso a scelta",
       features: [
-        "Perfetto per corsi di gruppo",
-        "Interazione collettiva gestita dal docente",
-        "Proiettore/TV 55\" sufficiente",
-        "Controller passabile tra partecipanti",
-        "Report statistiche di gruppo",
-        "Tutti i moduli disponibili",
-        "Assistenza tecnica inclusa",
-        "Aggiornamenti normativi automatici"
+        "Accesso a 1 corso completo",
+        "Ideale per valutare la piattaforma",
+        "Tutti i contenuti del modulo inclusi",
+        "Test finale e attestato di prova",
+        "Esperienza 3D e gamification complete",
+        "Supporto durante la prova",
+        "Nessun impegno a lungo termine",
+        "Possibilità di upgrade in qualsiasi momento"
       ],
       highlight: false
     },
