@@ -282,7 +282,7 @@ const DemoPath = () => {
         ) : (
           <div className="space-y-4 relative">
             {modules.map((mod, index) => {
-              const isCompleted = completed.has(mod.id);
+              const isCompleted = isModuleCompleted(mod.id);
               const Icon = MODULE_ICONS[mod.id] || Shield;
               const duration = MODULE_DURATIONS[mod.id] || 10;
 
