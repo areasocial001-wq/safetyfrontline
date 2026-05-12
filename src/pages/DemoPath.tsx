@@ -35,6 +35,22 @@ const MODULE_DURATIONS: Record<string, number> = {
   cybersecurity: 8,
 };
 
+// Map "macro" package module IDs to the actual content moduleId used by TrainingModule
+const MACRO_TO_CONTENT_ID: Record<string, string> = {
+  formazione_alto: "ra_rischi_meccanici_avanzati",
+  specifica_aziende: "ls_aziende",
+  antincendio_m2: "antincendio_protezione",
+  primo_soccorso_m2: "primo_soccorso_intervento",
+  rls_m2: "rls_rischi_valutazione",
+  cybersecurity: "cybersecurity-awareness",
+  // fallback / extra package entries
+  office: "ls_uffici",
+  warehouse: "ls_aziende",
+  general: "giuridico_normativo",
+};
+
+const resolveContentId = (macroId: string) => MACRO_TO_CONTENT_ID[macroId] || macroId;
+
 interface DemoModule {
   id: string;
   order: number;
@@ -103,11 +119,14 @@ const DemoPath = () => {
     setCompleted(new Set());
   };
 
-  const startModule = (moduleId: string) => {
-    navigate(`/formazione/${moduleId}?demo=1`);
+  const startModule = (macroId: string) => {
+    navigate(`/formazione/${resolveContentId(macroId)}?demo=1`);
   };
 
-  const completedCount = modules.filter((m) => completed.has(m.id)).length;
+  const isModuleCompleted = (macroId: string) =>
+    completed.has(macroId) || completed.has(resolveContentId(macroId));
+
+  const completedCount = modules.filter((m) => isModuleCompleted(m.id)).length;
   const totalCount = modules.length;
   const progressPercent = totalCount > 0 ? (completedCount / totalCount) * 100 : 0;
   const allDone = completedCount === totalCount && totalCount > 0;
@@ -263,7 +282,7 @@ const DemoPath = () => {
         ) : (
           <div className="space-y-4 relative">
             {modules.map((mod, index) => {
-              const isCompleted = completed.has(mod.id);
+              const isCompleted = isModuleCompleted(mod.id);
               const Icon = MODULE_ICONS[mod.id] || Shield;
               const duration = MODULE_DURATIONS[mod.id] || 10;
 
