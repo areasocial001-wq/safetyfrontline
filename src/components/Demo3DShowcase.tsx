@@ -36,14 +36,20 @@ export const Demo3DShowcase = () => {
           {/* Main Showcase Card */}
           <Card className="overflow-hidden border-2 border-primary/30 shadow-[0_0_50px_rgba(255,103,31,0.2)] hover:shadow-[0_0_80px_rgba(255,103,31,0.3)] transition-all duration-500 animate-scale-in">
             <div className="grid md:grid-cols-2 gap-0">
-              {/* Image Side */}
-              <div className="relative overflow-hidden group">
-                <img 
-                  src={heroGameImage} 
-                  alt="Gameplay 3D First Person"
-                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+              {/* Video Side */}
+              <div className="relative overflow-hidden group min-h-[320px]">
+                <video
+                  src="/videos/safety-frontline-promo.mp4"
+                  poster={heroGameImage}
+                  autoPlay
+                  loop
+                  muted
+                  playsInline
+                  preload="metadata"
+                  aria-label="Gameplay 3D First Person - video promo Safety Frontline"
+                  className="w-full h-full object-cover absolute inset-0"
                 />
-                <div className="absolute inset-0 bg-gradient-to-tr from-primary/40 via-transparent to-secondary/40 opacity-80 group-hover:opacity-60 transition-opacity" />
+                <div className="absolute inset-0 bg-gradient-to-tr from-primary/30 via-transparent to-secondary/30 opacity-60 group-hover:opacity-30 transition-opacity pointer-events-none" />
                 
                 {/* Floating Badges on Image */}
                 <div className="absolute top-4 left-4 flex flex-col gap-2">
