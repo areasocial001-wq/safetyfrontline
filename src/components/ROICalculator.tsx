@@ -6,12 +6,27 @@ import { Input } from "@/components/ui/input";
 import { Slider } from "@/components/ui/slider";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { Calculator, TrendingUp, Clock, AlertTriangle, ShieldCheck, ArrowRight } from "lucide-react";
-import { SECTOR_PACKAGES, PLAN_TIERS, getSector, getTier } from "@/data/sector-packages";
+import { Calculator, TrendingUp, Clock, AlertTriangle, ShieldCheck, ArrowRight, Sparkles, Check } from "lucide-react";
+import { SECTOR_PACKAGES, PLAN_TIERS, getSector, getTier, type PlanTier, type SectorPackage } from "@/data/sector-packages";
 import { QuoteRequestDialog } from "@/components/QuoteRequestDialog";
 
 const fmt = (n: number) =>
   new Intl.NumberFormat("it-IT", { style: "currency", currency: "EUR", maximumFractionDigits: 0 }).format(n);
+
+function computeROI(sector: SectorPackage, tier: PlanTier, employees: number, hourlyCost: number) {
+  const pricePerEmp = Math.round(sector.pricePerEmployee * tier.multiplier);
+  const platformCost = pricePerEmp * employees;
+  const tradTotal = sector.totalHours * (hourlyCost + sector.tradAvgHourCost) * employees;
+  const baselineIncidentRate = sector.riskLevel === "alto" ? 0.08 : sector.riskLevel === "medio" ? 0.04 : 0.015;
+  const incidentsAvoided = Math.max(0, Math.round(employees * baselineIncidentRate * 0.6));
+  const incidentSavings = incidentsAvoided * 1500;
+  const hoursSaved = sector.totalHours * 0.55 * employees;
+  const timeSavings = hoursSaved * hourlyCost;
+  const totalSavings = tradTotal - platformCost + incidentSavings + timeSavings;
+  const roi = platformCost > 0 ? (totalSavings / platformCost) * 100 : 0;
+  const paybackMonths = totalSavings > 0 ? Math.max(1, Math.round((platformCost / (totalSavings / 12)) * 10) / 10) : 12;
+  return { pricePerEmp, platformCost, tradTotal, incidentsAvoided, incidentSavings, hoursSaved: Math.round(hoursSaved), timeSavings, totalSavings, roi, paybackMonths };
+}
 
 export const ROICalculator = () => {
   const [employees, setEmployees] = useState(20);
