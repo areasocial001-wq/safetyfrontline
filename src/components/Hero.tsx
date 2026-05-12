@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { NavLink } from "react-router-dom";
-import { Gamepad2, Play, Pause, Shield, Sparkles, Zap, Target, Trophy, Volume2, VolumeX, Maximize, Minimize, Volume, GraduationCap } from "lucide-react";
+import { Gamepad2, Play, Pause, Shield, Sparkles, Zap, Target, Trophy, Volume2, VolumeX, Maximize, Minimize, Volume, GraduationCap, RotateCcw } from "lucide-react";
 import { Slider } from "@/components/ui/slider";
 import heroImage from "@/assets/hero-game-corridor.jpg";
 import { UserMenu } from "@/components/auth/UserMenu";
