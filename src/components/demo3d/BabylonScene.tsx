@@ -1523,6 +1523,76 @@ export const BabylonScene = ({
         🎓 Guida: {guideMode ? 'ON' : 'OFF'}
       </button>
 
+      {/* Fire-scenario rendering controls (highlight toggle + layer debug) */}
+      {isFireScenario && (
+        <div className="fixed top-16 right-4 z-40 flex flex-col gap-1 items-end">
+          <button
+            type="button"
+            onClick={() => setHighlightEnabled(v => !v)}
+            className={`px-3 py-1.5 rounded-full text-xs font-semibold shadow-lg backdrop-blur-md border transition-colors ${
+              highlightEnabled
+                ? 'bg-amber-500/90 text-white border-amber-300'
+                : 'bg-background/80 text-foreground border-border'
+            }`}
+            title="Disattiva il bordo evidenziatore se copre fiamme/fumo"
+          >
+            ✨ Highlight: {highlightEnabled ? 'ON' : 'OFF'}
+          </button>
+          <button
+            type="button"
+            onClick={() => setShowLayerDebug(v => !v)}
+            className={`px-3 py-1.5 rounded-full text-xs font-semibold shadow-lg backdrop-blur-md border transition-colors ${
+              showLayerDebug
+                ? 'bg-sky-500/90 text-white border-sky-300'
+                : 'bg-background/80 text-foreground border-border'
+            }`}
+            title="Mostra layer di rendering attivi"
+          >
+            🐞 Layers: {showLayerDebug ? 'ON' : 'OFF'}
+          </button>
+          {showLayerDebug && layerDebugInfo && (
+            <div className="mt-1 w-72 max-h-[60vh] overflow-y-auto rounded-lg border border-border bg-background/95 backdrop-blur-md p-2 text-[10px] shadow-xl text-foreground">
+              <div className="font-bold mb-1 flex items-center justify-between">
+                <span>Rendering layers</span>
+                <span className={layerDebugInfo.highlight ? 'text-amber-500' : 'text-muted-foreground'}>
+                  HL: {layerDebugInfo.highlight ? 'ON' : 'OFF'}
+                </span>
+              </div>
+              <div className="mb-1.5">
+                <div className="font-semibold opacity-70">Mesh per group</div>
+                <div className="grid grid-cols-4 gap-1 mt-0.5">
+                  {Object.entries(layerDebugInfo.groupCounts).sort().map(([g, n]) => (
+                    <div key={g} className="rounded bg-muted px-1 py-0.5 text-center">
+                      g{g}: <span className="font-mono">{n}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <div>
+                <div className="font-semibold opacity-70 mb-0.5">
+                  Particle systems ({layerDebugInfo.particleSystems.length})
+                </div>
+                <div className="space-y-0.5">
+                  {layerDebugInfo.particleSystems.map((p, i) => (
+                    <div key={i} className="flex items-center justify-between gap-1 leading-tight">
+                      <span className="truncate flex-1" title={p.name}>{p.name}</span>
+                      <span className="font-mono opacity-70">g{p.group}</span>
+                      <span className="font-mono opacity-70">b{p.blendMode}</span>
+                      <span className={p.active ? 'text-emerald-500' : 'text-muted-foreground'}>
+                        {p.active ? '●' : '○'}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <div className="mt-1.5 pt-1 border-t border-border text-[9px] opacity-60">
+                ● attivo · b=blendMode (1=ADD, 2=STD) · g=renderingGroup
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
       {/* Language selector */}
       <div className="fixed top-4 right-32 z-40 flex gap-1 bg-background/80 backdrop-blur-md rounded-full px-1 py-1 border border-border shadow-lg">
         {LANGUAGES.map(l => (
