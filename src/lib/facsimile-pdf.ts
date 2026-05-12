@@ -65,8 +65,10 @@ const GREY: [number, number, number] = [100, 100, 100];
 
 function drawWatermark(pdf: jsPDF, w: number, h: number) {
   pdf.saveGraphicsState();
-  // @ts-expect-error jspdf typings
-  pdf.setGState(new (jsPDF.GState as any)({ opacity: 0.08 }));
+  const anyPdf = pdf as any;
+  if (typeof anyPdf.GState === "function") {
+    anyPdf.setGState(new anyPdf.GState({ opacity: 0.08 }));
+  }
   pdf.setTextColor(...ORANGE);
   pdf.setFont("helvetica", "bold");
   pdf.setFontSize(110);
