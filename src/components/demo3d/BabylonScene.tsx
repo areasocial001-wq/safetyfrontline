@@ -155,6 +155,33 @@ export const BabylonScene = ({
     // Expose live refs for the SceneDebugOverlay
     (window as unknown as { __activeBabylon?: unknown }).__activeBabylon = { scene, camera, engine };
 
+    // Camera presets listener (used by CameraPresetsPanel for the construction scenario)
+    const PRESETS: Record<string, { pos: BABYLON.Vector3; target: BABYLON.Vector3 }> = {
+      pedestrian: { pos: new BABYLON.Vector3(0, 1.7, 0), target: new BABYLON.Vector3(0, 1.7, 5) },
+      drone: { pos: new BABYLON.Vector3(0, 28, -22), target: new BABYLON.Vector3(0, 0, 0) },
+      excavator: { pos: new BABYLON.Vector3(18, 6, -8), target: new BABYLON.Vector3(12, 2, -15) },
+      truck: { pos: new BABYLON.Vector3(-2, 5, 18), target: new BABYLON.Vector3(-6, 1.5, 12) },
+    };
+    const handleCamPreset = (e: Event) => {
+      const detail = (e as CustomEvent).detail as { name?: string };
+      const cam = cameraRef.current;
+      if (!cam || !detail?.name) return;
+      const preset = PRESETS[detail.name];
+      if (!preset) return;
+      const ease = new BABYLON.CubicEase();
+      ease.setEasingMode(BABYLON.EasingFunction.EASINGMODE_EASEINOUT);
+      BABYLON.Animation.CreateAndStartAnimation(
+        'camPos', cam, 'position', 60, 36, cam.position.clone(), preset.pos.clone(),
+        BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT, ease
+      );
+      cam.setTarget(preset.target.clone());
+    };
+    window.addEventListener('babylon-camera-preset', handleCamPreset);
+    const cleanupCamPresetRef = handleCamPreset;
+    (scene as unknown as { __camPresetCleanup?: () => void }).__camPresetCleanup = () => {
+      window.removeEventListener('babylon-camera-preset', cleanupCamPresetRef);
+    };
+
     // 2. First-person extinguisher (laboratory only)
     if (scenario.type === 'laboratory' && extinguisherType) {
       createFirstPersonExtinguisher(scene, camera, extinguisherType);
