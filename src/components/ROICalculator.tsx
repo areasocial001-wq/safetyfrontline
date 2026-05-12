@@ -6,12 +6,27 @@ import { Input } from "@/components/ui/input";
 import { Slider } from "@/components/ui/slider";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { Calculator, TrendingUp, Clock, AlertTriangle, ShieldCheck, ArrowRight } from "lucide-react";
-import { SECTOR_PACKAGES, PLAN_TIERS, getSector, getTier } from "@/data/sector-packages";
+import { Calculator, TrendingUp, Clock, AlertTriangle, ShieldCheck, ArrowRight, Sparkles, Check } from "lucide-react";
+import { SECTOR_PACKAGES, PLAN_TIERS, getSector, getTier, type PlanTier, type SectorPackage } from "@/data/sector-packages";
 import { QuoteRequestDialog } from "@/components/QuoteRequestDialog";
 
 const fmt = (n: number) =>
   new Intl.NumberFormat("it-IT", { style: "currency", currency: "EUR", maximumFractionDigits: 0 }).format(n);
+
+function computeROI(sector: SectorPackage, tier: PlanTier, employees: number, hourlyCost: number) {
+  const pricePerEmp = Math.round(sector.pricePerEmployee * tier.multiplier);
+  const platformCost = pricePerEmp * employees;
+  const tradTotal = sector.totalHours * (hourlyCost + sector.tradAvgHourCost) * employees;
+  const baselineIncidentRate = sector.riskLevel === "alto" ? 0.08 : sector.riskLevel === "medio" ? 0.04 : 0.015;
+  const incidentsAvoided = Math.max(0, Math.round(employees * baselineIncidentRate * 0.6));
+  const incidentSavings = incidentsAvoided * 1500;
+  const hoursSaved = sector.totalHours * 0.55 * employees;
+  const timeSavings = hoursSaved * hourlyCost;
+  const totalSavings = tradTotal - platformCost + incidentSavings + timeSavings;
+  const roi = platformCost > 0 ? (totalSavings / platformCost) * 100 : 0;
+  const paybackMonths = totalSavings > 0 ? Math.max(1, Math.round((platformCost / (totalSavings / 12)) * 10) / 10) : 12;
+  return { pricePerEmp, platformCost, tradTotal, incidentsAvoided, incidentSavings, hoursSaved: Math.round(hoursSaved), timeSavings, totalSavings, roi, paybackMonths };
+}
 
 export const ROICalculator = () => {
   const [employees, setEmployees] = useState(20);
@@ -23,46 +38,13 @@ export const ROICalculator = () => {
   const calc = useMemo(() => {
     const sector = getSector(sectorId)!;
     const tier = getTier(tierId)!;
-
-    // Costi piattaforma
-    const pricePerEmp = Math.round(sector.pricePerEmployee * tier.multiplier);
-    const platformCost = pricePerEmp * employees;
-
-    // Costi formazione tradizionale
-    // Ore totali x (costo orario dipendente + costo orario aula/docente)
-    const tradCostPerEmp = sector.totalHours * (hourlyCost + sector.tradAvgHourCost);
-    const tradTotal = tradCostPerEmp * employees;
-
-    // Risparmi indiretti
-    // -60% errori comportamentali → stima incidenti evitati
-    // Costo medio infortunio lieve PMI: ~1.500€ (giornate perse + pratiche INAIL)
-    const baselineIncidentRate = sector.riskLevel === "alto" ? 0.08 : sector.riskLevel === "medio" ? 0.04 : 0.015;
-    const incidentsAvoided = Math.max(0, Math.round(employees * baselineIncidentRate * 0.6));
-    const incidentSavings = incidentsAvoided * 1500;
-
-    // Tempo recuperato: micro-learning vs aula (5 min vs 60 min/sessione)
-    const hoursSaved = sector.totalHours * 0.55 * employees; // ~55% del tempo aula
-    const timeSavings = hoursSaved * hourlyCost;
-
-    const totalSavings = tradTotal - platformCost + incidentSavings + timeSavings;
-    const roi = platformCost > 0 ? (totalSavings / platformCost) * 100 : 0;
-    const paybackMonths = totalSavings > 0 ? Math.max(1, Math.round((platformCost / (totalSavings / 12)) * 10) / 10) : 12;
-
-    return {
-      sector,
-      tier,
-      pricePerEmp,
-      platformCost,
-      tradTotal,
-      incidentsAvoided,
-      incidentSavings,
-      hoursSaved: Math.round(hoursSaved),
-      timeSavings,
-      totalSavings,
-      roi,
-      paybackMonths,
-    };
+    return { sector, tier, ...computeROI(sector, tier, employees, hourlyCost) };
   }, [employees, sectorId, tierId, hourlyCost]);
+
+  const comparison = useMemo(() => {
+    const sector = getSector(sectorId)!;
+    return PLAN_TIERS.map((t) => ({ tier: t, ...computeROI(sector, t, employees, hourlyCost) }));
+  }, [sectorId, employees, hourlyCost]);
 
   return (
     <section className="py-16 bg-background">
@@ -203,6 +185,86 @@ export const ROICalculator = () => {
               <AlertTriangle className="w-3 h-3 mt-0.5 shrink-0" />
               Stime indicative basate su benchmark di settore (formazione aula media 45-65 €/h, costo medio infortunio lieve INAIL ~1.500€, riduzione errori 60% da gamification). Il preventivo finale dipende da volumi, durata contrattuale e personalizzazioni.
             </p>
+          </div>
+        </div>
+
+        {/* Tier Comparison */}
+        <div className="mt-14">
+          <div className="text-center mb-6">
+            <h3 className="text-2xl md:text-3xl font-bold mb-2">
+              Confronta i 3 piani per <span className="text-primary">{calc.sector.name}</span>
+            </h3>
+            <p className="text-sm text-muted-foreground">
+              Stesso settore e {employees} dipendenti — vedi ROI e payback per ogni piano.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-5">
+            {comparison.map(({ tier, pricePerEmp, platformCost, totalSavings, roi, paybackMonths }) => {
+              const isSelected = tier.id === tierId;
+              const isBest = tier.id === "professional";
+              return (
+                <Card
+                  key={tier.id}
+                  onClick={() => setTierId(tier.id)}
+                  className={`p-5 cursor-pointer transition-all hover:shadow-lg ${
+                    isSelected ? "border-primary ring-2 ring-primary/30 bg-primary/5" : "hover:border-primary/40"
+                  }`}
+                >
+                  <div className="flex items-center justify-between mb-3">
+                    <h4 className="text-xl font-bold">{tier.name}</h4>
+                    {isBest && (
+                      <Badge className="bg-primary text-primary-foreground">
+                        <Sparkles className="w-3 h-3 mr-1" /> Più scelto
+                      </Badge>
+                    )}
+                  </div>
+
+                  <div className="mb-4 pb-4 border-b border-border">
+                    <p className="text-3xl font-black text-primary tabular-nums">{fmt(pricePerEmp)}</p>
+                    <p className="text-xs text-muted-foreground">per dipendente / anno</p>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Totale: <span className="font-semibold tabular-nums">{fmt(platformCost)}</span>/anno
+                    </p>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-3 mb-4">
+                    <div>
+                      <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">ROI</p>
+                      <p className="text-2xl font-bold text-accent tabular-nums">{Math.round(roi)}%</p>
+                    </div>
+                    <div>
+                      <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Payback</p>
+                      <p className="text-2xl font-bold tabular-nums">
+                        {paybackMonths} <span className="text-sm font-normal text-muted-foreground">mesi</span>
+                      </p>
+                    </div>
+                    <div className="col-span-2">
+                      <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Risparmio annuo netto</p>
+                      <p className="text-xl font-bold text-primary tabular-nums">{fmt(totalSavings)}</p>
+                    </div>
+                  </div>
+
+                  <ul className="space-y-1.5 text-xs text-muted-foreground mb-4">
+                    {tier.perks.slice(0, 4).map((p, i) => (
+                      <li key={i} className="flex items-start gap-2">
+                        <Check className="w-3.5 h-3.5 text-accent mt-0.5 shrink-0" />
+                        <span>{p}</span>
+                      </li>
+                    ))}
+                  </ul>
+
+                  <Button
+                    variant={isSelected ? "hero" : "outline"}
+                    size="sm"
+                    className="w-full"
+                    onClick={(e) => { e.stopPropagation(); setTierId(tier.id); }}
+                  >
+                    {isSelected ? "Piano selezionato" : `Scegli ${tier.name}`}
+                  </Button>
+                </Card>
+              );
+            })}
           </div>
         </div>
 
