@@ -25,6 +25,7 @@ import MyCertificates from "./pages/MyCertificates";
 import NotFound from "./pages/NotFound";
 import PresetTestPage from "./pages/PresetTestPage";
 import SpotTheHazardPage from "./pages/SpotTheHazardPage";
+import DemoPath from "./pages/DemoPath";
 
 const queryClient = new QueryClient();
 
@@ -57,6 +58,7 @@ const App = () => (
           <Route path="/i-miei-attestati" element={<MyCertificates />} />
           <Route path="/preset-test" element={<PresetTestPage />} />
           <Route path="/spot-the-hazard" element={<SpotTheHazardPage />} />
+          <Route path="/demo-percorso" element={<DemoPath />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

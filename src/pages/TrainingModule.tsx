@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -50,9 +50,13 @@ const SECTION_ICONS: Record<string, { emoji: string; label: string; gradient: st
   lesson: { emoji: '📖', label: 'Lezione', gradient: 'from-accent/20 to-accent/5' },
 };
 
+const DEMO_STORAGE_KEY = 'demo-completed-modules';
+
 const TrainingModule = () => {
   const { moduleId } = useParams<{ moduleId: string }>();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const isDemoMode = searchParams.get('demo') === '1';
   const { user } = useAuth();
   const { initializeProgress, updateProgress, addXp, getModuleProgress } = useTrainingProgress();
 
@@ -225,6 +229,18 @@ const TrainingModule = () => {
       addXp(30);
     }
     if (nextIndex >= totalSections) {
+      // DEMO mode: skip all DB writes, persist completion to localStorage, return to demo path
+      if (isDemoMode) {
+        try {
+          const raw = localStorage.getItem(DEMO_STORAGE_KEY);
+          const arr: string[] = raw ? JSON.parse(raw) : [];
+          if (!arr.includes(moduleId)) arr.push(moduleId);
+          localStorage.setItem(DEMO_STORAGE_KEY, JSON.stringify(arr));
+        } catch {}
+        toast({ title: '🎉 Modulo Demo Completato!', description: 'Torno al percorso demo...' });
+        setTimeout(() => navigate('/demo-percorso'), 800);
+        return;
+      }
       await updateProgress(moduleId, { status: 'completed', current_section: totalSections, xp_earned: sessionXp, time_spent_seconds: totalTimeSpent, completed_at: new Date().toISOString() });
       toast({ title: '🎉 Modulo Completato!', description: `Hai guadagnato ${sessionXp} XP` });
       if (user) {
@@ -251,7 +267,7 @@ const TrainingModule = () => {
     setBossTestMaxScore(0);
     setPerfectQuiz(true);
     setStreak(0);
-  }, [moduleId, moduleContent, currentSectionIndex, totalSections, sessionXp, totalTimeSpent, updateProgress, navigate, currentSection, perfectQuiz, healthBar, achievementPopup, addXp]);
+  }, [moduleId, moduleContent, currentSectionIndex, totalSections, sessionXp, totalTimeSpent, updateProgress, navigate, currentSection, perfectQuiz, healthBar, achievementPopup, addXp, isDemoMode, user, bossTestScore, bossTestMaxScore, getModuleProgress]);
 
   if (!moduleContent || !currentSection) {
     return (
@@ -263,7 +279,7 @@ const TrainingModule = () => {
             </div>
             <h2 className="text-xl font-bold mb-2">Modulo non trovato</h2>
             <p className="text-muted-foreground mb-4">Questo modulo potrebbe non essere ancora disponibile.</p>
-            <Button onClick={() => navigate('/formazione')}>Torna alla Formazione</Button>
+            <Button onClick={() => navigate(isDemoMode ? '/demo-percorso' : '/formazione')}>Torna {isDemoMode ? 'al Percorso Demo' : 'alla Formazione'}</Button>
           </CardContent>
         </Card>
       </div>
@@ -305,7 +321,7 @@ const TrainingModule = () => {
         <div className="container mx-auto px-4 py-3">
           <div className="flex items-center justify-between gap-3">
             {/* Exit */}
-            <Button variant="ghost" size="icon" onClick={() => navigate('/formazione')} className="shrink-0">
+            <Button variant="ghost" size="icon" onClick={() => navigate(isDemoMode ? '/demo-percorso' : '/formazione')} className="shrink-0">
               <XCircle className="w-5 h-5 text-muted-foreground" />
             </Button>
 

@@ -19,6 +19,7 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ComplianceReport } from "@/components/company/ComplianceReport";
 import { SectionTimeConfig } from "@/components/admin/SectionTimeConfig";
+import { DemoSettingsCard } from "@/components/admin/DemoSettingsCard";
 
 const ALL_MODULES = [
   { id: "office", name: "Office Hazard Quest - Sicurezza in Ufficio", icon: "🏢" },
@@ -289,6 +290,9 @@ const TrainingConfig = () => {
           </TabsContent>
 
           <TabsContent value="config" className="space-y-8">
+          {/* Demo & Min times */}
+          <DemoSettingsCard />
+
           {/* Global Reminder Configuration */}
           <Card className="p-6">
             <div className="flex items-center gap-3 mb-6">
