@@ -642,6 +642,7 @@ export const BabylonScene = ({
     return () => {
       window.removeEventListener('resize', handleResize);
       window.removeEventListener('mousemove', handleMouseMove);
+      try { (scene as unknown as { __camPresetCleanup?: () => void }).__camPresetCleanup?.(); } catch (e) {}
       if (soundtrackRef.current) { soundtrackRef.current.stop(); soundtrackRef.current = null; }
       if (ambientAudioRef.current) { ambientAudioRef.current.stop(); ambientAudioRef.current = null; }
       if (npcSoundSystemRef.current) { npcSoundSystemRef.current.dispose(); npcSoundSystemRef.current = null; }
