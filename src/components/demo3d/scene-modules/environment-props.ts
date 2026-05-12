@@ -902,6 +902,9 @@ function addLaboratoryProps(
   smokeSystem.updateSpeed = 0.004;
   smokeSystem.minEmitBox = new BABYLON.Vector3(-1, 0, -1);
   smokeSystem.maxEmitBox = new BABYLON.Vector3(1, 0, 1);
+  // Same group as fire/perSmoke so additive/standard particles are not eaten
+  // by HighlightLayer composite (which renders in group 0).
+  smokeSystem.renderingGroupId = 1;
   smokeSystem.start();
 
   // Fire propagation system
