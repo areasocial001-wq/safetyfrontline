@@ -111,6 +111,9 @@ export const Modules = () => {
       { icon: Flame, title: "Cucina Ristorante Cartoon", subtitle: "8 rischi · 3 vite", description: "Pentole in fiamme, affettatrici incustodite, pavimenti grassi, cavi vicino al lavello, estintori bloccati. HACCP e D.Lgs. 81/08.", color: "destructive", image: cartoonKitchen },
       { icon: Cog, title: "Officina Meccanica Cartoon", subtitle: "8 rischi · 3 vite", description: "Carichi sospesi, saldatori senza maschera, torni senza protezione, oli sul pavimento, segnaletica usurata. Macchine utensili e carroponte.", color: "secondary", image: cartoonFactory },
     ],
+    bonus: [
+      { icon: Lock, title: "Cyber Security Office", subtitle: "Simulazione 3D · 8 rischi informatici", description: "Modulo extra non incluso nel piano standard. Identifica 8 rischi cyber in un ufficio 3D: post-it con password, schermi sbloccati, email di phishing, chiavette USB sospette. Durata 30-45 min.", color: "primary", previewKey: "cybersecurity", bonus: true },
+    ],
     piattaforma: [
       { icon: Bell, title: "Notifiche Smart", subtitle: "In-App & Email", description: "Notifiche automatiche per completamento moduli, scadenze, assegnazione settori e promemoria giornalieri.", color: "primary" },
       { icon: Bot, title: "AI Tutor", subtitle: "Assistente Intelligente", description: "Tutor AI integrato che risponde a domande sulla sicurezza e guida il percorso formativo.", color: "secondary" },
