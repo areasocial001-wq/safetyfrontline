@@ -1,5 +1,6 @@
 import * as BABYLON from '@babylonjs/core';
 import '@babylonjs/loaders/glTF';
+import { SkyMaterial } from '@babylonjs/materials/sky';
 import { Scenario3D } from '@/data/scenarios3d';
 import type { AudioSettings } from '@/hooks/useGraphicsSettings';
 
