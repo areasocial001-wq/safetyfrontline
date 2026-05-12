@@ -132,6 +132,7 @@ export const BabylonScene = ({
   const [guideOverlay, setGuideOverlay] = useState<{ label: string; description: string; normative: string; severity: string } | null>(null);
   const [guideMode, setGuideMode] = useState(true);
   const guideModeRef = useRef(true);
+  const guideOverlayActiveRef = useRef(false);
   useEffect(() => { guideModeRef.current = guideMode; }, [guideMode]);
 
   // Derive normative reference from risk content
