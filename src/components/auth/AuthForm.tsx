@@ -41,7 +41,8 @@ export const AuthForm = () => {
 
         const { error } = await resetPassword(formData.email);
         if (error) {
-          toast.error(error.message || 'Errore durante l\'invio dell\'email');
+          console.error('[Auth] resetPassword error:', error);
+          toast.error('Impossibile inviare l\'email di reset. Riprova più tardi.');
         } else {
           toast.success('Email di reset inviata! Controlla la tua casella di posta.');
           setMode('signin');
