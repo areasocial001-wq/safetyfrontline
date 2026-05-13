@@ -1,6 +1,7 @@
 import * as BABYLON from '@babylonjs/core';
 import { toast } from 'sonner';
 import { FIRE_CLASSES, getEffectivenessMultiplier } from './audio-helpers';
+import { getSoftParticleTexture } from './particle-textures';
 
 /**
  * Create first-person extinguisher model attached to camera
