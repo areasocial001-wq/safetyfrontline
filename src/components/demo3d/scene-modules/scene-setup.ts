@@ -367,7 +367,9 @@ export function finalizeScenePerformance(
     'worker_', 'npc_', 'avatar_', 'rig_', 'bone_',
     'fire', 'flame', 'smoke', 'spark', 'particle',
     'sprinkler', 'rocker', 'spinner', 'wheel',
-    'extinguisher', 'ext_', 'spray', 'water_', 'foam_', 'powder_',
+    'extinguisher', 'ext_', 'exthalo', 'extbeam', 'extlabel', 'extpulse',
+    'bracket_', 'nozzle_', 'pickup',
+    'spray', 'water_', 'foam_', 'powder_',
     'godrays', 'dust', 'marble', 'projectile',
     'risk_marker', 'highlight', 'cyo_glow',
   ];
