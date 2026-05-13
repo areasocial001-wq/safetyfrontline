@@ -149,6 +149,12 @@ export class LODSystem {
       '__root__', 'ground', 'skybox', 'ceiling', 'floor', 'wall',
       'boundary', 'BackgroundPlane', 'BackgroundSkybox',
       '_indicator', '_check', '_lod_',
+      // First-person extinguisher + spray + recharge pickups must never be culled
+      'ext_', 'extinguisher', 'exthalo', 'extbeam', 'extlabel', 'extpulse',
+      'spray', 'sprayEmitter', 'water_', 'foam_', 'powder_',
+      'bracket_', 'nozzle_', 'pickup',
+      // Fire/smoke emitters and particle helpers
+      'fireEmitter', 'fireLight', 'fire_', 'smoke', 'flame', 'spark', 'particle',
     ];
     const allExcludes = [...defaultExcludes, ...excludePatterns];
 
@@ -162,6 +168,16 @@ export class LODSystem {
       if (allExcludes.some(p => mesh.name.includes(p))) return;
       // Skip very small meshes (UI elements, indicators)
       if (mesh instanceof BABYLON.Mesh && mesh.getTotalVertices() < 20) return;
+      // Skip meshes parented (directly or transitively) to the active camera —
+      // their world position rides with the camera, so distance-based culling
+      // would flicker them on/off and freezing/proxy-swap would misplace them.
+      let p: BABYLON.Node | null = mesh.parent;
+      let attachedToCamera = false;
+      while (p) {
+        if (p instanceof BABYLON.Camera) { attachedToCamera = true; break; }
+        p = p.parent;
+      }
+      if (attachedToCamera) return;
 
       const isStatic = mesh.name.startsWith('rack_') ||
         mesh.name.startsWith('shelf_') ||
