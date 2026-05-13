@@ -212,12 +212,36 @@ export const FirstPersonScene = ({
       }
     };
 
-    window.addEventListener('keydown', handleKeyDown);
-    window.addEventListener('keyup', handleKeyUp);
+    // Reset all movement keys (called on blur, tab hidden, pointer lock release,
+    // or any time an overlay may have swallowed our keyup events).
+    const clearAllKeys = () => {
+      const k = keysPressed.current;
+      const wasPressed = k.forward || k.backward || k.left || k.right;
+      k.forward = false;
+      k.backward = false;
+      k.left = false;
+      k.right = false;
+      if (wasPressed && onKeysUpdate) onKeysUpdate({ ...k });
+    };
+    const onVisibility = () => { if (document.hidden) clearAllKeys(); };
+    const onPointerLockChange = () => {
+      if (!document.pointerLockElement) clearAllKeys();
+    };
+
+    // Use capture phase so overlays that stopPropagation in bubble phase
+    // can't prevent us from registering keyup and unsticking the keys.
+    window.addEventListener('keydown', handleKeyDown, true);
+    window.addEventListener('keyup', handleKeyUp, true);
+    window.addEventListener('blur', clearAllKeys);
+    document.addEventListener('visibilitychange', onVisibility);
+    document.addEventListener('pointerlockchange', onPointerLockChange);
 
     return () => {
-      window.removeEventListener('keydown', handleKeyDown);
-      window.removeEventListener('keyup', handleKeyUp);
+      window.removeEventListener('keydown', handleKeyDown, true);
+      window.removeEventListener('keyup', handleKeyUp, true);
+      window.removeEventListener('blur', clearAllKeys);
+      document.removeEventListener('visibilitychange', onVisibility);
+      document.removeEventListener('pointerlockchange', onPointerLockChange);
     };
   }, [isActive, onKeysUpdate]);
 
