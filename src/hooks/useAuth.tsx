@@ -6,36 +6,26 @@ export const useAuth = () => {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
-  const [initialized, setInitialized] = useState(false);
 
   useEffect(() => {
-    // Set up auth state listener FIRST
+    // Set up auth state listener FIRST (sync state updates only)
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        if (import.meta.env.DEV) {
-          console.log('🔐 useAuth - Auth state changed:', { event, hasSession: !!session });
-        }
+      (_event, session) => {
         setSession(session);
         setUser(session?.user ?? null);
-        if (initialized) {
-          setLoading(false);
-        }
+        setLoading(false);
       }
     );
 
     // THEN check for existing session
     supabase.auth.getSession().then(({ data: { session } }) => {
-      if (import.meta.env.DEV) {
-        console.log('🔐 useAuth - Initial session check:', { hasSession: !!session });
-      }
       setSession(session);
       setUser(session?.user ?? null);
       setLoading(false);
-      setInitialized(true);
     });
 
     return () => subscription.unsubscribe();
-  }, [initialized]);
+  }, []);
 
   const signUp = async (
     email: string, 
