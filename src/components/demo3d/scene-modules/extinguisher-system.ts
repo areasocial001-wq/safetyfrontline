@@ -153,7 +153,9 @@ export function shootExtinguisherSpray(
       case 'co2':
         return { color1: new BABYLON.Color4(0.9, 0.95, 1.0, 0.6), color2: new BABYLON.Color4(0.8, 0.85, 0.95, 0.4), colorDead: new BABYLON.Color4(0.95, 0.97, 1.0, 0), size: { min: 0.08, max: 0.25 } };
       case 'powder':
-        return { color1: new BABYLON.Color4(1.0, 0.95, 0.7, 0.8), color2: new BABYLON.Color4(0.95, 0.85, 0.5, 0.6), colorDead: new BABYLON.Color4(0.9, 0.85, 0.6, 0), size: { min: 0.1, max: 0.35 } };
+        // Saturated warm yellow/orange with full alpha so the dense cloud
+        // reads clearly against bright office/lab backgrounds.
+        return { color1: new BABYLON.Color4(1.0, 0.88, 0.35, 1.0), color2: new BABYLON.Color4(1.0, 0.78, 0.2, 0.95), colorDead: new BABYLON.Color4(0.85, 0.75, 0.5, 0), size: { min: 0.18, max: 0.55 } };
       case 'foam':
         return { color1: new BABYLON.Color4(1.0, 1.0, 1.0, 0.7), color2: new BABYLON.Color4(0.95, 0.97, 1.0, 0.5), colorDead: new BABYLON.Color4(1.0, 1.0, 1.0, 0), size: { min: 0.12, max: 0.4 } };
       case 'water': default:
