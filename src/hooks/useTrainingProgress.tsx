@@ -58,7 +58,8 @@ export const useTrainingProgress = () => {
       .maybeSingle();
     
     if (xpData) {
-      setUserXp({ total_xp: xpData.total_xp, level: xpData.level });
+      xpRef.current = { total_xp: xpData.total_xp, level: xpData.level };
+      setUserXp(xpRef.current);
     }
 
     setLoading(false);
