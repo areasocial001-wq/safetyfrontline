@@ -33,27 +33,15 @@ export function createScene(
   const scene = new BABYLON.Scene(engine);
 
   // ===== Global performance policies (apply across ALL scenarios) =====
-  // 1) Cap simultaneous lights per material to 4 (Babylon recompiles shaders
-  //    when this count changes; without a cap, each new PointLight from props
-  //    triggers a recompile of every material it touches).
-  // 2) Block material dirty mechanism during construction; finalize* will
-  //    re-enable it after meshes/materials are frozen.
-  // 3) Skip pointer-move picking — saves a per-frame raycast against all
-  //    pickable meshes. Click picking still works.
-  scene.blockMaterialDirtyMechanism = true;
+  // Cap simultaneous lights per material to 4 — prevents shader recompiles
+  // when transient point lights (fire, glows) are added/removed. We do NOT
+  // disable extra lights or block the material dirty mechanism here, because
+  // doing so caused dark/unlit scenes (especially in the antincendio lab,
+  // which relies on multiple fire emitters as primary light sources).
   scene.skipPointerMovePicking = true;
   scene.onNewMaterialAddedObservable.add((mat) => {
     const m = mat as unknown as { maxSimultaneousLights?: number };
     if (typeof m.maxSimultaneousLights === 'number') m.maxSimultaneousLights = 4;
-  });
-
-  // 4) Light budget per quality preset. Extra lights created by props/signage
-  //    modules beyond the budget are auto-disabled (kept in the graph for
-  //    safe disposal, but cost no uniform slot or shader recompile).
-  const LIGHT_BUDGET: Record<string, number> = { low: 2, medium: 4, high: 6, ultra: 8 };
-  const lightBudget = LIGHT_BUDGET[quality] ?? 4;
-  scene.onNewLightAddedObservable.add((light) => {
-    if (scene.lights.length > lightBudget) light.setEnabled(false);
   });
 
   // Scenario-specific atmosphere presets
@@ -412,15 +400,11 @@ export function finalizeScenePerformance(
     }
   }
 
-  scene.blockMaterialDirtyMechanism = false;
-
-  // Only freeze the active mesh set when there are no per-frame visibility
-  // changes (low/medium have fewer effects toggling visibility).
-  if (quality === 'low' || quality === 'medium') {
-    try {
-      scene.freezeActiveMeshes();
-    } catch { /* ignore */ }
-  }
+  // NOTE: We intentionally do NOT call scene.freezeActiveMeshes() anymore.
+  // GLTF props, NPCs and fire emitters can finish loading after this call,
+  // and freezing the active set would leave them invisible (the antincendio
+  // lab went completely dark because fire-light-bearing meshes weren't in
+  // the frozen set yet).
 
   console.log(
     `[ScenePerf] Frozen ${frozenMeshes} meshes / ${frozenMaterials} materials. ` +
