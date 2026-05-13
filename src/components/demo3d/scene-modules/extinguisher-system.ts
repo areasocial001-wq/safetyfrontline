@@ -96,6 +96,48 @@ export function createFirstPersonExtinguisher(
   console.log('[BabylonScene] ✓ First-person extinguisher created:', type);
 }
 
+function resolveSprayAnchor(
+  scene: BABYLON.Scene,
+  camera: BABYLON.UniversalCamera,
+): {
+  nozzle: BABYLON.AbstractMesh | null;
+  sprayOrigin: BABYLON.Vector3;
+  forward: BABYLON.Vector3;
+} {
+  const cameraForward = camera.getDirection(BABYLON.Vector3.Forward()).normalize();
+
+  for (let i = scene.meshes.length - 1; i >= 0; i--) {
+    const mesh = scene.meshes[i];
+    if (mesh.isDisposed() || mesh.name !== 'ext_nozzle') continue;
+
+    mesh.computeWorldMatrix(true);
+
+    const nozzleForward = mesh.getDirection(BABYLON.Axis.Y).normalize();
+    const oppositeForward = nozzleForward.scale(-1);
+    const forward = BABYLON.Vector3.Dot(nozzleForward, cameraForward) >= BABYLON.Vector3.Dot(oppositeForward, cameraForward)
+      ? nozzleForward
+      : oppositeForward;
+
+    return {
+      nozzle: mesh,
+      sprayOrigin: mesh.getAbsolutePosition().add(forward.scale(0.12)),
+      forward,
+    };
+  }
+
+  const right = camera.getDirection(BABYLON.Vector3.Right()).normalize();
+  const up = camera.getDirection(BABYLON.Vector3.Up()).normalize();
+
+  return {
+    nozzle: null,
+    sprayOrigin: camera.position.clone()
+      .addInPlace(cameraForward.scale(0.72))
+      .addInPlace(right.scale(0.28))
+      .addInPlace(up.scale(-0.18)),
+    forward: cameraForward,
+  };
+}
+
 /**
  * Shoot extinguisher spray particles from camera forward
  */
@@ -120,16 +162,20 @@ export function shootExtinguisherSpray(
   };
 
   const colors = getSprayColors();
-  const forward = camera.getDirection(BABYLON.Vector3.Forward());
-
-  const sprayOrigin = camera.position.clone()
-    .addInPlace(forward.scale(0.8))
-    .addInPlace(new BABYLON.Vector3(0.3, -0.2, 0));
+  const { nozzle, sprayOrigin, forward } = resolveSprayAnchor(scene, camera);
 
   const spray = new BABYLON.ParticleSystem('extSpray', 300, scene);
   const emitter = BABYLON.MeshBuilder.CreateSphere('sprayEmitter', { diameter: 0.05 }, scene);
-  emitter.position = sprayOrigin;
+  if (nozzle) {
+    emitter.parent = nozzle;
+    emitter.position = new BABYLON.Vector3(0, 0.12, 0);
+  } else {
+    emitter.position = sprayOrigin;
+  }
   emitter.isVisible = false;
+  emitter.isPickable = false;
+  emitter.checkCollisions = false;
+  emitter.computeWorldMatrix(true);
   spray.emitter = emitter;
 
   // Use a true-alpha radial puff. The flare.png has no alpha channel, so
@@ -145,6 +191,7 @@ export function shootExtinguisherSpray(
   spray.maxLifeTime = 0.8;
   spray.emitRate = 250;
   spray.blendMode = extinguisherType === 'co2' ? BABYLON.ParticleSystem.BLENDMODE_ONEONE : BABYLON.ParticleSystem.BLENDMODE_STANDARD;
+  spray.renderingGroupId = 2;
 
   const spreadAmount = extinguisherType === 'powder' ? 0.6 : 0.3;
   spray.direction1 = forward.scale(3).add(new BABYLON.Vector3(-spreadAmount, -spreadAmount, -spreadAmount));
