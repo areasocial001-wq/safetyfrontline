@@ -52,6 +52,11 @@ const BonusModules = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <Seo
+        title="Moduli Bonus 3D | Safety Frontline"
+        description="Esplora i moduli bonus: Cyber Security Office, scenari 3D extra e contenuti formativi avanzati."
+        path="/moduli-bonus"
+      />
 
       {/* Header */}
       <section className="relative overflow-hidden border-b border-border bg-gradient-to-br from-fuchsia-500/10 via-purple-500/5 to-primary/10">
