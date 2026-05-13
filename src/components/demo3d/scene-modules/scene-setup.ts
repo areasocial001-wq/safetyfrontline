@@ -107,6 +107,7 @@ export function createScene(
   const shadowGenerator = setupShadows(scene, quality);
   if (quality !== 'low') {
     setupPostProcessing(scene, camera, scenario.type);
+    applyCinematicEnhancements(scene, camera, quality, scenario.type);
   }
 
   // Create ground
