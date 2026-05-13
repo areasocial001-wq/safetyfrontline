@@ -33,27 +33,15 @@ export function createScene(
   const scene = new BABYLON.Scene(engine);
 
   // ===== Global performance policies (apply across ALL scenarios) =====
-  // 1) Cap simultaneous lights per material to 4 (Babylon recompiles shaders
-  //    when this count changes; without a cap, each new PointLight from props
-  //    triggers a recompile of every material it touches).
-  // 2) Block material dirty mechanism during construction; finalize* will
-  //    re-enable it after meshes/materials are frozen.
-  // 3) Skip pointer-move picking — saves a per-frame raycast against all
-  //    pickable meshes. Click picking still works.
-  scene.blockMaterialDirtyMechanism = true;
+  // Cap simultaneous lights per material to 4 — prevents shader recompiles
+  // when transient point lights (fire, glows) are added/removed. We do NOT
+  // disable extra lights or block the material dirty mechanism here, because
+  // doing so caused dark/unlit scenes (especially in the antincendio lab,
+  // which relies on multiple fire emitters as primary light sources).
   scene.skipPointerMovePicking = true;
   scene.onNewMaterialAddedObservable.add((mat) => {
     const m = mat as unknown as { maxSimultaneousLights?: number };
     if (typeof m.maxSimultaneousLights === 'number') m.maxSimultaneousLights = 4;
-  });
-
-  // 4) Light budget per quality preset. Extra lights created by props/signage
-  //    modules beyond the budget are auto-disabled (kept in the graph for
-  //    safe disposal, but cost no uniform slot or shader recompile).
-  const LIGHT_BUDGET: Record<string, number> = { low: 2, medium: 4, high: 6, ultra: 8 };
-  const lightBudget = LIGHT_BUDGET[quality] ?? 4;
-  scene.onNewLightAddedObservable.add((light) => {
-    if (scene.lights.length > lightBudget) light.setEnabled(false);
   });
 
   // Scenario-specific atmosphere presets
