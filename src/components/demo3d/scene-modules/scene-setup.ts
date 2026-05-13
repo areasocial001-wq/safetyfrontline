@@ -3,6 +3,7 @@ import '@babylonjs/loaders/glTF';
 import { SkyMaterial } from '@babylonjs/materials/sky';
 import { Scenario3D } from '@/data/scenarios3d';
 import type { AudioSettings } from '@/hooks/useGraphicsSettings';
+import { applyCinematicEnhancements } from './cinematic-effects';
 
 export interface SceneContext {
   engine: BABYLON.Engine;
