@@ -8,6 +8,7 @@ import { ROICalculator } from "@/components/ROICalculator";
 import { SECTOR_PACKAGES, PLAN_TIERS } from "@/data/sector-packages";
 import { QuoteRequestDialog } from "@/components/QuoteRequestDialog";
 import { Footer } from "@/components/Footer";
+import { Seo } from "@/components/Seo";
 
 const fmt = (n: number) =>
   new Intl.NumberFormat("it-IT", { style: "currency", currency: "EUR", maximumFractionDigits: 0 }).format(n);
@@ -21,6 +22,11 @@ const ROICalculatorPage = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <Seo
+        title="Calcolatore ROI e Pacchetti Settore | Safety Frontline"
+        description="Calcola ROI e payback della formazione sicurezza per il tuo settore. Confronta Starter, Professional, Enterprise."
+        path="/roi"
+      />
       {/* Topbar */}
       <header className="border-b border-border bg-background/80 backdrop-blur sticky top-0 z-20">
         <div className="container px-4 mx-auto py-3 flex items-center justify-between">
