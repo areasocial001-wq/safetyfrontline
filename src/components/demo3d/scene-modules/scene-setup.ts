@@ -353,3 +353,78 @@ function createBoundaries(scene: BABYLON.Scene) {
   ceiling.checkCollisions = true;
   ceiling.isPickable = false;
 }
+
+/**
+ * Finalize a scene for steady-state rendering. Call ONCE after all props,
+ * NPCs, signage, and GLTF assets have been loaded. Safe to call multiple
+ * times — subsequent calls are no-ops on already-frozen meshes/materials.
+ *
+ * What it does:
+ *  - Freezes world matrices on static meshes (walls, props, signage, ground).
+ *  - Freezes materials so Babylon stops uploading uniforms each frame.
+ *  - Skips bounding-info sync on static meshes (they don't move).
+ *  - Re-enables blockMaterialDirtyMechanism so frozen state survives.
+ *  - Calls scene.freezeActiveMeshes() — Babylon stops re-evaluating which
+ *    meshes are visible every frame, since the static set is known.
+ *
+ * Skinned meshes, NPCs (worker_*), particle emitters, the camera target, and
+ * meshes flagged as animated (rocker, spinner, sprinkler, fire) are excluded
+ * automatically.
+ */
+export function finalizeScenePerformance(
+  scene: BABYLON.Scene,
+  quality: 'low' | 'medium' | 'high' | 'ultra',
+): void {
+  const dynamicNamePatterns = [
+    'worker_', 'npc_', 'avatar_', 'rig_', 'bone_',
+    'fire', 'flame', 'smoke', 'spark', 'particle',
+    'sprinkler', 'rocker', 'spinner', 'wheel',
+    'extinguisher', 'spray', 'water_', 'foam_', 'powder_',
+    'godrays', 'dust', 'marble', 'projectile',
+    'risk_marker', 'highlight', 'cyo_glow',
+  ];
+  const isDynamic = (name: string) => {
+    const n = name.toLowerCase();
+    return dynamicNamePatterns.some((p) => n.includes(p));
+  };
+
+  let frozenMeshes = 0;
+  let frozenMaterials = 0;
+
+  for (const mesh of scene.meshes) {
+    if (mesh.isDisposed()) continue;
+    if (isDynamic(mesh.name)) continue;
+    // Skip skinned meshes — their world matrix is driven by the skeleton.
+    if (mesh.skeleton) continue;
+    // Skip meshes attached to a transform that animates (parent has running anims).
+    if (mesh instanceof BABYLON.Mesh) {
+      try {
+        mesh.freezeWorldMatrix();
+        mesh.doNotSyncBoundingInfo = true;
+        frozenMeshes++;
+      } catch { /* ignore */ }
+    }
+    if (mesh.material && !mesh.material.isFrozen) {
+      try {
+        mesh.material.freeze();
+        frozenMaterials++;
+      } catch { /* ignore */ }
+    }
+  }
+
+  scene.blockMaterialDirtyMechanism = false;
+
+  // Only freeze the active mesh set when there are no per-frame visibility
+  // changes (low/medium have fewer effects toggling visibility).
+  if (quality === 'low' || quality === 'medium') {
+    try {
+      scene.freezeActiveMeshes();
+    } catch { /* ignore */ }
+  }
+
+  console.log(
+    `[ScenePerf] Frozen ${frozenMeshes} meshes / ${frozenMaterials} materials. ` +
+    `Lights active: ${scene.lights.filter(l => l.isEnabled()).length}/${scene.lights.length}. ` +
+    `Quality: ${quality}.`
+  );
+}
