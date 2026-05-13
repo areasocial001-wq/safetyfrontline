@@ -49,7 +49,7 @@ export function applyCinematicEnhancements(
     .find(p => p.name === 'cinematicPipeline') as BABYLON.DefaultRenderingPipeline | undefined;
 
   if (pipeline) {
-    pipeline.fxaaEnabled = quality !== 'low';
+    pipeline.fxaaEnabled = true;
     pipeline.samples = quality === 'ultra' ? 4 : 1;
 
     pipeline.sharpenEnabled = true;
