@@ -4,6 +4,7 @@ import { RegisterForm } from '@/components/auth/RegisterForm';
 import { useAuth } from '@/hooks/useAuth';
 import { Shield, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Seo } from '@/components/Seo';
 
 const Register = () => {
   const { user, loading } = useAuth();
@@ -28,6 +29,11 @@ const Register = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <Seo
+        title="Registrati | Safety Frontline"
+        description="Crea un account Safety Frontline e inizia la formazione sicurezza gamificata per la tua azienda."
+        path="/register"
+      />
       {/* Header */}
       <header className="border-b border-border bg-card/50 backdrop-blur-sm">
         <div className="container mx-auto px-4 py-4">

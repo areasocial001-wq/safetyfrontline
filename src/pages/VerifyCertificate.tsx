@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Shield, CheckCircle, XCircle, Search, ArrowLeft } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { Seo } from '@/components/Seo';
 
 interface CertificateInfo {
   certificate_code: string;
@@ -82,6 +83,11 @@ const VerifyCertificate = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <Seo
+        title="Verifica Attestato | Safety Frontline"
+        description="Verifica l'autenticità di un attestato di formazione sulla sicurezza emesso da Safety Frontline."
+        path="/verify-certificate"
+      />
       {/* Header */}
       <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-10">
         <div className="container mx-auto px-4 py-4">

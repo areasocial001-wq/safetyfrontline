@@ -9,6 +9,7 @@ import { Sim3dPreview } from "@/components/Sim3dPreview";
 import { SIM3D_PREVIEWS } from "@/data/sim3d-previews";
 import { QuoteRequestDialog } from "@/components/QuoteRequestDialog";
 import { Footer } from "@/components/Footer";
+import { Seo } from "@/components/Seo";
 
 interface BonusModule {
   id: string;

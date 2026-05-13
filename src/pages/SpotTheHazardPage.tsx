@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import SpotTheHazardGame from "@/components/training/SpotTheHazardGame";
 import { CARTOON_LEVELS } from "@/data/cartoon-hazard-levels";
+import { Seo } from "@/components/Seo";
 
 const SpotTheHazardPage = () => {
   const [levelId, setLevelId] = useState<string | null>(null);
@@ -12,6 +13,11 @@ const SpotTheHazardPage = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <Seo
+        title="Spot the Hazard | Safety Frontline"
+        description="Mini-game illustrato: trova i rischi sul lavoro nelle scene 2D e impara la sicurezza in modo divertente."
+        path="/spot-the-hazard"
+      />
       <header className="border-b sticky top-0 z-10 bg-background/80 backdrop-blur-sm">
         <div className="container mx-auto px-4 py-3 flex items-center justify-between gap-3">
           <div className="flex items-center gap-3">
