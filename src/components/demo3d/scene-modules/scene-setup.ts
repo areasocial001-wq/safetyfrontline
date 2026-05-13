@@ -367,7 +367,7 @@ export function finalizeScenePerformance(
     'worker_', 'npc_', 'avatar_', 'rig_', 'bone_',
     'fire', 'flame', 'smoke', 'spark', 'particle',
     'sprinkler', 'rocker', 'spinner', 'wheel',
-    'extinguisher', 'spray', 'water_', 'foam_', 'powder_',
+    'extinguisher', 'ext_', 'spray', 'water_', 'foam_', 'powder_',
     'godrays', 'dust', 'marble', 'projectile',
     'risk_marker', 'highlight', 'cyo_glow',
   ];
@@ -382,6 +382,16 @@ export function finalizeScenePerformance(
   for (const mesh of scene.meshes) {
     if (mesh.isDisposed()) continue;
     if (isDynamic(mesh.name)) continue;
+    // Skip meshes parented (directly or transitively) to the active camera —
+    // freezing their world matrix would lock them in place while the camera
+    // moves, hiding first-person props like the extinguisher.
+    let node: BABYLON.Node | null = mesh.parent;
+    let attachedToCamera = false;
+    while (node) {
+      if (node instanceof BABYLON.Camera) { attachedToCamera = true; break; }
+      node = node.parent;
+    }
+    if (attachedToCamera) continue;
     // Skip skinned meshes — their world matrix is driven by the skeleton.
     if (mesh.skeleton) continue;
     // Skip meshes attached to a transform that animates (parent has running anims).
