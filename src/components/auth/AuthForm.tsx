@@ -73,10 +73,11 @@ export const AuthForm = () => {
         );
 
         if (error) {
-          if (error.message.includes('already registered')) {
+          console.error('[Auth] signUp error:', error);
+          if (error.message.includes('already registered') || error.message.toLowerCase().includes('already')) {
             toast.error('Questo indirizzo email è già registrato. Prova ad accedere.');
           } else {
-            toast.error(error.message || 'Errore durante la registrazione');
+            toast.error('Registrazione non riuscita. Verifica i dati e riprova.');
           }
           setLoading(false);
           return;
