@@ -1,4 +1,5 @@
 import * as BABYLON from '@babylonjs/core';
+import { getSoftParticleTexture } from './particle-textures';
 import { toast } from 'sonner';
 import { AmbientAudioPlayer } from '@/lib/audio-system';
 import { getVoiceNarrator } from '@/lib/voice-narrator';
