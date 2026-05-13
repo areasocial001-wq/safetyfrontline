@@ -400,15 +400,11 @@ export function finalizeScenePerformance(
     }
   }
 
-  scene.blockMaterialDirtyMechanism = false;
-
-  // Only freeze the active mesh set when there are no per-frame visibility
-  // changes (low/medium have fewer effects toggling visibility).
-  if (quality === 'low' || quality === 'medium') {
-    try {
-      scene.freezeActiveMeshes();
-    } catch { /* ignore */ }
-  }
+  // NOTE: We intentionally do NOT call scene.freezeActiveMeshes() anymore.
+  // GLTF props, NPCs and fire emitters can finish loading after this call,
+  // and freezing the active set would leave them invisible (the antincendio
+  // lab went completely dark because fire-light-bearing meshes weren't in
+  // the frozen set yet).
 
   console.log(
     `[ScenePerf] Frozen ${frozenMeshes} meshes / ${frozenMaterials} materials. ` +
