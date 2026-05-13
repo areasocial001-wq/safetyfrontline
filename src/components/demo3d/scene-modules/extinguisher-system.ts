@@ -192,7 +192,7 @@ export function shootExtinguisherSpray(
   spray.maxSize = colors.size.max;
   spray.minLifeTime = 0.3;
   spray.maxLifeTime = 0.8;
-  spray.emitRate = 250;
+  spray.emitRate = extinguisherType === 'powder' ? 500 : 250;
   spray.blendMode = extinguisherType === 'co2' ? BABYLON.ParticleSystem.BLENDMODE_ONEONE : BABYLON.ParticleSystem.BLENDMODE_STANDARD;
   spray.renderingGroupId = 2;
 
