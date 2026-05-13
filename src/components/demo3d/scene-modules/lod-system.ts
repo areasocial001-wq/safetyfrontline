@@ -156,16 +156,17 @@ export class LODSystem {
       // Fire/smoke emitters and particle helpers
       'fireEmitter', 'fireLight', 'fire_', 'smoke', 'flame', 'spark', 'particle',
     ];
-    const allExcludes = [...defaultExcludes, ...excludePatterns];
+    const allExcludes = [...defaultExcludes, ...excludePatterns].map((pattern) => pattern.toLowerCase());
 
     let registered = 0;
 
     this.scene.meshes.forEach(mesh => {
       if (mesh.isDisposed()) return;
+      const meshName = mesh.name.toLowerCase();
       // Skip already managed meshes
       if (this.managedMeshes.some(m => m.mesh === mesh)) return;
       // Skip excluded patterns
-      if (allExcludes.some(p => mesh.name.includes(p))) return;
+      if (allExcludes.some(p => meshName.includes(p))) return;
       // Skip very small meshes (UI elements, indicators)
       if (mesh instanceof BABYLON.Mesh && mesh.getTotalVertices() < 20) return;
       // Skip meshes parented (directly or transitively) to the active camera —
