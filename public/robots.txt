@@ -12,3 +12,14 @@ Allow: /
 
 User-agent: *
 Allow: /
+Disallow: /admin
+Disallow: /company
+Disallow: /employee
+Disallow: /profile
+Disallow: /player-profile
+Disallow: /i-miei-attestati
+Disallow: /reset-password
+Disallow: /preset-test
+Disallow: /sound-studio
+
+Sitemap: https://www.safetyfrontline.com/sitemap.xml
