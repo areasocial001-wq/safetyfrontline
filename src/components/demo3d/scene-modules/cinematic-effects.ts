@@ -188,7 +188,7 @@ export function applyCinematicEnhancements(
 
 let cachedDustTex: BABYLON.DynamicTexture | null = null;
 function createDustTexture(scene: BABYLON.Scene): BABYLON.DynamicTexture {
-  if (cachedDustTex && !cachedDustTex.isDisposed()) return cachedDustTex;
+  if (cachedDustTex && cachedDustTex.getScene() === scene) return cachedDustTex;
   const size = 64;
   const tex = new BABYLON.DynamicTexture('dust_tex', size, scene, false);
   const ctx = tex.getContext() as CanvasRenderingContext2D;
