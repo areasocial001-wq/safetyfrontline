@@ -3,6 +3,7 @@ import '@babylonjs/loaders/glTF';
 import { SkyMaterial } from '@babylonjs/materials/sky';
 import { Scenario3D } from '@/data/scenarios3d';
 import type { AudioSettings } from '@/hooks/useGraphicsSettings';
+import { applyCinematicEnhancements } from './cinematic-effects';
 
 export interface SceneContext {
   engine: BABYLON.Engine;
@@ -106,6 +107,7 @@ export function createScene(
   const shadowGenerator = setupShadows(scene, quality);
   if (quality !== 'low') {
     setupPostProcessing(scene, camera, scenario.type);
+    applyCinematicEnhancements(scene, camera, quality, scenario.type);
   }
 
   // Create ground
