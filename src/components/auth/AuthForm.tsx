@@ -106,10 +106,13 @@ export const AuthForm = () => {
         );
 
         if (error) {
+          console.error('[Auth] signIn error:', error);
           if (error.message.includes('Invalid login credentials')) {
             toast.error('Email o password non corretti');
+          } else if (error.message.toLowerCase().includes('email not confirmed')) {
+            toast.error('Devi prima confermare la tua email. Controlla la casella di posta.');
           } else {
-            toast.error(error.message || 'Errore durante l\'accesso');
+            toast.error('Accesso non riuscito. Riprova più tardi.');
           }
           setLoading(false);
           return;
