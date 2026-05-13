@@ -132,7 +132,10 @@ export function shootExtinguisherSpray(
   emitter.isVisible = false;
   spray.emitter = emitter;
 
-  spray.particleTexture = new BABYLON.Texture('https://assets.babylonjs.com/textures/flare.png', scene);
+  // Use a true-alpha radial puff. The flare.png has no alpha channel, so
+  // BLENDMODE_STANDARD (water/foam/powder) was rendering each particle as a
+  // black square around the white flare.
+  spray.particleTexture = getSoftParticleTexture(scene);
   spray.color1 = colors.color1;
   spray.color2 = colors.color2;
   spray.colorDead = colors.colorDead;
