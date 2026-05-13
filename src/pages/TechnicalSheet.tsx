@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import { generateTechnicalSheetPDF } from "@/lib/pdf-generator";
 import { toast } from "sonner";
 import logoSicurAzienda from "@/assets/logo-sicurazienda.png";
-
+import { Seo } from "@/components/Seo";
 const TechnicalSheet = () => {
   const handleDownloadPDF = async () => {
     try {
@@ -19,6 +19,11 @@ const TechnicalSheet = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <Seo
+        title="Scheda Tecnica | Safety Frontline"
+        description="Specifiche tecniche, conformità normativa e architettura della piattaforma di formazione Safety Frontline."
+        path="/scheda-tecnica"
+      />
       {/* Header */}
       <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4">

@@ -4,6 +4,7 @@ import { AuthForm } from '@/components/auth/AuthForm';
 import { useAuth } from '@/hooks/useAuth';
 import { Shield, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Seo } from '@/components/Seo';
 
 const Auth = () => {
   const { user, loading } = useAuth();
@@ -28,6 +29,11 @@ const Auth = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <Seo
+        title="Accedi | Safety Frontline"
+        description="Accedi al tuo account Safety Frontline per la formazione sulla sicurezza sul lavoro."
+        path="/auth"
+      />
       {/* Header */}
       <header className="border-b border-border bg-card/50 backdrop-blur-sm">
         <div className="container mx-auto px-4 py-4">

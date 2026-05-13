@@ -13,6 +13,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { getModuleInfo } from "@/data/all-training-modules";
 import { generateCertificatePdf, DEFAULT_CERTIFICATE_SETTINGS } from "@/lib/facsimile-pdf";
 import { toast } from "sonner";
+import { Seo } from "@/components/Seo";
 
 const DEFAULT_DEMO_PACKAGE_ID = "8829ce9f-3bd3-4322-9f5a-1b29237076a2"; // IRM
 const STORAGE_KEY = "demo-completed-modules";
@@ -171,6 +172,11 @@ const DemoPath = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-background via-background to-primary/5">
+      <Seo
+        title="Demo Percorso Formativo | Safety Frontline"
+        description="Prova un percorso formativo demo: moduli, quiz e attestato facsimile della formazione sicurezza gamificata."
+        path="/demo-percorso"
+      />
       {/* Header */}
       <header className="sticky top-0 z-30 border-b bg-background/85 backdrop-blur-md">
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">

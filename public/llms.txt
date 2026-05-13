@@ -1,0 +1,20 @@
+# Safety Frontline
+
+> Piattaforma italiana di formazione sulla sicurezza sul lavoro gamificata per PMI, conforme al D.Lgs. 81/08 e all'Accordo Stato-Regioni 2025. Include simulazioni 3D, micro-learning, quiz e rilascio di attestati.
+
+## Pages
+
+- [Home](/): Panoramica della piattaforma, moduli e prezzi.
+- [Guida completa](/guida): Guida d'uso e best practice formative.
+- [Scheda tecnica](/scheda-tecnica): Dettagli tecnici, conformità normativa, architettura.
+- [ROI e pacchetti](/roi): Calcolatore ROI e pacchetti per settore (Starter, Professional, Enterprise).
+- [Demo 3D](/demo-3d): Simulazioni 3D interattive (ufficio, magazzino, cantiere, antincendio, cybersecurity).
+- [Spot the Hazard](/spot-the-hazard): Mini-game di individuazione rischi sul lavoro.
+- [Demo percorso](/demo-percorso): Demo di un percorso formativo completo.
+- [Moduli bonus](/moduli-bonus): Moduli formativi aggiuntivi.
+- [Verifica attestato](/verify-certificate): Verifica autenticità di un attestato emesso.
+
+## Optional
+
+- [Accedi](/auth): Login utenti registrati.
+- [Registrati](/register): Creazione nuovo account.

@@ -1,5 +1,6 @@
 import { useState, Suspense, useEffect, useRef, useMemo, useCallback } from "react";
 import { Link, useSearchParams } from "react-router-dom";
+import { Seo } from "@/components/Seo";
 import { BabylonScene } from "@/components/demo3d/BabylonScene";
 import { SceneDebugOverlay } from "@/components/demo3d/SceneDebugOverlay";
 import { AudioDiagnosticsHUD } from "@/components/demo3d/AudioDiagnosticsHUD";
@@ -809,6 +810,11 @@ const Demo3D = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <Seo
+        title="Demo 3D Sicurezza Lavoro | Safety Frontline"
+        description="Simulazioni 3D interattive: ufficio, magazzino, cantiere, antincendio e cybersecurity per la formazione sulla sicurezza."
+        path="/demo-3d"
+      />
       {/* Show loading state while auth is initializing */}
       {authLoading ? (
         <div className="min-h-screen flex items-center justify-center">

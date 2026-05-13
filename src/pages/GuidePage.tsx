@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import jsPDF from "jspdf";
+import { Seo } from "@/components/Seo";
 
 const GuidePage = () => {
   const navigate = useNavigate();
@@ -449,6 +450,11 @@ const GuidePage = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <Seo
+        title="Guida Completa | Safety Frontline"
+        description="Guida d'uso e best practice per la formazione gamificata sulla sicurezza sul lavoro con Safety Frontline."
+        path="/guida"
+      />
       {/* Header */}
       <div className="sticky top-0 z-50 bg-background/95 backdrop-blur border-b border-border">
         <div className="container px-4 mx-auto">
