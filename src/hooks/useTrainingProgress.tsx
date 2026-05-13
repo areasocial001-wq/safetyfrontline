@@ -24,6 +24,8 @@ export const useTrainingProgress = () => {
   const { user } = useAuth();
   const [progress, setProgress] = useState<ModuleProgress[]>([]);
   const [userXp, setUserXp] = useState<UserXP>({ total_xp: 0, level: 1 });
+  const xpRef = useRef<UserXP>({ total_xp: 0, level: 1 });
+  const xpQueueRef = useRef<Promise<void>>(Promise.resolve());
   const [loading, setLoading] = useState(true);
 
   const fetchProgress = useCallback(async () => {
