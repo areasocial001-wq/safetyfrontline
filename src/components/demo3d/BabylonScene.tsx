@@ -537,6 +537,16 @@ export const BabylonScene = ({
           });
 
           onRiskFound(riskData.risk.id, isCritical);
+          // Cinematic gameplay feedback (Temple Run-style)
+          window.dispatchEvent(new CustomEvent('babylon-fx-shake', {
+            detail: { intensity: isCritical ? 0.5 : 0.25, duration: isCritical ? 320 : 180 },
+          }));
+          window.dispatchEvent(new CustomEvent('babylon-fx-flash', {
+            detail: { color: isCritical ? 'rgba(34,197,94,0.35)' : 'rgba(59,130,246,0.25)', duration: 220 },
+          }));
+          if (isCritical) {
+            window.dispatchEvent(new CustomEvent('babylon-fx-hitstop', { detail: { duration: 90 } }));
+          }
 
           // Anchored 2D label (briefly) before the popup
           const cam = cameraRef.current;
