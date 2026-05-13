@@ -1,4 +1,5 @@
 import * as BABYLON from '@babylonjs/core';
+import { getSoftParticleTexture } from './particle-textures';
 import { toast } from 'sonner';
 import { AmbientAudioPlayer } from '@/lib/audio-system';
 import { getVoiceNarrator } from '@/lib/voice-narrator';
@@ -844,7 +845,10 @@ function addLaboratoryProps(
     perSmokeEmitter.isVisible = false;
     const perSmoke = new BABYLON.ParticleSystem(`fireSmoke_${idx}`, 100, scene);
     perSmoke.emitter = perSmokeEmitter;
-    perSmoke.particleTexture = new BABYLON.Texture('https://assets.babylonjs.com/textures/flare.png', scene);
+    // Soft alpha puff — flare.png has no alpha and renders as a black
+    // square under BLENDMODE_STANDARD. Use a true-alpha texture so smoke
+    // composites cleanly over the scene.
+    perSmoke.particleTexture = getSoftParticleTexture(scene);
     perSmoke.color1 = smokeColor1;
     perSmoke.color2 = smokeColor2;
     perSmoke.colorDead = new BABYLON.Color4(0.1, 0.1, 0.1, 0);
@@ -884,7 +888,7 @@ function addLaboratoryProps(
 
   const smokeSystem = new BABYLON.ParticleSystem('labSmoke', 60, scene);
   smokeSystem.emitter = smokeEmitter;
-  smokeSystem.particleTexture = new BABYLON.Texture('https://assets.babylonjs.com/textures/flare.png', scene);
+  smokeSystem.particleTexture = getSoftParticleTexture(scene);
   smokeSystem.color1 = new BABYLON.Color4(0.3, 0.3, 0.35, 0.15);
   smokeSystem.color2 = new BABYLON.Color4(0.2, 0.2, 0.25, 0.08);
   smokeSystem.colorDead = new BABYLON.Color4(0.1, 0.1, 0.15, 0);
