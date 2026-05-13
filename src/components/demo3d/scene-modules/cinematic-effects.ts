@@ -26,22 +26,23 @@ export function applyCinematicEnhancements(
     return () => {};
   }
 
-  // ===== SSAO2 =====
-  try {
-    const ssaoRatio = quality === 'ultra' ? 0.75 : quality === 'high' ? 0.5 : 0.4;
-    const ssao = new BABYLON.SSAO2RenderingPipeline('ssao', scene, {
-      ssaoRatio,
-      blurRatio: 0.5,
-    }, [camera as BABYLON.Camera]);
-    ssao.radius = 1.6;
-    ssao.totalStrength = scenarioType === 'office' ? 0.9 : 1.2;
-    ssao.expensiveBlur = quality === 'ultra';
-    ssao.samples = quality === 'ultra' ? 16 : 8;
-    ssao.maxZ = 80;
-    cleanups.push(() => ssao.dispose());
-  } catch (err) {
-    // Hardware may not support depth texture; ignore.
-    console.warn('[cinematic] SSAO2 unavailable', err);
+  // SSAO2 is expensive (depth pre-pass + blur). Restrict to high/ultra.
+  if (quality === 'high' || quality === 'ultra') {
+    try {
+      const ssaoRatio = quality === 'ultra' ? 0.75 : 0.5;
+      const ssao = new BABYLON.SSAO2RenderingPipeline('ssao', scene, {
+        ssaoRatio,
+        blurRatio: 0.5,
+      }, [camera as BABYLON.Camera]);
+      ssao.radius = 1.6;
+      ssao.totalStrength = scenarioType === 'office' ? 0.9 : 1.2;
+      ssao.expensiveBlur = quality === 'ultra';
+      ssao.samples = quality === 'ultra' ? 16 : 8;
+      ssao.maxZ = 80;
+      cleanups.push(() => ssao.dispose());
+    } catch (err) {
+      console.warn('[cinematic] SSAO2 unavailable', err);
+    }
   }
 
   // ===== Existing pipeline tweaks (sharpness, FXAA, grain, motion blur, DoF) =====
@@ -56,9 +57,12 @@ export function applyCinematicEnhancements(
     pipeline.sharpen.edgeAmount = scenarioType === 'office' ? 0.18 : 0.32;
     pipeline.sharpen.colorAmount = 1.0;
 
-    pipeline.grainEnabled = true;
-    pipeline.grain.intensity = scenarioType === 'warehouse' ? 8 : 4;
-    pipeline.grain.animated = true;
+    // Grain only on high/ultra — animated grain is a per-frame post-process.
+    pipeline.grainEnabled = quality === 'high' || quality === 'ultra';
+    if (pipeline.grainEnabled) {
+      pipeline.grain.intensity = scenarioType === 'warehouse' ? 8 : 4;
+      pipeline.grain.animated = true;
+    }
 
     if (quality === 'high' || quality === 'ultra') {
       // Motion blur: stronger at higher quality.
@@ -97,9 +101,10 @@ export function applyCinematicEnhancements(
     } catch (e) { /* ignore */ }
   }
 
-  // ===== Ambient dust / pollen particles =====
-  try {
-    const count = quality === 'ultra' ? 600 : quality === 'high' ? 350 : 180;
+  // ===== Ambient dust / pollen particles (high+ only — 180-600 alive
+  // particles cost CPU emit + GPU overdraw every frame) =====
+  if (quality === 'high' || quality === 'ultra') try {
+    const count = quality === 'ultra' ? 600 : 350;
     const dust = new BABYLON.ParticleSystem('ambient_dust', count, scene);
     dust.particleTexture = createDustTexture(scene);
     dust.minEmitBox = new BABYLON.Vector3(-15, 0, -15);
