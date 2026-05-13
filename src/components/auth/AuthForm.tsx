@@ -41,7 +41,8 @@ export const AuthForm = () => {
 
         const { error } = await resetPassword(formData.email);
         if (error) {
-          toast.error(error.message || 'Errore durante l\'invio dell\'email');
+          console.error('[Auth] resetPassword error:', error);
+          toast.error('Impossibile inviare l\'email di reset. Riprova più tardi.');
         } else {
           toast.success('Email di reset inviata! Controlla la tua casella di posta.');
           setMode('signin');
@@ -72,10 +73,11 @@ export const AuthForm = () => {
         );
 
         if (error) {
-          if (error.message.includes('already registered')) {
+          console.error('[Auth] signUp error:', error);
+          if (error.message.includes('already registered') || error.message.toLowerCase().includes('already')) {
             toast.error('Questo indirizzo email è già registrato. Prova ad accedere.');
           } else {
-            toast.error(error.message || 'Errore durante la registrazione');
+            toast.error('Registrazione non riuscita. Verifica i dati e riprova.');
           }
           setLoading(false);
           return;
@@ -104,10 +106,13 @@ export const AuthForm = () => {
         );
 
         if (error) {
+          console.error('[Auth] signIn error:', error);
           if (error.message.includes('Invalid login credentials')) {
             toast.error('Email o password non corretti');
+          } else if (error.message.toLowerCase().includes('email not confirmed')) {
+            toast.error('Devi prima confermare la tua email. Controlla la casella di posta.');
           } else {
-            toast.error(error.message || 'Errore durante l\'accesso');
+            toast.error('Accesso non riuscito. Riprova più tardi.');
           }
           setLoading(false);
           return;

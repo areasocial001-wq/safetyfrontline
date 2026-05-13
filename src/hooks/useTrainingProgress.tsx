@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 
@@ -24,6 +24,8 @@ export const useTrainingProgress = () => {
   const { user } = useAuth();
   const [progress, setProgress] = useState<ModuleProgress[]>([]);
   const [userXp, setUserXp] = useState<UserXP>({ total_xp: 0, level: 1 });
+  const xpRef = useRef<UserXP>({ total_xp: 0, level: 1 });
+  const xpQueueRef = useRef<Promise<void>>(Promise.resolve());
   const [loading, setLoading] = useState(true);
 
   const fetchProgress = useCallback(async () => {
@@ -56,7 +58,8 @@ export const useTrainingProgress = () => {
       .maybeSingle();
     
     if (xpData) {
-      setUserXp({ total_xp: xpData.total_xp, level: xpData.level });
+      xpRef.current = { total_xp: xpData.total_xp, level: xpData.level };
+      setUserXp(xpRef.current);
     }
 
     setLoading(false);
@@ -105,21 +108,27 @@ export const useTrainingProgress = () => {
 
   const addXp = useCallback(async (amount: number) => {
     if (!user) return;
-    
-    const newTotal = userXp.total_xp + amount;
-    const newLevel = Math.floor(newTotal / 200) + 1; // Simple leveling
-    
-    await supabase
-      .from('user_xp')
-      .upsert({
-        user_id: user.id,
-        total_xp: newTotal,
-        level: newLevel,
-        updated_at: new Date().toISOString(),
-      }, { onConflict: 'user_id' });
 
-    setUserXp({ total_xp: newTotal, level: newLevel });
-  }, [user, userXp]);
+    // Serialize concurrent calls and use a ref so each call sees the latest total
+    const run = async () => {
+      const newTotal = xpRef.current.total_xp + amount;
+      const newLevel = Math.floor(newTotal / 200) + 1;
+      xpRef.current = { total_xp: newTotal, level: newLevel };
+      setUserXp(xpRef.current);
+
+      await supabase
+        .from('user_xp')
+        .upsert({
+          user_id: user.id,
+          total_xp: newTotal,
+          level: newLevel,
+          updated_at: new Date().toISOString(),
+        }, { onConflict: 'user_id' });
+    };
+
+    xpQueueRef.current = xpQueueRef.current.then(run, run);
+    return xpQueueRef.current;
+  }, [user]);
 
   const getModuleProgress = useCallback((moduleId: string) => {
     return progress.find(p => p.module_id === moduleId);
