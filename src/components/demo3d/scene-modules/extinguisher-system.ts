@@ -166,7 +166,8 @@ export function shootExtinguisherSpray(
   const colors = getSprayColors();
   const { nozzle, sprayOrigin, forward } = resolveSprayAnchor(scene, camera);
 
-  const spray = new BABYLON.ParticleSystem('extSpray', 300, scene);
+  const capacity = extinguisherType === 'powder' ? 600 : 300;
+  const spray = new BABYLON.ParticleSystem('extSpray', capacity, scene);
   const emitter = BABYLON.MeshBuilder.CreateSphere('sprayEmitter', { diameter: 0.05 }, scene);
   if (nozzle) {
     emitter.parent = nozzle;
