@@ -31,7 +31,7 @@ import { useLang, t, isRTL, LANGUAGES, type Lang } from '@/lib/risk-i18n';
 import { getNormative } from '@/lib/risk-normative';
 
 // Scene modules
-import { createScene } from './scene-modules/scene-setup';
+import { createScene, finalizeScenePerformance } from './scene-modules/scene-setup';
 import { loadEnvironmentOptimized } from './scene-modules/environment-loader';
 import { createParticleEffect, playRiskSound, fireAmbientContexts } from './scene-modules/audio-helpers';
 import { createFirstPersonExtinguisher, shootExtinguisherSpray, aimHasFire } from './scene-modules/extinguisher-system';
@@ -295,7 +295,10 @@ export const BabylonScene = ({
     setTimeout(() => {
       const count = lodSystem.registerSceneMeshes();
       console.log(`[BabylonScene] LOD system active: ${count} meshes managed`);
-    }, 2000);
+      // Freeze static meshes/materials & lock the active-mesh set so the
+      // render loop stops re-evaluating geometry that never changes.
+      finalizeScenePerformance(scene, quality);
+    }, 2500);
 
     // 10. Create risk markers
     const riskGlow = new BABYLON.GlowLayer('riskGlow', scene);
