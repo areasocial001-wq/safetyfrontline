@@ -2,7 +2,7 @@ import { NavLink } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Gamepad2, Trophy, Target, Zap, Play, Sparkles, Flame, ShieldAlert, Users, Bot } from "lucide-react";
+import { Gamepad2, Trophy, Target, Zap, Play, Sparkles, Flame, Users, Bot } from "lucide-react";
 import heroGameImage from "@/assets/hero-game-corridor.jpg";
 
 export const Demo3DShowcase = () => {
@@ -29,7 +29,7 @@ export const Demo3DShowcase = () => {
               Simulazioni <span className="bg-gradient-hero bg-clip-text text-transparent drop-shadow-lg">3D First-Person</span>
             </h2>
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-              Antincendio con estintore reale, cybersecurity in ufficio, evacuazione ed NPC realistici (Ready Player Me + Mixamo). Tutto in browser con Babylon.js.
+              Antincendio con estintore reale, evacuazione ed NPC realistici (Ready Player Me + Mixamo). Tutto in browser con Babylon.js.
             </p>
           </div>
 
@@ -51,11 +51,7 @@ export const Demo3DShowcase = () => {
                     <Flame className="w-3 h-3 mr-1" />
                     Estintore reale
                   </Badge>
-                  <Badge className="bg-secondary/90 backdrop-blur-sm border-secondary text-secondary-foreground shadow-lg animate-pulse" style={{ animationDelay: '0.3s' }}>
-                    <ShieldAlert className="w-3 h-3 mr-1" />
-                    Cybersecurity
-                  </Badge>
-                  <Badge className="bg-accent/90 backdrop-blur-sm border-accent text-accent-foreground shadow-lg animate-pulse" style={{ animationDelay: '0.6s' }}>
+                  <Badge className="bg-accent/90 backdrop-blur-sm border-accent text-accent-foreground shadow-lg animate-pulse" style={{ animationDelay: '0.3s' }}>
                     <Users className="w-3 h-3 mr-1" />
                     NPC realistici
                   </Badge>
@@ -84,15 +80,6 @@ export const Demo3DShowcase = () => {
                     <div>
                       <p className="font-semibold">Simulatore Antincendio Realistico</p>
                       <p className="text-sm text-muted-foreground">Estintore in prima persona con particelle, classi di fuoco e quiz contestuali</p>
-                    </div>
-                  </li>
-                  <li className="flex items-start gap-3 group">
-                    <div className="mt-1 p-2 rounded-lg bg-secondary/10 group-hover:bg-secondary/20 transition-colors">
-                      <ShieldAlert className="w-5 h-5 text-secondary" />
-                    </div>
-                    <div>
-                      <p className="font-semibold">Cybersecurity in Ufficio 3D</p>
-                      <p className="text-sm text-muted-foreground">8 rischi nascosti da identificare con feedback educativo immediato</p>
                     </div>
                   </li>
                   <li className="flex items-start gap-3 group">
