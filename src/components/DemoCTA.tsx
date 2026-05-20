@@ -82,6 +82,15 @@ export const DemoCTA = () => {
     } catch {}
   };
 
+  const handleSeek = (e: React.MouseEvent<HTMLDivElement>) => {
+    const v = videoRef.current;
+    const bar = e.currentTarget;
+    if (!v || !bar || !v.duration) return;
+    const rect = bar.getBoundingClientRect();
+    const ratio = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+    v.currentTime = ratio * v.duration;
+  };
+
   const closeVideo = () => {
     const v = videoRef.current;
     if (v) v.pause();
@@ -139,11 +148,16 @@ export const DemoCTA = () => {
                   }`}
                 >
                   <div className="px-4 pt-3">
-                    <div className="h-1 bg-muted/50 rounded-full overflow-hidden">
+                    <div
+                      className="h-2 bg-muted/50 rounded-full overflow-hidden cursor-pointer relative group"
+                      onClick={handleSeek}
+                    >
                       <div
-                        className="h-full bg-gradient-to-r from-primary to-secondary transition-all duration-150"
+                        className="h-full bg-gradient-to-r from-primary to-secondary transition-all duration-150 relative"
                         style={{ width: `${progress}%` }}
-                      />
+                      >
+                        <div className="absolute right-0 top-1/2 -translate-y-1/2 w-3 h-3 bg-primary-foreground rounded-full shadow opacity-0 group-hover:opacity-100 transition-opacity" />
+                      </div>
                     </div>
                   </div>
                   <div className="flex items-center justify-between px-4 py-3 gap-2">
