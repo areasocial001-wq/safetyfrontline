@@ -619,6 +619,54 @@ export const TrainingPackagesManager = () => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Rename Dialog */}
+      <Dialog
+        open={!!renamingPackageId}
+        onOpenChange={(o) => !o && setRenamingPackageId(null)}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Rinomina Pacchetto</DialogTitle>
+            <DialogDescription>
+              Aggiorna il nome e la descrizione del pacchetto formativo
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="rename-name">Nome Pacchetto *</Label>
+              <Input
+                id="rename-name"
+                value={renameValue}
+                onChange={(e) => setRenameValue(e.target.value)}
+                placeholder="Nome del pacchetto"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="rename-desc">Descrizione</Label>
+              <Textarea
+                id="rename-desc"
+                value={renameDescription}
+                onChange={(e) => setRenameDescription(e.target.value)}
+                rows={2}
+                placeholder="Descrizione opzionale..."
+              />
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setRenamingPackageId(null)}>
+              Annulla
+            </Button>
+            <Button variant="professional" onClick={handleRenamePackage}>
+              <Save className="w-4 h-4 mr-2" />
+              Salva
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
+
   );
 };
