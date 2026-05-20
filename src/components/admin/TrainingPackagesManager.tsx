@@ -75,6 +75,37 @@ export const TrainingPackagesManager = () => {
   // Edit package
   const [editingPackageId, setEditingPackageId] = useState<string | null>(null);
 
+  // Rename package
+  const [renamingPackageId, setRenamingPackageId] = useState<string | null>(null);
+  const [renameValue, setRenameValue] = useState("");
+  const [renameDescription, setRenameDescription] = useState("");
+
+  const handleRenamePackage = async () => {
+    if (!renamingPackageId) return;
+    if (!renameValue.trim()) {
+      toast.error("Il nome non può essere vuoto");
+      return;
+    }
+    try {
+      const { error } = await supabase
+        .from("training_packages")
+        .update({
+          name: renameValue.trim(),
+          description: renameDescription.trim() || null,
+        })
+        .eq("id", renamingPackageId);
+      if (error) throw error;
+      toast.success("✅ Pacchetto aggiornato");
+      setRenamingPackageId(null);
+      setRenameValue("");
+      setRenameDescription("");
+      fetchAll();
+    } catch (e: any) {
+      toast.error("❌ Errore: " + e.message);
+    }
+  };
+
+
   // Assign dialog
   const [assignDialogPackageId, setAssignDialogPackageId] = useState<string | null>(null);
   const [assignCompanyId, setAssignCompanyId] = useState<string>("");
@@ -411,10 +442,25 @@ export const TrainingPackagesManager = () => {
                       <Button
                         variant="outline"
                         size="sm"
+                        onClick={() => {
+                          setRenamingPackageId(pkg.id);
+                          setRenameValue(pkg.name);
+                          setRenameDescription(pkg.description || "");
+                        }}
+                        title="Rinomina pacchetto"
+                      >
+                        <Edit className="w-4 h-4 mr-1" />
+                        Rinomina
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
                         onClick={() => setEditingPackageId(isEditing ? null : pkg.id)}
+                        title="Modifica moduli"
                       >
                         {isEditing ? <X className="w-4 h-4" /> : <Edit className="w-4 h-4" />}
                       </Button>
+
                       <Button
                         variant="outline"
                         size="sm"
@@ -573,6 +619,54 @@ export const TrainingPackagesManager = () => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Rename Dialog */}
+      <Dialog
+        open={!!renamingPackageId}
+        onOpenChange={(o) => !o && setRenamingPackageId(null)}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Rinomina Pacchetto</DialogTitle>
+            <DialogDescription>
+              Aggiorna il nome e la descrizione del pacchetto formativo
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="rename-name">Nome Pacchetto *</Label>
+              <Input
+                id="rename-name"
+                value={renameValue}
+                onChange={(e) => setRenameValue(e.target.value)}
+                placeholder="Nome del pacchetto"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="rename-desc">Descrizione</Label>
+              <Textarea
+                id="rename-desc"
+                value={renameDescription}
+                onChange={(e) => setRenameDescription(e.target.value)}
+                rows={2}
+                placeholder="Descrizione opzionale..."
+              />
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setRenamingPackageId(null)}>
+              Annulla
+            </Button>
+            <Button variant="professional" onClick={handleRenamePackage}>
+              <Save className="w-4 h-4 mr-2" />
+              Salva
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
+
   );
 };
