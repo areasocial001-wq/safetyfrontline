@@ -83,15 +83,6 @@ export const Demo3DShowcase = () => {
                     </div>
                   </li>
                   <li className="flex items-start gap-3 group">
-                    <div className="mt-1 p-2 rounded-lg bg-secondary/10 group-hover:bg-secondary/20 transition-colors">
-                      <ShieldAlert className="w-5 h-5 text-secondary" />
-                    </div>
-                    <div>
-                      <p className="font-semibold">Cybersecurity in Ufficio 3D</p>
-                      <p className="text-sm text-muted-foreground">8 rischi nascosti da identificare con feedback educativo immediato</p>
-                    </div>
-                  </li>
-                  <li className="flex items-start gap-3 group">
                     <div className="mt-1 p-2 rounded-lg bg-accent/10 group-hover:bg-accent/20 transition-colors">
                       <Bot className="w-5 h-5 text-accent" />
                     </div>
