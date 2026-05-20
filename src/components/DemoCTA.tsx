@@ -82,6 +82,15 @@ export const DemoCTA = () => {
     } catch {}
   };
 
+  const handleSeek = (e: React.MouseEvent<HTMLDivElement>) => {
+    const v = videoRef.current;
+    const bar = e.currentTarget;
+    if (!v || !bar || !v.duration) return;
+    const rect = bar.getBoundingClientRect();
+    const ratio = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+    v.currentTime = ratio * v.duration;
+  };
+
   const closeVideo = () => {
     const v = videoRef.current;
     if (v) v.pause();
