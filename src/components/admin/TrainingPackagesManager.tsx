@@ -75,6 +75,37 @@ export const TrainingPackagesManager = () => {
   // Edit package
   const [editingPackageId, setEditingPackageId] = useState<string | null>(null);
 
+  // Rename package
+  const [renamingPackageId, setRenamingPackageId] = useState<string | null>(null);
+  const [renameValue, setRenameValue] = useState("");
+  const [renameDescription, setRenameDescription] = useState("");
+
+  const handleRenamePackage = async () => {
+    if (!renamingPackageId) return;
+    if (!renameValue.trim()) {
+      toast.error("Il nome non può essere vuoto");
+      return;
+    }
+    try {
+      const { error } = await supabase
+        .from("training_packages")
+        .update({
+          name: renameValue.trim(),
+          description: renameDescription.trim() || null,
+        })
+        .eq("id", renamingPackageId);
+      if (error) throw error;
+      toast.success("✅ Pacchetto aggiornato");
+      setRenamingPackageId(null);
+      setRenameValue("");
+      setRenameDescription("");
+      fetchAll();
+    } catch (e: any) {
+      toast.error("❌ Errore: " + e.message);
+    }
+  };
+
+
   // Assign dialog
   const [assignDialogPackageId, setAssignDialogPackageId] = useState<string | null>(null);
   const [assignCompanyId, setAssignCompanyId] = useState<string>("");
