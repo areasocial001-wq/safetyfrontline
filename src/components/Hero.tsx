@@ -244,7 +244,7 @@ export const Hero = () => {
               <img
                 src={logoSicurazienda}
                 alt="SicurAzienda"
-                className="inline-block w-auto h-20 md:h-28 lg:h-36 drop-shadow-[0_8px_24px_rgba(0,0,0,0.45)]"
+                className="inline-block w-auto h-40 md:h-56 lg:h-72 drop-shadow-[0_8px_24px_rgba(0,0,0,0.45)]"
               />
             </span>
             <span 
