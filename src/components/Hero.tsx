@@ -231,20 +231,21 @@ export const Hero = () => {
 
           {/* Main Heading with Staggered Entrance and Ripple Effect */}
           <h1 className="text-5xl md:text-7xl lg:text-8xl font-black tracking-tight relative">
-            <span 
-              className="block text-foreground drop-shadow-[0_4px_12px_rgba(0,0,0,0.5)] opacity-0 animate-title-entrance relative inline-block" 
-              style={{ 
-                textShadow: '2px 2px 4px rgba(0,0,0,0.3), 0 0 20px rgba(0,0,0,0.2)',
-                animationDelay: '0.3s'
-              }}
+            <span
+              className="block opacity-0 animate-title-entrance relative"
+              style={{ animationDelay: '0.3s' }}
             >
-              <RippleEffect 
-                isActive={titleRippleActive} 
-                color="primary" 
+              <RippleEffect
+                isActive={titleRippleActive}
+                color="primary"
                 intensity={1}
                 delay={0}
               />
-              SicurAzienda
+              <img
+                src={logoSicurazienda}
+                alt="SicurAzienda"
+                className="inline-block w-auto h-20 md:h-28 lg:h-36 drop-shadow-[0_8px_24px_rgba(0,0,0,0.45)]"
+              />
             </span>
             <span 
               className="block bg-gradient-hero bg-clip-text text-transparent mt-2 opacity-0 animate-title-entrance relative inline-block" 
