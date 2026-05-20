@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Sparkles, Play, ArrowRight, GraduationCap, Shield, Flame, Cross, Monitor, Building2, Heart } from "lucide-react";
+import { Sparkles, Play, ArrowRight, GraduationCap, Shield, Flame, Cross, Building2, Heart } from "lucide-react";
 import { Card } from "@/components/ui/card";
 
 const PREVIEW_MODULES = [
@@ -9,7 +9,6 @@ const PREVIEW_MODULES = [
   { icon: Flame, label: "Antincendio" },
   { icon: Cross, label: "Primo Soccorso" },
   { icon: Heart, label: "RLS" },
-  { icon: Monitor, label: "Cybersecurity" },
 ];
 
 export const DemoCTA = () => {
