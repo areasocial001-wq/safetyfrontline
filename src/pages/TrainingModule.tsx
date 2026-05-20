@@ -429,7 +429,7 @@ const TrainingModule = () => {
         {/* Point and Click Level */}
         {currentSection.type === 'point_and_click' && moduleId && (
           <div className="mb-6">
-            <PointAndClickLevel levelData={getRiskHuntLevelForModule(moduleId)} />
+            <PointAndClickLevel levelData={getRiskHuntLevelForModule(moduleId)} demoMode={isDemoMode} />
           </div>
         )}
 
