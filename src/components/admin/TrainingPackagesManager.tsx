@@ -442,10 +442,25 @@ export const TrainingPackagesManager = () => {
                       <Button
                         variant="outline"
                         size="sm"
+                        onClick={() => {
+                          setRenamingPackageId(pkg.id);
+                          setRenameValue(pkg.name);
+                          setRenameDescription(pkg.description || "");
+                        }}
+                        title="Rinomina pacchetto"
+                      >
+                        <Edit className="w-4 h-4 mr-1" />
+                        Rinomina
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
                         onClick={() => setEditingPackageId(isEditing ? null : pkg.id)}
+                        title="Modifica moduli"
                       >
                         {isEditing ? <X className="w-4 h-4" /> : <Edit className="w-4 h-4" />}
                       </Button>
+
                       <Button
                         variant="outline"
                         size="sm"
