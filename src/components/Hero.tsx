@@ -4,6 +4,7 @@ import { NavLink } from "react-router-dom";
 import { Gamepad2, Play, Pause, Shield, Sparkles, Zap, Target, Trophy, Volume2, VolumeX, Maximize, Minimize, Volume, GraduationCap, RotateCcw } from "lucide-react";
 import { Slider } from "@/components/ui/slider";
 import heroImage from "@/assets/hero-game-corridor.jpg";
+import logoSicurazienda from "@/assets/logo-sicurazienda.png";
 import { UserMenu } from "@/components/auth/UserMenu";
 import { QuoteRequestDialog } from "@/components/QuoteRequestDialog";
 import { RippleEffect } from "@/components/RippleEffect";
