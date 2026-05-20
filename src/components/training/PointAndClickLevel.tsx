@@ -180,7 +180,7 @@ const PointAndClickLevel = ({ levelData = DEFAULT_LEVEL, forcedPreset, readOnly,
 
   // Load saved progress
   useEffect(() => {
-    if (!user) return;
+    if (!user || demoMode) return;
     (async () => {
       const { data } = await supabase
         .from("point_click_progress")
@@ -191,10 +191,10 @@ const PointAndClickLevel = ({ levelData = DEFAULT_LEVEL, forcedPreset, readOnly,
         setScore(data.score ?? 0);
       }
     })();
-  }, [user, levelData.level_id]);
+  }, [user, levelData.level_id, demoMode]);
 
   const saveProgress = useCallback(async (newFound: Set<string>, newScore: number) => {
-    if (!user) return;
+    if (!user || demoMode) return;
     setSaving(true);
     const isCompleted = newFound.size === levelData.total_hazards;
     const { error } = await supabase.from("point_click_progress").upsert({
@@ -204,7 +204,7 @@ const PointAndClickLevel = ({ levelData = DEFAULT_LEVEL, forcedPreset, readOnly,
     }, { onConflict: "user_id,level_id" });
     if (error) console.error("Save error:", error);
     setSaving(false);
-  }, [user, levelData.level_id, levelData.total_hazards]);
+  }, [user, levelData.level_id, levelData.total_hazards, demoMode]);
 
   const handleHazardClick = useCallback((hazard: Hazard) => {
     if (readOnly) return;
