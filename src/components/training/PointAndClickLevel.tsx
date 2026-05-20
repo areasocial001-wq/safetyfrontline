@@ -136,9 +136,10 @@ interface PointAndClickLevelProps {
   forcedPreset?: DevicePreset;
   readOnly?: boolean;
   forceShowHitboxes?: boolean;
+  demoMode?: boolean;
 }
 
-const PointAndClickLevel = ({ levelData = DEFAULT_LEVEL, forcedPreset, readOnly, forceShowHitboxes }: PointAndClickLevelProps) => {
+const PointAndClickLevel = ({ levelData = DEFAULT_LEVEL, forcedPreset, readOnly, forceShowHitboxes, demoMode }: PointAndClickLevelProps) => {
   const { user } = useAuth();
   const containerRef = useRef<HTMLDivElement>(null);
   const [foundHazards, setFoundHazards] = useState<Set<string>>(new Set());
