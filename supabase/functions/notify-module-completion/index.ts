@@ -178,8 +178,8 @@ serve(async (req: Request) => {
               </div>
               <div class="content">
                 <div class="employee-card">
-                  <strong style="font-size: 16px;">👤 ${employeeName}</strong>
-                  <p style="margin: 5px 0 0; font-size: 14px; color: #666;">ha completato il modulo <strong>${moduleTitle}</strong></p>
+                  <strong style="font-size: 16px;">👤 ${escapeHtml(employeeName)}</strong>
+                  <p style="margin: 5px 0 0; font-size: 14px; color: #666;">ha completato il modulo <strong>${escapeHtml(moduleTitle)}</strong></p>
                 </div>
 
                 <div class="stats-grid">
