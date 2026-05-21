@@ -166,8 +166,8 @@ serve(async (req: Request) => {
                 <p style="margin: 8px 0 0; opacity: 0.9;">Formazione Specifica</p>
               </div>
               <div class="content">
-                <p>Ciao <strong>${employeeName}</strong>,</p>
-                <p>${adminName} ti ha assegnato al seguente settore di formazione specifica:</p>
+                <p>Ciao <strong>${escapeHtml(employeeName)}</strong>,</p>
+                <p>${escapeHtml(adminName)} ti ha assegnato al seguente settore di formazione specifica:</p>
                 
                 <div class="sector-card">
                   <p class="sector-label">🏷️ ${sectorInfo.label}</p>
