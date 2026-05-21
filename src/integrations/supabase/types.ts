@@ -1132,6 +1132,21 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      get_top_leaderboard_replays: {
+        Args: { _limit?: number; _scenario_id: string }
+        Returns: {
+          achievements_unlocked: string[]
+          collisions: number
+          created_at: string
+          id: string
+          is_personal_record: boolean
+          scenario_id: string
+          score: number
+          time_elapsed: number
+          user_id: string
+          video_url: string
+        }[]
+      }
       get_user_company_id: { Args: { _user_id: string }; Returns: string }
       has_role: {
         Args: {

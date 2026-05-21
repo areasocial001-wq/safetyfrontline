@@ -126,19 +126,17 @@ export async function getTopReplays(scenarioId: string, limit: number = 10): Pro
     return cached.slice(0, limit);
   }
 
-  // Fetch from database
-  const { data, error } = await supabase
-    .from('game_replays')
-    .select('*')
-    .eq('scenario_id', scenarioId)
-    .eq('is_personal_record', true)
-    .order('score', { ascending: false })
-    .limit(limit);
+  // Fetch from database via SECURITY DEFINER RPC (restricted to top players)
+  const { data, error } = await supabase.rpc('get_top_leaderboard_replays', {
+    _scenario_id: scenarioId,
+    _limit: limit,
+  });
 
   if (error) {
     console.error('Error loading top replays:', error);
     return [];
   }
+
 
   const replays = data || [];
   
