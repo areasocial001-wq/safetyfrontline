@@ -12,6 +12,14 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type",
 };
 
+const escapeHtml = (s: unknown) =>
+  String(s ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+
 // All available training modules
 const ALL_MODULES = [
   { id: "office", name: "Office Hazard Quest - Sicurezza in Ufficio" },
