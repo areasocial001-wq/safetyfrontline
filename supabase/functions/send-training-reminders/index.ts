@@ -168,7 +168,7 @@ const handler = async (req: Request): Promise<Response> => {
     for (const employee of employeesWithMissing) {
       try {
         const modulesList = employee.missingModules
-          .map((m) => `<li><strong>${m.name}</strong></li>`)
+          .map((m) => `<li><strong>${escapeHtml(m.name)}</strong></li>`)
           .join("");
 
         const emailResponse = await resend.emails.send({
