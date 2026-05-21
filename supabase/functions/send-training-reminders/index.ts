@@ -268,7 +268,7 @@ const handler = async (req: Request): Promise<Response> => {
                   </div>
                   
                   <div class="content">
-                    <p>Ciao <strong>${employee.fullName}</strong>,</p>
+                    <p>Ciao <strong>${escapeHtml(employee.fullName)}</strong>,</p>
                     
                     <div class="alert-box">
                       <strong>⚠️ Attenzione:</strong> Hai ancora dei moduli di formazione obbligatoria sulla sicurezza che devono essere completati.
