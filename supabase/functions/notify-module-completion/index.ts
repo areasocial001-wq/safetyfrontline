@@ -148,7 +148,7 @@ serve(async (req: Request) => {
     const emailResponse = await resend.emails.send({
       from: "SicurAzienda <onboarding@resend.dev>",
       to: adminEmails,
-      subject: `📊 ${employeeName} ha completato: ${moduleTitle}`,
+      subject: `📊 ${employeeName} ha completato: ${moduleTitle}`.replace(/[\r\n]/g, " "),
       html: `
         <!DOCTYPE html>
         <html>
