@@ -39,15 +39,42 @@ const handler = async (req: Request): Promise<Response> => {
     if (claimsError || !claimsData?.claims) {
       return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
-    const {
-      employeeEmail,
-      employeeName,
-      moduleName,
-      score,
-      maxScore,
-      percentage,
-      certificateUrl,
-    }: CertificateNotificationRequest = await req.json();
+    const callerId = claimsData.claims.sub as string;
+
+    const body: CertificateNotificationRequest = await req.json();
+
+    // Fetch caller's verified email/name from profiles using service role to bypass RLS reliably
+    const adminClient = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
+    const { data: profile, error: profileError } = await adminClient
+      .from("profiles")
+      .select("email, full_name")
+      .eq("id", callerId)
+      .single();
+
+    if (profileError || !profile?.email) {
+      return new Response(JSON.stringify({ error: "Profile not found" }), { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    }
+
+    // Reject if requested recipient differs from authenticated caller (prevents email spoofing/abuse)
+    if (body.employeeEmail?.toLowerCase().trim() !== profile.email.toLowerCase().trim()) {
+      return new Response(JSON.stringify({ error: "Recipient email does not match authenticated user" }), { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    }
+
+    // Sanitize text inputs to prevent HTML injection
+    const escapeHtml = (s: string) => String(s ?? "")
+      .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+
+    const employeeEmail = profile.email;
+    const employeeName = escapeHtml(body.employeeName || profile.full_name || "");
+    const moduleName = escapeHtml(body.moduleName || "");
+    const score = Number(body.score) || 0;
+    const maxScore = Number(body.maxScore) || 0;
+    const percentage = Math.max(0, Math.min(100, Number(body.percentage) || 0));
+    const certificateUrl = typeof body.certificateUrl === "string" && /^https?:\/\//.test(body.certificateUrl)
+      ? body.certificateUrl
+      : `${Deno.env.get("SUPABASE_URL")}`;
+
 
     console.log("Sending certificate notification to:", employeeEmail);
 
