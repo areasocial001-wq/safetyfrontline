@@ -309,7 +309,7 @@ const handler = async (req: Request): Promise<Response> => {
                   <div class="footer">
                     <p>Questa email è stata generata automaticamente da <strong>SicurAzienda</strong></p>
                     <p>Piattaforma di formazione gamificata sulla sicurezza sul lavoro</p>
-                    ${employee.companyName ? `<p>Azienda: ${employee.companyName}</p>` : ""}
+                    ${employee.companyName ? `<p>Azienda: ${escapeHtml(employee.companyName)}</p>` : ""}
                   </div>
                 </div>
               </body>
