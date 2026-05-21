@@ -1132,6 +1132,13 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      get_module_time_config: {
+        Args: { _module_id: string }
+        Returns: {
+          min_time_seconds: number
+          section_id: string
+        }[]
+      }
       get_top_leaderboard_replays: {
         Args: { _limit?: number; _scenario_id: string }
         Returns: {

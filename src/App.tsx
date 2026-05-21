@@ -6,6 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import Index from "./pages/Index";
+import { ProtectedRoute } from "@/components/ProtectedRoute";
 
 // Lazy-load secondary routes to reduce initial bundle
 const Demo3D = lazy(() => import("./pages/Demo3D"));
@@ -56,20 +57,20 @@ const App = () => (
               <Route path="/auth" element={<Auth />} />
               <Route path="/register" element={<Register />} />
               <Route path="/reset-password" element={<ResetPassword />} />
-              <Route path="/admin" element={<AdminDashboard />} />
-              <Route path="/admin/training-config" element={<TrainingConfig />} />
-              <Route path="/company" element={<CompanyDashboard />} />
-              <Route path="/employee" element={<EmployeeDashboard />} />
-              <Route path="/profile" element={<Profile />} />
-              <Route path="/player-profile" element={<PlayerProfile />} />
+              <Route path="/admin" element={<ProtectedRoute roles={["admin"]}><AdminDashboard /></ProtectedRoute>} />
+              <Route path="/admin/training-config" element={<ProtectedRoute roles={["admin"]}><TrainingConfig /></ProtectedRoute>} />
+              <Route path="/company" element={<ProtectedRoute roles={["admin", "company_client"]}><CompanyDashboard /></ProtectedRoute>} />
+              <Route path="/employee" element={<ProtectedRoute roles={["admin", "company_client", "employee"]}><EmployeeDashboard /></ProtectedRoute>} />
+              <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+              <Route path="/player-profile" element={<ProtectedRoute><PlayerProfile /></ProtectedRoute>} />
               <Route path="/verify-certificate" element={<VerifyCertificate />} />
               <Route path="/sound-studio" element={<SoundStudio />} />
               <Route path="/scheda-tecnica" element={<TechnicalSheet />} />
-              <Route path="/formazione" element={<TrainingHub />} />
-              <Route path="/formazione/:moduleId" element={<TrainingModule />} />
-              <Route path="/admin/training-analytics" element={<TrainingAnalytics />} />
+              <Route path="/formazione" element={<ProtectedRoute><TrainingHub /></ProtectedRoute>} />
+              <Route path="/formazione/:moduleId" element={<ProtectedRoute><TrainingModule /></ProtectedRoute>} />
+              <Route path="/admin/training-analytics" element={<ProtectedRoute roles={["admin"]}><TrainingAnalytics /></ProtectedRoute>} />
               <Route path="/guida" element={<GuidePage />} />
-              <Route path="/i-miei-attestati" element={<MyCertificates />} />
+              <Route path="/i-miei-attestati" element={<ProtectedRoute><MyCertificates /></ProtectedRoute>} />
               <Route path="/preset-test" element={<PresetTestPage />} />
               <Route path="/spot-the-hazard" element={<SpotTheHazardPage />} />
               <Route path="/demo-percorso" element={<DemoPath />} />

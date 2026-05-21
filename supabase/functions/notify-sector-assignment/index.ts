@@ -16,6 +16,14 @@ const SECTOR_LABELS: Record<string, { label: string; hours: number; description:
   alto: { label: "Rischio Alto", hours: 12, description: "Costruzioni, industria, chimica, sanità, rifiuti" },
 };
 
+const escapeHtml = (s: unknown) =>
+  String(s ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+
 interface NotifyRequest {
   employeeUserId: string;
   sector: string;
@@ -158,8 +166,8 @@ serve(async (req: Request) => {
                 <p style="margin: 8px 0 0; opacity: 0.9;">Formazione Specifica</p>
               </div>
               <div class="content">
-                <p>Ciao <strong>${employeeName}</strong>,</p>
-                <p>${adminName} ti ha assegnato al seguente settore di formazione specifica:</p>
+                <p>Ciao <strong>${escapeHtml(employeeName)}</strong>,</p>
+                <p>${escapeHtml(adminName)} ti ha assegnato al seguente settore di formazione specifica:</p>
                 
                 <div class="sector-card">
                   <p class="sector-label">🏷️ ${sectorInfo.label}</p>

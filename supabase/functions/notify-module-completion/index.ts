@@ -20,6 +20,14 @@ interface NotifyRequest {
   timeSpentMinutes: number;
 }
 
+const escapeHtml = (s: unknown) =>
+  String(s ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+
 serve(async (req: Request) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -140,7 +148,7 @@ serve(async (req: Request) => {
     const emailResponse = await resend.emails.send({
       from: "SicurAzienda <onboarding@resend.dev>",
       to: adminEmails,
-      subject: `📊 ${employeeName} ha completato: ${moduleTitle}`,
+      subject: `📊 ${employeeName} ha completato: ${moduleTitle}`.replace(/[\r\n]/g, " "),
       html: `
         <!DOCTYPE html>
         <html>
@@ -170,8 +178,8 @@ serve(async (req: Request) => {
               </div>
               <div class="content">
                 <div class="employee-card">
-                  <strong style="font-size: 16px;">👤 ${employeeName}</strong>
-                  <p style="margin: 5px 0 0; font-size: 14px; color: #666;">ha completato il modulo <strong>${moduleTitle}</strong></p>
+                  <strong style="font-size: 16px;">👤 ${escapeHtml(employeeName)}</strong>
+                  <p style="margin: 5px 0 0; font-size: 14px; color: #666;">ha completato il modulo <strong>${escapeHtml(moduleTitle)}</strong></p>
                 </div>
 
                 <div class="stats-grid">

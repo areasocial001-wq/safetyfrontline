@@ -12,6 +12,14 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type",
 };
 
+const escapeHtml = (s: unknown) =>
+  String(s ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+
 // All available training modules
 const ALL_MODULES = [
   { id: "office", name: "Office Hazard Quest - Sicurezza in Ufficio" },
@@ -160,7 +168,7 @@ const handler = async (req: Request): Promise<Response> => {
     for (const employee of employeesWithMissing) {
       try {
         const modulesList = employee.missingModules
-          .map((m) => `<li><strong>${m.name}</strong></li>`)
+          .map((m) => `<li><strong>${escapeHtml(m.name)}</strong></li>`)
           .join("");
 
         const emailResponse = await resend.emails.send({
@@ -260,7 +268,7 @@ const handler = async (req: Request): Promise<Response> => {
                   </div>
                   
                   <div class="content">
-                    <p>Ciao <strong>${employee.fullName}</strong>,</p>
+                    <p>Ciao <strong>${escapeHtml(employee.fullName)}</strong>,</p>
                     
                     <div class="alert-box">
                       <strong>⚠️ Attenzione:</strong> Hai ancora dei moduli di formazione obbligatoria sulla sicurezza che devono essere completati.
@@ -301,7 +309,7 @@ const handler = async (req: Request): Promise<Response> => {
                   <div class="footer">
                     <p>Questa email è stata generata automaticamente da <strong>SicurAzienda</strong></p>
                     <p>Piattaforma di formazione gamificata sulla sicurezza sul lavoro</p>
-                    ${employee.companyName ? `<p>Azienda: ${employee.companyName}</p>` : ""}
+                    ${employee.companyName ? `<p>Azienda: ${escapeHtml(employee.companyName)}</p>` : ""}
                   </div>
                 </div>
               </body>

@@ -95,13 +95,10 @@ const TrainingModule = () => {
   useEffect(() => {
     if (!moduleId) return;
     const fetchTimeOverrides = async () => {
-      const { data } = await supabase
-        .from('training_time_config')
-        .select('section_id, min_time_seconds')
-        .eq('module_id', moduleId);
+      const { data } = await supabase.rpc('get_module_time_config', { _module_id: moduleId });
       if (data) {
         const map: Record<string, number> = {};
-        data.forEach((row: any) => { map[row.section_id] = row.min_time_seconds; });
+        (data as any[]).forEach((row) => { map[row.section_id] = row.min_time_seconds; });
         setTimeOverrides(map);
       }
     };
