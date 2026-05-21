@@ -16,6 +16,14 @@ const SECTOR_LABELS: Record<string, { label: string; hours: number; description:
   alto: { label: "Rischio Alto", hours: 12, description: "Costruzioni, industria, chimica, sanità, rifiuti" },
 };
 
+const escapeHtml = (s: unknown) =>
+  String(s ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+
 interface NotifyRequest {
   employeeUserId: string;
   sector: string;
