@@ -6,6 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import Index from "./pages/Index";
+import { ProtectedRoute } from "@/components/ProtectedRoute";
 
 // Lazy-load secondary routes to reduce initial bundle
 const Demo3D = lazy(() => import("./pages/Demo3D"));
