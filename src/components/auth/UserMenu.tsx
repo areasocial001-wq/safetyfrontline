@@ -9,14 +9,16 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { User, LogOut, Settings, Shield, Building, GraduationCap, Trophy, BookOpen } from 'lucide-react';
+import { User, LogOut, Settings, Shield, Building, GraduationCap, Trophy, BookOpen, RefreshCw } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
+import { useState } from 'react';
 
 export const UserMenu = () => {
   const { user, signOut } = useAuth();
-  const { isAdmin, isCompanyClient, isEmployee } = useUserRole();
+  const { isAdmin, isCompanyClient, isEmployee, refresh } = useUserRole();
   const navigate = useNavigate();
+  const [refreshing, setRefreshing] = useState(false);
 
   const handleSignOut = async () => {
     const { error } = await signOut();
@@ -27,6 +29,20 @@ export const UserMenu = () => {
       navigate('/');
     }
   };
+
+  const handleRefreshPermissions = async (e: Event) => {
+    e.preventDefault();
+    setRefreshing(true);
+    try {
+      const newRole = await refresh();
+      toast.success(newRole ? `Permessi aggiornati: ${newRole}` : 'Permessi aggiornati');
+    } catch {
+      toast.error('Errore durante l\'aggiornamento dei permessi');
+    } finally {
+      setRefreshing(false);
+    }
+  };
+
 
   if (!user) {
     return (
