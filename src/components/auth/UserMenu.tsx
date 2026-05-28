@@ -107,6 +107,11 @@ export const UserMenu = () => {
           Formazione Generale
         </DropdownMenuItem>
         <DropdownMenuSeparator />
+        <DropdownMenuItem onSelect={handleRefreshPermissions} disabled={refreshing}>
+          <RefreshCw className={`w-4 h-4 mr-2 ${refreshing ? 'animate-spin' : ''}`} />
+          {refreshing ? 'Aggiornamento...' : 'Aggiorna permessi'}
+        </DropdownMenuItem>
+        <DropdownMenuSeparator />
         <DropdownMenuItem onClick={handleSignOut}>
           <LogOut className="w-4 h-4 mr-2" />
           Logout
