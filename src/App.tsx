@@ -33,6 +33,7 @@ const SpotTheHazardPage = lazy(() => import("./pages/SpotTheHazardPage"));
 const DemoPath = lazy(() => import("./pages/DemoPath"));
 const BonusModules = lazy(() => import("./pages/BonusModules"));
 const ROICalculatorPage = lazy(() => import("./pages/ROICalculatorPage"));
+const DebugRole = lazy(() => import("./pages/DebugRole"));
 
 const queryClient = new QueryClient();
 
@@ -76,6 +77,7 @@ const App = () => (
               <Route path="/demo-percorso" element={<DemoPath />} />
               <Route path="/moduli-bonus" element={<BonusModules />} />
               <Route path="/roi" element={<ROICalculatorPage />} />
+              <Route path="/debug/role" element={<ProtectedRoute><DebugRole /></ProtectedRoute>} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>
