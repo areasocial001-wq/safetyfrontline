@@ -10,6 +10,7 @@ import { QuoteRequestDialog } from "@/components/QuoteRequestDialog";
 import { RippleEffect } from "@/components/RippleEffect";
 import { useIntroMusic } from "@/hooks/useIntroMusic";
 import { AudioFrequencyVisualizer } from "@/components/AudioFrequencyVisualizer";
+import logoSF from "@/assets/logo-sf.png.asset.json";
 
 export const Hero = () => {
   const [quoteDialogOpen, setQuoteDialogOpen] = useState(false);
