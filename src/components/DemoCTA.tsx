@@ -98,7 +98,7 @@ export const DemoCTA = () => {
   };
 
   return (
-    <section className="py-20 px-4 bg-gradient-to-br from-primary/5 via-background to-secondary/5 relative overflow-hidden">
+    <section className="py-20 px-3 sm:px-4 bg-gradient-to-br from-primary/5 via-background to-secondary/5 relative overflow-hidden">
       <div className="absolute top-10 left-10 w-72 h-72 bg-primary/10 rounded-full blur-3xl pointer-events-none" />
       <div className="absolute bottom-10 right-10 w-72 h-72 bg-secondary/10 rounded-full blur-3xl pointer-events-none" />
 
@@ -188,7 +188,7 @@ export const DemoCTA = () => {
               </div>
             </div>
           ) : (
-            <div className="grid md:grid-cols-2 gap-8 p-8 md:p-12 items-center">
+            <div className="grid md:grid-cols-2 gap-8 p-5 sm:p-8 md:p-12 items-center">
               <div>
                 <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-bold mb-4">
                   <Sparkles className="w-3.5 h-3.5" />
