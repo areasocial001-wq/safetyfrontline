@@ -303,7 +303,7 @@ export const CARTOON_FACTORY: CartoonHazardLevel = {
     },
     {
       id: "cf_oil_spill", name: "Pozza d'olio sul pavimento",
-      position: { top: "78%", left: "38%" }, hitbox_size: { width: "14%", height: "16%" }, points: 100,
+      position: { top: "86%", left: "26%" }, hitbox_size: { width: "14%", height: "12%" }, points: 100,
       feedback: { title: "Scivolamento", message: "Macchia di olio non segnalata in zona di passaggio.", type: "warning" },
       educational: { why: "Gli oli da macchine utensili rendono il pavimento estremamente scivoloso e infiammabile.", correct_action: "Cospargere materiale assorbente, segnalare con cartello, smaltire come rifiuto pericoloso.", regulation: "D.Lgs. 81/08 All. IV" },
     },
