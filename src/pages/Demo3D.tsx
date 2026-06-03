@@ -1513,7 +1513,16 @@ const Demo3D = () => {
               risksFoundIds={riskFoundOrder.current}
               quality={quality}
               isActive={gameStarted}
-              audioSettings={audioSettings}
+              audioSettings={{
+                ...audioSettings,
+                // Apply user mouse sensitivity preference (higher pref = more sensitive
+                // => lower angularSensibility divisor in Babylon).
+                mouseSensitivity: Math.max(
+                  50,
+                  (audioSettings.mouseSensitivity || 500) /
+                    Math.max(0.1, controlPrefs.mouse_sensitivity),
+                ),
+              }}
               
               extinguisherType={selectedExtinguisher || undefined}
               onFirePropagationChange={(level: number) => {
