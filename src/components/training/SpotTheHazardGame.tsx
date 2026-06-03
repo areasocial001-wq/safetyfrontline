@@ -113,7 +113,7 @@ const SpotTheHazardGame = ({ level, onExit }: Props) => {
   const reset = () => {
     setFound(new Set()); setScore(0); setLives(level.lives);
     setWrongClicks(0); setActiveHazard(null); setStatus("playing");
-    setHintsLeft(3); setHintedId(null);
+    setHintsLeft(HINTS_PER_GAME); setHintedId(null); setHintCooldownUntil(0);
   };
 
   const finalAccuracy = useMemo(() => {
@@ -149,13 +149,16 @@ const SpotTheHazardGame = ({ level, onExit }: Props) => {
               size="sm"
               variant="secondary"
               onClick={(e) => { e.stopPropagation(); useHint(); }}
-              disabled={hintsLeft <= 0 || status !== "playing"}
+              disabled={hintDisabled}
               className="rounded-full shadow-md gap-1.5 bg-background/90 backdrop-blur-sm border border-border"
               aria-label="Mostra un indizio"
+              title={cooldownLeft > 0 ? `Disponibile fra ${cooldownLeft}s` : `Indizi rimasti: ${hintsLeft}`}
             >
               <Lightbulb className="h-4 w-4 text-yellow-500" />
               <span className="hidden sm:inline">Indizio</span>
-              <span className="text-xs font-bold tabular-nums">{hintsLeft}</span>
+              <span className="text-xs font-bold tabular-nums">
+                {cooldownLeft > 0 ? `${cooldownLeft}s` : hintsLeft}
+              </span>
             </Button>
             <div className="flex items-center gap-1 bg-background/90 backdrop-blur-sm rounded-full px-3 py-2 border border-border shadow-md pointer-events-none">
               {Array.from({ length: level.lives }).map((_, i) => (
@@ -169,7 +172,7 @@ const SpotTheHazardGame = ({ level, onExit }: Props) => {
         </div>
 
         {/* Hazard click zones (invisible) */}
-        {level.hazards.map(h => {
+        {renderedHazards.map(h => {
           const isFound = found.has(h.id);
           const isHinted = hintedId === h.id;
           return (
