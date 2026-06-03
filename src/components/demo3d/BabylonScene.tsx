@@ -1158,6 +1158,10 @@ export const BabylonScene = ({
     }
   }, [audioSettings.mouseSensitivity]);
 
+  // Mirror touch props into refs consumed by the per-frame render loop
+  useEffect(() => { touchMovementRef.current = touchMovement; }, [touchMovement]);
+  useEffect(() => { touchLookSensitivityRef.current = touchLookSensitivity; }, [touchLookSensitivity]);
+
   // Re-attach camera controls when isActive changes
   useEffect(() => {
     const camera = cameraRef.current;
