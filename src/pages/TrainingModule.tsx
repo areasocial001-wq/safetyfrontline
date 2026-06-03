@@ -140,6 +140,21 @@ const TrainingModule = () => {
     return () => { if (timerRef.current) clearInterval(timerRef.current); };
   }, []);
 
+  // Per-question reading countdown. Resets when current question or section changes.
+  // Stops at 0 (no auto-advance) and can be paused or skipped by the user.
+  useEffect(() => {
+    setQuestionTimeLeft(QUESTION_READ_SECONDS);
+    setIsReadingPaused(false);
+  }, [currentQuestionIndex, currentSectionIndex]);
+
+  useEffect(() => {
+    if (isReadingPaused) return;
+    if (questionTimeLeft <= 0) return;
+    const t = setInterval(() => setQuestionTimeLeft(prev => Math.max(0, prev - 1)), 1000);
+    return () => clearInterval(t);
+  }, [isReadingPaused, questionTimeLeft]);
+
+
   const allQuestionsAnswered = currentSection?.questions
     ? currentSection.questions.every(q => answeredQuestions[q.id] !== undefined)
     : true;
