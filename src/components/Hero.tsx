@@ -238,7 +238,7 @@ export const Hero = () => {
           </div>
 
           {/* Main Heading with Staggered Entrance and Ripple Effect */}
-          <h1 className="text-5xl md:text-7xl lg:text-8xl font-black tracking-tight relative">
+          <h1 className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-black tracking-tight relative break-words">
             <span
               className="block opacity-0 animate-title-entrance relative"
               style={{ animationDelay: '0.3s' }}
@@ -252,11 +252,11 @@ export const Hero = () => {
               <img
                 src={logoSicurazienda}
                 alt="SicurAzienda"
-                className="inline-block w-auto h-40 md:h-56 lg:h-72 drop-shadow-[0_8px_24px_rgba(0,0,0,0.45)] object-fill"
+                className="inline-block w-auto h-28 sm:h-40 md:h-56 lg:h-72 max-w-full drop-shadow-[0_8px_24px_rgba(0,0,0,0.45)] object-contain"
               />
             </span>
             <span 
-              className="block bg-gradient-hero bg-clip-text text-transparent mt-2 opacity-0 animate-title-entrance relative inline-block" 
+              className="block bg-gradient-hero bg-clip-text text-transparent mt-2 opacity-0 animate-title-entrance relative inline-block max-w-full break-words" 
               style={{ 
                 animationDelay: '0.7s',
                 WebkitTextStroke: '1px rgba(255,103,31,0.3)',
@@ -272,6 +272,7 @@ export const Hero = () => {
               Safety Frontline
             </span>
           </h1>
+
 
           {/* Subheading - Delayed entrance */}
           <p 
