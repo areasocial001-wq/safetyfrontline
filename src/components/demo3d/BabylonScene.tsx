@@ -1238,13 +1238,38 @@ export const BabylonScene = ({
     // Babylon's keyboard input lost the canvas focus.
     const scene = sceneRef.current;
     const obs = scene?.onBeforeRenderObservable.add(() => {
-      if (!state.w && !state.a && !state.s && !state.d) return;
       const speed = camera.speed ?? 0.3;
-      // UniversalCamera: translate in local space
+
+      // --- Keyboard WASD ---
       if (state.w) camera.position.addInPlace(camera.getDirection(BABYLON.Vector3.Forward()).scale(speed));
       if (state.s) camera.position.addInPlace(camera.getDirection(BABYLON.Vector3.Backward()).scale(speed));
       if (state.a) camera.position.addInPlace(camera.getDirection(BABYLON.Vector3.Left()).scale(speed));
       if (state.d) camera.position.addInPlace(camera.getDirection(BABYLON.Vector3.Right()).scale(speed));
+
+      // --- Touch joystick movement (mobile) ---
+      const tm = touchMovementRef.current;
+      if (tm) {
+        if (tm.forward > 0.05) camera.position.addInPlace(camera.getDirection(BABYLON.Vector3.Forward()).scale(speed * tm.forward));
+        if (tm.backward > 0.05) camera.position.addInPlace(camera.getDirection(BABYLON.Vector3.Backward()).scale(speed * tm.backward));
+        if (tm.left > 0.05) camera.position.addInPlace(camera.getDirection(BABYLON.Vector3.Left()).scale(speed * tm.left));
+        if (tm.right > 0.05) camera.position.addInPlace(camera.getDirection(BABYLON.Vector3.Right()).scale(speed * tm.right));
+      }
+
+      // --- Touch look-pad (mobile camera rotation) ---
+      const look = touchLookDeltaRef?.current;
+      if (look && (look.dx !== 0 || look.dy !== 0)) {
+        // Convert pixels to radians: angularSensibility is the divisor Babylon
+        // uses for mouse; we mimic the same scaling so the feel matches.
+        const sensibility = (camera.angularSensibility ?? 1000) / Math.max(0.1, touchLookSensitivityRef.current);
+        camera.rotation.y += look.dx / sensibility;
+        camera.rotation.x += look.dy / sensibility;
+        // Clamp pitch to avoid flipping upside-down
+        const maxPitch = Math.PI / 2 - 0.05;
+        if (camera.rotation.x > maxPitch) camera.rotation.x = maxPitch;
+        if (camera.rotation.x < -maxPitch) camera.rotation.x = -maxPitch;
+        look.dx = 0;
+        look.dy = 0;
+      }
     });
 
     return () => {
