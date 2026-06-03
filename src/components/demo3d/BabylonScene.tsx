@@ -1270,14 +1270,24 @@ export const BabylonScene = ({
         if (tm.right > 0.05) camera.position.addInPlace(camera.getDirection(BABYLON.Vector3.Right()).scale(speed * tm.right));
       }
 
+      // --- External movement (gamepad / accessibility) ---
+      const em = externalMovementRef?.current;
+      if (em) {
+        if (em.forward > 0.05) camera.position.addInPlace(camera.getDirection(BABYLON.Vector3.Forward()).scale(speed * em.forward));
+        if (em.backward > 0.05) camera.position.addInPlace(camera.getDirection(BABYLON.Vector3.Backward()).scale(speed * em.backward));
+        if (em.left > 0.05) camera.position.addInPlace(camera.getDirection(BABYLON.Vector3.Left()).scale(speed * em.left));
+        if (em.right > 0.05) camera.position.addInPlace(camera.getDirection(BABYLON.Vector3.Right()).scale(speed * em.right));
+      }
+
       // --- Touch look-pad (mobile camera rotation) ---
       const look = touchLookDeltaRef?.current;
       if (look && (look.dx !== 0 || look.dy !== 0)) {
         // Convert pixels to radians: angularSensibility is the divisor Babylon
         // uses for mouse; we mimic the same scaling so the feel matches.
         const sensibility = (camera.angularSensibility ?? 1000) / Math.max(0.1, touchLookSensitivityRef.current);
+        const yFactor = invertYRef.current ? -1 : 1;
         camera.rotation.y += look.dx / sensibility;
-        camera.rotation.x += look.dy / sensibility;
+        camera.rotation.x += (look.dy * yFactor) / sensibility;
         // Clamp pitch to avoid flipping upside-down
         const maxPitch = Math.PI / 2 - 0.05;
         if (camera.rotation.x > maxPitch) camera.rotation.x = maxPitch;
