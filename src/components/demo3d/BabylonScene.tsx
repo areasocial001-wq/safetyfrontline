@@ -102,6 +102,8 @@ export const BabylonScene = ({
   touchMovement,
   touchLookDeltaRef,
   touchLookSensitivity = 1,
+  externalMovementRef,
+  invertY = false,
 }: BabylonSceneProps) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const engineRef = useRef<BABYLON.Engine | null>(null);
