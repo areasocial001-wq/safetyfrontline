@@ -137,10 +137,15 @@ All colors MUST be HSL.
     @apply border-border;
   }
 
+  html,
   body {
     @apply bg-background text-foreground;
+    /* Guardrail: prevent any single element from causing horizontal page scroll */
+    overflow-x: hidden;
+    max-width: 100%;
   }
 }
+
 
 /* Gamification utilities */
 @layer utilities {
