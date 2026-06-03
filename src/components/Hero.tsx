@@ -221,7 +221,7 @@ export const Hero = () => {
       <div className="container relative z-10 px-4 py-20 mx-auto">
         <div className="max-w-5xl mx-auto text-center space-y-8">
           {/* Badge with Glow - Animated entrance */}
-          <div className="flex items-center justify-center gap-4 flex-wrap">
+          <div className="flex items-center justify-center gap-6 md:gap-10 flex-col sm:flex-row">
             <img
               src={logoSF.url}
               alt="Safety Frontline logo"
@@ -229,11 +229,11 @@ export const Hero = () => {
               style={{ animationDelay: '0.1s' }}
             />
             <div 
-              className="inline-flex items-center gap-3 px-6 py-3 rounded-full bg-gray-100 dark:bg-gray-800 border-[3px] border-black dark:border-white backdrop-blur-sm opacity-0 animate-badge-pop shadow-[0_0_25px_rgba(0,0,0,0.4)] dark:shadow-[0_0_25px_rgba(255,255,255,0.4)]" 
+              className="inline-flex items-center gap-4 px-8 py-4 md:px-10 md:py-5 rounded-full bg-gray-100 dark:bg-gray-800 border-[3px] border-black dark:border-white backdrop-blur-sm opacity-0 animate-badge-pop shadow-[0_0_25px_rgba(0,0,0,0.4)] dark:shadow-[0_0_25px_rgba(255,255,255,0.4)]" 
               style={{ animationDelay: '0.1s' }}
             >
-              <Shield className="w-6 h-6 text-black dark:text-white animate-pulse" />
-              <span className="text-lg font-bold text-black dark:text-white">Conforme Accordo Stato-Regioni 2025</span>
+              <Shield className="w-8 h-8 md:w-10 md:h-10 text-black dark:text-white animate-pulse" />
+              <span className="text-xl md:text-2xl font-bold text-black dark:text-white">Conforme Accordo Stato-Regioni 2025</span>
             </div>
           </div>
 
