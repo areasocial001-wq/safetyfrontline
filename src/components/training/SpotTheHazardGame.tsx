@@ -237,7 +237,7 @@ const SpotTheHazardGame = ({ level, onExit }: Props) => {
         </ul>
         {status === "playing" && (
           <p className="text-xs text-muted-foreground border-t pt-2">
-            💡 Click ovunque per cercare. Click sbagliati = vita persa.
+            💡 Click ovunque per cercare. Click sbagliati = vita persa. Usa "Indizio" se non trovi un rischio.
           </p>
         )}
       </Card>
