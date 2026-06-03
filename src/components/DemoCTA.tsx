@@ -189,21 +189,21 @@ export const DemoCTA = () => {
             </div>
           ) : (
             <div className="grid md:grid-cols-2 gap-8 p-5 sm:p-8 md:p-12 items-center">
-              <div>
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-bold mb-4">
-                  <Sparkles className="w-3.5 h-3.5" />
-                  NUOVO • Anteprima interattiva
+              <div className="min-w-0">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-bold mb-4 max-w-full">
+                  <Sparkles className="w-3.5 h-3.5 shrink-0" />
+                  <span className="truncate">NUOVO • Anteprima interattiva</span>
                 </div>
-                <h2 className="text-3xl md:text-4xl font-black tracking-tight mb-4">
+                <h2 className="text-2xl sm:text-3xl md:text-4xl font-black tracking-tight mb-4 break-words">
                   Prova il <span className="text-primary">Percorso Demo</span> completo
                 </h2>
-                <p className="text-muted-foreground mb-6 text-base leading-relaxed">
+                <p className="text-muted-foreground mb-6 text-base leading-relaxed break-words">
                   Esplora liberamente un esempio di Pacchetto Formativo Personalizzato:
                   tutti i moduli, le lezioni e i test che riceveranno i tuoi dipendenti.
                   Senza registrazione, senza tempi di attesa.
                 </p>
-                <div className="flex flex-wrap gap-3">
-                  <Button asChild size="lg" className="rounded-xl font-bold shadow-lg">
+                <div className="flex flex-col sm:flex-row sm:flex-wrap gap-3">
+                  <Button asChild size="lg" className="rounded-xl font-bold shadow-lg w-full sm:w-auto">
                     <Link to="/demo-percorso">
                       <Play className="w-4 h-4 mr-2" />
                       Avvia il Percorso Demo
@@ -213,13 +213,13 @@ export const DemoCTA = () => {
                   <Button
                     size="lg"
                     variant="secondary"
-                    className="rounded-xl font-bold"
+                    className="rounded-xl font-bold w-full sm:w-auto"
                     onClick={() => setShowVideo(true)}
                   >
                     <Play className="w-4 h-4 mr-2" />
                     Guarda il Video Demo
                   </Button>
-                  <Button asChild size="lg" variant="outline" className="rounded-xl">
+                  <Button asChild size="lg" variant="outline" className="rounded-xl w-full sm:w-auto">
                     <Link to="/demo-3d">
                       <GraduationCap className="w-4 h-4 mr-2" />
                       Vedi le Sim 3D
@@ -227,6 +227,7 @@ export const DemoCTA = () => {
                   </Button>
                 </div>
               </div>
+
 
               <div className="grid grid-cols-3 gap-3">
                 {PREVIEW_MODULES.map((m, i) => {
