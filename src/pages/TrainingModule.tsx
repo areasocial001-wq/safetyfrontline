@@ -91,8 +91,28 @@ const TrainingModule = () => {
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const xpIdRef = useRef(0);
 
-  const currentSection = moduleContent?.sections[currentSectionIndex];
+  const rawCurrentSection = moduleContent?.sections[currentSectionIndex];
   const totalSections = moduleContent?.sections.length || 0;
+
+  // Per-attempt seed: shuffles question order + option order to remove "always B" bias.
+  // Regenerated when changing section or when retrying a boss test.
+  const [sectionSeed, setSectionSeed] = useState<number>(() => makeQuizSeed());
+
+  const currentSection = useMemo(() => {
+    if (!rawCurrentSection) return rawCurrentSection;
+    if (!rawCurrentSection.questions || rawCurrentSection.questions.length === 0) return rawCurrentSection;
+    return {
+      ...rawCurrentSection,
+      questions: shuffleQuestions(rawCurrentSection.questions, sectionSeed),
+    };
+  }, [rawCurrentSection, sectionSeed]);
+
+  // Per-question reading countdown (60s) with Pause + Skip controls.
+  // Informational only — does not block answering.
+  const QUESTION_READ_SECONDS = 60;
+  const [questionTimeLeft, setQuestionTimeLeft] = useState<number>(QUESTION_READ_SECONDS);
+  const [isReadingPaused, setIsReadingPaused] = useState<boolean>(false);
+
 
   // Fetch admin time overrides from DB
   useEffect(() => {
