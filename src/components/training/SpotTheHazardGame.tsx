@@ -1,7 +1,7 @@
 import { useState, useCallback, useMemo, useRef, useEffect } from "react";
-import { Heart, Trophy, CheckCircle2, XCircle, AlertTriangle, BookOpen, RotateCcw, Lightbulb } from "lucide-react";
+import { Heart, Trophy, CheckCircle2, XCircle, AlertTriangle, BookOpen, RotateCcw, Lightbulb, GraduationCap } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { Card } from "@/components/ui/card";
 import type { CartoonHazardLevel, CartoonHazard } from "@/data/cartoon-hazard-levels";
 import { toast } from "sonner";
@@ -13,6 +13,14 @@ interface Props {
 
 type Status = "playing" | "won" | "lost";
 
+// Hint balance (kept central for tuning)
+const HINTS_PER_GAME = 2;
+const HINT_COOLDOWN_MS = 25_000;
+const HINT_GLOW_MS = 1_500;
+
+// Parse "12%" -> 12 (numeric percent)
+const pct = (v: string) => parseFloat(v) || 0;
+
 const SpotTheHazardGame = ({ level, onExit }: Props) => {
   const [found, setFound] = useState<Set<string>>(new Set());
   const [score, setScore] = useState(0);
@@ -21,24 +29,55 @@ const SpotTheHazardGame = ({ level, onExit }: Props) => {
   const [activeHazard, setActiveHazard] = useState<CartoonHazard | null>(null);
   const [status, setStatus] = useState<Status>("playing");
   const [shakeAt, setShakeAt] = useState<{ x: number; y: number; id: number } | null>(null);
-  const [hintsLeft, setHintsLeft] = useState(3);
+  const [hintsLeft, setHintsLeft] = useState(HINTS_PER_GAME);
   const [hintedId, setHintedId] = useState<string | null>(null);
+  const [hintCooldownUntil, setHintCooldownUntil] = useState(0);
+  const [now, setNow] = useState(Date.now());
+  const [showTutorial, setShowTutorial] = useState(() => {
+    if (typeof window === "undefined") return false;
+    return !sessionStorage.getItem(`sth_tutorial_seen_${level.level_id}`);
+  });
   const containerRef = useRef<HTMLDivElement>(null);
+
+  // Render hazards smallest-area last so the more specific click target sits on top
+  // (resolves overlaps and edge clicks deterministically).
+  const renderedHazards = useMemo(() => {
+    const area = (h: CartoonHazard) => pct(h.hitbox_size.width) * pct(h.hitbox_size.height);
+    return [...level.hazards].sort((a, b) => area(b) - area(a));
+  }, [level.hazards]);
 
   useEffect(() => {
     if (!hintedId) return;
-    const t = setTimeout(() => setHintedId(null), 2800);
+    const t = setTimeout(() => setHintedId(null), HINT_GLOW_MS);
     return () => clearTimeout(t);
   }, [hintedId]);
 
+  // Tick for cooldown UI
+  useEffect(() => {
+    if (hintCooldownUntil <= Date.now()) return;
+    const t = setInterval(() => setNow(Date.now()), 500);
+    return () => clearInterval(t);
+  }, [hintCooldownUntil]);
+
+  const cooldownLeft = Math.max(0, Math.ceil((hintCooldownUntil - now) / 1000));
+  const hintDisabled = status !== "playing" || hintsLeft <= 0 || cooldownLeft > 0;
+
   const useHint = useCallback(() => {
-    if (status !== "playing" || hintsLeft <= 0) return;
+    if (status !== "playing" || hintsLeft <= 0 || Date.now() < hintCooldownUntil) return;
     const remaining = level.hazards.filter(h => !found.has(h.id));
     if (remaining.length === 0) return;
     const pick = remaining[Math.floor(Math.random() * remaining.length)];
     setHintedId(pick.id);
     setHintsLeft(n => n - 1);
-  }, [status, hintsLeft, level.hazards, found]);
+    setHintCooldownUntil(Date.now() + HINT_COOLDOWN_MS);
+    setNow(Date.now());
+  }, [status, hintsLeft, hintCooldownUntil, level.hazards, found]);
+
+  const dismissTutorial = () => {
+    setShowTutorial(false);
+    try { sessionStorage.setItem(`sth_tutorial_seen_${level.level_id}`, "1"); } catch {}
+  };
+
 
   const totalHazards = level.hazards.length;
   const progress = (found.size / totalHazards) * 100;
