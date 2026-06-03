@@ -545,6 +545,50 @@ const TrainingModule = () => {
 
               return (
                 <div className={`space-y-4 ${answered && isCorrect ? 'game-correct-pulse' : answered && !isCorrect ? 'game-wrong-shake' : ''}`}>
+                  {/* Reading countdown + Pause/Skip controls */}
+                  {!answered && (
+                    <div className="flex items-center justify-center gap-3 px-4">
+                      <div
+                        className={`flex items-center gap-2 px-3 py-1.5 rounded-full border text-sm font-semibold tabular-nums transition-colors ${
+                          questionTimeLeft === 0
+                            ? 'border-muted text-muted-foreground bg-muted/30'
+                            : questionTimeLeft <= 10
+                              ? 'border-destructive/40 text-destructive bg-destructive/5'
+                              : 'border-primary/30 text-primary bg-primary/5'
+                        }`}
+                        aria-live="polite"
+                        aria-label={`Tempo di lettura rimanente ${questionTimeLeft} secondi`}
+                      >
+                        <Timer className="w-4 h-4" />
+                        <span>{questionTimeLeft === 0 ? 'Tempo scaduto' : `${questionTimeLeft}s`}</span>
+                      </div>
+                      <Button
+                        type="button"
+                        size="sm"
+                        variant="outline"
+                        className="rounded-full h-9"
+                        onClick={() => setIsReadingPaused(p => !p)}
+                        disabled={questionTimeLeft === 0}
+                        aria-label={isReadingPaused ? 'Riprendi tempo di lettura' : 'Metti in pausa il tempo di lettura'}
+                      >
+                        {isReadingPaused ? <Play className="w-4 h-4 mr-1.5" /> : <Pause className="w-4 h-4 mr-1.5" />}
+                        {isReadingPaused ? 'Riprendi' : 'Pausa'}
+                      </Button>
+                      <Button
+                        type="button"
+                        size="sm"
+                        variant="ghost"
+                        className="rounded-full h-9"
+                        onClick={() => setQuestionTimeLeft(0)}
+                        disabled={questionTimeLeft === 0}
+                        aria-label="Salta il tempo di lettura"
+                      >
+                        <FastForward className="w-4 h-4 mr-1.5" />
+                        Avanti
+                      </Button>
+                    </div>
+                  )}
+
                   {/* Question */}
                   <div className="text-center px-4">
                     <div className="flex items-center justify-center gap-2 mb-3">
@@ -554,6 +598,7 @@ const TrainingModule = () => {
                     </div>
                     <h3 className="text-xl font-bold leading-snug">{question.question}</h3>
                   </div>
+
 
                   {/* Options - big, tappable, Duolingo-style */}
                   <div className="space-y-3">
