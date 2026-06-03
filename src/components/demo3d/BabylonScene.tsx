@@ -116,6 +116,7 @@ export const BabylonScene = ({
   // Latest-ref mirrors so the render-loop closure always reads current values
   const touchMovementRef = useRef(touchMovement);
   const touchLookSensitivityRef = useRef(touchLookSensitivity);
+  const invertYRef = useRef(invertY);
   const lookedAtMeshRef = useRef<{
     mesh: BABYLON.AbstractMesh;
     originalScale: BABYLON.Vector3;
