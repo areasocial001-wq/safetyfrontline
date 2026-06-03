@@ -70,6 +70,10 @@ interface BabylonSceneProps {
   touchLookDeltaRef?: React.MutableRefObject<{ dx: number; dy: number }>;
   /** Mouse sensitivity multiplier for touch-look (yaw/pitch). Default 1.0. */
   touchLookSensitivity?: number;
+  /** Per-frame movement supplement (e.g. gamepad). Same shape as touchMovement. */
+  externalMovementRef?: React.MutableRefObject<{ forward: number; backward: number; left: number; right: number } | null>;
+  /** When true the look pitch input is inverted (gamepad + touch). */
+  invertY?: boolean;
 }
 
 export const BabylonScene = ({
