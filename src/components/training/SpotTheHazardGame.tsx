@@ -1,5 +1,5 @@
-import { useState, useCallback, useMemo, useRef } from "react";
-import { Heart, Trophy, CheckCircle2, XCircle, AlertTriangle, BookOpen, RotateCcw } from "lucide-react";
+import { useState, useCallback, useMemo, useRef, useEffect } from "react";
+import { Heart, Trophy, CheckCircle2, XCircle, AlertTriangle, BookOpen, RotateCcw, Lightbulb } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Card } from "@/components/ui/card";
@@ -21,7 +21,24 @@ const SpotTheHazardGame = ({ level, onExit }: Props) => {
   const [activeHazard, setActiveHazard] = useState<CartoonHazard | null>(null);
   const [status, setStatus] = useState<Status>("playing");
   const [shakeAt, setShakeAt] = useState<{ x: number; y: number; id: number } | null>(null);
+  const [hintsLeft, setHintsLeft] = useState(3);
+  const [hintedId, setHintedId] = useState<string | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!hintedId) return;
+    const t = setTimeout(() => setHintedId(null), 2800);
+    return () => clearTimeout(t);
+  }, [hintedId]);
+
+  const useHint = useCallback(() => {
+    if (status !== "playing" || hintsLeft <= 0) return;
+    const remaining = level.hazards.filter(h => !found.has(h.id));
+    if (remaining.length === 0) return;
+    const pick = remaining[Math.floor(Math.random() * remaining.length)];
+    setHintedId(pick.id);
+    setHintsLeft(n => n - 1);
+  }, [status, hintsLeft, level.hazards, found]);
 
   const totalHazards = level.hazards.length;
   const progress = (found.size / totalHazards) * 100;
@@ -57,6 +74,7 @@ const SpotTheHazardGame = ({ level, onExit }: Props) => {
   const reset = () => {
     setFound(new Set()); setScore(0); setLives(level.lives);
     setWrongClicks(0); setActiveHazard(null); setStatus("playing");
+    setHintsLeft(3); setHintedId(null);
   };
 
   const finalAccuracy = useMemo(() => {
@@ -81,25 +99,40 @@ const SpotTheHazardGame = ({ level, onExit }: Props) => {
         />
 
         {/* HUD */}
-        <div className="absolute top-3 left-3 right-3 z-20 flex items-center justify-between gap-2 pointer-events-none">
-          <div className="flex items-center gap-2 bg-background/90 backdrop-blur-sm rounded-full px-4 py-2 border border-border shadow-md">
+        <div className="absolute top-3 left-3 right-3 z-20 flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2 bg-background/90 backdrop-blur-sm rounded-full px-4 py-2 border border-border shadow-md pointer-events-none">
             <Trophy className="h-5 w-5 text-yellow-500" />
             <span className="font-bold tabular-nums">{score}</span>
             <span className="text-muted-foreground text-sm">XP</span>
           </div>
-          <div className="flex items-center gap-1 bg-background/90 backdrop-blur-sm rounded-full px-3 py-2 border border-border shadow-md">
-            {Array.from({ length: level.lives }).map((_, i) => (
-              <Heart
-                key={i}
-                className={`h-5 w-5 transition-all ${i < lives ? "text-red-500 fill-red-500" : "text-muted-foreground/40"}`}
-              />
-            ))}
+          <div className="flex items-center gap-2">
+            <Button
+              size="sm"
+              variant="secondary"
+              onClick={(e) => { e.stopPropagation(); useHint(); }}
+              disabled={hintsLeft <= 0 || status !== "playing"}
+              className="rounded-full shadow-md gap-1.5 bg-background/90 backdrop-blur-sm border border-border"
+              aria-label="Mostra un indizio"
+            >
+              <Lightbulb className="h-4 w-4 text-yellow-500" />
+              <span className="hidden sm:inline">Indizio</span>
+              <span className="text-xs font-bold tabular-nums">{hintsLeft}</span>
+            </Button>
+            <div className="flex items-center gap-1 bg-background/90 backdrop-blur-sm rounded-full px-3 py-2 border border-border shadow-md pointer-events-none">
+              {Array.from({ length: level.lives }).map((_, i) => (
+                <Heart
+                  key={i}
+                  className={`h-5 w-5 transition-all ${i < lives ? "text-red-500 fill-red-500" : "text-muted-foreground/40"}`}
+                />
+              ))}
+            </div>
           </div>
         </div>
 
         {/* Hazard click zones (invisible) */}
         {level.hazards.map(h => {
           const isFound = found.has(h.id);
+          const isHinted = hintedId === h.id;
           return (
             <button
               key={h.id}
@@ -114,6 +147,11 @@ const SpotTheHazardGame = ({ level, onExit }: Props) => {
                   <span className="absolute inset-0 rounded-full bg-green-500/25 border-4 border-green-500 animate-in zoom-in duration-300" />
                   <CheckCircle2 className="relative h-8 w-8 text-white drop-shadow-lg animate-in zoom-in duration-500" />
                 </span>
+              ) : isHinted ? (
+                <>
+                  <span className="absolute inset-0 rounded-full bg-yellow-400/30 border-4 border-yellow-400 animate-ping" />
+                  <span className="absolute inset-0 rounded-full border-2 border-yellow-500/80 shadow-[0_0_25px_rgba(250,204,21,0.8)]" />
+                </>
               ) : (
                 <span className="absolute inset-0 rounded-full opacity-0 group-hover:opacity-100 group-focus:opacity-100 bg-primary/20 border-2 border-primary/60 transition-opacity" />
               )}
@@ -199,7 +237,7 @@ const SpotTheHazardGame = ({ level, onExit }: Props) => {
         </ul>
         {status === "playing" && (
           <p className="text-xs text-muted-foreground border-t pt-2">
-            💡 Click ovunque per cercare. Click sbagliati = vita persa.
+            💡 Click ovunque per cercare. Click sbagliati = vita persa. Usa "Indizio" se non trovi un rischio.
           </p>
         )}
       </Card>
