@@ -74,6 +74,7 @@ const SpotTheHazardGame = ({ level, onExit }: Props) => {
   const reset = () => {
     setFound(new Set()); setScore(0); setLives(level.lives);
     setWrongClicks(0); setActiveHazard(null); setStatus("playing");
+    setHintsLeft(3); setHintedId(null);
   };
 
   const finalAccuracy = useMemo(() => {
