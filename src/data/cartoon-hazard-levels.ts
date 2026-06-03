@@ -237,7 +237,7 @@ export const CARTOON_KITCHEN: CartoonHazardLevel = {
     },
     {
       id: "ck_wet_floor", name: "Pavimento bagnato e unto in zona di passaggio",
-      position: { top: "48%", left: "20%" }, hitbox_size: { width: "40%", height: "32%" }, points: 100,
+      position: { top: "56%", left: "30%" }, hitbox_size: { width: "20%", height: "20%" }, points: 100,
       feedback: { title: "Scivolamento", message: "Ampia chiazza di liquido/grasso versato al centro della cucina.", type: "warning" },
       educational: { why: "Pavimenti grassi/bagnati sono la prima causa di infortuni in cucina, anche con cartello presente se l'area è transitata.", correct_action: "Asciugare subito, delimitare l'area, calzature antiscivolo obbligatorie. Il cartello da solo non basta.", regulation: "D.Lgs. 81/08 All. IV" },
     },
@@ -255,7 +255,7 @@ export const CARTOON_KITCHEN: CartoonHazardLevel = {
     },
     {
       id: "ck_knife_edge", name: "Coltello affilato sul bordo del bancone",
-      position: { top: "84%", left: "30%" }, hitbox_size: { width: "22%", height: "14%" }, points: 150,
+      position: { top: "86%", left: "30%" }, hitbox_size: { width: "16%", height: "12%" }, points: 150,
       feedback: { title: "Caduta lama / Taglio", message: "Coltello da cucina lasciato sul bordo del piano di lavoro, lama verso l'esterno.", type: "critical" },
       educational: { why: "Una lama che cade può ferire piedi e gambe; il riflesso di afferrarla provoca tagli profondi a mani e tendini.", correct_action: "Riporre i coltelli nel ceppo o su tagliere con lama verso il muro. Se cade: indietreggiare, mai afferrare al volo.", regulation: "D.Lgs. 81/08 Titolo III" },
     },
@@ -267,7 +267,7 @@ export const CARTOON_KITCHEN: CartoonHazardLevel = {
     },
     {
       id: "ck_frayed_cable", name: "Cavo elettrico danneggiato vicino al lavello",
-      position: { top: "62%", left: "76%" }, hitbox_size: { width: "22%", height: "28%" }, points: 200,
+      position: { top: "60%", left: "70%" }, hitbox_size: { width: "14%", height: "20%" }, points: 200,
       feedback: { title: "Folgorazione", message: "Cavo con guaina rovinata accanto a fonte d'acqua corrente.", type: "critical" },
       educational: { why: "Acqua + cavi danneggiati = rischio elettrocuzione mortale, specialmente con mani bagnate.", correct_action: "Sostituire immediatamente il cavo, mai usare apparecchi con conduttori scoperti, prese RCD differenziali.", regulation: "CEI 64-8 - D.Lgs. 81/08 Art. 80" },
     },
@@ -303,7 +303,7 @@ export const CARTOON_FACTORY: CartoonHazardLevel = {
     },
     {
       id: "cf_oil_spill", name: "Pozza d'olio sul pavimento",
-      position: { top: "75%", left: "38%" }, hitbox_size: { width: "20%", height: "20%" }, points: 100,
+      position: { top: "78%", left: "38%" }, hitbox_size: { width: "14%", height: "16%" }, points: 100,
       feedback: { title: "Scivolamento", message: "Macchia di olio non segnalata in zona di passaggio.", type: "warning" },
       educational: { why: "Gli oli da macchine utensili rendono il pavimento estremamente scivoloso e infiammabile.", correct_action: "Cospargere materiale assorbente, segnalare con cartello, smaltire come rifiuto pericoloso.", regulation: "D.Lgs. 81/08 All. IV" },
     },
@@ -321,7 +321,7 @@ export const CARTOON_FACTORY: CartoonHazardLevel = {
     },
     {
       id: "cf_cables_floor", name: "Cavi elettrici volanti nel percorso pedonale",
-      position: { top: "82%", left: "50%" }, hitbox_size: { width: "48%", height: "16%" }, points: 150,
+      position: { top: "84%", left: "56%" }, hitbox_size: { width: "42%", height: "14%" }, points: 150,
       feedback: { title: "Inciampo e rischio elettrico", message: "Fascio di cavi neri stesi a terra attraverso la corsia di passaggio in basso a destra.", type: "critical" },
       educational: { why: "Cavi a terra causano inciampi, rotture della guaina e cortocircuiti, soprattutto con passaggio di muletti e operatori che trasportano carichi.", correct_action: "Cablaggi a soffitto in canaline, passacavi a terra rinforzati nelle attraversate temporanee, mai cavi liberi in zone di transito.", regulation: "CEI 64-8 - D.Lgs. 81/08 Art. 80" },
     },
