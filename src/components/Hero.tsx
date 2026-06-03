@@ -10,6 +10,7 @@ import { QuoteRequestDialog } from "@/components/QuoteRequestDialog";
 import { RippleEffect } from "@/components/RippleEffect";
 import { useIntroMusic } from "@/hooks/useIntroMusic";
 import { AudioFrequencyVisualizer } from "@/components/AudioFrequencyVisualizer";
+import logoSF from "@/assets/logo-sf.png.asset.json";
 
 export const Hero = () => {
   const [quoteDialogOpen, setQuoteDialogOpen] = useState(false);
@@ -220,13 +221,21 @@ export const Hero = () => {
       <div className="container relative z-10 px-4 py-20 mx-auto">
         <div className="max-w-5xl mx-auto text-center space-y-8">
           {/* Badge with Glow - Animated entrance */}
-          <div 
-            className="inline-flex items-center gap-3 px-6 py-3 rounded-full bg-gray-100 dark:bg-gray-800 border-[3px] border-black dark:border-white backdrop-blur-sm opacity-0 animate-badge-pop shadow-[0_0_25px_rgba(0,0,0,0.4)] dark:shadow-[0_0_25px_rgba(255,255,255,0.4)]" 
-            style={{ animationDelay: '0.1s' }}
-          >
-            <Shield className="w-6 h-6 text-black dark:text-white animate-pulse" />
-            <span className="text-lg font-bold text-black dark:text-white">Conforme Accordo Stato-Regioni 2025</span>
-            <Sparkles className="w-6 h-6 text-black dark:text-white animate-pulse" style={{ animationDelay: '0.5s' }} />
+          <div className="flex items-center justify-center gap-4 flex-wrap">
+            <img
+              src={logoSF.url}
+              alt="Safety Frontline logo"
+              className="w-16 h-16 md:w-20 md:h-20 rounded-full opacity-0 animate-badge-pop drop-shadow-[0_4px_16px_rgba(0,0,0,0.4)]"
+              style={{ animationDelay: '0.1s' }}
+            />
+            <div 
+              className="inline-flex items-center gap-3 px-6 py-3 rounded-full bg-gray-100 dark:bg-gray-800 border-[3px] border-black dark:border-white backdrop-blur-sm opacity-0 animate-badge-pop shadow-[0_0_25px_rgba(0,0,0,0.4)] dark:shadow-[0_0_25px_rgba(255,255,255,0.4)]" 
+              style={{ animationDelay: '0.1s' }}
+            >
+              <Shield className="w-6 h-6 text-black dark:text-white animate-pulse" />
+              <span className="text-lg font-bold text-black dark:text-white">Conforme Accordo Stato-Regioni 2025</span>
+              <Sparkles className="w-6 h-6 text-black dark:text-white animate-pulse" style={{ animationDelay: '0.5s' }} />
+            </div>
           </div>
 
           {/* Main Heading with Staggered Entrance and Ripple Effect */}
