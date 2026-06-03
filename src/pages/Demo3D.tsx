@@ -1517,6 +1517,8 @@ const Demo3D = () => {
               onAimAtFire={setAimingAtFire}
               onAimAtFireIndex={setAimedFireIndex}
               readabilityMode={readabilityMode}
+              touchMovement={isTouchDevice ? touchMovement : undefined}
+              touchLookDeltaRef={isTouchDevice ? lookDeltaRef : undefined}
             />
 
             {gameStarted && memoizedScenario?.type === 'office' && (
