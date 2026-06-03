@@ -107,6 +107,9 @@ export const BabylonScene = ({
   const ambientAudioRef = useRef<AmbientAudioPlayer | null>(null);
   const npcSoundSystemRef = useRef<NPCAmbientSoundSystem | null>(null);
   const lodSystemRef = useRef<LODSystem | null>(null);
+  // Latest-ref mirrors so the render-loop closure always reads current values
+  const touchMovementRef = useRef(touchMovement);
+  const touchLookSensitivityRef = useRef(touchLookSensitivity);
   const lookedAtMeshRef = useRef<{
     mesh: BABYLON.AbstractMesh;
     originalScale: BABYLON.Vector3;
