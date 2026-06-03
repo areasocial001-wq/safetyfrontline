@@ -279,11 +279,11 @@ export const Hero = () => {
             className="text-xl md:text-2xl lg:text-3xl font-semibold text-foreground max-w-3xl mx-auto leading-relaxed drop-shadow-md opacity-0 animate-subtitle-entrance"
             style={{ animationDelay: '1.1s' }}
           >
-            La formazione sicurezza che <span className="font-extrabold text-primary drop-shadow-lg">si gioca</span>. Letteralmente.
+            Controlla l'efficacia della formazione sulla sicurezza attraverso la Gamification.
             <br />
-            <span className="text-lg md:text-xl lg:text-2xl">Gamification professionale per PMI.</span>
+            <span className="text-lg md:text-xl lg:text-2xl">Il nuovo Accordo Stato-Regioni richiede una verifica tangibile dell'efficacia formativa durante l'attività lavorativa.</span>
             <br />
-            <span className="text-lg md:text-xl lg:text-2xl">Niente fronzoli, massima efficacia.</span>
+            <span className="text-lg md:text-xl lg:text-2xl">Con Safety Frontline, trasformi la formazione in un sistema misurabile.</span>
           </p>
 
           {/* Key Points with Staggered Pop Animations */}
