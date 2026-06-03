@@ -1,7 +1,7 @@
 import { useState, useCallback, useMemo, useRef, useEffect } from "react";
-import { Heart, Trophy, CheckCircle2, XCircle, AlertTriangle, BookOpen, RotateCcw, Lightbulb } from "lucide-react";
+import { Heart, Trophy, CheckCircle2, XCircle, AlertTriangle, BookOpen, RotateCcw, Lightbulb, GraduationCap } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { Card } from "@/components/ui/card";
 import type { CartoonHazardLevel, CartoonHazard } from "@/data/cartoon-hazard-levels";
 import { toast } from "sonner";
@@ -13,6 +13,14 @@ interface Props {
 
 type Status = "playing" | "won" | "lost";
 
+// Hint balance (kept central for tuning)
+const HINTS_PER_GAME = 2;
+const HINT_COOLDOWN_MS = 25_000;
+const HINT_GLOW_MS = 1_500;
+
+// Parse "12%" -> 12 (numeric percent)
+const pct = (v: string) => parseFloat(v) || 0;
+
 const SpotTheHazardGame = ({ level, onExit }: Props) => {
   const [found, setFound] = useState<Set<string>>(new Set());
   const [score, setScore] = useState(0);
@@ -21,24 +29,55 @@ const SpotTheHazardGame = ({ level, onExit }: Props) => {
   const [activeHazard, setActiveHazard] = useState<CartoonHazard | null>(null);
   const [status, setStatus] = useState<Status>("playing");
   const [shakeAt, setShakeAt] = useState<{ x: number; y: number; id: number } | null>(null);
-  const [hintsLeft, setHintsLeft] = useState(3);
+  const [hintsLeft, setHintsLeft] = useState(HINTS_PER_GAME);
   const [hintedId, setHintedId] = useState<string | null>(null);
+  const [hintCooldownUntil, setHintCooldownUntil] = useState(0);
+  const [now, setNow] = useState(Date.now());
+  const [showTutorial, setShowTutorial] = useState(() => {
+    if (typeof window === "undefined") return false;
+    return !sessionStorage.getItem(`sth_tutorial_seen_${level.level_id}`);
+  });
   const containerRef = useRef<HTMLDivElement>(null);
+
+  // Render hazards smallest-area last so the more specific click target sits on top
+  // (resolves overlaps and edge clicks deterministically).
+  const renderedHazards = useMemo(() => {
+    const area = (h: CartoonHazard) => pct(h.hitbox_size.width) * pct(h.hitbox_size.height);
+    return [...level.hazards].sort((a, b) => area(b) - area(a));
+  }, [level.hazards]);
 
   useEffect(() => {
     if (!hintedId) return;
-    const t = setTimeout(() => setHintedId(null), 2800);
+    const t = setTimeout(() => setHintedId(null), HINT_GLOW_MS);
     return () => clearTimeout(t);
   }, [hintedId]);
 
+  // Tick for cooldown UI
+  useEffect(() => {
+    if (hintCooldownUntil <= Date.now()) return;
+    const t = setInterval(() => setNow(Date.now()), 500);
+    return () => clearInterval(t);
+  }, [hintCooldownUntil]);
+
+  const cooldownLeft = Math.max(0, Math.ceil((hintCooldownUntil - now) / 1000));
+  const hintDisabled = status !== "playing" || hintsLeft <= 0 || cooldownLeft > 0;
+
   const useHint = useCallback(() => {
-    if (status !== "playing" || hintsLeft <= 0) return;
+    if (status !== "playing" || hintsLeft <= 0 || Date.now() < hintCooldownUntil) return;
     const remaining = level.hazards.filter(h => !found.has(h.id));
     if (remaining.length === 0) return;
     const pick = remaining[Math.floor(Math.random() * remaining.length)];
     setHintedId(pick.id);
     setHintsLeft(n => n - 1);
-  }, [status, hintsLeft, level.hazards, found]);
+    setHintCooldownUntil(Date.now() + HINT_COOLDOWN_MS);
+    setNow(Date.now());
+  }, [status, hintsLeft, hintCooldownUntil, level.hazards, found]);
+
+  const dismissTutorial = () => {
+    setShowTutorial(false);
+    try { sessionStorage.setItem(`sth_tutorial_seen_${level.level_id}`, "1"); } catch {}
+  };
+
 
   const totalHazards = level.hazards.length;
   const progress = (found.size / totalHazards) * 100;
@@ -74,7 +113,7 @@ const SpotTheHazardGame = ({ level, onExit }: Props) => {
   const reset = () => {
     setFound(new Set()); setScore(0); setLives(level.lives);
     setWrongClicks(0); setActiveHazard(null); setStatus("playing");
-    setHintsLeft(3); setHintedId(null);
+    setHintsLeft(HINTS_PER_GAME); setHintedId(null); setHintCooldownUntil(0);
   };
 
   const finalAccuracy = useMemo(() => {
@@ -110,13 +149,16 @@ const SpotTheHazardGame = ({ level, onExit }: Props) => {
               size="sm"
               variant="secondary"
               onClick={(e) => { e.stopPropagation(); useHint(); }}
-              disabled={hintsLeft <= 0 || status !== "playing"}
+              disabled={hintDisabled}
               className="rounded-full shadow-md gap-1.5 bg-background/90 backdrop-blur-sm border border-border"
               aria-label="Mostra un indizio"
+              title={cooldownLeft > 0 ? `Disponibile fra ${cooldownLeft}s` : `Indizi rimasti: ${hintsLeft}`}
             >
               <Lightbulb className="h-4 w-4 text-yellow-500" />
               <span className="hidden sm:inline">Indizio</span>
-              <span className="text-xs font-bold tabular-nums">{hintsLeft}</span>
+              <span className="text-xs font-bold tabular-nums">
+                {cooldownLeft > 0 ? `${cooldownLeft}s` : hintsLeft}
+              </span>
             </Button>
             <div className="flex items-center gap-1 bg-background/90 backdrop-blur-sm rounded-full px-3 py-2 border border-border shadow-md pointer-events-none">
               {Array.from({ length: level.lives }).map((_, i) => (
@@ -130,7 +172,7 @@ const SpotTheHazardGame = ({ level, onExit }: Props) => {
         </div>
 
         {/* Hazard click zones (invisible) */}
-        {level.hazards.map(h => {
+        {renderedHazards.map(h => {
           const isFound = found.has(h.id);
           const isHinted = hintedId === h.id;
           return (
@@ -236,11 +278,64 @@ const SpotTheHazardGame = ({ level, onExit }: Props) => {
           })}
         </ul>
         {status === "playing" && (
-          <p className="text-xs text-muted-foreground border-t pt-2">
-            💡 Click ovunque per cercare. Click sbagliati = vita persa. Usa "Indizio" se non trovi un rischio.
-          </p>
+          <div className="border-t pt-2 space-y-1">
+            <p className="text-xs text-muted-foreground">
+              💡 Click ovunque per cercare. Click sbagliati = vita persa.
+            </p>
+            <Button
+              size="sm"
+              variant="ghost"
+              className="h-auto p-0 text-xs text-primary hover:text-primary/80"
+              onClick={() => setShowTutorial(true)}
+            >
+              <GraduationCap className="h-3.5 w-3.5 mr-1" /> Rivedi tutorial
+            </Button>
+          </div>
         )}
       </Card>
+
+      {/* Tutorial intro */}
+      <Dialog open={showTutorial} onOpenChange={(o) => { if (!o) dismissTutorial(); }}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="text-2xl flex items-center gap-2">
+              <GraduationCap className="h-6 w-6 text-primary" /> Come si gioca
+            </DialogTitle>
+            <DialogDescription>
+              {level.intro_dialogue.text} <span className="italic">— {level.intro_dialogue.speaker}</span>
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-3 text-sm">
+            <div className="rounded-lg border bg-muted/40 p-3">
+              <div className="font-semibold mb-1">🎯 Riconoscere gli hazard</div>
+              <ul className="list-disc pl-5 space-y-1 text-muted-foreground">
+                <li>Cerca <b>fonti di calore vicino a materiali combustibili</b> (strofinacci, carta, grassi).</li>
+                <li>Osserva <b>cavi danneggiati, multiprese sovraccariche</b> o liquidi vicino all'elettricità.</li>
+                <li>Controlla <b>DPI mancanti</b> (guanti, mascherine, occhiali) e <b>posture scorrette</b>.</li>
+                <li>Verifica <b>pavimenti scivolosi, ostacoli</b> e <b>uscite ostruite</b>.</li>
+                <li>Macchine in funzione <b>senza protezioni</b> o lame esposte sono critiche.</li>
+              </ul>
+            </div>
+            <div className="rounded-lg border bg-yellow-500/10 border-yellow-500/30 p-3">
+              <div className="font-semibold mb-1 flex items-center gap-2">
+                <Lightbulb className="h-4 w-4 text-yellow-500" /> Sistema Indizi
+              </div>
+              <ul className="list-disc pl-5 space-y-1 text-muted-foreground">
+                <li><b>{HINTS_PER_GAME} indizi</b> per partita, con <b>cooldown di {HINT_COOLDOWN_MS / 1000}s</b> tra uno e l'altro.</li>
+                <li>Un alone giallo lampeggia per <b>{HINT_GLOW_MS / 1000}s</b> su un rischio non ancora trovato.</li>
+                <li>Usali con parsimonia: trovare gli hazard da soli vale più XP e abilità.</li>
+              </ul>
+            </div>
+            <div className="text-xs text-muted-foreground">
+              ⚠️ Hai <b>{level.lives} vite</b>. Ogni click su zona vuota ne costa una.
+            </div>
+          </div>
+          <DialogFooter>
+            <Button onClick={dismissTutorial} className="w-full sm:w-auto">Ho capito, iniziamo!</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
 
       {/* Educational modal */}
       <Dialog open={!!activeHazard} onOpenChange={(o) => !o && setActiveHazard(null)}>
