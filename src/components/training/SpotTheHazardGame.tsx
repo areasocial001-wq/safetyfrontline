@@ -99,19 +99,33 @@ const SpotTheHazardGame = ({ level, onExit }: Props) => {
         />
 
         {/* HUD */}
-        <div className="absolute top-3 left-3 right-3 z-20 flex items-center justify-between gap-2 pointer-events-none">
-          <div className="flex items-center gap-2 bg-background/90 backdrop-blur-sm rounded-full px-4 py-2 border border-border shadow-md">
+        <div className="absolute top-3 left-3 right-3 z-20 flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2 bg-background/90 backdrop-blur-sm rounded-full px-4 py-2 border border-border shadow-md pointer-events-none">
             <Trophy className="h-5 w-5 text-yellow-500" />
             <span className="font-bold tabular-nums">{score}</span>
             <span className="text-muted-foreground text-sm">XP</span>
           </div>
-          <div className="flex items-center gap-1 bg-background/90 backdrop-blur-sm rounded-full px-3 py-2 border border-border shadow-md">
-            {Array.from({ length: level.lives }).map((_, i) => (
-              <Heart
-                key={i}
-                className={`h-5 w-5 transition-all ${i < lives ? "text-red-500 fill-red-500" : "text-muted-foreground/40"}`}
-              />
-            ))}
+          <div className="flex items-center gap-2">
+            <Button
+              size="sm"
+              variant="secondary"
+              onClick={(e) => { e.stopPropagation(); useHint(); }}
+              disabled={hintsLeft <= 0 || status !== "playing"}
+              className="rounded-full shadow-md gap-1.5 bg-background/90 backdrop-blur-sm border border-border"
+              aria-label="Mostra un indizio"
+            >
+              <Lightbulb className="h-4 w-4 text-yellow-500" />
+              <span className="hidden sm:inline">Indizio</span>
+              <span className="text-xs font-bold tabular-nums">{hintsLeft}</span>
+            </Button>
+            <div className="flex items-center gap-1 bg-background/90 backdrop-blur-sm rounded-full px-3 py-2 border border-border shadow-md pointer-events-none">
+              {Array.from({ length: level.lives }).map((_, i) => (
+                <Heart
+                  key={i}
+                  className={`h-5 w-5 transition-all ${i < lives ? "text-red-500 fill-red-500" : "text-muted-foreground/40"}`}
+                />
+              ))}
+            </div>
           </div>
         </div>
 
