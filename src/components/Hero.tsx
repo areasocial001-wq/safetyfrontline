@@ -235,7 +235,6 @@ export const Hero = () => {
               <Shield className="w-6 h-6 text-black dark:text-white animate-pulse" />
               <span className="text-lg font-bold text-black dark:text-white">Conforme Accordo Stato-Regioni 2025</span>
             </div>
-            </div>
           </div>
 
           {/* Main Heading with Staggered Entrance and Ripple Effect */}
