@@ -64,6 +64,12 @@ interface BabylonSceneProps {
   onAimAtFireIndex?: (index: number | null) => void;
   /** "readable" boosts visibility (less fog, less bloom, neutral exposure) */
   readabilityMode?: boolean;
+  /** Touch joystick movement (0..1 per direction) — mobile only */
+  touchMovement?: { forward: number; backward: number; left: number; right: number };
+  /** Mutable ref of accumulated touch look deltas (consumed every frame) */
+  touchLookDeltaRef?: React.MutableRefObject<{ dx: number; dy: number }>;
+  /** Mouse sensitivity multiplier for touch-look (yaw/pitch). Default 1.0. */
+  touchLookSensitivity?: number;
 }
 
 export const BabylonScene = ({
@@ -89,6 +95,9 @@ export const BabylonScene = ({
   onAimAtFire,
   onAimAtFireIndex,
   readabilityMode = false,
+  touchMovement,
+  touchLookDeltaRef,
+  touchLookSensitivity = 1,
 }: BabylonSceneProps) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const engineRef = useRef<BABYLON.Engine | null>(null);
@@ -98,6 +107,9 @@ export const BabylonScene = ({
   const ambientAudioRef = useRef<AmbientAudioPlayer | null>(null);
   const npcSoundSystemRef = useRef<NPCAmbientSoundSystem | null>(null);
   const lodSystemRef = useRef<LODSystem | null>(null);
+  // Latest-ref mirrors so the render-loop closure always reads current values
+  const touchMovementRef = useRef(touchMovement);
+  const touchLookSensitivityRef = useRef(touchLookSensitivity);
   const lookedAtMeshRef = useRef<{
     mesh: BABYLON.AbstractMesh;
     originalScale: BABYLON.Vector3;
@@ -1146,6 +1158,10 @@ export const BabylonScene = ({
     }
   }, [audioSettings.mouseSensitivity]);
 
+  // Mirror touch props into refs consumed by the per-frame render loop
+  useEffect(() => { touchMovementRef.current = touchMovement; }, [touchMovement]);
+  useEffect(() => { touchLookSensitivityRef.current = touchLookSensitivity; }, [touchLookSensitivity]);
+
   // Re-attach camera controls when isActive changes
   useEffect(() => {
     const camera = cameraRef.current;
@@ -1229,13 +1245,38 @@ export const BabylonScene = ({
     // Babylon's keyboard input lost the canvas focus.
     const scene = sceneRef.current;
     const obs = scene?.onBeforeRenderObservable.add(() => {
-      if (!state.w && !state.a && !state.s && !state.d) return;
       const speed = camera.speed ?? 0.3;
-      // UniversalCamera: translate in local space
+
+      // --- Keyboard WASD ---
       if (state.w) camera.position.addInPlace(camera.getDirection(BABYLON.Vector3.Forward()).scale(speed));
       if (state.s) camera.position.addInPlace(camera.getDirection(BABYLON.Vector3.Backward()).scale(speed));
       if (state.a) camera.position.addInPlace(camera.getDirection(BABYLON.Vector3.Left()).scale(speed));
       if (state.d) camera.position.addInPlace(camera.getDirection(BABYLON.Vector3.Right()).scale(speed));
+
+      // --- Touch joystick movement (mobile) ---
+      const tm = touchMovementRef.current;
+      if (tm) {
+        if (tm.forward > 0.05) camera.position.addInPlace(camera.getDirection(BABYLON.Vector3.Forward()).scale(speed * tm.forward));
+        if (tm.backward > 0.05) camera.position.addInPlace(camera.getDirection(BABYLON.Vector3.Backward()).scale(speed * tm.backward));
+        if (tm.left > 0.05) camera.position.addInPlace(camera.getDirection(BABYLON.Vector3.Left()).scale(speed * tm.left));
+        if (tm.right > 0.05) camera.position.addInPlace(camera.getDirection(BABYLON.Vector3.Right()).scale(speed * tm.right));
+      }
+
+      // --- Touch look-pad (mobile camera rotation) ---
+      const look = touchLookDeltaRef?.current;
+      if (look && (look.dx !== 0 || look.dy !== 0)) {
+        // Convert pixels to radians: angularSensibility is the divisor Babylon
+        // uses for mouse; we mimic the same scaling so the feel matches.
+        const sensibility = (camera.angularSensibility ?? 1000) / Math.max(0.1, touchLookSensitivityRef.current);
+        camera.rotation.y += look.dx / sensibility;
+        camera.rotation.x += look.dy / sensibility;
+        // Clamp pitch to avoid flipping upside-down
+        const maxPitch = Math.PI / 2 - 0.05;
+        if (camera.rotation.x > maxPitch) camera.rotation.x = maxPitch;
+        if (camera.rotation.x < -maxPitch) camera.rotation.x = -maxPitch;
+        look.dx = 0;
+        look.dy = 0;
+      }
     });
 
     return () => {

@@ -38,6 +38,7 @@ import { MiniMap } from "@/components/demo3d/MiniMap";
 import { ProximityRadar } from "@/components/demo3d/ProximityRadar";
 import { KeyboardIndicator } from "@/components/demo3d/KeyboardIndicator";
 import { VirtualJoystick } from "@/components/demo3d/VirtualJoystick";
+import { LookPad } from "@/components/demo3d/LookPad";
 import { GyroscopeToggle } from "@/components/demo3d/GyroscopeToggle";
 import { GraphicsSettings } from "@/components/demo3d/GraphicsSettings";
 import { AchievementsPanel } from "@/components/demo3d/AchievementsPanel";
@@ -58,6 +59,7 @@ import { Sim3dPreview } from "@/components/Sim3dPreview";
 import { achievements, GameStats } from "@/lib/achievements";
 import { useToast } from "@/hooks/use-toast";
 import { useTouchControls } from "@/hooks/useTouchControls";
+import { useTouchLook } from "@/hooks/useTouchLook";
 import { useGyroscope } from "@/hooks/useGyroscope";
 import { useGraphicsSettings } from "@/hooks/useGraphicsSettings";
 import { usePerformanceBenchmark } from "@/hooks/usePerformanceBenchmark";
@@ -97,6 +99,7 @@ const Demo3D = () => {
   const { toast } = useToast();
   const { user, loading: authLoading } = useAuth();
   const { isTouchDevice, touchMovement, handleJoystickMove, resetMovement } = useTouchControls();
+  const { lookDeltaRef, onLook: handleTouchLook, reset: resetTouchLook } = useTouchLook();
   const { 
     isSupported: isGyroSupported, 
     isEnabled: isGyroEnabled, 
@@ -1514,6 +1517,8 @@ const Demo3D = () => {
               onAimAtFire={setAimingAtFire}
               onAimAtFireIndex={setAimedFireIndex}
               readabilityMode={readabilityMode}
+              touchMovement={isTouchDevice ? touchMovement : undefined}
+              touchLookDeltaRef={isTouchDevice ? lookDeltaRef : undefined}
             />
 
             {gameStarted && memoizedScenario?.type === 'office' && (
@@ -1752,6 +1757,36 @@ const Demo3D = () => {
               <VirtualJoystick
                 onMove={handleJoystickMove}
                 onEnd={resetMovement}
+              />
+            )}
+
+            {/* Look-around pad for camera rotation (Touch Devices Only) */}
+            {gameStarted && isTouchDevice && (
+              <LookPad
+                onLook={handleTouchLook}
+                onEnd={resetTouchLook}
+                onTap={(x, y) => {
+                  // Forward as a synthetic click on the 3D canvas so existing
+                  // pick / interaction handlers fire (identify risks, etc.)
+                  const canvas = document.querySelector<HTMLCanvasElement>("canvas");
+                  if (!canvas) return;
+                  const evt = new MouseEvent("pointerdown", {
+                    bubbles: true,
+                    cancelable: true,
+                    clientX: x,
+                    clientY: y,
+                    button: 0,
+                  });
+                  canvas.dispatchEvent(evt);
+                  const evtUp = new MouseEvent("pointerup", {
+                    bubbles: true,
+                    cancelable: true,
+                    clientX: x,
+                    clientY: y,
+                    button: 0,
+                  });
+                  canvas.dispatchEvent(evtUp);
+                }}
               />
             )}
 
