@@ -225,7 +225,7 @@ export const Hero = () => {
             <img
               src={logoSF.url}
               alt="Safety Frontline logo"
-              className="w-20 h-20 md:w-28 md:h-28 rounded-full opacity-0 animate-badge-pop drop-shadow-[0_4px_16px_rgba(0,0,0,0.4)]"
+              className="w-32 h-32 md:w-44 md:h-44 rounded-full opacity-0 animate-badge-pop drop-shadow-[0_4px_16px_rgba(0,0,0,0.4)]"
               style={{ animationDelay: '0.1s' }}
             />
             <div 
