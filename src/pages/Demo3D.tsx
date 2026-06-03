@@ -107,7 +107,7 @@ const Demo3D = () => {
   const { isTouchDevice, touchMovement, handleJoystickMove, resetMovement } = useTouchControls();
   const { lookDeltaRef, onLook: handleTouchLook, reset: resetTouchLook } = useTouchLook();
   const { preferences: controlPrefs } = useControlPreferences();
-  const gamepadMovementRef = _useRefAdv<{ forward: number; backward: number; left: number; right: number } | null>({ forward: 0, backward: 0, left: 0, right: 0 });
+  const gamepadMovementRef = useRef<{ forward: number; backward: number; left: number; right: number } | null>({ forward: 0, backward: 0, left: 0, right: 0 });
   const { stateRef: gamepadStateRef, connected: gamepadConnected, padId: gamepadId } = useGamepad({
     enabled: controlPrefs.gamepad_enabled,
     deadzone: controlPrefs.gamepad_deadzone,
