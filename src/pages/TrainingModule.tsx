@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -7,7 +7,8 @@ import { Progress } from '@/components/ui/progress';
 import {
   ArrowLeft, ArrowRight, CheckCircle, XCircle, Clock,
   Star, Heart, AlertTriangle, Zap, Trophy, BookOpen,
-  MessageSquare, Timer, RotateCcw, Flame, Sparkles, PartyPopper
+  MessageSquare, Timer, RotateCcw, Flame, Sparkles, PartyPopper,
+  Pause, Play, FastForward
 } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useTrainingProgress } from '@/hooks/useTrainingProgress';
@@ -20,6 +21,8 @@ import AdaptiveLearningCard from '@/components/training/AdaptiveLearningCard';
 import TrainingAchievementPopup from '@/components/training/TrainingAchievementPopup';
 import PointAndClickLevel from '@/components/training/PointAndClickLevel';
 import { getRiskHuntLevelForModule } from '@/data/risk-hunt-levels';
+import { shuffleQuestions, makeQuizSeed } from '@/lib/quiz-shuffle';
+
 
 // Floating XP component
 const FloatingXP = ({ amount, id }: { amount: number; id: number }) => (
