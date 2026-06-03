@@ -21,7 +21,24 @@ const SpotTheHazardGame = ({ level, onExit }: Props) => {
   const [activeHazard, setActiveHazard] = useState<CartoonHazard | null>(null);
   const [status, setStatus] = useState<Status>("playing");
   const [shakeAt, setShakeAt] = useState<{ x: number; y: number; id: number } | null>(null);
+  const [hintsLeft, setHintsLeft] = useState(3);
+  const [hintedId, setHintedId] = useState<string | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!hintedId) return;
+    const t = setTimeout(() => setHintedId(null), 2800);
+    return () => clearTimeout(t);
+  }, [hintedId]);
+
+  const useHint = useCallback(() => {
+    if (status !== "playing" || hintsLeft <= 0) return;
+    const remaining = level.hazards.filter(h => !found.has(h.id));
+    if (remaining.length === 0) return;
+    const pick = remaining[Math.floor(Math.random() * remaining.length)];
+    setHintedId(pick.id);
+    setHintsLeft(n => n - 1);
+  }, [status, hintsLeft, level.hazards, found]);
 
   const totalHazards = level.hazards.length;
   const progress = (found.size / totalHazards) * 100;
