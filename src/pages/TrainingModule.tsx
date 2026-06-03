@@ -302,6 +302,8 @@ const TrainingModule = () => {
     setBossTestMaxScore(0);
     setPerfectQuiz(true);
     setStreak(0);
+    setSectionSeed(makeQuizSeed());
+
   }, [moduleId, moduleContent, currentSectionIndex, totalSections, sessionXp, totalTimeSpent, updateProgress, navigate, currentSection, perfectQuiz, healthBar, achievementPopup, addXp, isDemoMode, user, bossTestScore, bossTestMaxScore, getModuleProgress]);
 
   if (!moduleContent || !currentSection) {
@@ -715,6 +717,7 @@ const TrainingModule = () => {
                     questionIds.forEach(id => delete next[id]);
                     return next;
                   });
+                  setSectionSeed(makeQuizSeed());
                 }}>
                   <RotateCcw className="w-5 h-5 mr-2" /> Riprova
                 </Button>
@@ -737,6 +740,7 @@ const TrainingModule = () => {
               setCurrentQuestionIndex(0);
               setShowResults(false);
               setStreak(0);
+              setSectionSeed(makeQuizSeed());
             }}
           >
             <ArrowLeft className="w-5 h-5 mr-2" /> Indietro
