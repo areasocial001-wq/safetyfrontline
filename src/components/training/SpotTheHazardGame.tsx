@@ -132,6 +132,7 @@ const SpotTheHazardGame = ({ level, onExit }: Props) => {
         {/* Hazard click zones (invisible) */}
         {level.hazards.map(h => {
           const isFound = found.has(h.id);
+          const isHinted = hintedId === h.id;
           return (
             <button
               key={h.id}
@@ -146,6 +147,11 @@ const SpotTheHazardGame = ({ level, onExit }: Props) => {
                   <span className="absolute inset-0 rounded-full bg-green-500/25 border-4 border-green-500 animate-in zoom-in duration-300" />
                   <CheckCircle2 className="relative h-8 w-8 text-white drop-shadow-lg animate-in zoom-in duration-500" />
                 </span>
+              ) : isHinted ? (
+                <>
+                  <span className="absolute inset-0 rounded-full bg-yellow-400/30 border-4 border-yellow-400 animate-ping" />
+                  <span className="absolute inset-0 rounded-full border-2 border-yellow-500/80 shadow-[0_0_25px_rgba(250,204,21,0.8)]" />
+                </>
               ) : (
                 <span className="absolute inset-0 rounded-full opacity-0 group-hover:opacity-100 group-focus:opacity-100 bg-primary/20 border-2 border-primary/60 transition-opacity" />
               )}
