@@ -155,7 +155,7 @@ export const Modules = () => {
           {/* Section Header */}
           <div className="text-center mb-12 animate-fade-in">
             <h2 className="text-3xl md:text-5xl font-bold mb-4">
-              I Moduli del Sistema <span className="text-primary">Safety Frontline</span>
+              I Moduli del Sistema <span className="text-primary">SicurAzienda</span>
             </h2>
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
               35+ moduli formativi, 8 percorsi figura, 8 abilitazioni attrezzature, 5 simulazioni 3D e 5 mini-game 2D. Conforme Accordo Stato-Regioni 2025.
