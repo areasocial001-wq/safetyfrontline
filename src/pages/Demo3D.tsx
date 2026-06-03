@@ -1567,7 +1567,19 @@ const Demo3D = () => {
               readabilityMode={readabilityMode}
               touchMovement={isTouchDevice ? touchMovement : undefined}
               touchLookDeltaRef={isTouchDevice ? lookDeltaRef : undefined}
+              touchLookSensitivity={controlPrefs.touch_sensitivity}
+              externalMovementRef={gamepadMovementRef}
+              invertY={controlPrefs.invert_y}
             />
+
+            {/* Mobile tutorial — first run only, no permissions required */}
+            <MobileControlsTutorial show={isTouchDevice && gameStarted} />
+
+            {/* Floating advanced controls panel (sensitivity, invert-Y, gamepad) */}
+            {gameStarted && <ControlsSettingsPanel />}
+
+            {/* Gamepad connection indicator */}
+            <GamepadIndicator connected={gamepadConnected} id={gamepadId} />
 
             {gameStarted && memoizedScenario?.type === 'office' && (
               <SceneDebugOverlay
