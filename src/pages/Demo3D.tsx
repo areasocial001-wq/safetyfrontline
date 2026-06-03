@@ -94,12 +94,51 @@ import {
 } from "@/lib/replay-db";
 import { useAuth } from "@/hooks/useAuth";
 import { useCanvasRecorder } from "@/hooks/useCanvasRecorder";
+import { useControlPreferences } from "@/hooks/useControlPreferences";
+import { useGamepad } from "@/hooks/useGamepad";
+import { ControlsSettingsPanel } from "@/components/demo3d/ControlsSettingsPanel";
+import { MobileControlsTutorial } from "@/components/demo3d/MobileControlsTutorial";
+import { GamepadIndicator } from "@/components/demo3d/GamepadIndicator";
+
 
 const Demo3D = () => {
   const { toast } = useToast();
   const { user, loading: authLoading } = useAuth();
   const { isTouchDevice, touchMovement, handleJoystickMove, resetMovement } = useTouchControls();
   const { lookDeltaRef, onLook: handleTouchLook, reset: resetTouchLook } = useTouchLook();
+  const { preferences: controlPrefs } = useControlPreferences();
+  const gamepadMovementRef = useRef<{ forward: number; backward: number; left: number; right: number } | null>({ forward: 0, backward: 0, left: 0, right: 0 });
+  const { stateRef: gamepadStateRef, connected: gamepadConnected, padId: gamepadId } = useGamepad({
+    enabled: controlPrefs.gamepad_enabled,
+    deadzone: controlPrefs.gamepad_deadzone,
+    bindings: controlPrefs.gamepad_bindings,
+  });
+  // RAF that converts gamepad axes into movement + look deltas (no React state).
+  useEffect(() => {
+    if (!controlPrefs.gamepad_enabled) return;
+    let raf = 0;
+    const tick = () => {
+      const g = gamepadStateRef.current;
+      const m = gamepadMovementRef.current!;
+      if (g.connected) {
+        m.forward = g.moveY > 0 ? g.moveY : 0;
+        m.backward = g.moveY < 0 ? -g.moveY : 0;
+        m.left = g.moveX < 0 ? -g.moveX : 0;
+        m.right = g.moveX > 0 ? g.moveX : 0;
+        if (g.lookX !== 0 || g.lookY !== 0) {
+          // Feed into the same look-delta ref consumed by Babylon's render loop.
+          const k = 12 * controlPrefs.mouse_sensitivity;
+          lookDeltaRef.current.dx += g.lookX * k;
+          lookDeltaRef.current.dy += g.lookY * k;
+        }
+      } else {
+        m.forward = m.backward = m.left = m.right = 0;
+      }
+      raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [controlPrefs.gamepad_enabled, controlPrefs.mouse_sensitivity, gamepadStateRef, lookDeltaRef]);
   const { 
     isSupported: isGyroSupported, 
     isEnabled: isGyroEnabled, 
@@ -1474,7 +1513,16 @@ const Demo3D = () => {
               risksFoundIds={riskFoundOrder.current}
               quality={quality}
               isActive={gameStarted}
-              audioSettings={audioSettings}
+              audioSettings={{
+                ...audioSettings,
+                // Apply user mouse sensitivity preference (higher pref = more sensitive
+                // => lower angularSensibility divisor in Babylon).
+                mouseSensitivity: Math.max(
+                  50,
+                  (audioSettings.mouseSensitivity || 500) /
+                    Math.max(0.1, controlPrefs.mouse_sensitivity),
+                ),
+              }}
               
               extinguisherType={selectedExtinguisher || undefined}
               onFirePropagationChange={(level: number) => {
@@ -1519,7 +1567,19 @@ const Demo3D = () => {
               readabilityMode={readabilityMode}
               touchMovement={isTouchDevice ? touchMovement : undefined}
               touchLookDeltaRef={isTouchDevice ? lookDeltaRef : undefined}
+              touchLookSensitivity={controlPrefs.touch_sensitivity}
+              externalMovementRef={gamepadMovementRef}
+              invertY={controlPrefs.invert_y}
             />
+
+            {/* Mobile tutorial — first run only, no permissions required */}
+            <MobileControlsTutorial show={isTouchDevice && gameStarted} />
+
+            {/* Floating advanced controls panel (sensitivity, invert-Y, gamepad) */}
+            {gameStarted && <ControlsSettingsPanel />}
+
+            {/* Gamepad connection indicator */}
+            <GamepadIndicator connected={gamepadConnected} id={gamepadId} />
 
             {gameStarted && memoizedScenario?.type === 'office' && (
               <SceneDebugOverlay

@@ -1121,6 +1121,51 @@ export type Database = {
         }
         Relationships: []
       }
+      user_control_preferences: {
+        Row: {
+          controls_revision: number
+          created_at: string
+          gamepad_bindings: Json
+          gamepad_deadzone: number
+          gamepad_enabled: boolean
+          id: string
+          invert_y: boolean
+          key_bindings: Json
+          mouse_sensitivity: number
+          touch_sensitivity: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          controls_revision?: number
+          created_at?: string
+          gamepad_bindings?: Json
+          gamepad_deadzone?: number
+          gamepad_enabled?: boolean
+          id?: string
+          invert_y?: boolean
+          key_bindings?: Json
+          mouse_sensitivity?: number
+          touch_sensitivity?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          controls_revision?: number
+          created_at?: string
+          gamepad_bindings?: Json
+          gamepad_deadzone?: number
+          gamepad_enabled?: boolean
+          id?: string
+          invert_y?: boolean
+          key_bindings?: Json
+          mouse_sensitivity?: number
+          touch_sensitivity?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_risk_sectors: {
         Row: {
           assigned_by: string | null
