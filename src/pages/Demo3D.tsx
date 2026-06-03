@@ -38,6 +38,7 @@ import { MiniMap } from "@/components/demo3d/MiniMap";
 import { ProximityRadar } from "@/components/demo3d/ProximityRadar";
 import { KeyboardIndicator } from "@/components/demo3d/KeyboardIndicator";
 import { VirtualJoystick } from "@/components/demo3d/VirtualJoystick";
+import { LookPad } from "@/components/demo3d/LookPad";
 import { GyroscopeToggle } from "@/components/demo3d/GyroscopeToggle";
 import { GraphicsSettings } from "@/components/demo3d/GraphicsSettings";
 import { AchievementsPanel } from "@/components/demo3d/AchievementsPanel";
@@ -58,6 +59,7 @@ import { Sim3dPreview } from "@/components/Sim3dPreview";
 import { achievements, GameStats } from "@/lib/achievements";
 import { useToast } from "@/hooks/use-toast";
 import { useTouchControls } from "@/hooks/useTouchControls";
+import { useTouchLook } from "@/hooks/useTouchLook";
 import { useGyroscope } from "@/hooks/useGyroscope";
 import { useGraphicsSettings } from "@/hooks/useGraphicsSettings";
 import { usePerformanceBenchmark } from "@/hooks/usePerformanceBenchmark";
@@ -97,6 +99,7 @@ const Demo3D = () => {
   const { toast } = useToast();
   const { user, loading: authLoading } = useAuth();
   const { isTouchDevice, touchMovement, handleJoystickMove, resetMovement } = useTouchControls();
+  const { lookDeltaRef, onLook: handleTouchLook, reset: resetTouchLook } = useTouchLook();
   const { 
     isSupported: isGyroSupported, 
     isEnabled: isGyroEnabled, 
