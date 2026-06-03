@@ -283,7 +283,11 @@ export const Hero = () => {
             <br />
             <span className="text-lg md:text-xl lg:text-2xl">Il nuovo Accordo Stato-Regioni richiede una verifica tangibile dell'efficacia formativa durante l'attività lavorativa.</span>
             <br />
-            <span className="text-lg md:text-xl lg:text-2xl">Con Safety Frontline, trasformi la formazione in un sistema&nbsp;misurabile.</span>
+            <span className="text-lg md:text-xl lg:text-2xl">
+              Con Safety Frontline, trasformi la formazione
+              <br className="md:hidden" />
+              {" "}in un sistema&nbsp;misurabile.
+            </span>
           </p>
 
           {/* Key Points with Staggered Pop Animations */}
