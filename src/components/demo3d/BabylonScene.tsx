@@ -64,6 +64,12 @@ interface BabylonSceneProps {
   onAimAtFireIndex?: (index: number | null) => void;
   /** "readable" boosts visibility (less fog, less bloom, neutral exposure) */
   readabilityMode?: boolean;
+  /** Touch joystick movement (0..1 per direction) — mobile only */
+  touchMovement?: { forward: number; backward: number; left: number; right: number };
+  /** Mutable ref of accumulated touch look deltas (consumed every frame) */
+  touchLookDeltaRef?: React.MutableRefObject<{ dx: number; dy: number }>;
+  /** Mouse sensitivity multiplier for touch-look (yaw/pitch). Default 1.0. */
+  touchLookSensitivity?: number;
 }
 
 export const BabylonScene = ({
@@ -89,6 +95,9 @@ export const BabylonScene = ({
   onAimAtFire,
   onAimAtFireIndex,
   readabilityMode = false,
+  touchMovement,
+  touchLookDeltaRef,
+  touchLookSensitivity = 1,
 }: BabylonSceneProps) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const engineRef = useRef<BABYLON.Engine | null>(null);
