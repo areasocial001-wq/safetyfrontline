@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -7,7 +7,8 @@ import { Progress } from '@/components/ui/progress';
 import {
   ArrowLeft, ArrowRight, CheckCircle, XCircle, Clock,
   Star, Heart, AlertTriangle, Zap, Trophy, BookOpen,
-  MessageSquare, Timer, RotateCcw, Flame, Sparkles, PartyPopper
+  MessageSquare, Timer, RotateCcw, Flame, Sparkles, PartyPopper,
+  Pause, Play, FastForward
 } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useTrainingProgress } from '@/hooks/useTrainingProgress';
@@ -20,6 +21,8 @@ import AdaptiveLearningCard from '@/components/training/AdaptiveLearningCard';
 import TrainingAchievementPopup from '@/components/training/TrainingAchievementPopup';
 import PointAndClickLevel from '@/components/training/PointAndClickLevel';
 import { getRiskHuntLevelForModule } from '@/data/risk-hunt-levels';
+import { shuffleQuestions, makeQuizSeed } from '@/lib/quiz-shuffle';
+
 
 // Floating XP component
 const FloatingXP = ({ amount, id }: { amount: number; id: number }) => (
@@ -88,8 +91,28 @@ const TrainingModule = () => {
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const xpIdRef = useRef(0);
 
-  const currentSection = moduleContent?.sections[currentSectionIndex];
+  const rawCurrentSection = moduleContent?.sections[currentSectionIndex];
   const totalSections = moduleContent?.sections.length || 0;
+
+  // Per-attempt seed: shuffles question order + option order to remove "always B" bias.
+  // Regenerated when changing section or when retrying a boss test.
+  const [sectionSeed, setSectionSeed] = useState<number>(() => makeQuizSeed());
+
+  const currentSection = useMemo(() => {
+    if (!rawCurrentSection) return rawCurrentSection;
+    if (!rawCurrentSection.questions || rawCurrentSection.questions.length === 0) return rawCurrentSection;
+    return {
+      ...rawCurrentSection,
+      questions: shuffleQuestions(rawCurrentSection.questions, sectionSeed),
+    };
+  }, [rawCurrentSection, sectionSeed]);
+
+  // Per-question reading countdown (60s) with Pause + Skip controls.
+  // Informational only — does not block answering.
+  const QUESTION_READ_SECONDS = 60;
+  const [questionTimeLeft, setQuestionTimeLeft] = useState<number>(QUESTION_READ_SECONDS);
+  const [isReadingPaused, setIsReadingPaused] = useState<boolean>(false);
+
 
   // Fetch admin time overrides from DB
   useEffect(() => {
@@ -116,6 +139,21 @@ const TrainingModule = () => {
     }, 1000);
     return () => { if (timerRef.current) clearInterval(timerRef.current); };
   }, []);
+
+  // Per-question reading countdown. Resets when current question or section changes.
+  // Stops at 0 (no auto-advance) and can be paused or skipped by the user.
+  useEffect(() => {
+    setQuestionTimeLeft(QUESTION_READ_SECONDS);
+    setIsReadingPaused(false);
+  }, [currentQuestionIndex, currentSectionIndex]);
+
+  useEffect(() => {
+    if (isReadingPaused) return;
+    if (questionTimeLeft <= 0) return;
+    const t = setInterval(() => setQuestionTimeLeft(prev => Math.max(0, prev - 1)), 1000);
+    return () => clearInterval(t);
+  }, [isReadingPaused, questionTimeLeft]);
+
 
   const allQuestionsAnswered = currentSection?.questions
     ? currentSection.questions.every(q => answeredQuestions[q.id] !== undefined)
@@ -264,6 +302,8 @@ const TrainingModule = () => {
     setBossTestMaxScore(0);
     setPerfectQuiz(true);
     setStreak(0);
+    setSectionSeed(makeQuizSeed());
+
   }, [moduleId, moduleContent, currentSectionIndex, totalSections, sessionXp, totalTimeSpent, updateProgress, navigate, currentSection, perfectQuiz, healthBar, achievementPopup, addXp, isDemoMode, user, bossTestScore, bossTestMaxScore, getModuleProgress]);
 
   if (!moduleContent || !currentSection) {
@@ -507,6 +547,50 @@ const TrainingModule = () => {
 
               return (
                 <div className={`space-y-4 ${answered && isCorrect ? 'game-correct-pulse' : answered && !isCorrect ? 'game-wrong-shake' : ''}`}>
+                  {/* Reading countdown + Pause/Skip controls */}
+                  {!answered && (
+                    <div className="flex items-center justify-center gap-3 px-4">
+                      <div
+                        className={`flex items-center gap-2 px-3 py-1.5 rounded-full border text-sm font-semibold tabular-nums transition-colors ${
+                          questionTimeLeft === 0
+                            ? 'border-muted text-muted-foreground bg-muted/30'
+                            : questionTimeLeft <= 10
+                              ? 'border-destructive/40 text-destructive bg-destructive/5'
+                              : 'border-primary/30 text-primary bg-primary/5'
+                        }`}
+                        aria-live="polite"
+                        aria-label={`Tempo di lettura rimanente ${questionTimeLeft} secondi`}
+                      >
+                        <Timer className="w-4 h-4" />
+                        <span>{questionTimeLeft === 0 ? 'Tempo scaduto' : `${questionTimeLeft}s`}</span>
+                      </div>
+                      <Button
+                        type="button"
+                        size="sm"
+                        variant="outline"
+                        className="rounded-full h-9"
+                        onClick={() => setIsReadingPaused(p => !p)}
+                        disabled={questionTimeLeft === 0}
+                        aria-label={isReadingPaused ? 'Riprendi tempo di lettura' : 'Metti in pausa il tempo di lettura'}
+                      >
+                        {isReadingPaused ? <Play className="w-4 h-4 mr-1.5" /> : <Pause className="w-4 h-4 mr-1.5" />}
+                        {isReadingPaused ? 'Riprendi' : 'Pausa'}
+                      </Button>
+                      <Button
+                        type="button"
+                        size="sm"
+                        variant="ghost"
+                        className="rounded-full h-9"
+                        onClick={() => setQuestionTimeLeft(0)}
+                        disabled={questionTimeLeft === 0}
+                        aria-label="Salta il tempo di lettura"
+                      >
+                        <FastForward className="w-4 h-4 mr-1.5" />
+                        Avanti
+                      </Button>
+                    </div>
+                  )}
+
                   {/* Question */}
                   <div className="text-center px-4">
                     <div className="flex items-center justify-center gap-2 mb-3">
@@ -516,6 +600,7 @@ const TrainingModule = () => {
                     </div>
                     <h3 className="text-xl font-bold leading-snug">{question.question}</h3>
                   </div>
+
 
                   {/* Options - big, tappable, Duolingo-style */}
                   <div className="space-y-3">
@@ -632,6 +717,7 @@ const TrainingModule = () => {
                     questionIds.forEach(id => delete next[id]);
                     return next;
                   });
+                  setSectionSeed(makeQuizSeed());
                 }}>
                   <RotateCcw className="w-5 h-5 mr-2" /> Riprova
                 </Button>
@@ -654,6 +740,7 @@ const TrainingModule = () => {
               setCurrentQuestionIndex(0);
               setShowResults(false);
               setStreak(0);
+              setSectionSeed(makeQuizSeed());
             }}
           >
             <ArrowLeft className="w-5 h-5 mr-2" /> Indietro
