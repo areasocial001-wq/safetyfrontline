@@ -234,7 +234,7 @@ export const Hero = () => {
             >
               <Shield className="w-6 h-6 text-black dark:text-white animate-pulse" />
               <span className="text-lg font-bold text-black dark:text-white">Conforme Accordo Stato-Regioni 2025</span>
-              <Sparkles className="w-6 h-6 text-black dark:text-white animate-pulse" style={{ animationDelay: '0.5s' }} />
+            </div>
             </div>
           </div>
 
