@@ -99,7 +99,7 @@ import { useGamepad } from "@/hooks/useGamepad";
 import { ControlsSettingsPanel } from "@/components/demo3d/ControlsSettingsPanel";
 import { MobileControlsTutorial } from "@/components/demo3d/MobileControlsTutorial";
 import { GamepadIndicator } from "@/components/demo3d/GamepadIndicator";
-import { useRef as _useRefAdv } from "react";
+
 
 const Demo3D = () => {
   const { toast } = useToast();
