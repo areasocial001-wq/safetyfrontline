@@ -278,11 +278,64 @@ const SpotTheHazardGame = ({ level, onExit }: Props) => {
           })}
         </ul>
         {status === "playing" && (
-          <p className="text-xs text-muted-foreground border-t pt-2">
-            💡 Click ovunque per cercare. Click sbagliati = vita persa. Usa "Indizio" se non trovi un rischio.
-          </p>
+          <div className="border-t pt-2 space-y-1">
+            <p className="text-xs text-muted-foreground">
+              💡 Click ovunque per cercare. Click sbagliati = vita persa.
+            </p>
+            <Button
+              size="sm"
+              variant="ghost"
+              className="h-auto p-0 text-xs text-primary hover:text-primary/80"
+              onClick={() => setShowTutorial(true)}
+            >
+              <GraduationCap className="h-3.5 w-3.5 mr-1" /> Rivedi tutorial
+            </Button>
+          </div>
         )}
       </Card>
+
+      {/* Tutorial intro */}
+      <Dialog open={showTutorial} onOpenChange={(o) => { if (!o) dismissTutorial(); }}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="text-2xl flex items-center gap-2">
+              <GraduationCap className="h-6 w-6 text-primary" /> Come si gioca
+            </DialogTitle>
+            <DialogDescription>
+              {level.intro_dialogue.text} <span className="italic">— {level.intro_dialogue.speaker}</span>
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-3 text-sm">
+            <div className="rounded-lg border bg-muted/40 p-3">
+              <div className="font-semibold mb-1">🎯 Riconoscere gli hazard</div>
+              <ul className="list-disc pl-5 space-y-1 text-muted-foreground">
+                <li>Cerca <b>fonti di calore vicino a materiali combustibili</b> (strofinacci, carta, grassi).</li>
+                <li>Osserva <b>cavi danneggiati, multiprese sovraccariche</b> o liquidi vicino all'elettricità.</li>
+                <li>Controlla <b>DPI mancanti</b> (guanti, mascherine, occhiali) e <b>posture scorrette</b>.</li>
+                <li>Verifica <b>pavimenti scivolosi, ostacoli</b> e <b>uscite ostruite</b>.</li>
+                <li>Macchine in funzione <b>senza protezioni</b> o lame esposte sono critiche.</li>
+              </ul>
+            </div>
+            <div className="rounded-lg border bg-yellow-500/10 border-yellow-500/30 p-3">
+              <div className="font-semibold mb-1 flex items-center gap-2">
+                <Lightbulb className="h-4 w-4 text-yellow-500" /> Sistema Indizi
+              </div>
+              <ul className="list-disc pl-5 space-y-1 text-muted-foreground">
+                <li><b>{HINTS_PER_GAME} indizi</b> per partita, con <b>cooldown di {HINT_COOLDOWN_MS / 1000}s</b> tra uno e l'altro.</li>
+                <li>Un alone giallo lampeggia per <b>{HINT_GLOW_MS / 1000}s</b> su un rischio non ancora trovato.</li>
+                <li>Usali con parsimonia: trovare gli hazard da soli vale più XP e abilità.</li>
+              </ul>
+            </div>
+            <div className="text-xs text-muted-foreground">
+              ⚠️ Hai <b>{level.lives} vite</b>. Ogni click su zona vuota ne costa una.
+            </div>
+          </div>
+          <DialogFooter>
+            <Button onClick={dismissTutorial} className="w-full sm:w-auto">Ho capito, iniziamo!</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
 
       {/* Educational modal */}
       <Dialog open={!!activeHazard} onOpenChange={(o) => !o && setActiveHazard(null)}>
