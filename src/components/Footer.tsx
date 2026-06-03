@@ -58,19 +58,19 @@ export const Footer = () => {
               <ul className="space-y-3 text-sm opacity-80">
                 <li className="flex items-start gap-2">
                   <Mail className="w-4 h-4 mt-0.5 shrink-0 text-primary" />
-                  <a href="mailto:info@sicurazienda.it" className="hover:text-primary transition-colors">
-                    info@sicurazienda.it
+                  <a href="mailto:segreteria@sicurazienda.com" className="hover:text-primary transition-colors">
+                    segreteria@sicurazienda.com
                   </a>
                 </li>
                 <li className="flex items-start gap-2">
                   <Phone className="w-4 h-4 mt-0.5 shrink-0 text-primary" />
-                  <a href="tel:+390123456789" className="hover:text-primary transition-colors">
-                    +39 012 345 6789
+                  <a href="tel:+3901119503922" className="hover:text-primary transition-colors">
+                    +39 011 1950 3922
                   </a>
                 </li>
                 <li className="flex items-start gap-2">
                   <MapPin className="w-4 h-4 mt-0.5 shrink-0 text-primary" />
-                  <span>Italia</span>
+                  <span>Via Giacomo Leopardi, 13, 10095 Grugliasco TO</span>
                 </li>
               </ul>
             </div>
