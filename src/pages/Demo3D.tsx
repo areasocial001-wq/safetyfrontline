@@ -1760,6 +1760,36 @@ const Demo3D = () => {
               />
             )}
 
+            {/* Look-around pad for camera rotation (Touch Devices Only) */}
+            {gameStarted && isTouchDevice && (
+              <LookPad
+                onLook={handleTouchLook}
+                onEnd={resetTouchLook}
+                onTap={(x, y) => {
+                  // Forward as a synthetic click on the 3D canvas so existing
+                  // pick / interaction handlers fire (identify risks, etc.)
+                  const canvas = document.querySelector<HTMLCanvasElement>("canvas");
+                  if (!canvas) return;
+                  const evt = new MouseEvent("pointerdown", {
+                    bubbles: true,
+                    cancelable: true,
+                    clientX: x,
+                    clientY: y,
+                    button: 0,
+                  });
+                  canvas.dispatchEvent(evt);
+                  const evtUp = new MouseEvent("pointerup", {
+                    bubbles: true,
+                    cancelable: true,
+                    clientX: x,
+                    clientY: y,
+                    button: 0,
+                  });
+                  canvas.dispatchEvent(evtUp);
+                }}
+              />
+            )}
+
             {/* Gyroscope Toggle (Mobile Devices Only) */}
             {gameStarted && isTouchDevice && (
               <GyroscopeToggle
