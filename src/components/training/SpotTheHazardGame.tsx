@@ -39,12 +39,25 @@ const SpotTheHazardGame = ({ level, onExit }: Props) => {
   });
   const containerRef = useRef<HTMLDivElement>(null);
 
+  // ─── Calibration mode (?calibrate=1) ──────────────────────────────
+  const [calibrate, setCalibrate] = useState(false);
+  const [showHitboxes, setShowHitboxes] = useState(false);
+  const [editable, setEditable] = useState<CartoonHazard[]>(level.hazards);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  useEffect(() => { setEditable(level.hazards); }, [level.hazards]);
+  useEffect(() => {
+    if (typeof window !== "undefined" && new URLSearchParams(window.location.search).has("calibrate")) {
+      setCalibrate(true); setShowHitboxes(true);
+    }
+  }, []);
+
   // Render hazards smallest-area last so the more specific click target sits on top
   // (resolves overlaps and edge clicks deterministically).
   const renderedHazards = useMemo(() => {
+    const source = calibrate ? editable : level.hazards;
     const area = (h: CartoonHazard) => pct(h.hitbox_size.width) * pct(h.hitbox_size.height);
-    return [...level.hazards].sort((a, b) => area(b) - area(a));
-  }, [level.hazards]);
+    return [...source].sort((a, b) => area(b) - area(a));
+  }, [level.hazards, editable, calibrate]);
 
   useEffect(() => {
     if (!hintedId) return;
