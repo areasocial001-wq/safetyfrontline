@@ -71,22 +71,56 @@ const SpotTheHazardGame = ({ level, onExit }: Props) => {
   // ─── Calibration mode (?calibrate=1) ──────────────────────────────
   const [calibrate, setCalibrate] = useState(false);
   const [showHitboxes, setShowHitboxes] = useState(false);
-  const [editable, setEditable] = useState<CartoonHazard[]>(level.hazards);
+  const [verifyMode, setVerifyMode] = useState(true); // hover highlight + overlap detection
+  const [hoveredId, setHoveredId] = useState<string | null>(null);
+  // Effective hazards: original + any persisted overrides from localStorage (applied even during play)
+  const effectiveBase = useMemo(
+    () => applyOverrides(level.hazards, loadOverrides(level.level_id)),
+    [level.hazards, level.level_id]
+  );
+  const [editable, setEditable] = useState<CartoonHazard[]>(effectiveBase);
   const [selectedId, setSelectedId] = useState<string | null>(null);
-  useEffect(() => { setEditable(level.hazards); }, [level.hazards]);
+  useEffect(() => { setEditable(effectiveBase); }, [effectiveBase]);
   useEffect(() => {
     if (typeof window !== "undefined" && new URLSearchParams(window.location.search).has("calibrate")) {
       setCalibrate(true); setShowHitboxes(true);
     }
   }, []);
 
+  // Persist calibration to localStorage (debounced)
+  const persistOverrides = useCallback((hazards: CartoonHazard[]) => {
+    try {
+      const out: HazardOverride[] = hazards.map(h => ({
+        id: h.id, position: h.position, hitbox_size: h.hitbox_size,
+      }));
+      localStorage.setItem(calibKey(level.level_id), JSON.stringify(out));
+    } catch {}
+  }, [level.level_id]);
+  useEffect(() => {
+    if (!calibrate) return;
+    const t = setTimeout(() => persistOverrides(editable), 250);
+    return () => clearTimeout(t);
+  }, [editable, calibrate, persistOverrides]);
+
+  // ─── Overlap detection (calibrate + verify) ───────────────────────
+  const overlapIds = useMemo(() => {
+    if (!calibrate || !verifyMode) return new Set<string>();
+    const ids = new Set<string>();
+    for (let i = 0; i < editable.length; i++) {
+      for (let j = i + 1; j < editable.length; j++) {
+        if (overlaps(editable[i], editable[j])) { ids.add(editable[i].id); ids.add(editable[j].id); }
+      }
+    }
+    return ids;
+  }, [editable, calibrate, verifyMode]);
+
   // Render hazards smallest-area last so the more specific click target sits on top
   // (resolves overlaps and edge clicks deterministically).
   const renderedHazards = useMemo(() => {
-    const source = calibrate ? editable : level.hazards;
+    const source = calibrate ? editable : effectiveBase;
     const area = (h: CartoonHazard) => pct(h.hitbox_size.width) * pct(h.hitbox_size.height);
     return [...source].sort((a, b) => area(b) - area(a));
-  }, [level.hazards, editable, calibrate]);
+  }, [effectiveBase, editable, calibrate]);
 
   useEffect(() => {
     if (!hintedId) return;
