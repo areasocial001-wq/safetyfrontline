@@ -293,7 +293,7 @@ const SpotTheHazardGame = ({ level, onExit }: Props) => {
         </div>
 
         {/* Calibration toolbar (visible only with ?calibrate=1 or after toggling) */}
-        <div className="absolute bottom-3 left-3 z-30 flex flex-wrap gap-2" onClick={(e) => e.stopPropagation()}>
+        <div className="absolute bottom-3 left-3 z-30 flex flex-wrap gap-2 max-w-[calc(100%-1.5rem)]" onClick={(e) => e.stopPropagation()}>
           <Button
             variant={calibrate ? "default" : "outline"}
             size="sm"
@@ -309,12 +309,30 @@ const SpotTheHazardGame = ({ level, onExit }: Props) => {
                 {showHitboxes ? <EyeOff className="h-4 w-4 mr-1" /> : <Eye className="h-4 w-4 mr-1" />}
                 {showHitboxes ? "Nascondi" : "Mostra"} hitbox
               </Button>
+              <Button
+                variant={verifyMode ? "default" : "outline"}
+                size="sm"
+                onClick={() => setVerifyMode(v => !v)}
+                className="bg-background/90 backdrop-blur-sm"
+                title="Evidenzia area cliccabile al passaggio del mouse e segnala sovrapposizioni"
+              >
+                <Crosshair className="h-4 w-4 mr-1" />Verifica
+              </Button>
               <Button variant="outline" size="sm" onClick={copyJSON} className="bg-background/90 backdrop-blur-sm">
                 <Copy className="h-4 w-4 mr-1" />Copia JSON
               </Button>
               <Button variant="outline" size="sm" onClick={resetCalibration} className="bg-background/90 backdrop-blur-sm">
                 Reset
               </Button>
+              <span className="inline-flex items-center gap-1 text-[11px] px-2 py-1 rounded bg-background/90 backdrop-blur-sm border border-border text-muted-foreground">
+                💾 autosalvataggio attivo
+              </span>
+              {verifyMode && overlapIds.size > 0 && (
+                <span className="inline-flex items-center gap-1 text-[11px] px-2 py-1 rounded bg-yellow-500/90 text-yellow-950 border border-yellow-700 font-semibold">
+                  <Layers className="h-3.5 w-3.5" />
+                  {overlapIds.size / 2 | 0 || 1} sovrapposizion{overlapIds.size > 2 ? "i" : "e"}
+                </span>
+              )}
             </>
           )}
         </div>
