@@ -1,5 +1,5 @@
 import { useState, useCallback, useMemo, useRef, useEffect } from "react";
-import { Heart, Trophy, CheckCircle2, XCircle, AlertTriangle, BookOpen, RotateCcw, Lightbulb, GraduationCap, Move, Copy, Eye, EyeOff } from "lucide-react";
+import { Heart, Trophy, CheckCircle2, XCircle, AlertTriangle, BookOpen, RotateCcw, Lightbulb, GraduationCap, Move, Copy, Eye, EyeOff, Crosshair, Layers } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { Card } from "@/components/ui/card";
@@ -20,6 +20,35 @@ const HINT_GLOW_MS = 1_500;
 
 // Parse "12%" -> 12 (numeric percent)
 const pct = (v: string) => parseFloat(v) || 0;
+
+// localStorage key for per-level hitbox overrides
+const calibKey = (id: string) => `sth_calibration_${id}`;
+
+type HazardOverride = { id: string; position: { top: string; left: string }; hitbox_size: { width: string; height: string } };
+
+const loadOverrides = (levelId: string): HazardOverride[] | null => {
+  try {
+    const raw = localStorage.getItem(calibKey(levelId));
+    return raw ? JSON.parse(raw) as HazardOverride[] : null;
+  } catch { return null; }
+};
+const applyOverrides = (hazards: CartoonHazard[], overrides: HazardOverride[] | null): CartoonHazard[] => {
+  if (!overrides?.length) return hazards;
+  const map = new Map(overrides.map(o => [o.id, o]));
+  return hazards.map(h => {
+    const o = map.get(h.id);
+    return o ? { ...h, position: o.position, hitbox_size: o.hitbox_size } : h;
+  });
+};
+
+// AABB overlap test on two hazards (percentages)
+const overlaps = (a: CartoonHazard, b: CartoonHazard) => {
+  const ax1 = pct(a.position.left), ay1 = pct(a.position.top);
+  const ax2 = ax1 + pct(a.hitbox_size.width), ay2 = ay1 + pct(a.hitbox_size.height);
+  const bx1 = pct(b.position.left), by1 = pct(b.position.top);
+  const bx2 = bx1 + pct(b.hitbox_size.width), by2 = by1 + pct(b.hitbox_size.height);
+  return ax1 < bx2 && ax2 > bx1 && ay1 < by2 && ay2 > by1;
+};
 
 const SpotTheHazardGame = ({ level, onExit }: Props) => {
   const [found, setFound] = useState<Set<string>>(new Set());
@@ -42,22 +71,56 @@ const SpotTheHazardGame = ({ level, onExit }: Props) => {
   // ─── Calibration mode (?calibrate=1) ──────────────────────────────
   const [calibrate, setCalibrate] = useState(false);
   const [showHitboxes, setShowHitboxes] = useState(false);
-  const [editable, setEditable] = useState<CartoonHazard[]>(level.hazards);
+  const [verifyMode, setVerifyMode] = useState(true); // hover highlight + overlap detection
+  const [hoveredId, setHoveredId] = useState<string | null>(null);
+  // Effective hazards: original + any persisted overrides from localStorage (applied even during play)
+  const effectiveBase = useMemo(
+    () => applyOverrides(level.hazards, loadOverrides(level.level_id)),
+    [level.hazards, level.level_id]
+  );
+  const [editable, setEditable] = useState<CartoonHazard[]>(effectiveBase);
   const [selectedId, setSelectedId] = useState<string | null>(null);
-  useEffect(() => { setEditable(level.hazards); }, [level.hazards]);
+  useEffect(() => { setEditable(effectiveBase); }, [effectiveBase]);
   useEffect(() => {
     if (typeof window !== "undefined" && new URLSearchParams(window.location.search).has("calibrate")) {
       setCalibrate(true); setShowHitboxes(true);
     }
   }, []);
 
+  // Persist calibration to localStorage (debounced)
+  const persistOverrides = useCallback((hazards: CartoonHazard[]) => {
+    try {
+      const out: HazardOverride[] = hazards.map(h => ({
+        id: h.id, position: h.position, hitbox_size: h.hitbox_size,
+      }));
+      localStorage.setItem(calibKey(level.level_id), JSON.stringify(out));
+    } catch {}
+  }, [level.level_id]);
+  useEffect(() => {
+    if (!calibrate) return;
+    const t = setTimeout(() => persistOverrides(editable), 250);
+    return () => clearTimeout(t);
+  }, [editable, calibrate, persistOverrides]);
+
+  // ─── Overlap detection (calibrate + verify) ───────────────────────
+  const overlapIds = useMemo(() => {
+    if (!calibrate || !verifyMode) return new Set<string>();
+    const ids = new Set<string>();
+    for (let i = 0; i < editable.length; i++) {
+      for (let j = i + 1; j < editable.length; j++) {
+        if (overlaps(editable[i], editable[j])) { ids.add(editable[i].id); ids.add(editable[j].id); }
+      }
+    }
+    return ids;
+  }, [editable, calibrate, verifyMode]);
+
   // Render hazards smallest-area last so the more specific click target sits on top
   // (resolves overlaps and edge clicks deterministically).
   const renderedHazards = useMemo(() => {
-    const source = calibrate ? editable : level.hazards;
+    const source = calibrate ? editable : effectiveBase;
     const area = (h: CartoonHazard) => pct(h.hitbox_size.width) * pct(h.hitbox_size.height);
     return [...source].sort((a, b) => area(b) - area(a));
-  }, [level.hazards, editable, calibrate]);
+  }, [effectiveBase, editable, calibrate]);
 
   useEffect(() => {
     if (!hintedId) return;
@@ -160,7 +223,11 @@ const SpotTheHazardGame = ({ level, onExit }: Props) => {
     navigator.clipboard.writeText(JSON.stringify(out, null, 2));
     toast.success("Coordinate copiate negli appunti");
   };
-  const resetCalibration = () => { setEditable(level.hazards); toast.success("Coordinate ripristinate"); };
+  const resetCalibration = () => {
+    setEditable(level.hazards);
+    try { localStorage.removeItem(calibKey(level.level_id)); } catch {}
+    toast.success("Calibrazione ripristinata ai valori originali");
+  };
 
   const reset = () => {
     setFound(new Set()); setScore(0); setLives(level.lives);
@@ -226,7 +293,7 @@ const SpotTheHazardGame = ({ level, onExit }: Props) => {
         </div>
 
         {/* Calibration toolbar (visible only with ?calibrate=1 or after toggling) */}
-        <div className="absolute bottom-3 left-3 z-30 flex flex-wrap gap-2" onClick={(e) => e.stopPropagation()}>
+        <div className="absolute bottom-3 left-3 z-30 flex flex-wrap gap-2 max-w-[calc(100%-1.5rem)]" onClick={(e) => e.stopPropagation()}>
           <Button
             variant={calibrate ? "default" : "outline"}
             size="sm"
@@ -242,12 +309,30 @@ const SpotTheHazardGame = ({ level, onExit }: Props) => {
                 {showHitboxes ? <EyeOff className="h-4 w-4 mr-1" /> : <Eye className="h-4 w-4 mr-1" />}
                 {showHitboxes ? "Nascondi" : "Mostra"} hitbox
               </Button>
+              <Button
+                variant={verifyMode ? "default" : "outline"}
+                size="sm"
+                onClick={() => setVerifyMode(v => !v)}
+                className="bg-background/90 backdrop-blur-sm"
+                title="Evidenzia area cliccabile al passaggio del mouse e segnala sovrapposizioni"
+              >
+                <Crosshair className="h-4 w-4 mr-1" />Verifica
+              </Button>
               <Button variant="outline" size="sm" onClick={copyJSON} className="bg-background/90 backdrop-blur-sm">
                 <Copy className="h-4 w-4 mr-1" />Copia JSON
               </Button>
               <Button variant="outline" size="sm" onClick={resetCalibration} className="bg-background/90 backdrop-blur-sm">
                 Reset
               </Button>
+              <span className="inline-flex items-center gap-1 text-[11px] px-2 py-1 rounded bg-background/90 backdrop-blur-sm border border-border text-muted-foreground">
+                💾 autosalvataggio attivo
+              </span>
+              {verifyMode && overlapIds.size > 0 && (
+                <span className="inline-flex items-center gap-1 text-[11px] px-2 py-1 rounded bg-yellow-500/90 text-yellow-950 border border-yellow-700 font-semibold">
+                  <Layers className="h-3.5 w-3.5" />
+                  {overlapIds.size / 2 | 0 || 1} sovrapposizion{overlapIds.size > 2 ? "i" : "e"}
+                </span>
+              )}
             </>
           )}
         </div>
@@ -257,23 +342,31 @@ const SpotTheHazardGame = ({ level, onExit }: Props) => {
           const isFound = found.has(h.id);
           const isHinted = hintedId === h.id;
           const isSelected = calibrate && selectedId === h.id;
+          const isHovered = calibrate && verifyMode && hoveredId === h.id;
+          const isOverlap = overlapIds.has(h.id);
           return (
             <button
               key={h.id}
               onClick={(e) => handleHazardClick(h, e)}
               onPointerDown={(e) => onHazardPointerDown(e, h, "move")}
+              onMouseEnter={() => calibrate && verifyMode && setHoveredId(h.id)}
+              onMouseLeave={() => calibrate && verifyMode && setHoveredId(prev => prev === h.id ? null : prev)}
               disabled={!calibrate && (isFound || status !== "playing")}
               aria-label={h.name}
               className={`absolute group ${calibrate ? "cursor-move" : ""} ${
                 calibrate && showHitboxes
-                  ? isSelected ? "border-2 border-primary bg-primary/30" : "border-2 border-red-500 bg-red-500/20"
+                  ? isOverlap ? "border-2 border-yellow-400 bg-yellow-400/25"
+                  : isHovered ? "border-2 border-emerald-400 bg-emerald-400/30 shadow-[0_0_0_2px_rgba(52,211,153,0.4)]"
+                  : isSelected ? "border-2 border-primary bg-primary/30"
+                  : "border-2 border-red-500 bg-red-500/20"
                   : ""
               }`}
               style={{ top: h.position.top, left: h.position.left, width: h.hitbox_size.width, height: h.hitbox_size.height }}
             >
               {calibrate && showHitboxes && (
-                <span className="absolute -top-5 left-0 text-[10px] bg-background/90 px-1 rounded whitespace-nowrap font-mono pointer-events-none">
+                <span className="absolute -top-5 left-0 text-[10px] bg-background/90 px-1 rounded whitespace-nowrap font-mono pointer-events-none flex items-center gap-1">
                   {h.id}
+                  {isOverlap && <Layers className="h-2.5 w-2.5 text-yellow-600" />}
                 </span>
               )}
               {!calibrate && isFound ? (
