@@ -97,10 +97,11 @@ const SpotTheHazardGame = ({ level, onExit }: Props) => {
     } catch {}
   }, [level.level_id]);
   useEffect(() => {
-    if (!calibrate) return;
+    // Persist any calibration edits (even outside calibrate mode the value won't
+    // change without user interaction, so this only writes when something moved).
     const t = setTimeout(() => persistOverrides(editable), 250);
     return () => clearTimeout(t);
-  }, [editable, calibrate, persistOverrides]);
+  }, [editable, persistOverrides]);
 
   // ─── Overlap detection (calibrate + verify) ───────────────────────
   const overlapIds = useMemo(() => {
