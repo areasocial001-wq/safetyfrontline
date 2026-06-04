@@ -11,6 +11,7 @@ import { RippleEffect } from "@/components/RippleEffect";
 import { useIntroMusic } from "@/hooks/useIntroMusic";
 import { AudioFrequencyVisualizer } from "@/components/AudioFrequencyVisualizer";
 import logoSF from "@/assets/logo-sf.png.asset.json";
+import promoVideo from "@/assets/safety-frontline-promo.mp4.asset.json";
 
 export const Hero = () => {
   const [quoteDialogOpen, setQuoteDialogOpen] = useState(false);
