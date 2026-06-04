@@ -128,7 +128,7 @@ export const DemoCTA = () => {
                   playsInline
                   className="w-full aspect-video object-contain bg-black"
                 >
-                  <source src="/videos/safety-frontline-demo.mp4" type="video/mp4" />
+                  <source src={demoVideo.url} type="video/mp4" />
                 </video>
 
                 {!isPlaying && (
