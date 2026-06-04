@@ -342,23 +342,31 @@ const SpotTheHazardGame = ({ level, onExit }: Props) => {
           const isFound = found.has(h.id);
           const isHinted = hintedId === h.id;
           const isSelected = calibrate && selectedId === h.id;
+          const isHovered = calibrate && verifyMode && hoveredId === h.id;
+          const isOverlap = overlapIds.has(h.id);
           return (
             <button
               key={h.id}
               onClick={(e) => handleHazardClick(h, e)}
               onPointerDown={(e) => onHazardPointerDown(e, h, "move")}
+              onMouseEnter={() => calibrate && verifyMode && setHoveredId(h.id)}
+              onMouseLeave={() => calibrate && verifyMode && setHoveredId(prev => prev === h.id ? null : prev)}
               disabled={!calibrate && (isFound || status !== "playing")}
               aria-label={h.name}
               className={`absolute group ${calibrate ? "cursor-move" : ""} ${
                 calibrate && showHitboxes
-                  ? isSelected ? "border-2 border-primary bg-primary/30" : "border-2 border-red-500 bg-red-500/20"
+                  ? isOverlap ? "border-2 border-yellow-400 bg-yellow-400/25"
+                  : isHovered ? "border-2 border-emerald-400 bg-emerald-400/30 shadow-[0_0_0_2px_rgba(52,211,153,0.4)]"
+                  : isSelected ? "border-2 border-primary bg-primary/30"
+                  : "border-2 border-red-500 bg-red-500/20"
                   : ""
               }`}
               style={{ top: h.position.top, left: h.position.left, width: h.hitbox_size.width, height: h.hitbox_size.height }}
             >
               {calibrate && showHitboxes && (
-                <span className="absolute -top-5 left-0 text-[10px] bg-background/90 px-1 rounded whitespace-nowrap font-mono pointer-events-none">
+                <span className="absolute -top-5 left-0 text-[10px] bg-background/90 px-1 rounded whitespace-nowrap font-mono pointer-events-none flex items-center gap-1">
                   {h.id}
+                  {isOverlap && <Layers className="h-2.5 w-2.5 text-yellow-600" />}
                 </span>
               )}
               {!calibrate && isFound ? (
