@@ -339,7 +339,7 @@ export const Hero = () => {
                 className="w-full aspect-video object-cover bg-black"
                 poster={heroImage}
               >
-                <source src="/videos/safety-frontline-promo.mp4" type="video/mp4" />
+                <source src={promoVideo.url} type="video/mp4" />
               </video>
               
               {/* Video Overlay Effects */}
