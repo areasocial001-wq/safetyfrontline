@@ -32,11 +32,6 @@ const HINT_GLOW_MS = 1_500;
 // Parse "12%" -> 12 (numeric percent)
 const pct = (v: string) => parseFloat(v) || 0;
 
-// localStorage key for per-level hitbox overrides
-const calibKey = (id: string) => `sth_calibration_${id}`;
-
-type HazardOverride = { id: string; position: { top: string; left: string }; hitbox_size: { width: string; height: string } };
-
 const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value));
 
 const sanitizeHazard = (base: CartoonHazard, override?: HazardOverride | null): CartoonHazard => {
@@ -60,12 +55,6 @@ const sanitizeHazard = (base: CartoonHazard, override?: HazardOverride | null): 
   };
 };
 
-const loadOverrides = (levelId: string): HazardOverride[] | null => {
-  try {
-    const raw = localStorage.getItem(calibKey(levelId));
-    return raw ? JSON.parse(raw) as HazardOverride[] : null;
-  } catch { return null; }
-};
 const applyOverrides = (hazards: CartoonHazard[], overrides: HazardOverride[] | null): CartoonHazard[] => {
   if (!overrides?.length) return hazards;
   const map = new Map(overrides.map(o => [o.id, o]));
