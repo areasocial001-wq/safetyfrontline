@@ -97,6 +97,7 @@ const SpotTheHazardGame = ({ level, onExit }: Props) => {
 
   const handleHazardClick = useCallback((hazard: CartoonHazard, e: React.MouseEvent) => {
     e.stopPropagation();
+    if (calibrate) { setSelectedId(hazard.id); return; }
     if (status !== "playing" || found.has(hazard.id)) return;
     const newFound = new Set(found).add(hazard.id);
     const newScore = score + hazard.points;
@@ -104,9 +105,10 @@ const SpotTheHazardGame = ({ level, onExit }: Props) => {
     setScore(newScore);
     setActiveHazard(hazard);
     if (newFound.size === totalHazards) setStatus("won");
-  }, [found, score, status, totalHazards]);
+  }, [found, score, status, totalHazards, calibrate]);
 
   const handleBackgroundClick = useCallback((e: React.MouseEvent) => {
+    if (calibrate) return;
     if (status !== "playing") return;
     const rect = containerRef.current?.getBoundingClientRect();
     if (!rect) return;
@@ -121,7 +123,44 @@ const SpotTheHazardGame = ({ level, onExit }: Props) => {
     } else {
       toast.error("Click sbagliato!", { description: `Vite rimaste: ${newLives}`, duration: 1500 });
     }
-  }, [lives, status]);
+  }, [lives, status, calibrate]);
+
+  // ─── Drag / resize for calibration ────────────────────────────────
+  const dragRef = useRef<{ id: string; mode: "move" | "resize"; startX: number; startY: number; orig: CartoonHazard } | null>(null);
+  const onHazardPointerDown = (e: React.PointerEvent, hazard: CartoonHazard, mode: "move" | "resize") => {
+    if (!calibrate) return;
+    e.stopPropagation();
+    (e.target as HTMLElement).setPointerCapture(e.pointerId);
+    dragRef.current = { id: hazard.id, mode, startX: e.clientX, startY: e.clientY, orig: hazard };
+    setSelectedId(hazard.id);
+  };
+  const onContainerPointerMove = (e: React.PointerEvent) => {
+    const d = dragRef.current; if (!d || !containerRef.current) return;
+    const rect = containerRef.current.getBoundingClientRect();
+    const dxPct = ((e.clientX - d.startX) / rect.width) * 100;
+    const dyPct = ((e.clientY - d.startY) / rect.height) * 100;
+    setEditable(prev => prev.map(h => {
+      if (h.id !== d.id) return h;
+      if (d.mode === "move") {
+        return { ...h, position: {
+          left: `${(pct(d.orig.position.left) + dxPct).toFixed(2)}%`,
+          top: `${(pct(d.orig.position.top) + dyPct).toFixed(2)}%`,
+        }};
+      }
+      return { ...h, hitbox_size: {
+        width: `${Math.max(1, pct(d.orig.hitbox_size.width) + dxPct).toFixed(2)}%`,
+        height: `${Math.max(1, pct(d.orig.hitbox_size.height) + dyPct).toFixed(2)}%`,
+      }};
+    }));
+  };
+  const onContainerPointerUp = () => { dragRef.current = null; };
+
+  const copyJSON = () => {
+    const out = editable.map(h => ({ id: h.id, position: h.position, hitbox_size: h.hitbox_size }));
+    navigator.clipboard.writeText(JSON.stringify(out, null, 2));
+    toast.success("Coordinate copiate negli appunti");
+  };
+  const resetCalibration = () => { setEditable(level.hazards); toast.success("Coordinate ripristinate"); };
 
   const reset = () => {
     setFound(new Set()); setScore(0); setLives(level.lives);
