@@ -21,6 +21,35 @@ const HINT_GLOW_MS = 1_500;
 // Parse "12%" -> 12 (numeric percent)
 const pct = (v: string) => parseFloat(v) || 0;
 
+// localStorage key for per-level hitbox overrides
+const calibKey = (id: string) => `sth_calibration_${id}`;
+
+type HazardOverride = { id: string; position: { top: string; left: string }; hitbox_size: { width: string; height: string } };
+
+const loadOverrides = (levelId: string): HazardOverride[] | null => {
+  try {
+    const raw = localStorage.getItem(calibKey(levelId));
+    return raw ? JSON.parse(raw) as HazardOverride[] : null;
+  } catch { return null; }
+};
+const applyOverrides = (hazards: CartoonHazard[], overrides: HazardOverride[] | null): CartoonHazard[] => {
+  if (!overrides?.length) return hazards;
+  const map = new Map(overrides.map(o => [o.id, o]));
+  return hazards.map(h => {
+    const o = map.get(h.id);
+    return o ? { ...h, position: o.position, hitbox_size: o.hitbox_size } : h;
+  });
+};
+
+// AABB overlap test on two hazards (percentages)
+const overlaps = (a: CartoonHazard, b: CartoonHazard) => {
+  const ax1 = pct(a.position.left), ay1 = pct(a.position.top);
+  const ax2 = ax1 + pct(a.hitbox_size.width), ay2 = ay1 + pct(a.hitbox_size.height);
+  const bx1 = pct(b.position.left), by1 = pct(b.position.top);
+  const bx2 = bx1 + pct(b.hitbox_size.width), by2 = by1 + pct(b.hitbox_size.height);
+  return ax1 < bx2 && ax2 > bx1 && ay1 < by2 && ay2 > by1;
+};
+
 const SpotTheHazardGame = ({ level, onExit }: Props) => {
   const [found, setFound] = useState<Set<string>>(new Set());
   const [score, setScore] = useState(0);
