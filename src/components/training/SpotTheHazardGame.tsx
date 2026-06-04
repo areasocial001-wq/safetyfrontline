@@ -266,8 +266,32 @@ const SpotTheHazardGame = ({ level, onExit }: Props) => {
   };
   const resetCalibration = () => {
     setEditable(level.hazards);
-    try { localStorage.removeItem(calibKey(level.level_id)); } catch {}
+    clearEnvelope(level.level_id);
     toast.success("Calibrazione ripristinata ai valori originali");
+  };
+
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const exportCalibrations = () => {
+    const bundle = exportBundle(Object.values(CARTOON_LEVELS));
+    const count = Object.keys(bundle.levels).length;
+    if (!count) { toast.info("Nessuna calibrazione salvata da esportare"); return; }
+    const date = new Date().toISOString().slice(0, 10);
+    downloadJSON(`spot-the-hazard-calibrations-${date}.json`, bundle);
+    toast.success(`Esportate calibrazioni per ${count} liv.`);
+  };
+  const importCalibrations = async (file: File) => {
+    try {
+      const text = await file.text();
+      const data = JSON.parse(text);
+      const count = importBundle(data);
+      if (count === 0) { toast.error("Nessuna calibrazione valida nel file"); return; }
+      toast.success(`Importate ${count} calibrazion${count === 1 ? "e" : "i"}. Ricarico…`);
+      // Reapply current level overrides immediately
+      const fresh = applyOverrides(level.hazards, loadStoredOverrides(level.level_id));
+      setEditable(fresh);
+    } catch {
+      toast.error("File JSON non valido");
+    }
   };
 
   const reset = () => {
