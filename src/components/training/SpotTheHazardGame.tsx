@@ -1,5 +1,5 @@
 import { useState, useCallback, useMemo, useRef, useEffect } from "react";
-import { Heart, Trophy, CheckCircle2, XCircle, AlertTriangle, BookOpen, RotateCcw, Lightbulb, GraduationCap } from "lucide-react";
+import { Heart, Trophy, CheckCircle2, XCircle, AlertTriangle, BookOpen, RotateCcw, Lightbulb, GraduationCap, Move, Copy, Eye, EyeOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { Card } from "@/components/ui/card";
@@ -39,12 +39,25 @@ const SpotTheHazardGame = ({ level, onExit }: Props) => {
   });
   const containerRef = useRef<HTMLDivElement>(null);
 
+  // ─── Calibration mode (?calibrate=1) ──────────────────────────────
+  const [calibrate, setCalibrate] = useState(false);
+  const [showHitboxes, setShowHitboxes] = useState(false);
+  const [editable, setEditable] = useState<CartoonHazard[]>(level.hazards);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  useEffect(() => { setEditable(level.hazards); }, [level.hazards]);
+  useEffect(() => {
+    if (typeof window !== "undefined" && new URLSearchParams(window.location.search).has("calibrate")) {
+      setCalibrate(true); setShowHitboxes(true);
+    }
+  }, []);
+
   // Render hazards smallest-area last so the more specific click target sits on top
   // (resolves overlaps and edge clicks deterministically).
   const renderedHazards = useMemo(() => {
+    const source = calibrate ? editable : level.hazards;
     const area = (h: CartoonHazard) => pct(h.hitbox_size.width) * pct(h.hitbox_size.height);
-    return [...level.hazards].sort((a, b) => area(b) - area(a));
-  }, [level.hazards]);
+    return [...source].sort((a, b) => area(b) - area(a));
+  }, [level.hazards, editable, calibrate]);
 
   useEffect(() => {
     if (!hintedId) return;
@@ -84,6 +97,7 @@ const SpotTheHazardGame = ({ level, onExit }: Props) => {
 
   const handleHazardClick = useCallback((hazard: CartoonHazard, e: React.MouseEvent) => {
     e.stopPropagation();
+    if (calibrate) { setSelectedId(hazard.id); return; }
     if (status !== "playing" || found.has(hazard.id)) return;
     const newFound = new Set(found).add(hazard.id);
     const newScore = score + hazard.points;
@@ -91,9 +105,10 @@ const SpotTheHazardGame = ({ level, onExit }: Props) => {
     setScore(newScore);
     setActiveHazard(hazard);
     if (newFound.size === totalHazards) setStatus("won");
-  }, [found, score, status, totalHazards]);
+  }, [found, score, status, totalHazards, calibrate]);
 
   const handleBackgroundClick = useCallback((e: React.MouseEvent) => {
+    if (calibrate) return;
     if (status !== "playing") return;
     const rect = containerRef.current?.getBoundingClientRect();
     if (!rect) return;
@@ -108,7 +123,44 @@ const SpotTheHazardGame = ({ level, onExit }: Props) => {
     } else {
       toast.error("Click sbagliato!", { description: `Vite rimaste: ${newLives}`, duration: 1500 });
     }
-  }, [lives, status]);
+  }, [lives, status, calibrate]);
+
+  // ─── Drag / resize for calibration ────────────────────────────────
+  const dragRef = useRef<{ id: string; mode: "move" | "resize"; startX: number; startY: number; orig: CartoonHazard } | null>(null);
+  const onHazardPointerDown = (e: React.PointerEvent, hazard: CartoonHazard, mode: "move" | "resize") => {
+    if (!calibrate) return;
+    e.stopPropagation();
+    (e.target as HTMLElement).setPointerCapture(e.pointerId);
+    dragRef.current = { id: hazard.id, mode, startX: e.clientX, startY: e.clientY, orig: hazard };
+    setSelectedId(hazard.id);
+  };
+  const onContainerPointerMove = (e: React.PointerEvent) => {
+    const d = dragRef.current; if (!d || !containerRef.current) return;
+    const rect = containerRef.current.getBoundingClientRect();
+    const dxPct = ((e.clientX - d.startX) / rect.width) * 100;
+    const dyPct = ((e.clientY - d.startY) / rect.height) * 100;
+    setEditable(prev => prev.map(h => {
+      if (h.id !== d.id) return h;
+      if (d.mode === "move") {
+        return { ...h, position: {
+          left: `${(pct(d.orig.position.left) + dxPct).toFixed(2)}%`,
+          top: `${(pct(d.orig.position.top) + dyPct).toFixed(2)}%`,
+        }};
+      }
+      return { ...h, hitbox_size: {
+        width: `${Math.max(1, pct(d.orig.hitbox_size.width) + dxPct).toFixed(2)}%`,
+        height: `${Math.max(1, pct(d.orig.hitbox_size.height) + dyPct).toFixed(2)}%`,
+      }};
+    }));
+  };
+  const onContainerPointerUp = () => { dragRef.current = null; };
+
+  const copyJSON = () => {
+    const out = editable.map(h => ({ id: h.id, position: h.position, hitbox_size: h.hitbox_size }));
+    navigator.clipboard.writeText(JSON.stringify(out, null, 2));
+    toast.success("Coordinate copiate negli appunti");
+  };
+  const resetCalibration = () => { setEditable(level.hazards); toast.success("Coordinate ripristinate"); };
 
   const reset = () => {
     setFound(new Set()); setScore(0); setLives(level.lives);
@@ -127,7 +179,9 @@ const SpotTheHazardGame = ({ level, onExit }: Props) => {
       <div
         ref={containerRef}
         onClick={handleBackgroundClick}
-        className="relative w-full aspect-video overflow-hidden rounded-2xl border-2 border-border shadow-xl select-none cursor-crosshair bg-muted"
+        onPointerMove={onContainerPointerMove}
+        onPointerUp={onContainerPointerUp}
+        className={`relative w-full aspect-video overflow-hidden rounded-2xl border-2 border-border shadow-xl select-none bg-muted ${calibrate ? "cursor-default touch-none" : "cursor-crosshair"}`}
       >
         <img
           src={level.background_image_url}
@@ -171,31 +225,75 @@ const SpotTheHazardGame = ({ level, onExit }: Props) => {
           </div>
         </div>
 
-        {/* Hazard click zones (invisible) */}
+        {/* Calibration toolbar (visible only with ?calibrate=1 or after toggling) */}
+        <div className="absolute bottom-3 left-3 z-30 flex flex-wrap gap-2" onClick={(e) => e.stopPropagation()}>
+          <Button
+            variant={calibrate ? "default" : "outline"}
+            size="sm"
+            onClick={() => { setCalibrate(v => !v); setShowHitboxes(true); }}
+            className="bg-background/90 backdrop-blur-sm"
+            title="Modalità calibrazione (?calibrate=1)"
+          >
+            <Move className="h-4 w-4 mr-1" />{calibrate ? "Esci calibrazione" : "Calibra"}
+          </Button>
+          {calibrate && (
+            <>
+              <Button variant="outline" size="sm" onClick={() => setShowHitboxes(v => !v)} className="bg-background/90 backdrop-blur-sm">
+                {showHitboxes ? <EyeOff className="h-4 w-4 mr-1" /> : <Eye className="h-4 w-4 mr-1" />}
+                {showHitboxes ? "Nascondi" : "Mostra"} hitbox
+              </Button>
+              <Button variant="outline" size="sm" onClick={copyJSON} className="bg-background/90 backdrop-blur-sm">
+                <Copy className="h-4 w-4 mr-1" />Copia JSON
+              </Button>
+              <Button variant="outline" size="sm" onClick={resetCalibration} className="bg-background/90 backdrop-blur-sm">
+                Reset
+              </Button>
+            </>
+          )}
+        </div>
+
+        {/* Hazard click zones */}
         {renderedHazards.map(h => {
           const isFound = found.has(h.id);
           const isHinted = hintedId === h.id;
+          const isSelected = calibrate && selectedId === h.id;
           return (
             <button
               key={h.id}
               onClick={(e) => handleHazardClick(h, e)}
-              disabled={isFound || status !== "playing"}
+              onPointerDown={(e) => onHazardPointerDown(e, h, "move")}
+              disabled={!calibrate && (isFound || status !== "playing")}
               aria-label={h.name}
-              className="absolute group"
+              className={`absolute group ${calibrate ? "cursor-move" : ""} ${
+                calibrate && showHitboxes
+                  ? isSelected ? "border-2 border-primary bg-primary/30" : "border-2 border-red-500 bg-red-500/20"
+                  : ""
+              }`}
               style={{ top: h.position.top, left: h.position.left, width: h.hitbox_size.width, height: h.hitbox_size.height }}
             >
-              {isFound ? (
+              {calibrate && showHitboxes && (
+                <span className="absolute -top-5 left-0 text-[10px] bg-background/90 px-1 rounded whitespace-nowrap font-mono pointer-events-none">
+                  {h.id}
+                </span>
+              )}
+              {!calibrate && isFound ? (
                 <span className="absolute inset-0 flex items-center justify-center">
                   <span className="absolute inset-0 rounded-full bg-green-500/25 border-4 border-green-500 animate-in zoom-in duration-300" />
                   <CheckCircle2 className="relative h-8 w-8 text-white drop-shadow-lg animate-in zoom-in duration-500" />
                 </span>
-              ) : isHinted ? (
+              ) : !calibrate && isHinted ? (
                 <>
                   <span className="absolute inset-0 rounded-full bg-yellow-400/30 border-4 border-yellow-400 animate-ping" />
                   <span className="absolute inset-0 rounded-full border-2 border-yellow-500/80 shadow-[0_0_25px_rgba(250,204,21,0.8)]" />
                 </>
-              ) : (
+              ) : !calibrate ? (
                 <span className="absolute inset-0 rounded-full opacity-0 group-hover:opacity-100 group-focus:opacity-100 bg-primary/20 border-2 border-primary/60 transition-opacity" />
+              ) : null}
+              {calibrate && (
+                <span
+                  onPointerDown={(e) => onHazardPointerDown(e, h, "resize")}
+                  className="absolute bottom-0 right-0 w-4 h-4 bg-primary border border-background cursor-nwse-resize"
+                />
               )}
             </button>
           );
