@@ -1,7 +1,7 @@
 // 2D cartoon "Spot the Hazard" levels — illustrated style, UPEHS-inspired.
 // Includes side-panel risk list, educational modal, lives system.
 
-import constructionImg from "@/assets/cartoon-construction.jpg";
+import constructionImg from "@/assets/cartoon-construction-no-helmet.jpg";
 import officeImg from "@/assets/cartoon-office.jpg";
 import warehouseImg from "@/assets/cartoon-warehouse.jpg";
 import kitchenImg from "@/assets/cartoon-kitchen.jpg";
@@ -68,10 +68,10 @@ export const CARTOON_CONSTRUCTION: CartoonHazardLevel = {
       educational: { why: "Inclinazione errata e mancato fissaggio causano scivolamento.", correct_action: "Inclinazione 75°, base antiscivolo, sporgenza 1m oltre il piano.", regulation: "D.Lgs. 81/08 Art. 113" },
     },
     {
-      id: "cc_signs", name: "Segnaletica danneggiata a terra",
-      position: { top: "76%", left: "40%" }, hitbox_size: { width: "16%", height: "20%" }, points: 75,
-      feedback: { title: "Segnaletica", message: "Cartelli rotti e non visibili.", type: "warning" },
-      educational: { why: "Segnali illeggibili impediscono la corretta identificazione dei rischi.", correct_action: "Sostituire e installare i cartelli all'altezza degli occhi.", regulation: "D.Lgs. 81/08 Titolo V" },
+      id: "cc_no_helmet", name: "Operaio senza casco",
+      position: { top: "67%", left: "23%" }, hitbox_size: { width: "14%", height: "24%" }, points: 100,
+      feedback: { title: "DPI mancante", message: "L'operaio cammina in cantiere senza casco protettivo.", type: "critical" },
+      educational: { why: "In cantiere il casco protegge da urti, caduta materiali e impatti accidentali.", correct_action: "Indossare sempre un elmetto di protezione conforme e ben allacciato nelle aree operative.", regulation: "D.Lgs. 81/08 Art. 77" },
     },
     {
       id: "cc_rebar", name: "Ferri d'armatura non protetti",
