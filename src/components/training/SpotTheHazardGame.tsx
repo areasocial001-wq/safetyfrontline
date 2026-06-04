@@ -223,7 +223,11 @@ const SpotTheHazardGame = ({ level, onExit }: Props) => {
     navigator.clipboard.writeText(JSON.stringify(out, null, 2));
     toast.success("Coordinate copiate negli appunti");
   };
-  const resetCalibration = () => { setEditable(level.hazards); toast.success("Coordinate ripristinate"); };
+  const resetCalibration = () => {
+    setEditable(level.hazards);
+    try { localStorage.removeItem(calibKey(level.level_id)); } catch {}
+    toast.success("Calibrazione ripristinata ai valori originali");
+  };
 
   const reset = () => {
     setFound(new Set()); setScore(0); setLives(level.lives);
