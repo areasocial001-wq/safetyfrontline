@@ -227,14 +227,20 @@ const SpotTheHazardGame = ({ level, onExit }: Props) => {
     setEditable(prev => prev.map(h => {
       if (h.id !== d.id) return h;
       if (d.mode === "move") {
+        const width = pct(d.orig.hitbox_size.width);
+        const height = pct(d.orig.hitbox_size.height);
+        const left = clamp(pct(d.orig.position.left) + dxPct, 0, Math.max(0, 100 - width));
+        const top = clamp(pct(d.orig.position.top) + dyPct, 0, Math.max(0, 100 - height));
         return { ...h, position: {
-          left: `${(pct(d.orig.position.left) + dxPct).toFixed(2)}%`,
-          top: `${(pct(d.orig.position.top) + dyPct).toFixed(2)}%`,
+          left: `${left.toFixed(2)}%`,
+          top: `${top.toFixed(2)}%`,
         }};
       }
+      const width = clamp(pct(d.orig.hitbox_size.width) + dxPct, 1, Math.max(1, 100 - pct(d.orig.position.left)));
+      const height = clamp(pct(d.orig.hitbox_size.height) + dyPct, 1, Math.max(1, 100 - pct(d.orig.position.top)));
       return { ...h, hitbox_size: {
-        width: `${Math.max(1, pct(d.orig.hitbox_size.width) + dxPct).toFixed(2)}%`,
-        height: `${Math.max(1, pct(d.orig.hitbox_size.height) + dyPct).toFixed(2)}%`,
+        width: `${width.toFixed(2)}%`,
+        height: `${height.toFixed(2)}%`,
       }};
     }));
   };
