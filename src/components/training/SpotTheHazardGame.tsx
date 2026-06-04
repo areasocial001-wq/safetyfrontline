@@ -26,6 +26,29 @@ const calibKey = (id: string) => `sth_calibration_${id}`;
 
 type HazardOverride = { id: string; position: { top: string; left: string }; hitbox_size: { width: string; height: string } };
 
+const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value));
+
+const sanitizeHazard = (base: CartoonHazard, override?: HazardOverride | null): CartoonHazard => {
+  if (!override) return base;
+
+  const width = clamp(Number.isFinite(pct(override.hitbox_size.width)) ? pct(override.hitbox_size.width) : pct(base.hitbox_size.width), 1, 100);
+  const height = clamp(Number.isFinite(pct(override.hitbox_size.height)) ? pct(override.hitbox_size.height) : pct(base.hitbox_size.height), 1, 100);
+  const left = clamp(Number.isFinite(pct(override.position.left)) ? pct(override.position.left) : pct(base.position.left), 0, Math.max(0, 100 - width));
+  const top = clamp(Number.isFinite(pct(override.position.top)) ? pct(override.position.top) : pct(base.position.top), 0, Math.max(0, 100 - height));
+
+  return {
+    ...base,
+    position: {
+      left: `${left.toFixed(2)}%`,
+      top: `${top.toFixed(2)}%`,
+    },
+    hitbox_size: {
+      width: `${width.toFixed(2)}%`,
+      height: `${height.toFixed(2)}%`,
+    },
+  };
+};
+
 const loadOverrides = (levelId: string): HazardOverride[] | null => {
   try {
     const raw = localStorage.getItem(calibKey(levelId));
@@ -35,10 +58,7 @@ const loadOverrides = (levelId: string): HazardOverride[] | null => {
 const applyOverrides = (hazards: CartoonHazard[], overrides: HazardOverride[] | null): CartoonHazard[] => {
   if (!overrides?.length) return hazards;
   const map = new Map(overrides.map(o => [o.id, o]));
-  return hazards.map(h => {
-    const o = map.get(h.id);
-    return o ? { ...h, position: o.position, hitbox_size: o.hitbox_size } : h;
-  });
+  return hazards.map(h => sanitizeHazard(h, map.get(h.id)));
 };
 
 // AABB overlap test on two hazards (percentages)
