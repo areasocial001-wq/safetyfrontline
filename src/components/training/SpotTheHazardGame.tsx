@@ -95,7 +95,7 @@ const SpotTheHazardGame = ({ level, onExit }: Props) => {
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   // Effective hazards: original + any persisted overrides from localStorage (applied even during play)
   const effectiveBase = useMemo(
-    () => applyOverrides(level.hazards, loadOverrides(level.level_id)),
+    () => applyOverrides(level.hazards, loadStoredOverrides(level.level_id)),
     [level.hazards, level.level_id]
   );
   const [editable, setEditable] = useState<CartoonHazard[]>(effectiveBase);
@@ -107,18 +107,31 @@ const SpotTheHazardGame = ({ level, onExit }: Props) => {
     }
   }, []);
 
-  // Persist calibration to localStorage (debounced)
+  // Audit all stored calibrations once per session and warn about anomalies.
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const key = "sth_audit_session_seen";
+    if (sessionStorage.getItem(key)) return;
+    sessionStorage.setItem(key, "1");
+    const issues = auditAllLevels(Object.values(CARTOON_LEVELS));
+    if (issues.length) {
+      const head = issues.slice(0, 3).map(i => `• [${i.levelId}] ${i.message}`).join("\n");
+      const more = issues.length > 3 ? `\n…e altri ${issues.length - 3}` : "";
+      toast.warning(`Calibrazioni: ${issues.length} anomalie rilevate`, {
+        description: head + more,
+        duration: 6000,
+      });
+    }
+  }, []);
+
+  // Persist calibration to localStorage (debounced) using the versioned envelope
   const persistOverrides = useCallback((hazards: CartoonHazard[]) => {
-    try {
-      const out: HazardOverride[] = hazards.map(h => ({
-        id: h.id, position: h.position, hitbox_size: h.hitbox_size,
-      }));
-      localStorage.setItem(calibKey(level.level_id), JSON.stringify(out));
-    } catch {}
+    const out: HazardOverride[] = hazards.map(h => ({
+      id: h.id, position: h.position, hitbox_size: h.hitbox_size,
+    }));
+    saveEnvelope(level.level_id, out);
   }, [level.level_id]);
   useEffect(() => {
-    // Persist any calibration edits (even outside calibrate mode the value won't
-    // change without user interaction, so this only writes when something moved).
     const t = setTimeout(() => persistOverrides(editable), 250);
     return () => clearTimeout(t);
   }, [editable, persistOverrides]);
