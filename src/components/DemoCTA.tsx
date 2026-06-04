@@ -8,6 +8,7 @@ import {
   Volume2, VolumeX, Maximize, RotateCcw, X,
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
+import demoVideo from "@/assets/safety-frontline-demo.mp4.asset.json";
 
 const PREVIEW_MODULES = [
   { icon: Shield, label: "Formazione Generale" },
