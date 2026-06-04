@@ -147,7 +147,7 @@ export const SpotTheHazardShowcase = () => {
                     </Button>
                   </Link>
                   <p className="text-xs text-center text-muted-foreground">
-                    Nessuna installazione · Scene illustrate cartoon · 3 ambienti diversi
+                    Nessuna installazione · Scene illustrate cartoon · 5 ambienti diversi
                   </p>
                 </div>
               </div>
