@@ -116,11 +116,12 @@ const SpotTheHazardGame = ({ level, onExit }: Props) => {
 
   // Render hazards smallest-area last so the more specific click target sits on top
   // (resolves overlaps and edge clicks deterministically).
+  // Always use `editable` as the single source of truth so saved calibrations are
+  // immediately visible when exiting calibration mode (no reload required).
   const renderedHazards = useMemo(() => {
-    const source = calibrate ? editable : effectiveBase;
     const area = (h: CartoonHazard) => pct(h.hitbox_size.width) * pct(h.hitbox_size.height);
-    return [...source].sort((a, b) => area(b) - area(a));
-  }, [effectiveBase, editable, calibrate]);
+    return [...editable].sort((a, b) => area(b) - area(a));
+  }, [editable]);
 
   useEffect(() => {
     if (!hintedId) return;
