@@ -386,7 +386,8 @@ const SpotTheHazardGame = ({ level, onExit }: Props) => {
               ) : null}
               {calibrate && (
                 <span
-                  onPointerDown={(e) => onHazardPointerDown(e, h, "resize")}
+                  onPointerDown={(e) => { e.stopPropagation(); onHazardPointerDown(e, h, "resize"); }}
+                  onClick={(e) => e.stopPropagation()}
                   className="absolute bottom-0 right-0 w-4 h-4 bg-primary border border-background cursor-nwse-resize"
                 />
               )}
