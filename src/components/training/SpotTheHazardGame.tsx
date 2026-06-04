@@ -386,6 +386,23 @@ const SpotTheHazardGame = ({ level, onExit }: Props) => {
               <Button variant="outline" size="sm" onClick={copyJSON} className="bg-background/90 backdrop-blur-sm">
                 <Copy className="h-4 w-4 mr-1" />Copia JSON
               </Button>
+              <Button variant="outline" size="sm" onClick={exportCalibrations} className="bg-background/90 backdrop-blur-sm" title="Esporta tutte le calibrazioni in un file JSON">
+                <Download className="h-4 w-4 mr-1" />Esporta
+              </Button>
+              <Button variant="outline" size="sm" onClick={() => fileInputRef.current?.click()} className="bg-background/90 backdrop-blur-sm" title="Importa calibrazioni da un file JSON">
+                <Upload className="h-4 w-4 mr-1" />Importa
+              </Button>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="application/json,.json"
+                className="hidden"
+                onChange={(e) => {
+                  const f = e.target.files?.[0];
+                  if (f) importCalibrations(f);
+                  e.target.value = "";
+                }}
+              />
               <Button variant="outline" size="sm" onClick={resetCalibration} className="bg-background/90 backdrop-blur-sm">
                 Reset
               </Button>
