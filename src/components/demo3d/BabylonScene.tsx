@@ -1255,28 +1255,37 @@ export const BabylonScene = ({
     const obs = scene?.onBeforeRenderObservable.add(() => {
       const speed = camera.speed ?? 0.3;
 
+      // Accumulate displacement, then apply ONCE via moveWithCollisions so the
+      // camera's ellipsoid is checked against walls/props/floor and gravity is
+      // applied. Direct camera.position writes bypass collisions entirely.
+      const displacement = BABYLON.Vector3.Zero();
+
       // --- Keyboard WASD ---
-      if (state.w) camera.position.addInPlace(camera.getDirection(BABYLON.Vector3.Forward()).scale(speed));
-      if (state.s) camera.position.addInPlace(camera.getDirection(BABYLON.Vector3.Backward()).scale(speed));
-      if (state.a) camera.position.addInPlace(camera.getDirection(BABYLON.Vector3.Left()).scale(speed));
-      if (state.d) camera.position.addInPlace(camera.getDirection(BABYLON.Vector3.Right()).scale(speed));
+      if (state.w) displacement.addInPlace(camera.getDirection(BABYLON.Vector3.Forward()).scale(speed));
+      if (state.s) displacement.addInPlace(camera.getDirection(BABYLON.Vector3.Backward()).scale(speed));
+      if (state.a) displacement.addInPlace(camera.getDirection(BABYLON.Vector3.Left()).scale(speed));
+      if (state.d) displacement.addInPlace(camera.getDirection(BABYLON.Vector3.Right()).scale(speed));
 
       // --- Touch joystick movement (mobile) ---
       const tm = touchMovementRef.current;
       if (tm) {
-        if (tm.forward > 0.05) camera.position.addInPlace(camera.getDirection(BABYLON.Vector3.Forward()).scale(speed * tm.forward));
-        if (tm.backward > 0.05) camera.position.addInPlace(camera.getDirection(BABYLON.Vector3.Backward()).scale(speed * tm.backward));
-        if (tm.left > 0.05) camera.position.addInPlace(camera.getDirection(BABYLON.Vector3.Left()).scale(speed * tm.left));
-        if (tm.right > 0.05) camera.position.addInPlace(camera.getDirection(BABYLON.Vector3.Right()).scale(speed * tm.right));
+        if (tm.forward > 0.05) displacement.addInPlace(camera.getDirection(BABYLON.Vector3.Forward()).scale(speed * tm.forward));
+        if (tm.backward > 0.05) displacement.addInPlace(camera.getDirection(BABYLON.Vector3.Backward()).scale(speed * tm.backward));
+        if (tm.left > 0.05) displacement.addInPlace(camera.getDirection(BABYLON.Vector3.Left()).scale(speed * tm.left));
+        if (tm.right > 0.05) displacement.addInPlace(camera.getDirection(BABYLON.Vector3.Right()).scale(speed * tm.right));
       }
 
       // --- External movement (gamepad / accessibility) ---
       const em = externalMovementRef?.current;
       if (em) {
-        if (em.forward > 0.05) camera.position.addInPlace(camera.getDirection(BABYLON.Vector3.Forward()).scale(speed * em.forward));
-        if (em.backward > 0.05) camera.position.addInPlace(camera.getDirection(BABYLON.Vector3.Backward()).scale(speed * em.backward));
-        if (em.left > 0.05) camera.position.addInPlace(camera.getDirection(BABYLON.Vector3.Left()).scale(speed * em.left));
-        if (em.right > 0.05) camera.position.addInPlace(camera.getDirection(BABYLON.Vector3.Right()).scale(speed * em.right));
+        if (em.forward > 0.05) displacement.addInPlace(camera.getDirection(BABYLON.Vector3.Forward()).scale(speed * em.forward));
+        if (em.backward > 0.05) displacement.addInPlace(camera.getDirection(BABYLON.Vector3.Backward()).scale(speed * em.backward));
+        if (em.left > 0.05) displacement.addInPlace(camera.getDirection(BABYLON.Vector3.Left()).scale(speed * em.left));
+        if (em.right > 0.05) displacement.addInPlace(camera.getDirection(BABYLON.Vector3.Right()).scale(speed * em.right));
+      }
+
+      if (displacement.lengthSquared() > 0) {
+        (camera as unknown as { moveWithCollisions: (v: BABYLON.Vector3) => void }).moveWithCollisions(displacement);
       }
 
       // --- Touch look-pad (mobile camera rotation) ---
