@@ -332,8 +332,10 @@ const NPC_VOICE_LINES: Record<string, string[]> = {
   laboratory: [
     "Conosci la posizione degli estintori più vicini?",
     "In caso d'incendio, mantieni la calma e segui il piano.",
-    "Attenzione! Mai usare acqua su fuoco elettrico!",
-    "L'estintore a CO₂ è per apparecchiature elettriche.",
+    "Classe C: gas — chiudi prima la valvola, poi spegni!",
+    "Classe D: metalli — solo polveri speciali, mai acqua!",
+    "Classe E: batterie al litio — attento al thermal runaway.",
+    "Classe F: oli da cucina — coperta antifiamma, mai acqua!",
     "Ricorda: tira, punta, premi, muovi. TPPM!",
     "Le vie di fuga devono essere sempre libere!",
     "Hai partecipato all'ultima esercitazione antincendio?",
