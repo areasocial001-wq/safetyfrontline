@@ -1285,7 +1285,7 @@ export const BabylonScene = ({
       }
 
       if (displacement.lengthSquared() > 0) {
-        camera.moveWithCollisions(displacement);
+        (camera as unknown as { moveWithCollisions: (v: BABYLON.Vector3) => void }).moveWithCollisions(displacement);
       }
 
       // --- Touch look-pad (mobile camera rotation) ---
