@@ -32,6 +32,13 @@ export function createScene(
   // Create scene
   const scene = new BABYLON.Scene(engine);
 
+  // ===== Collision + gravity (required for camera.checkCollisions / applyGravity) =====
+  // Without these two assignments, Babylon's collision engine stays off and
+  // the camera walks through walls / sinks through the floor regardless of
+  // per-mesh checkCollisions flags.
+  scene.collisionsEnabled = true;
+  scene.gravity = new BABYLON.Vector3(0, -0.5, 0);
+
   // ===== Global performance policies (apply across ALL scenarios) =====
   // Cap simultaneous lights per material to 4 — prevents shader recompiles
   // when transient point lights (fire, glows) are added/removed. We do NOT
