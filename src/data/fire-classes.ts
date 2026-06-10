@@ -6,12 +6,12 @@
  *   B — Liquidi infiammabili (benzina, oli, solventi)
  *   C — Gas infiammabili (metano, GPL, idrogeno)
  *   D — Metalli combustibili (sodio, magnesio, alluminio in polvere)
- *   E — Apparecchiature elettriche sotto tensione (convenzionale, non standard ISO)
+ *   E — Batterie al litio (litio-ione, accumulatori)
  *   F — Oli e grassi vegetali/animali da cottura
  *
  * The 3 visual fires in `addLaboratoryProps` are mapped here by index:
  *   index 0 = orange   → Class A (solidi)
- *   index 1 = dark red → Class E (elettrico - rosso scuro tipico delle braci)
+ *   index 1 = dark red → Class E (batterie al litio - colore violaceo/scuro tipico)
  *   index 2 = white    → Class D (metalli - fiamma bianco-incandescente)
  */
 
@@ -91,14 +91,14 @@ export const FIRE_CLASS_INFO: Record<FireClassKey, FireClassInfo> = {
   E: {
     key: 'E',
     label: 'Classe E',
-    fullLabel: 'Apparecchiature elettriche in tensione',
-    examples: 'Quadri elettrici, server, motori, cabine MT',
-    hint: 'CO₂ o polvere — MAI acqua o schiuma su parti in tensione.',
-    colorHsl: '0 75% 35%',
-    chipBg: 'bg-red-700',
+    fullLabel: 'Batterie al litio',
+    examples: 'Batterie litio-ione di smartphone, laptop, e-bike, accumulatori',
+    hint: 'Polvere o estintori specifici al litio — MAI acqua a getto pieno: rischio thermal runaway.',
+    colorHsl: '280 70% 45%',
+    chipBg: 'bg-purple-700',
     chipText: 'text-white',
-    ringClass: 'ring-red-700/60',
-    recommended: ['co2', 'powder'],
+    ringClass: 'ring-purple-700/60',
+    recommended: ['powder'],
     avoid: ['water', 'foam'],
   },
   F: {

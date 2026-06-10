@@ -7,8 +7,7 @@ import { Progress } from '@/components/ui/progress';
 import {
   ArrowLeft, ArrowRight, CheckCircle, XCircle, Clock,
   Star, Heart, AlertTriangle, Zap, Trophy, BookOpen,
-  MessageSquare, Timer, RotateCcw, Flame, Sparkles, PartyPopper,
-  Pause, Play, FastForward
+  MessageSquare, RotateCcw, Flame, Sparkles, PartyPopper
 } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useTrainingProgress } from '@/hooks/useTrainingProgress';
@@ -107,11 +106,8 @@ const TrainingModule = () => {
     };
   }, [rawCurrentSection, sectionSeed]);
 
-  // Per-question reading countdown (60s) with Pause + Skip controls.
-  // Informational only — does not block answering.
-  const QUESTION_READ_SECONDS = 60;
-  const [questionTimeLeft, setQuestionTimeLeft] = useState<number>(QUESTION_READ_SECONDS);
-  const [isReadingPaused, setIsReadingPaused] = useState<boolean>(false);
+
+
 
 
   // Fetch admin time overrides from DB
@@ -140,19 +136,8 @@ const TrainingModule = () => {
     return () => { if (timerRef.current) clearInterval(timerRef.current); };
   }, []);
 
-  // Per-question reading countdown. Resets when current question or section changes.
-  // Stops at 0 (no auto-advance) and can be paused or skipped by the user.
-  useEffect(() => {
-    setQuestionTimeLeft(QUESTION_READ_SECONDS);
-    setIsReadingPaused(false);
-  }, [currentQuestionIndex, currentSectionIndex]);
 
-  useEffect(() => {
-    if (isReadingPaused) return;
-    if (questionTimeLeft <= 0) return;
-    const t = setInterval(() => setQuestionTimeLeft(prev => Math.max(0, prev - 1)), 1000);
-    return () => clearInterval(t);
-  }, [isReadingPaused, questionTimeLeft]);
+
 
 
   const allQuestionsAnswered = currentSection?.questions
@@ -547,49 +532,6 @@ const TrainingModule = () => {
 
               return (
                 <div className={`space-y-4 ${answered && isCorrect ? 'game-correct-pulse' : answered && !isCorrect ? 'game-wrong-shake' : ''}`}>
-                  {/* Reading countdown + Pause/Skip controls */}
-                  {!answered && (
-                    <div className="flex items-center justify-center gap-3 px-4">
-                      <div
-                        className={`flex items-center gap-2 px-3 py-1.5 rounded-full border text-sm font-semibold tabular-nums transition-colors ${
-                          questionTimeLeft === 0
-                            ? 'border-muted text-muted-foreground bg-muted/30'
-                            : questionTimeLeft <= 10
-                              ? 'border-destructive/40 text-destructive bg-destructive/5'
-                              : 'border-primary/30 text-primary bg-primary/5'
-                        }`}
-                        aria-live="polite"
-                        aria-label={`Tempo di lettura rimanente ${questionTimeLeft} secondi`}
-                      >
-                        <Timer className="w-4 h-4" />
-                        <span>{questionTimeLeft === 0 ? 'Tempo scaduto' : `${questionTimeLeft}s`}</span>
-                      </div>
-                      <Button
-                        type="button"
-                        size="sm"
-                        variant="outline"
-                        className="rounded-full h-9"
-                        onClick={() => setIsReadingPaused(p => !p)}
-                        disabled={questionTimeLeft === 0}
-                        aria-label={isReadingPaused ? 'Riprendi tempo di lettura' : 'Metti in pausa il tempo di lettura'}
-                      >
-                        {isReadingPaused ? <Play className="w-4 h-4 mr-1.5" /> : <Pause className="w-4 h-4 mr-1.5" />}
-                        {isReadingPaused ? 'Riprendi' : 'Pausa'}
-                      </Button>
-                      <Button
-                        type="button"
-                        size="sm"
-                        variant="ghost"
-                        className="rounded-full h-9"
-                        onClick={() => setQuestionTimeLeft(0)}
-                        disabled={questionTimeLeft === 0}
-                        aria-label="Salta il tempo di lettura"
-                      >
-                        <FastForward className="w-4 h-4 mr-1.5" />
-                        Avanti
-                      </Button>
-                    </div>
-                  )}
 
                   {/* Question */}
                   <div className="text-center px-4">

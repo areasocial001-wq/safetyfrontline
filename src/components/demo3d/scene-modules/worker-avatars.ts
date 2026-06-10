@@ -623,7 +623,8 @@ export function addWorkerAvatars(
     ], 0.04);
 
   } else if (type === 'laboratory') {
-    const labRoles = SAFETY_ROLES.slice(0, 3);
+    // Antincendio scenario: no Medico (not relevant). Use fire-safety relevant roles.
+    const labRoles = ['RSPP', 'Addetto Antincendio', 'Preposto'];
     const labPositions = [
       new BABYLON.Vector3(-10, 0, 0),
       new BABYLON.Vector3(10, 0, -5),

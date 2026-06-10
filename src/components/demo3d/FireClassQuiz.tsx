@@ -25,7 +25,7 @@ const QUIZ_QUESTIONS: QuizQuestion[] = [
   },
   {
     question: 'Degli scatoloni di carta prendono fuoco in magazzino. Che tipo di incendio è?',
-    options: ['Classe B — Liquidi', 'Classe C — Elettrico', 'Classe A — Solidi', 'Classe D — Metalli'],
+    options: ['Classe B — Liquidi', 'Classe C — Gas', 'Classe A — Solidi', 'Classe D — Metalli'],
     correctIndex: 2,
     explanation: 'Carta, legno, tessuti e cartone sono materiali solidi combustibili → Classe A. L\'estintore ad acqua o a polvere è il più indicato.',
   },
