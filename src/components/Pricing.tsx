@@ -46,7 +46,7 @@ export const Pricing = () => {
   ];
 
   return (
-    <section className="py-20 bg-muted/30">
+    <section id="pricing" className="py-20 bg-muted/30">
       <div className="container px-4 mx-auto">
         <div className="max-w-6xl mx-auto">
           {/* Section Header */}
