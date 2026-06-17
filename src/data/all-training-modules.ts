@@ -43,6 +43,14 @@ export const ALL_TRAINING_MODULES: TrainingModuleInfo[] = [
   { id: "preposto", name: "Preposto - Modulo 1", icon: "📋", category: "Ruoli" },
   { id: "preposto_m2", name: "Preposto - Modulo 2", icon: "📋", category: "Ruoli" },
   { id: "preposto_m3", name: "Preposto - Modulo 3", icon: "📋", category: "Ruoli" },
+
+  // Specialistici (rischi specifici)
+  { id: "privacy_gdpr", name: "Privacy & GDPR (Reg. UE 2016/679)", icon: "🔒", category: "Specialistici" },
+  { id: "rischio_rumore", name: "Rischio Rumore (D.Lgs 81/08 Tit. VIII)", icon: "🔊", category: "Specialistici" },
+  { id: "lavori_quota", name: "Lavori in Quota e DPI 3ª Categoria", icon: "🪜", category: "Specialistici" },
+  { id: "pei_pes_pav", name: "PEI PES PAV - Lavori Elettrici (CEI 11-27)", icon: "⚡", category: "Specialistici" },
+  { id: "diisocianati", name: "Diisocianati (Reg. UE 2020/1149)", icon: "🧪", category: "Specialistici" },
+  { id: "segnaletica_stradale", name: "Addetto Segnaletica Stradale (D.I. 22/01/2019)", icon: "🚧", category: "Specialistici" },
 ];
 
 // Moduli bonus / extra non inclusi nel piano formativo standard

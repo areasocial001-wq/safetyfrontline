@@ -47,6 +47,7 @@ const SECTION_COUNTS: Record<string, number> = {
   preposto_ruolo_obblighi: 7, preposto_valutazione_dpi: 6, preposto_emergenze: 6,
   antincendio_prevenzione: 9, antincendio_protezione: 12, antincendio_esercitazioni: 8,
   primo_soccorso_allertare: 10, primo_soccorso_intervento: 12, primo_soccorso_conoscenze: 12,
+  privacy_gdpr: 5, rischio_rumore: 5, lavori_quota: 5, pei_pes_pav: 5, diisocianati: 5, segnaletica_stradale: 5,
 };
 
 // Training path definitions - all independent

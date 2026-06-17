@@ -894,6 +894,12 @@ import { antincendioEsercitazioniContent } from './training-content-antincendio-
 import { primoSoccorsoAllertareContent } from './training-content-primo-soccorso-m1';
 import { primoSoccorsoInterventoContent } from './training-content-primo-soccorso-m2';
 import { primoSoccorsoConoscenzeContent } from './training-content-primo-soccorso-m3';
+import { privacyGdprContent } from './training-content-privacy';
+import { rischioRumoreContent } from './training-content-rumore';
+import { lavoriQuotaContent } from './training-content-lavori-quota';
+import { peiPesPavContent } from './training-content-pei-pes-pav';
+import { diisocianatiContent } from './training-content-diisocianati';
+import { segnaleticaStradaleContent } from './training-content-segnaletica-stradale';
 
 export const allModulesContent: ModuleContent[] = [
   modulo1Content,
@@ -923,6 +929,12 @@ export const allModulesContent: ModuleContent[] = [
   primoSoccorsoAllertareContent,
   primoSoccorsoInterventoContent,
   primoSoccorsoConoscenzeContent,
+  privacyGdprContent,
+  rischioRumoreContent,
+  lavoriQuotaContent,
+  peiPesPavContent,
+  diisocianatiContent,
+  segnaleticaStradaleContent,
 ];
 
 // Inject a "Caccia ai Rischi" interactive level between theory and the boss test,
