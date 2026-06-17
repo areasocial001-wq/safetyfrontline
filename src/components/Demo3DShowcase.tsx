@@ -94,19 +94,19 @@ export const Demo3DShowcase = () => {
                 </ul>
 
                 <div className="pt-4 space-y-3">
-                  <NavLink to="/demo-3d" className="block">
+                  <a href="#pricing" className="block">
                     <Button 
                       variant="hero" 
                       size="lg" 
                       className="w-full group shadow-[0_0_30px_rgba(255,103,31,0.3)] hover:shadow-[0_0_50px_rgba(255,103,31,0.5)] transition-all"
                     >
                       <Gamepad2 className="w-5 h-5 group-hover:rotate-12 transition-transform" />
-                      Gioca Ora in 3D
+                      Richiedi la Demo 3D
                       <Play className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                     </Button>
-                  </NavLink>
+                  </a>
                   <p className="text-xs text-center text-muted-foreground">
-                    Nessuna installazione richiesta • 100% Browser-Based • Controlli WASD + Mouse
+                    Simulazioni 3D disponibili nei pacchetti aziendali • 100% Browser-Based
                   </p>
                 </div>
               </div>

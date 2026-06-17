@@ -135,19 +135,19 @@ export const SpotTheHazardShowcase = () => {
                 </ul>
 
                 <div className="pt-4 space-y-3">
-                  <Link to="/spot-the-hazard" className="block">
+                  <a href="#pricing" className="block">
                     <Button
                       variant="hero"
                       size="lg"
                       className="w-full group shadow-[0_0_30px_rgba(255,103,31,0.3)] hover:shadow-[0_0_50px_rgba(255,103,31,0.5)] transition-all"
                     >
                       <Eye className="w-5 h-5 group-hover:scale-110 transition-transform" />
-                      Gioca a Spot the Hazard
+                      Richiedi Spot the Hazard
                       <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                     </Button>
-                  </Link>
+                  </a>
                   <p className="text-xs text-center text-muted-foreground">
-                    Nessuna installazione · Scene illustrate cartoon · 5 ambienti diversi
+                    Mini-game incluso nei pacchetti aziendali · Scene illustrate · 5 ambienti
                   </p>
                 </div>
               </div>

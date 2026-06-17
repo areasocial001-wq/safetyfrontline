@@ -204,27 +204,20 @@ export const DemoCTA = () => {
                   Senza registrazione, senza tempi di attesa.
                 </p>
                 <div className="flex flex-col sm:flex-row sm:flex-wrap gap-3">
-                  <Button asChild size="lg" className="rounded-xl font-bold shadow-lg w-full sm:w-auto">
-                    <Link to="/demo-percorso">
-                      <Play className="w-4 h-4 mr-2" />
-                      Avvia il Percorso Demo
-                      <ArrowRight className="w-4 h-4 ml-2" />
-                    </Link>
-                  </Button>
                   <Button
                     size="lg"
-                    variant="secondary"
-                    className="rounded-xl font-bold w-full sm:w-auto"
+                    className="rounded-xl font-bold shadow-lg w-full sm:w-auto"
                     onClick={() => setShowVideo(true)}
                   >
                     <Play className="w-4 h-4 mr-2" />
                     Guarda il Video Demo
+                    <ArrowRight className="w-4 h-4 ml-2" />
                   </Button>
                   <Button asChild size="lg" variant="outline" className="rounded-xl w-full sm:w-auto">
-                    <Link to="/demo-3d">
+                    <a href="#pricing">
                       <GraduationCap className="w-4 h-4 mr-2" />
-                      Vedi le Sim 3D
-                    </Link>
+                      Richiedi il Percorso Completo
+                    </a>
                   </Button>
                 </div>
               </div>

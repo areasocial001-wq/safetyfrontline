@@ -247,9 +247,9 @@ export const Modules = () => {
                 I moduli bonus sono extra opzionali, attivabili separatamente rispetto al piano formativo standard.
               </p>
               <Button asChild variant="hero" size="lg">
-                <Link to="/moduli-bonus" className="gap-2">
-                  Scopri i Moduli Bonus <ArrowRight className="w-4 h-4" />
-                </Link>
+                <a href="#pricing" className="gap-2">
+                  Richiedi i Moduli Bonus <ArrowRight className="w-4 h-4" />
+                </a>
               </Button>
             </div>
           )}
