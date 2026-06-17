@@ -9,7 +9,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { User, LogOut, Settings, Shield, Building, GraduationCap, Trophy, BookOpen, RefreshCw } from 'lucide-react';
+import { User, LogOut, Settings, Shield, Building, GraduationCap, Trophy, BookOpen, RefreshCw, Gamepad2, Target, Box, Music, BarChart3, SlidersHorizontal, Sparkles, FileText } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { useState } from 'react';
