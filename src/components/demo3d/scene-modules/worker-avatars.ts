@@ -16,6 +16,10 @@ const NPC_MODELS = [
   'avatar-07.glb',
 ];
 
+// Antincendio (laboratory): use only worker-style models to avoid medic/lab-coat avatars.
+// Refined: worker-01 is the canonical hi-vis worker.
+const FIRE_SAFETY_NPC_MODELS = ['worker-01.glb', 'avatar-04.glb', 'avatar-06.glb'];
+
 interface NPCVariation {
   skinTone: BABYLON.Color3;
   shirtColor: BABYLON.Color3;
@@ -461,16 +465,46 @@ export function addWorkerAvatars(
     uniformColor: BABYLON.Color3,
     hasHelmet: boolean,
     rotation: number = 0,
-    safetyRole?: string
+    safetyRole?: string,
+    modelPool: string[] = NPC_MODELS
   ) => {
     const currentNpcIndex = npcVariationCounter;
     const variation = getNPCVariation(npcVariationCounter++);
     const behavior = IDLE_BEHAVIORS[currentNpcIndex % IDLE_BEHAVIORS.length];
-    const modelFile = NPC_MODELS[currentNpcIndex % NPC_MODELS.length];
+    const modelFile = modelPool[currentNpcIndex % modelPool.length];
     console.log(`[NPC] Creating stationary worker ${name} model=${modelFile} behavior=${behavior}`);
+
+    // --- Synchronous placeholder so user never sees "only the sign" while GLB loads ---
+    const placeholderBody = BABYLON.MeshBuilder.CreateCapsule(`${name}_placeholder`, { height: 1.7, radius: 0.25 }, scene);
+    placeholderBody.position = position.clone();
+    placeholderBody.position.y = 0.85;
+    placeholderBody.rotation.y = rotation;
+    const phMat = new BABYLON.StandardMaterial(`${name}_phMat`, scene);
+    phMat.diffuseColor = uniformColor.clone();
+    phMat.emissiveColor = uniformColor.scale(0.12);
+    phMat.specularColor = new BABYLON.Color3(0.2, 0.2, 0.2);
+    placeholderBody.material = phMat;
+    placeholderBody.checkCollisions = true;
+    if (safetyRole) {
+      placeholderBody.metadata = { safetyRole };
+      placeholderBody.isPickable = true;
+    }
+    const placeholderHead = BABYLON.MeshBuilder.CreateSphere(`${name}_phHead`, { diameter: 0.3 }, scene);
+    placeholderHead.position = position.clone();
+    placeholderHead.position.y = 1.85;
+    const phHeadMat = new BABYLON.StandardMaterial(`${name}_phHeadMat`, scene);
+    phHeadMat.diffuseColor = new BABYLON.Color3(0.85, 0.72, 0.58);
+    placeholderHead.material = phHeadMat;
+    if (shadowGenerator) shadowGenerator.addShadowCaster(placeholderBody);
+
+    const disposePlaceholder = () => {
+      placeholderBody.dispose();
+      placeholderHead.dispose();
+    };
 
     BABYLON.SceneLoader.ImportMeshAsync('', '/models/avatars/', modelFile, scene).then((result) => {
       console.log(`[NPC] ✓ GLB loaded for ${name}: ${result.meshes.length} meshes`);
+      disposePlaceholder();
       const root = result.meshes[0] as BABYLON.Mesh;
       root.name = `${name}_root`;
       root.position = position.clone();
@@ -508,31 +542,10 @@ export function addWorkerAvatars(
           npcSoundSystem.addBreathingSound(soundId, getPos);
         }
       }
-      toast.success(`NPC ${name} caricato`);
     }).catch(err => {
       console.error(`[NPC] ✗ Failed to load GLB avatar for ${name}:`, err);
-      console.log(`[NPC] Creating procedural fallback for ${name}`);
-      const body = BABYLON.MeshBuilder.CreateCapsule(`${name}_fallback`, { height: 1.7, radius: 0.25 }, scene);
-      body.position = position.clone();
-      body.position.y = 0.85;
-      const fbMat = new BABYLON.StandardMaterial(`${name}_fbMat`, scene);
-      fbMat.diffuseColor = uniformColor.clone();
-      fbMat.emissiveColor = uniformColor.scale(0.15);
-      fbMat.specularColor = new BABYLON.Color3(0.2, 0.2, 0.2);
-      body.material = fbMat;
-      body.checkCollisions = true;
-      if (safetyRole) {
-        body.metadata = { safetyRole };
-        body.isPickable = true;
-      }
-      if (shadowGenerator) shadowGenerator.addShadowCaster(body);
-      const head = BABYLON.MeshBuilder.CreateSphere(`${name}_head`, { diameter: 0.3 }, scene);
-      head.position = position.clone();
-      head.position.y = 1.85;
-      const headMat = new BABYLON.StandardMaterial(`${name}_headMat`, scene);
-      headMat.diffuseColor = new BABYLON.Color3(0.85, 0.72, 0.58);
-      headMat.emissiveColor = new BABYLON.Color3(0.12, 0.1, 0.08);
-      head.material = headMat;
+      console.log(`[NPC] Keeping procedural placeholder for ${name}`);
+      // Placeholder already in place — leave it as fallback.
       toast.warning(`NPC ${name} (fallback procedurale)`);
     });
   };
@@ -633,7 +646,16 @@ export function addWorkerAvatars(
       new BABYLON.Vector3(0, 0, 10),
     ];
     labPositions.forEach((pos, i) => {
-      createWorker(`lab_worker_${i}`, pos, new BABYLON.Color3(1, 1, 1), new BABYLON.Color3(0.9, 0.9, 0.92), false, Math.random() * Math.PI * 2, labRoles[i]);
+      createWorker(
+        `lab_worker_${i}`,
+        pos,
+        new BABYLON.Color3(0.95, 0.25, 0.18), // red firefighter helmet
+        new BABYLON.Color3(0.85, 0.35, 0.15), // hi-vis orange/red uniform
+        true,
+        Math.random() * Math.PI * 2,
+        labRoles[i],
+        FIRE_SAFETY_NPC_MODELS,
+      );
       createRoleLabel(scene, pos, labRoles[i], i, 'lab');
     });
 
