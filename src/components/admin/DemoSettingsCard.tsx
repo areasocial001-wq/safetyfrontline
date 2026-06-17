@@ -32,7 +32,7 @@ export const DemoSettingsCard = () => {
     const load = async () => {
       const [{ data: s }, { data: pkgs }] = await Promise.all([
         supabase.from("platform_settings").select("bypass_min_times, demo_package_id").maybeSingle(),
-        supabase.from("training_packages").select("id, name").order("name"),
+        supabase.from("training_packages").select("id, name").eq("is_demo", true).order("name"),
       ]);
       if (s) setSettings({ bypass_min_times: s.bypass_min_times, demo_package_id: s.demo_package_id });
       if (pkgs) setPackages(pkgs);
