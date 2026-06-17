@@ -73,6 +73,54 @@ export const UserMenu = () => {
               <Shield className="w-4 h-4 mr-2" />
               Dashboard Admin
             </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => navigate('/company')}>
+              <Building className="w-4 h-4 mr-2" />
+              Dashboard Azienda
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => navigate('/employee')}>
+              <GraduationCap className="w-4 h-4 mr-2" />
+              Dashboard Dipendente
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuLabel className="text-xs text-muted-foreground">Giochi & Demo</DropdownMenuLabel>
+            <DropdownMenuItem onClick={() => navigate('/demo-percorso')}>
+              <Sparkles className="w-4 h-4 mr-2" />
+              Percorso Demo
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => navigate('/spot-the-hazard')}>
+              <Target className="w-4 h-4 mr-2" />
+              Spot the Hazard (2D)
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => navigate('/demo-3d')}>
+              <Box className="w-4 h-4 mr-2" />
+              Demo 3D
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => navigate('/moduli-bonus')}>
+              <Gamepad2 className="w-4 h-4 mr-2" />
+              Moduli Bonus
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuLabel className="text-xs text-muted-foreground">Strumenti Admin</DropdownMenuLabel>
+            <DropdownMenuItem onClick={() => navigate('/admin/training-config')}>
+              <SlidersHorizontal className="w-4 h-4 mr-2" />
+              Config Formazione
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => navigate('/admin/training-analytics')}>
+              <BarChart3 className="w-4 h-4 mr-2" />
+              Analytics Formazione
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => navigate('/sound-studio')}>
+              <Music className="w-4 h-4 mr-2" />
+              Sound Studio
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => navigate('/scheda-tecnica')}>
+              <FileText className="w-4 h-4 mr-2" />
+              Scheda Tecnica
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => navigate('/guida')}>
+              <BookOpen className="w-4 h-4 mr-2" />
+              Guida
+            </DropdownMenuItem>
             <DropdownMenuSeparator />
           </>
         )}
