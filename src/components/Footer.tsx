@@ -45,10 +45,10 @@ export const Footer = () => {
                 <li><a href="/guida" className="hover:text-primary transition-colors">📖 Guida Completa</a></li>
                 <li><a href="/scheda-tecnica" className="hover:text-primary transition-colors">📄 Scheda Tecnica</a></li>
                 <li><a href="#moduli" className="hover:text-primary transition-colors">I Moduli</a></li>
-                <li><a href="#come-funziona" className="hover:text-primary transition-colors">Come Funziona</a></li>
-                <li><a href="#normativa" className="hover:text-primary transition-colors">Conformità</a></li>
-                <li><a href="#pricing" className="hover:text-primary transition-colors">Piani</a></li>
-                <li><a href="#contatti" className="hover:text-primary transition-colors">Contatti</a></li>
+                <li><a href="#come-funziona" className="hover:text-primary transition-colors"></a></li>
+                <li><a href="#normativa" className="hover:text-primary transition-colors"></a></li>
+                <li><a href="#pricing" className="hover:text-primary transition-colors"></a></li>
+                <li><a href="#contatti" className="hover:text-primary transition-colors"></a></li>
               </ul>
             </div>
 
