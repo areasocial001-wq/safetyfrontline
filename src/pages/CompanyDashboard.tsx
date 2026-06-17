@@ -26,6 +26,7 @@ import { ModuleCompletionHistory } from '@/components/company/ModuleCompletionHi
 import { CompletionsByModuleChart } from '@/components/company/CompletionsByModuleChart';
 import { ScoreTrendChart } from '@/components/company/ScoreTrendChart';
 import { DashboardPDFExport } from '@/components/company/DashboardPDFExport';
+import { FinalTrainingReport } from '@/components/company/FinalTrainingReport';
 import { EmployeeSectorAssignment } from '@/components/company/EmployeeSectorAssignment';
 import { AtecoCodeInput } from '@/components/company/AtecoCodeInput';
 import { supabase } from '@/integrations/supabase/client';
@@ -200,6 +201,12 @@ const CompanyDashboard = () => {
               </div>
             </div>
             <div className="flex items-center gap-2">
+              <FinalTrainingReport
+                companyId={company.id}
+                companyName={company.name}
+                companyVat={(company as any).vat_number ?? null}
+                ownerName={user?.user_metadata?.full_name ?? null}
+              />
               <DashboardPDFExport companyId={company.id} companyName={company.name} stats={stats} />
               {/* Notification Bell */}
               <Button
