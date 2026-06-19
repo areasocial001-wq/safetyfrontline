@@ -18,6 +18,7 @@ import { RecentSessions } from '@/components/employee/RecentSessions';
 import { Certificates } from '@/components/employee/Certificates';
 import { EmployeeNotifications } from '@/components/employee/EmployeeNotifications';
 import { supabase } from '@/integrations/supabase/client';
+import { isAllowlistedAdminEmail } from '@/lib/admin-allowlist';
 import { toast } from 'sonner';
 
 const EmployeeDashboard = () => {
