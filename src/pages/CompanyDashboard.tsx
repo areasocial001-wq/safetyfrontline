@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useUserRole } from '@/hooks/useUserRole';
 import { useCompany } from '@/hooks/useCompany';
+import { isAllowlistedAdminEmail } from '@/lib/admin-allowlist';
 import { Shield, ArrowLeft, Building, Home, ChevronRight, Bell } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -34,7 +35,7 @@ import { toast } from 'sonner';
 
 const CompanyDashboard = () => {
   const { user, loading: authLoading } = useAuth();
-  const { isCompanyClient, loading: roleLoading } = useUserRole();
+  const { isCompanyClient, isAdmin, loading: roleLoading } = useUserRole();
   const { company, loading: companyLoading } = useCompany();
   const navigate = useNavigate();
   const [refreshKey, setRefreshKey] = useState(0);
@@ -55,12 +56,13 @@ const CompanyDashboard = () => {
       return;
     }
 
-    if (!isCompanyClient) {
+    const adminAllowed = isAdmin && isAllowlistedAdminEmail(user.email);
+    if (!isCompanyClient && !adminAllowed) {
       toast.error('Accesso negato. Solo le aziende clienti possono accedere a questa pagina.');
       navigate('/');
       return;
     }
-  }, [user, isCompanyClient, authLoading, roleLoading, navigate]);
+  }, [user, isCompanyClient, isAdmin, authLoading, roleLoading, navigate]);
 
   useEffect(() => {
     if (company?.id) {

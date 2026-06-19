@@ -18,11 +18,12 @@ import { RecentSessions } from '@/components/employee/RecentSessions';
 import { Certificates } from '@/components/employee/Certificates';
 import { EmployeeNotifications } from '@/components/employee/EmployeeNotifications';
 import { supabase } from '@/integrations/supabase/client';
+import { isAllowlistedAdminEmail } from '@/lib/admin-allowlist';
 import { toast } from 'sonner';
 
 const EmployeeDashboard = () => {
   const { user, loading: authLoading } = useAuth();
-  const { isEmployee, loading: roleLoading } = useUserRole();
+  const { isEmployee, isAdmin, loading: roleLoading } = useUserRole();
   const navigate = useNavigate();
 
   const [stats, setStats] = useState({
@@ -40,12 +41,13 @@ const EmployeeDashboard = () => {
       return;
     }
 
-    if (!isEmployee) {
+    const adminAllowed = isAdmin && isAllowlistedAdminEmail(user.email);
+    if (!isEmployee && !adminAllowed) {
       toast.error('Accesso negato. Solo i dipendenti possono accedere a questa pagina.');
       navigate('/');
       return;
     }
-  }, [user, isEmployee, authLoading, roleLoading, navigate]);
+  }, [user, isEmployee, isAdmin, authLoading, roleLoading, navigate]);
 
   useEffect(() => {
     if (user) {
