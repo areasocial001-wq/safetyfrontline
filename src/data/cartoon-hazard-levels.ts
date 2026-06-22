@@ -255,7 +255,7 @@ export const CARTOON_KITCHEN: CartoonHazardLevel = {
     },
     {
       id: "ck_knife_edge", name: "Coltello affilato sul bordo del bancone",
-      position: { top: "86%", left: "30%" }, hitbox_size: { width: "16%", height: "12%" }, points: 150,
+      position: { top: "82%", left: "4%" }, hitbox_size: { width: "20%", height: "14%" }, points: 150,
       feedback: { title: "Caduta lama / Taglio", message: "Coltello da cucina lasciato sul bordo del piano di lavoro, lama verso l'esterno.", type: "critical" },
       educational: { why: "Una lama che cade può ferire piedi e gambe; il riflesso di afferrarla provoca tagli profondi a mani e tendini.", correct_action: "Riporre i coltelli nel ceppo o su tagliere con lama verso il muro. Se cade: indietreggiare, mai afferrare al volo.", regulation: "D.Lgs. 81/08 Titolo III" },
     },
