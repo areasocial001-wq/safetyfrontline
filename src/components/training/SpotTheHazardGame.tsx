@@ -315,7 +315,8 @@ const SpotTheHazardGame = ({ level, onExit }: Props) => {
         onClick={handleBackgroundClick}
         onPointerMove={onContainerPointerMove}
         onPointerUp={onContainerPointerUp}
-        className={`relative w-full aspect-square overflow-hidden rounded-2xl border-2 border-border shadow-xl select-none bg-muted ${calibrate ? "cursor-default touch-none" : "cursor-crosshair"}`}
+        style={{ aspectRatio: imgAspect }}
+        className={`relative w-full mx-auto max-h-[80vh] overflow-hidden rounded-2xl border-2 border-border shadow-xl select-none bg-muted ${calibrate ? "cursor-default touch-none" : "cursor-crosshair"}`}
       >
         <img
           src={level.background_image_url}
@@ -323,6 +324,12 @@ const SpotTheHazardGame = ({ level, onExit }: Props) => {
           className="absolute inset-0 w-full h-full object-cover pointer-events-none"
           draggable={false}
           loading="lazy"
+          onLoad={(e) => {
+            const im = e.currentTarget;
+            if (im.naturalWidth && im.naturalHeight) {
+              setImgAspect(`${im.naturalWidth} / ${im.naturalHeight}`);
+            }
+          }}
         />
 
         {/* HUD */}
