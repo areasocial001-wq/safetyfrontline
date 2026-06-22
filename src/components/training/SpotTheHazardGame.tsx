@@ -323,7 +323,7 @@ const SpotTheHazardGame = ({ level, onExit }: Props) => {
         <img
           src={level.background_image_url}
           alt={level.title}
-          className="absolute inset-0 w-full h-full object-cover pointer-events-none"
+          className="absolute inset-0 w-full h-full object-contain pointer-events-none"
           draggable={false}
           loading="lazy"
           onLoad={(e) => {
