@@ -307,6 +307,8 @@ const SpotTheHazardGame = ({ level, onExit }: Props) => {
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-4 w-full">
+      {/* Game column (canvas + calibration toolbar below) */}
+      <div className="flex flex-col gap-2 min-w-0">
       {/* Game canvas */}
       <div
         ref={containerRef}
