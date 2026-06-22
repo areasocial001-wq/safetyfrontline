@@ -75,6 +75,7 @@ const SpotTheHazardGame = ({ level, onExit }: Props) => {
   const [score, setScore] = useState(0);
   const [lives, setLives] = useState(level.lives);
   const [wrongClicks, setWrongClicks] = useState(0);
+  const [imgAspect, setImgAspect] = useState<string>("16 / 9");
   const [activeHazard, setActiveHazard] = useState<CartoonHazard | null>(null);
   const [status, setStatus] = useState<Status>("playing");
   const [shakeAt, setShakeAt] = useState<{ x: number; y: number; id: number } | null>(null);
@@ -315,7 +316,8 @@ const SpotTheHazardGame = ({ level, onExit }: Props) => {
         onClick={handleBackgroundClick}
         onPointerMove={onContainerPointerMove}
         onPointerUp={onContainerPointerUp}
-        className={`relative w-full aspect-square overflow-hidden rounded-2xl border-2 border-border shadow-xl select-none bg-muted ${calibrate ? "cursor-default touch-none" : "cursor-crosshair"}`}
+        style={{ aspectRatio: imgAspect }}
+        className={`relative w-full mx-auto max-h-[80vh] overflow-hidden rounded-2xl border-2 border-border shadow-xl select-none bg-muted ${calibrate ? "cursor-default touch-none" : "cursor-crosshair"}`}
       >
         <img
           src={level.background_image_url}
@@ -323,6 +325,12 @@ const SpotTheHazardGame = ({ level, onExit }: Props) => {
           className="absolute inset-0 w-full h-full object-cover pointer-events-none"
           draggable={false}
           loading="lazy"
+          onLoad={(e) => {
+            const im = e.currentTarget;
+            if (im.naturalWidth && im.naturalHeight) {
+              setImgAspect(`${im.naturalWidth} / ${im.naturalHeight}`);
+            }
+          }}
         />
 
         {/* HUD */}
