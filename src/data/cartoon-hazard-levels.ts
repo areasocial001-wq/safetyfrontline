@@ -225,7 +225,7 @@ export const CARTOON_KITCHEN: CartoonHazardLevel = {
     },
     {
       id: "ck_powerstrip", name: "Multipresa sovraccarica appesa al muro",
-      position: { top: "4%", left: "38%" }, hitbox_size: { width: "26%", height: "26%" }, points: 150,
+      position: { top: "8%", left: "42%" }, hitbox_size: { width: "16%", height: "16%" }, points: 150,
       feedback: { title: "Rischio incendio elettrico", message: "Ciabatta con troppe spine collegate a cascata sopra al banco.", type: "critical" },
       educational: { why: "Il sovraccarico surriscalda i contatti fino all'innesco, soprattutto vicino a frigoriferi e fonti di calore.", correct_action: "Una presa per dispositivo, mai prolunghe in cascata, prese certificate IP a norma.", regulation: "CEI 64-8" },
     },
