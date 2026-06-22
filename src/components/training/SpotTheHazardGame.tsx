@@ -315,7 +315,7 @@ const SpotTheHazardGame = ({ level, onExit }: Props) => {
         onClick={handleBackgroundClick}
         onPointerMove={onContainerPointerMove}
         onPointerUp={onContainerPointerUp}
-        className={`relative w-full aspect-video overflow-hidden rounded-2xl border-2 border-border shadow-xl select-none bg-muted ${calibrate ? "cursor-default touch-none" : "cursor-crosshair"}`}
+        className={`relative w-full aspect-square overflow-hidden rounded-2xl border-2 border-border shadow-xl select-none bg-muted ${calibrate ? "cursor-default touch-none" : "cursor-crosshair"}`}
       >
         <img
           src={level.background_image_url}
