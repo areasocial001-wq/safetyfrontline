@@ -75,6 +75,7 @@ const SpotTheHazardGame = ({ level, onExit }: Props) => {
   const [score, setScore] = useState(0);
   const [lives, setLives] = useState(level.lives);
   const [wrongClicks, setWrongClicks] = useState(0);
+  const [imgAspect, setImgAspect] = useState<string>("16 / 9");
   const [activeHazard, setActiveHazard] = useState<CartoonHazard | null>(null);
   const [status, setStatus] = useState<Status>("playing");
   const [shakeAt, setShakeAt] = useState<{ x: number; y: number; id: number } | null>(null);
