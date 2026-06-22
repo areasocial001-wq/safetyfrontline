@@ -461,6 +461,69 @@ const SpotTheHazardGame = ({ level, onExit }: Props) => {
         )}
       </div>
 
+      {/* Calibration toolbar (below the canvas so it never blocks hitboxes) */}
+      <div className="flex flex-wrap gap-2">
+        <Button
+          variant={calibrate ? "default" : "outline"}
+          size="sm"
+          onClick={() => { setCalibrate(v => !v); setShowHitboxes(true); }}
+          title="Modalità calibrazione (?calibrate=1)"
+        >
+          <Move className="h-4 w-4 mr-1" />{calibrate ? "Esci calibrazione" : "Calibra"}
+        </Button>
+        {calibrate && (
+          <>
+            <Button variant="outline" size="sm" onClick={() => setShowHitboxes(v => !v)}>
+              {showHitboxes ? <EyeOff className="h-4 w-4 mr-1" /> : <Eye className="h-4 w-4 mr-1" />}
+              {showHitboxes ? "Nascondi" : "Mostra"} hitbox
+            </Button>
+            <Button
+              variant={verifyMode ? "default" : "outline"}
+              size="sm"
+              onClick={() => setVerifyMode(v => !v)}
+              title="Evidenzia area cliccabile al passaggio del mouse e segnala sovrapposizioni"
+            >
+              <Crosshair className="h-4 w-4 mr-1" />Verifica
+            </Button>
+            <Button variant="outline" size="sm" onClick={copyJSON}>
+              <Copy className="h-4 w-4 mr-1" />Copia JSON
+            </Button>
+            <Button variant="outline" size="sm" onClick={exportCalibrations} title="Esporta tutte le calibrazioni in un file JSON">
+              <Download className="h-4 w-4 mr-1" />Esporta
+            </Button>
+            <Button variant="outline" size="sm" onClick={() => fileInputRef.current?.click()} title="Importa calibrazioni da un file JSON">
+              <Upload className="h-4 w-4 mr-1" />Importa
+            </Button>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="application/json,.json"
+              className="hidden"
+              onChange={(e) => {
+                const f = e.target.files?.[0];
+                if (f) importCalibrations(f);
+                e.target.value = "";
+              }}
+            />
+            <Button variant="outline" size="sm" onClick={resetCalibration}>
+              Reset
+            </Button>
+            <span className="inline-flex items-center gap-1 text-[11px] px-2 py-1 rounded bg-muted border border-border text-muted-foreground">
+              💾 autosalvataggio attivo
+            </span>
+            {verifyMode && overlapIds.size > 0 && (
+              <span className="inline-flex items-center gap-1 text-[11px] px-2 py-1 rounded bg-yellow-500/90 text-yellow-950 border border-yellow-700 font-semibold">
+                <Layers className="h-3.5 w-3.5" />
+                {overlapIds.size / 2 | 0 || 1} sovrapposizion{overlapIds.size > 2 ? "i" : "e"}
+              </span>
+            )}
+          </>
+        )}
+      </div>
+      </div>
+
+
+
       {/* Side panel: hazard checklist */}
       <Card className="p-4 flex flex-col gap-3 lg:max-h-[calc(56.25vw*1)] overflow-hidden">
         <div>
