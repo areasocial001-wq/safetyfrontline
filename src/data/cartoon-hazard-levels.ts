@@ -302,10 +302,10 @@ export const CARTOON_FACTORY: CartoonHazardLevel = {
       educational: { why: "L'arco di saldatura emette UV/IR che causano cheratocongiuntivite ('colpo d'arco'), ustioni e cecità temporanea.", correct_action: "Maschera autoscurante, guanti, grembiule in cuoio, paravento e aspirazione fumi.", regulation: "D.Lgs. 81/08 Titolo VIII Capo V" },
     },
     {
-      id: "cf_oil_spill", name: "Pozza d'olio sul pavimento",
+      id: "cf_metal_chips", name: "Frammenti di materiale lavorato sul pavimento",
       position: { top: "86%", left: "26%" }, hitbox_size: { width: "14%", height: "12%" }, points: 100,
-      feedback: { title: "Scivolamento", message: "Macchia di olio non segnalata in zona di passaggio.", type: "warning" },
-      educational: { why: "Gli oli da macchine utensili rendono il pavimento estremamente scivoloso e infiammabile.", correct_action: "Cospargere materiale assorbente, segnalare con cartello, smaltire come rifiuto pericoloso.", regulation: "D.Lgs. 81/08 All. IV" },
+      feedback: { title: "Rischio scivolamento / taglio", message: "Trucioli e frammenti metallici sparsi vicino al tornio.", type: "warning" },
+      educational: { why: "I trucioli metallici sul pavimento causano scivolamenti, forature delle calzature e tagli. Inoltre attraggono l'umidità e possono ossidarsi.", correct_action: "Raschiare e aspirare i trucioli periodicamente, usare stuoie antiscivolo intorno alle macchine utensili.", regulation: "D.Lgs. 81/08 All. IV" },
     },
     {
       id: "cf_unstable_stool", name: "Lavoratore in piedi su sgabello instabile",
