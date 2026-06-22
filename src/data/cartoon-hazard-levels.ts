@@ -261,7 +261,7 @@ export const CARTOON_KITCHEN: CartoonHazardLevel = {
     },
     {
       id: "ck_extinguisher", name: "Estintore mal posizionato e senza cartello",
-      position: { top: "76%", left: "48%" }, hitbox_size: { width: "14%", height: "22%" }, points: 200,
+      position: { top: "6%", left: "60%" }, hitbox_size: { width: "8%", height: "16%" }, points: 200,
       feedback: { title: "Antincendio non conforme", message: "Estintore appoggiato a terra, senza supporto a parete né cartello segnaletico.", type: "critical" },
       educational: { why: "L'estintore deve essere visibile, segnalato e a 1-1,5 m da terra. A terra non è riconoscibile in emergenza ed è soggetto a urti.", correct_action: "Fissare a parete con supporto omologato, cartello triangolare rosso visibile, raggio libero di 1 metro.", regulation: "D.M. 10/03/1998 Art. 4 - UNI EN 3" },
     },
