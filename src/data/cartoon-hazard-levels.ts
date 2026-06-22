@@ -225,7 +225,7 @@ export const CARTOON_KITCHEN: CartoonHazardLevel = {
     },
     {
       id: "ck_powerstrip", name: "Multipresa sovraccarica appesa al muro",
-      position: { top: "8%", left: "42%" }, hitbox_size: { width: "16%", height: "16%" }, points: 150,
+      position: { top: "7%", left: "31%" }, hitbox_size: { width: "22%", height: "18%" }, points: 150,
       feedback: { title: "Rischio incendio elettrico", message: "Ciabatta con troppe spine collegate a cascata sopra al banco.", type: "critical" },
       educational: { why: "Il sovraccarico surriscalda i contatti fino all'innesco, soprattutto vicino a frigoriferi e fonti di calore.", correct_action: "Una presa per dispositivo, mai prolunghe in cascata, prese certificate IP a norma.", regulation: "CEI 64-8" },
     },
@@ -255,7 +255,7 @@ export const CARTOON_KITCHEN: CartoonHazardLevel = {
     },
     {
       id: "ck_knife_edge", name: "Coltello affilato sul bordo del bancone",
-      position: { top: "82%", left: "4%" }, hitbox_size: { width: "20%", height: "14%" }, points: 150,
+      position: { top: "86%", left: "34%" }, hitbox_size: { width: "18%", height: "12%" }, points: 150,
       feedback: { title: "Caduta lama / Taglio", message: "Coltello da cucina lasciato sul bordo del piano di lavoro, lama verso l'esterno.", type: "critical" },
       educational: { why: "Una lama che cade può ferire piedi e gambe; il riflesso di afferrarla provoca tagli profondi a mani e tendini.", correct_action: "Riporre i coltelli nel ceppo o su tagliere con lama verso il muro. Se cade: indietreggiare, mai afferrare al volo.", regulation: "D.Lgs. 81/08 Titolo III" },
     },
