@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Download, Save, RotateCcw, Loader2, FileText, Award } from "lucide-react";
+import { Download, Save, RotateCcw, Loader2, FileText, Award, BarChart3 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import {
@@ -249,6 +249,35 @@ export const FacSimilePreview = () => {
           </div>
         </TabsContent>
       </Tabs>
+
+      <Card>
+        <CardHeader className="flex flex-row items-start justify-between gap-4">
+          <div>
+            <CardTitle className="flex items-center gap-2 text-base">
+              <BarChart3 className="w-5 h-5 text-primary" /> Fac-simile Report Aziendale
+            </CardTitle>
+            <CardDescription>
+              Esempio completo del report di compliance e analytics generato per l'azienda
+              (KPI, tracciamento dipendenti, scadenze certificati, piano d'azione).
+            </CardDescription>
+          </div>
+          <Button asChild variant="professional">
+            <a href="/samples/facsimile-report-aziendale.pdf" download>
+              <Download className="w-4 h-4 mr-2" /> Scarica PDF
+            </a>
+          </Button>
+        </CardHeader>
+        <CardContent className="p-0">
+          <div className="bg-muted/20 border-t">
+            <iframe
+              src="/samples/facsimile-report-aziendale.pdf#view=FitH&toolbar=0"
+              title="Fac-simile report aziendale"
+              className="w-full h-[640px] bg-white"
+            />
+          </div>
+        </CardContent>
+      </Card>
+
 
       {!isAdmin && (
         <Card className="p-4 bg-muted/30 border-dashed">
