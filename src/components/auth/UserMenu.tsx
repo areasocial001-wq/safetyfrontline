@@ -9,7 +9,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { User, LogOut, Settings, Shield, Building, GraduationCap, Trophy, BookOpen, RefreshCw, Gamepad2, Target, Box, Music, BarChart3, SlidersHorizontal, Sparkles, FileText } from 'lucide-react';
+import { User, LogOut, Settings, Shield, Building, GraduationCap, Trophy, BookOpen, RefreshCw, Gamepad2, Target, Box, Music, BarChart3, SlidersHorizontal, Sparkles, FileText, Shirt } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { useState } from 'react';
@@ -153,6 +153,10 @@ export const UserMenu = () => {
         <DropdownMenuItem onClick={() => navigate('/formazione')}>
           <GraduationCap className="w-4 h-4 mr-2" />
           Formazione Generale
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={() => navigate('/vestizione-dpi')}>
+          <Shirt className="w-4 h-4 mr-2" />
+          Vestizione DPI
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem onSelect={handleRefreshPermissions} disabled={refreshing}>
