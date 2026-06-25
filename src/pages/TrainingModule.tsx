@@ -457,6 +457,13 @@ const TrainingModule = () => {
           </div>
         )}
 
+        {/* DPI Dressing Game */}
+        {currentSection.type === 'dpi_dressing' && (
+          <div className="mb-6">
+            <DPIDressingGame scenarioId={(currentSection as any).dpiScenario || 'cantiere'} />
+          </div>
+        )}
+
         {/* NPC Dialogues - chat bubble style */}
         {currentSection.npcDialogue && (
           <div className="space-y-4 mb-6">
