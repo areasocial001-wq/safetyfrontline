@@ -375,84 +375,151 @@ function Avatar({ worn, season, hivis, highlight }: { worn: Set<DPIKey>; season:
   const layers: Record<DPIKey, React.ReactNode> = {
     tuta: (
       <Cartoon big>
+        {/* corpo + maniche + gambe arrotondate */}
         <path
-          d="M250 250 L300 240 L384 260 L468 240 L518 250 L520 600 L495 980 L420 980 L400 700 L368 700 L348 980 L273 980 L248 600 Z"
+          d="M250 250 Q260 240 300 235 L330 250 Q384 262 438 250 L468 235 Q508 240 518 250
+             L530 360 Q524 380 506 376 L500 360 L505 600 L495 980 L420 980 L400 700 L368 700 L348 980 L273 980 L263 600 L268 360 L262 376 Q244 380 238 360 Z"
           fill={tutaFill}
         />
-        <path d="M384 260 L384 980" stroke={T.navyDark} strokeWidth="6" opacity="0.6" />
-        <rect x="356" y="320" width="56" height="80" rx="6" fill={tutaAccent} />
+        {/* zip */}
+        <path d="M384 260 L384 470" stroke={T.dark} strokeWidth="4" />
+        {/* tasca pettorale */}
+        <rect x="396" y="310" width="56" height="64" rx="6" fill={tutaAccent} />
+        <path d="M396 320 L452 320" stroke={T.dark} strokeWidth="3" opacity=".6" />
+        {/* cintura */}
+        <rect x="268" y="468" width="232" height="14" rx="3" fill={T.dark} opacity=".55" stroke="none" />
+        {/* cuciture gambe */}
+        <path d="M340 500 L340 970 M428 500 L428 970" stroke={T.dark} strokeWidth="2" opacity=".4" />
+        {season === 'estivo' && (
+          <path d="M275 270 L268 320 M493 270 L500 320" stroke={T.fabricSummer} strokeWidth="6" opacity=".85" />
+        )}
       </Cartoon>
     ),
     scarpe: (
       <Cartoon big>
-        <path d="M250 935 L355 935 L375 920 L410 920 Q445 920 445 955 L445 985 L245 985 Z" fill={season === 'invernale' ? T.fabricWinter : T.yellow} />
-        <path d="M325 935 L430 935 L450 920 L490 920 Q525 920 525 955 L525 985 L320 985 Z" fill={season === 'invernale' ? T.fabricWinter : T.yellow} />
-        <rect x="245" y="975" width="285" height="14" rx="3" fill={T.navyDark} />
+        {/* tomaia sx */}
+        <path d="M255 920 L255 950 Q255 985 295 985 L375 985 L405 960 L405 940 L378 925 L335 925 Q300 920 295 905 Z" fill={season === 'invernale' ? T.fabricWinter : T.yellow} />
+        {/* tomaia dx */}
+        <path d="M395 920 L395 950 Q395 985 435 985 L515 985 L515 940 L488 925 L445 925 Q410 920 405 905 Z" fill={season === 'invernale' ? T.fabricWinter : T.yellow} />
+        {/* punte rinforzate */}
+        <path d="M375 985 L405 960 L405 940 L378 925 Q360 925 360 945 L360 985 Z" fill="#C9D2DA" />
+        <path d="M515 985 L515 940 L488 925 Q470 925 470 945 L470 985 Z" fill="#C9D2DA" />
+        {/* lacci */}
+        <path d="M275 930 L295 930 M275 945 L295 945 M275 960 L295 960" stroke={T.dark} strokeWidth="3" />
+        <path d="M415 930 L435 930 M415 945 L435 945 M415 960 L435 960" stroke={T.dark} strokeWidth="3" />
+        {/* suola */}
+        <path d="M245 980 L530 980 L525 1000 Q520 1006 510 1006 L260 1006 Q252 1006 248 1000 Z" fill={T.navyDark} />
       </Cartoon>
     ),
     gilet: (
       <Cartoon big>
-        <path d="M260 270 L350 260 L384 290 L418 260 L508 270 L500 580 L268 580 Z" fill={hv.base} />
-        <rect x="275" y="380" width="220" height="24" fill={T.reflect} />
-        <rect x="275" y="470" width="220" height="24" fill={T.reflect} />
-        <path d="M384 290 L384 580" stroke={hv.dark} strokeWidth="4" opacity="0.6" />
+        <path d="M260 270 Q280 258 350 260 L384 290 L418 260 Q488 258 508 270 L512 580 Q508 590 498 590 L270 590 Q260 590 258 580 Z" fill={hv.base} />
+        {/* zip */}
+        <path d="M384 290 L384 590" stroke={T.dark} strokeWidth="4" />
+        {/* bande rifrangenti con bordino scuro */}
+        <rect x="270" y="374" width="228" height="22" fill={T.reflect} />
+        <rect x="270" y="370" width="228" height="4" fill={T.dark} opacity=".5" />
+        <rect x="270" y="396" width="228" height="4" fill={T.dark} opacity=".5" />
+        <rect x="270" y="466" width="228" height="22" fill={T.reflect} />
+        <rect x="270" y="462" width="228" height="4" fill={T.dark} opacity=".5" />
+        <rect x="270" y="488" width="228" height="4" fill={T.dark} opacity=".5" />
+        {season === 'invernale' && (
+          <path d="M260 270 L350 260 L384 290 L418 260 L508 270 L508 320 L260 320 Z" fill={hv.dark} opacity=".55" stroke="none" />
+        )}
       </Cartoon>
     ),
     imbracatura: (
       <Cartoon big>
-        <path d="M310 270 L384 470 L458 270" stroke={T.dark} strokeWidth="18" />
-        <path d="M310 270 L384 470 L458 270" stroke={T.yellow} strokeWidth="12" />
-        <rect x="270" y="466" width="228" height="26" rx="4" fill={T.yellow} />
-        <circle cx="384" cy="479" r="20" fill={T.navy} />
-        <circle cx="384" cy="479" r="6" fill={T.yellow} stroke="none" />
+        {/* spalline a X */}
+        <path d="M300 260 L468 480 M468 260 L300 480" stroke={T.dark} strokeWidth="20" />
+        <path d="M300 260 L468 480 M468 260 L300 480" stroke={T.yellow} strokeWidth="12" />
+        {/* cintura */}
+        <rect x="266" y="466" width="236" height="30" rx="5" fill={T.yellow} />
+        <path d="M266 478 L502 478" stroke={T.dark} strokeWidth="2" opacity=".5" />
+        {/* fibbia D-ring centrale */}
+        <circle cx="384" cy="481" r="22" fill={T.navy} />
+        <circle cx="384" cy="481" r="8" fill={T.yellow} stroke="none" />
+        {/* cosciali */}
+        <path d="M315 496 Q300 580 340 620 M453 496 Q468 580 428 620" strokeWidth="14" stroke={T.dark} />
+        <path d="M315 496 Q300 580 340 620 M453 496 Q468 580 428 620" strokeWidth="8" stroke={T.yellow} />
       </Cartoon>
     ),
     cordino: (
       <Cartoon big>
-        <path d="M384 481 Q560 400 680 200" stroke={T.dark} strokeWidth="18" />
-        <path d="M384 481 Q560 400 680 200" stroke={T.yellow} strokeWidth="11" />
-        <rect x="658" y="168" width="38" height="56" rx="8" fill={T.navy} />
+        <path d="M384 481 Q560 380 690 200" stroke={T.dark} strokeWidth="20" />
+        <path d="M384 481 Q560 380 690 200" stroke={T.yellow} strokeWidth="12" />
+        {/* assorbitore di energia */}
+        <rect x="495" y="350" width="44" height="70" rx="6" fill={T.yellow} stroke={T.dark} strokeWidth="4" />
+        <path d="M499 372 L535 372 M499 388 L535 388 M499 404 L535 404" stroke={T.yellowDark} strokeWidth="3" />
+        {/* moschettone */}
+        <path d="M660 160 Q706 160 706 210 L706 246 Q706 262 692 262 L678 262 Q664 262 664 246 Z" fill={T.navy} stroke={T.dark} strokeWidth="4" />
+        <circle cx="685" cy="200" r="6" fill={T.yellow} stroke="none" />
       </Cartoon>
     ),
     guanti: (
       <Cartoon big>
-        <ellipse cx="170" cy="555" rx="58" ry="64" fill={glovesFill} />
-        <ellipse cx="600" cy="555" rx="58" ry="64" fill={glovesFill} />
-        <path d="M125 555 L215 555 M555 555 L645 555" stroke={season === 'invernale' ? T.navyDark : T.yellowDark} strokeWidth="4" />
+        {/* sx */}
+        <path d="M120 510 Q120 488 140 488 Q160 488 160 510 L160 528 Q165 480 188 480 Q210 482 210 526 Q214 488 232 488 Q250 488 250 528 L250 600 Q250 624 224 624 L150 624 Q120 624 120 600 Z" fill={glovesFill} />
+        <rect x="118" y="600" width="134" height="22" fill={season === 'invernale' ? T.navy : T.yellowDark} />
+        {/* dx */}
+        <path d="M518 510 Q518 488 538 488 Q558 488 558 528 Q562 488 580 480 Q602 482 602 526 Q608 488 626 488 Q646 488 646 510 L646 600 Q646 624 616 624 L548 624 Q518 624 518 600 Z" fill={glovesFill} />
+        <rect x="516" y="600" width="132" height="22" fill={season === 'invernale' ? T.navy : T.yellowDark} />
       </Cartoon>
     ),
     maschera: (
       <Cartoon big>
-        <path d="M295 175 Q384 155 473 175 L460 245 Q384 270 308 245 Z" fill={T.navy} />
-        <circle cx="340" cy="220" r="24" fill={T.yellow} />
-        <circle cx="428" cy="220" r="24" fill={T.yellow} />
-        <path d="M295 195 Q258 178 250 205 M473 195 Q510 178 518 205" />
+        <path d="M295 175 Q384 158 473 175 L468 240 Q448 268 384 272 Q320 268 300 240 Z" fill={T.navy} />
+        {/* filtri */}
+        <circle cx="335" cy="222" r="26" fill={T.yellow} />
+        <circle cx="433" cy="222" r="26" fill={T.yellow} />
+        <circle cx="335" cy="222" r="11" fill={T.yellowDark} stroke="none" />
+        <circle cx="433" cy="222" r="11" fill={T.yellowDark} stroke="none" />
+        {/* valvola */}
+        <ellipse cx="384" cy="252" rx="18" ry="10" fill={T.navyDark} />
+        {/* cinturini */}
+        <path d="M295 195 Q254 178 248 210 M473 195 Q514 178 520 210" strokeWidth="5" />
       </Cartoon>
     ),
     occhiali: (
       <Cartoon big>
-        <path d="M280 145 Q384 122 488 145 L488 178 Q384 200 280 178 Z" fill={T.yellow} />
-        <rect x="295" y="140" width="78" height="42" rx="8" fill="#F4FAFF" />
-        <rect x="395" y="140" width="78" height="42" rx="8" fill="#F4FAFF" />
-        <path d="M308 152 L350 152 M408 152 L450 152" stroke="#fff" strokeWidth="4" opacity=".9" />
+        {/* ponte */}
+        <path d="M370 152 Q384 144 398 152" />
+        {/* lenti */}
+        <path d="M290 144 Q290 130 304 130 L354 130 Q368 130 368 144 L368 178 Q368 192 354 192 L304 192 Q290 192 290 178 Z" fill="#9FE3FF" />
+        <path d="M400 144 Q400 130 414 130 L464 130 Q478 130 478 144 L478 178 Q478 192 464 192 L414 192 Q400 192 400 178 Z" fill="#9FE3FF" />
+        {/* riflessi */}
+        <path d="M300 148 Q314 138 332 140" stroke="#fff" strokeWidth="4" opacity=".95" />
+        <path d="M410 148 Q424 138 442 140" stroke="#fff" strokeWidth="4" opacity=".95" />
+        {/* stanghette */}
+        <path d="M290 158 L268 168 M478 158 L500 168" />
       </Cartoon>
     ),
     cuffie: (
       <Cartoon big>
-        <path d="M270 110 Q384 22 498 110" stroke={T.dark} strokeWidth="16" />
-        <path d="M270 110 Q384 22 498 110" stroke={T.navy} strokeWidth="10" />
-        <rect x="238" y="105" width="52" height="84" rx="14" fill={T.navy} />
-        <rect x="478" y="105" width="52" height="84" rx="14" fill={T.navy} />
-        <rect x="230" y="130" width="14" height="34" rx="2" fill={T.yellow} />
-        <rect x="524" y="130" width="14" height="34" rx="2" fill={T.yellow} />
+        <path d="M270 110 Q384 18 498 110" stroke={T.dark} strokeWidth="18" />
+        <path d="M270 110 Q384 28 498 110" stroke={T.navy} strokeWidth="10" />
+        {/* coppe */}
+        <path d="M234 108 Q224 108 224 122 L224 200 Q224 216 240 216 L278 216 Q294 216 294 200 L294 122 Q294 108 284 108 Z" fill={T.navy} />
+        <path d="M474 108 Q484 108 484 122 L484 200 Q484 216 500 216 L538 216 Q554 216 554 200 L554 122 Q554 108 544 108 Z" fill={T.navy} />
+        {/* pad gialli */}
+        <rect x="230" y="130" width="48" height="60" rx="8" fill={T.yellow} />
+        <rect x="490" y="130" width="48" height="60" rx="8" fill={T.yellow} />
       </Cartoon>
     ),
     casco: (
       <Cartoon big>
-        <path d="M250 135 Q384 -5 518 135 Z" fill={T.yellow} />
-        <path d="M260 135 Q384 35 508 135" fill={T.yellowDark} opacity="0.4" stroke="none" />
-        <rect x="240" y="128" width="288" height="22" rx="5" fill={T.navy} />
-        <path d="M384 5 L384 130" stroke={T.yellowDark} strokeWidth="6" opacity="0.6" />
+        {/* calotta */}
+        <path d="M242 140 Q252 8 384 4 Q516 8 526 140 Z" fill={T.yellow} />
+        {/* shading metà */}
+        <path d="M384 4 Q516 8 526 140 L384 140 Z" fill={T.yellowDark} opacity=".3" stroke="none" />
+        {/* cresta */}
+        <path d="M384 8 L384 140" stroke={T.yellowDark} strokeWidth="6" opacity=".55" />
+        {/* highlight */}
+        <path d="M270 100 Q300 40 360 28" stroke="#FFF6D6" strokeWidth="7" opacity=".9" />
+        {/* visiera */}
+        <path d="M232 138 Q384 168 536 138 L528 162 Q384 188 240 162 Z" fill={T.yellowDark} />
+        {/* sottogola */}
+        <rect x="240" y="158" width="288" height="14" rx="3" fill={T.navy} />
       </Cartoon>
     ),
   };
