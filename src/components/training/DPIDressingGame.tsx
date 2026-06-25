@@ -812,11 +812,6 @@ export default function DPIDressingGame({ scenarioId = 'cantiere', onComplete }:
     </TooltipProvider>
   );
 }
-        </CardContent>
-      </Card>
-    </TooltipProvider>
-  );
-}
 
 function DpiCard({
   k,
