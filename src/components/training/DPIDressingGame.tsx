@@ -1,10 +1,17 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { CheckCircle2, RotateCcw, ShieldCheck, AlertTriangle, Trophy, Info, Sun, Snowflake } from 'lucide-react';
+import {
+  CheckCircle2, RotateCcw, ShieldCheck, AlertTriangle, Trophy, Info, Sun, Snowflake,
+  PlayCircle, PauseCircle, FileDown, FileSpreadsheet,
+} from 'lucide-react';
 import dpiAvatarHuman from '@/assets/dpi-avatar-human.png';
+import { useDpiPreferences } from '@/lib/dpi-preferences';
+import { useCompany } from '@/hooks/useCompany';
+import { useAuth } from '@/hooks/useAuth';
+import { exportDpiReportCsv, exportDpiReportPdf, downloadBlob, type DPIReportData } from '@/lib/dpi-report';
 
 // ============================================================
 // Tipi
