@@ -674,7 +674,7 @@ export default function DPIDressingGame({ scenarioId = 'cantiere', onComplete }:
           <p className="text-sm text-muted-foreground mb-4">{scenario.intro}</p>
 
           {legendOpen && (
-            <div className="mb-4 grid grid-cols-1 sm:grid-cols-2 gap-2 p-3 rounded-lg bg-slate-50 border border-slate-200">
+            <div id="dpi-legend" className="mb-4 grid grid-cols-1 sm:grid-cols-2 gap-2 p-3 rounded-lg bg-slate-50 border border-slate-200">
               {scenario.sequence.concat(scenario.distractors || []).map((k) => (
                 <div key={k} className="flex items-start gap-2 text-xs">
                   <div className="shrink-0">
@@ -684,7 +684,7 @@ export default function DPIDressingGame({ scenarioId = 'cantiere', onComplete }:
                     <div className="font-semibold text-foreground">{ALL_ITEMS[k].label}</div>
                     <div className="text-muted-foreground leading-snug">{ALL_ITEMS[k].description}</div>
                     {ALL_ITEMS[k].normativa && (
-                      <div className="text-[10px] text-slate-500 mt-0.5">📘 {ALL_ITEMS[k].normativa}</div>
+                      <div className="text-[10px] text-slate-600 mt-0.5">📘 {ALL_ITEMS[k].normativa}</div>
                     )}
                   </div>
                 </div>
@@ -692,9 +692,16 @@ export default function DPIDressingGame({ scenarioId = 'cantiere', onComplete }:
             </div>
           )}
 
-          {/* Layout responsive: mobile = stack verticale; desktop = 3 colonne */}
+          {/* Hint del prossimo DPI atteso (utile in modalità guidata e per screen reader) */}
+          {!completed && expectedKey && (
+            <div className="mb-3 text-xs text-muted-foreground" aria-live="polite">
+              Prossimo DPI: <span className="font-semibold text-foreground">{ALL_ITEMS[expectedKey].label}</span>
+              {' '}— area: <span className="italic">{ANATOMY[expectedKey].label}</span>
+            </div>
+          )}
+
+          {/* Layout responsive */}
           <div className="grid grid-cols-2 md:grid-cols-[1fr_1.4fr_1fr] gap-3 md:gap-4 items-start">
-            {/* Colonna SX DPI */}
             <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-1 gap-2 sm:gap-3 order-2 md:order-1 col-span-2 md:col-span-1">
               {allKeys.slice(0, Math.ceil(allKeys.length / 2)).map(k => (
                 <DpiCard
@@ -705,14 +712,21 @@ export default function DPIDressingGame({ scenarioId = 'cantiere', onComplete }:
                   onPick={() => handlePick(k)}
                   season={season}
                   hivis={hivis}
+                  isNext={k === expectedKey && !worn.has(k)}
                 />
               ))}
             </div>
 
-            {/* Avatar centrale */}
             <div className="bg-gradient-to-b from-sky-50 to-slate-100 rounded-xl border-2 border-dashed border-slate-300 p-3 flex flex-col items-center order-1 md:order-2 col-span-2 md:col-span-1">
-              <Avatar worn={worn} season={season} hivis={hivis} />
-              <div className="w-full mt-2 h-2 bg-slate-200 rounded-full overflow-hidden">
+              <Avatar worn={worn} season={season} hivis={hivis} highlight={highlight} />
+              <div
+                className="w-full mt-2 h-2 bg-slate-200 rounded-full overflow-hidden"
+                role="progressbar"
+                aria-valuenow={progress}
+                aria-valuemin={0}
+                aria-valuemax={100}
+                aria-label="Avanzamento vestizione DPI"
+              >
                 <div
                   className="h-full bg-gradient-to-r from-[#1F7A3A] to-[#6B1622] transition-all"
                   style={{ width: `${progress}%` }}
@@ -723,7 +737,6 @@ export default function DPIDressingGame({ scenarioId = 'cantiere', onComplete }:
               </div>
             </div>
 
-            {/* Colonna DX DPI */}
             <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-1 gap-2 sm:gap-3 order-3 col-span-2 md:col-span-1">
               {allKeys.slice(Math.ceil(allKeys.length / 2)).map(k => (
                 <DpiCard
@@ -734,45 +747,71 @@ export default function DPIDressingGame({ scenarioId = 'cantiere', onComplete }:
                   onPick={() => handlePick(k)}
                   season={season}
                   hivis={hivis}
+                  isNext={k === expectedKey && !worn.has(k)}
                 />
               ))}
             </div>
           </div>
 
-          {/* Feedback */}
+          {/* Feedback con spiegazione cartoon */}
           {feedback && (
             <div
+              role="status"
+              aria-live="polite"
               className={`mt-4 p-3 rounded-lg border text-sm flex items-start gap-2 ${
                 feedback.kind === 'ok'
-                  ? 'bg-emerald-50 border-emerald-200 text-emerald-800'
-                  : 'bg-red-50 border-red-200 text-red-800'
+                  ? 'bg-emerald-50 border-emerald-300 text-emerald-900'
+                  : 'bg-red-50 border-red-300 text-red-900'
               }`}
             >
               {feedback.kind === 'ok' ? (
-                <CheckCircle2 className="w-4 h-4 mt-0.5 shrink-0" />
+                <CheckCircle2 className="w-4 h-4 mt-0.5 shrink-0" aria-hidden="true" />
               ) : (
-                <AlertTriangle className="w-4 h-4 mt-0.5 shrink-0" />
+                <AlertTriangle className="w-4 h-4 mt-0.5 shrink-0" aria-hidden="true" />
               )}
-              <span>{feedback.text}</span>
+              <div className="space-y-1">
+                <div className="font-medium">{feedback.text}</div>
+                {feedback.cartoon && (
+                  <div className="text-xs opacity-90">💬 {feedback.cartoon}</div>
+                )}
+              </div>
             </div>
           )}
 
           {completed && (
-            <div className="mt-4 p-4 rounded-xl bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-200 flex flex-wrap items-center justify-between gap-3">
-              <div className="flex items-center gap-2">
-                <Trophy className="w-6 h-6 text-amber-500" />
-                <div>
-                  <div className="font-bold text-emerald-900">Vestizione completata!</div>
-                  <div className="text-xs text-emerald-700">
-                    Sequenza corretta con {mistakes} {mistakes === 1 ? 'errore' : 'errori'}.
+            <div className="mt-4 p-4 rounded-xl bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-300">
+              <div className="flex flex-wrap items-center justify-between gap-3 mb-3">
+                <div className="flex items-center gap-2">
+                  <Trophy className="w-6 h-6 text-amber-500" aria-hidden="true" />
+                  <div>
+                    <div className="font-bold text-emerald-900">Vestizione completata!</div>
+                    <div className="text-xs text-emerald-800">
+                      Punteggio <strong>{score}/100</strong> · {mistakes} {mistakes === 1 ? 'errore' : 'errori'} · Tempo {Math.floor(totalSeconds/60)}m {totalSeconds%60}s
+                    </div>
                   </div>
                 </div>
+                <Button size="sm" variant="outline" onClick={handleReset} aria-label="Ripeti la vestizione">
+                  <RotateCcw className="w-4 h-4 mr-2" aria-hidden="true" /> Ripeti
+                </Button>
               </div>
-              <Button size="sm" variant="outline" onClick={handleReset}>
-                <RotateCcw className="w-4 h-4 mr-2" /> Ripeti
-              </Button>
+              <div className="flex flex-wrap gap-2">
+                <Button size="sm" onClick={handleExportPdf} className="bg-[#6B1622] hover:bg-[#54101a] text-white" aria-label="Esporta report PDF">
+                  <FileDown className="w-4 h-4 mr-2" aria-hidden="true" /> Esporta report PDF
+                </Button>
+                <Button size="sm" variant="outline" onClick={handleExportCsv} aria-label="Esporta report CSV">
+                  <FileSpreadsheet className="w-4 h-4 mr-2" aria-hidden="true" /> Esporta CSV
+                </Button>
+              </div>
+              <p className="text-[11px] text-emerald-800/80 mt-2">
+                Conserva il report per gli audit del DVR e per la documentazione di formazione (D.Lgs. 81/08).
+              </p>
             </div>
           )}
+        </CardContent>
+      </Card>
+    </TooltipProvider>
+  );
+}
         </CardContent>
       </Card>
     </TooltipProvider>
