@@ -837,6 +837,38 @@ const TrainingHub = () => {
         </div>
       </div>
 
+      {/* Mini-giochi interattivi */}
+      <div className="container mx-auto px-4 py-6 max-w-4xl">
+        <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
+          <Shirt className="w-6 h-6 text-primary" /> Mini-giochi interattivi
+        </h2>
+        <div className="grid md:grid-cols-3 gap-4">
+          <Card
+            className="cursor-pointer transition-all duration-300 hover:shadow-lg hover:-translate-y-1 border-2 border-border hover:border-primary/40 rounded-2xl overflow-hidden"
+            onClick={() => navigate('/vestizione-dpi')}
+          >
+            <div className="h-2 bg-gradient-to-r from-primary to-secondary" />
+            <CardContent className="p-5 flex flex-col gap-3">
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
+                  <Shirt className="w-6 h-6 text-primary" />
+                </div>
+                <div>
+                  <h3 className="font-bold">Vestizione DPI</h3>
+                  <p className="text-xs text-muted-foreground">Indossa i DPI nell&apos;ordine corretto</p>
+                </div>
+              </div>
+              <p className="text-sm text-muted-foreground">
+                Allenati con tre scenari — cantiere, lavori in quota e officina — per imparare la sequenza giusta dei dispositivi di protezione.
+              </p>
+              <Button variant="default" size="sm" className="w-full rounded-xl mt-1">
+                <Play className="w-4 h-4 mr-2" /> Gioca ora
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+
       {/* Training Paths grouped by category */}
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-4xl mx-auto space-y-12">
