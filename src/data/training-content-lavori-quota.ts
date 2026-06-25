@@ -79,6 +79,14 @@ Dopo una caduta, il lavoratore appeso può sviluppare **sindrome da sospensione*
       minTimeSeconds: 60, xpReward: 25,
     },
     {
+      id: 'lq_vestizione',
+      title: '🦺 Vestizione DPI — Lavori in Quota',
+      type: 'dpi_dressing',
+      dpiScenario: 'quota',
+      content: 'Indossa correttamente imbracatura, cordino e gli altri DPI prima di salire in quota.',
+      minTimeSeconds: 30, xpReward: 30,
+    },
+    {
       id: 'lq_quiz_2',
       title: 'Verifica: Sistemi e Soccorso',
       type: 'quiz',

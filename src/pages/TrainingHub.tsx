@@ -34,7 +34,7 @@ const GENERAL_MODULES = ['giuridico_normativo', 'gestione_organizzazione', 'valu
 
 
 const SECTION_COUNTS: Record<string, number> = {
-  giuridico_normativo: 9, gestione_organizzazione: 6, valutazione_rischi: 4, dpi_protezione: 4,
+  giuridico_normativo: 9, gestione_organizzazione: 6, valutazione_rischi: 4, dpi_protezione: 5,
   rb_videoterminali: 6, rb_stress_lavoro: 5, rb_rischio_elettrico: 4, rb_microclima_ergonomia: 5,
   rm_rischi_meccanici: 4, rm_movimentazione: 4, rm_rischio_elettrico: 3, rm_agenti_fisici: 3,
   rm_sostanze_pericolose: 3, rm_cadute_alto: 3, rm_incendio: 3, rm_primo_soccorso: 3,
@@ -47,7 +47,7 @@ const SECTION_COUNTS: Record<string, number> = {
   preposto_ruolo_obblighi: 7, preposto_valutazione_dpi: 6, preposto_emergenze: 6,
   antincendio_prevenzione: 9, antincendio_protezione: 12, antincendio_esercitazioni: 8,
   primo_soccorso_allertare: 10, primo_soccorso_intervento: 12, primo_soccorso_conoscenze: 12,
-  privacy_gdpr: 5, rischio_rumore: 5, lavori_quota: 5, pei_pes_pav: 5, diisocianati: 5, segnaletica_stradale: 5,
+  privacy_gdpr: 5, rischio_rumore: 5, lavori_quota: 6, pei_pes_pav: 5, diisocianati: 5, segnaletica_stradale: 5,
 };
 
 // Training path definitions - all independent

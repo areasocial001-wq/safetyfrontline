@@ -19,6 +19,7 @@ import AITutorChat from '@/components/training/AITutorChat';
 import AdaptiveLearningCard from '@/components/training/AdaptiveLearningCard';
 import TrainingAchievementPopup from '@/components/training/TrainingAchievementPopup';
 import PointAndClickLevel from '@/components/training/PointAndClickLevel';
+import DPIDressingGame from '@/components/training/DPIDressingGame';
 import { getRiskHuntLevelForModule } from '@/data/risk-hunt-levels';
 import { shuffleQuestions, makeQuizSeed } from '@/lib/quiz-shuffle';
 
@@ -47,6 +48,7 @@ const SECTION_ICONS: Record<string, { emoji: string; label: string; gradient: st
   boss_test: { emoji: '🐉', label: 'Boss Fight', gradient: 'from-destructive/20 to-destructive/5' },
   interactive: { emoji: '🎮', label: 'Interattivo', gradient: 'from-game-combo/20 to-game-combo/5' },
   point_and_click: { emoji: '🔍', label: 'Caccia ai Rischi', gradient: 'from-game-xp/20 to-game-xp/5' },
+  dpi_dressing: { emoji: '🦺', label: 'Vestizione DPI', gradient: 'from-amber-500/20 to-amber-500/5' },
   quiz: { emoji: '🧠', label: 'Quiz', gradient: 'from-secondary/20 to-secondary/5' },
   scenario_3d: { emoji: '🌐', label: 'Scenario 3D', gradient: 'from-primary/20 to-primary/5' },
   lesson: { emoji: '📖', label: 'Lezione', gradient: 'from-accent/20 to-accent/5' },
@@ -452,6 +454,13 @@ const TrainingModule = () => {
         {currentSection.type === 'point_and_click' && moduleId && (
           <div className="mb-6">
             <PointAndClickLevel levelData={getRiskHuntLevelForModule(moduleId)} demoMode={isDemoMode} />
+          </div>
+        )}
+
+        {/* DPI Dressing Game */}
+        {currentSection.type === 'dpi_dressing' && (
+          <div className="mb-6">
+            <DPIDressingGame scenarioId={(currentSection as any).dpiScenario || 'cantiere'} />
           </div>
         )}
 

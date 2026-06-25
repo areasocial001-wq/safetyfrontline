@@ -14,12 +14,13 @@ export interface QuizQuestion {
 export interface TrainingSection {
   id: string;
   title: string;
-  type: 'lesson' | 'quiz' | 'interactive' | 'boss_test' | 'scenario_3d' | 'point_and_click';
+  type: 'lesson' | 'quiz' | 'interactive' | 'boss_test' | 'scenario_3d' | 'point_and_click' | 'dpi_dressing';
   content?: string;
   npcDialogue?: { speaker: string; role: string; text: string }[];
   questions?: QuizQuestion[];
   minTimeSeconds: number; // Anti-cheat: minimum time before proceeding
   xpReward: number;
+  dpiScenario?: 'cantiere' | 'quota' | 'officina';
 }
 
 export interface ModuleContent {
@@ -736,6 +737,15 @@ _Esempi: imbracature anticaduta, respiratori, tute NBC, DPI per lavori in tensio
 - Segnalare difetti o deterioramento`,
       minTimeSeconds: 60,
       xpReward: 30,
+    },
+    {
+      id: 'dpi_vestizione_cantiere',
+      title: '🦺 Vestizione DPI — Cantiere',
+      type: 'dpi_dressing',
+      dpiScenario: 'cantiere',
+      content: 'Indossa i DPI nell\'ordine corretto sul lavoratore. Parti dalla tuta e termina con il casco.',
+      minTimeSeconds: 30,
+      xpReward: 35,
     },
     {
       id: 'dpi_interattivo',
