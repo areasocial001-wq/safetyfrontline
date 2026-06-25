@@ -34,7 +34,7 @@ const GENERAL_MODULES = ['giuridico_normativo', 'gestione_organizzazione', 'valu
 
 
 const SECTION_COUNTS: Record<string, number> = {
-  giuridico_normativo: 9, gestione_organizzazione: 6, valutazione_rischi: 4, dpi_protezione: 4,
+  giuridico_normativo: 9, gestione_organizzazione: 6, valutazione_rischi: 4, dpi_protezione: 5,
   rb_videoterminali: 6, rb_stress_lavoro: 5, rb_rischio_elettrico: 4, rb_microclima_ergonomia: 5,
   rm_rischi_meccanici: 4, rm_movimentazione: 4, rm_rischio_elettrico: 3, rm_agenti_fisici: 3,
   rm_sostanze_pericolose: 3, rm_cadute_alto: 3, rm_incendio: 3, rm_primo_soccorso: 3,
