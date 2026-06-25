@@ -154,6 +154,10 @@ export const UserMenu = () => {
           <GraduationCap className="w-4 h-4 mr-2" />
           Formazione Generale
         </DropdownMenuItem>
+        <DropdownMenuItem onClick={() => navigate('/vestizione-dpi')}>
+          <Shirt className="w-4 h-4 mr-2" />
+          Vestizione DPI
+        </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem onSelect={handleRefreshPermissions} disabled={refreshing}>
           <RefreshCw className={`w-4 h-4 mr-2 ${refreshing ? 'animate-spin' : ''}`} />
