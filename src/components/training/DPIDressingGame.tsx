@@ -820,6 +820,7 @@ function DpiCard({
   onPick,
   season,
   hivis,
+  isNext = false,
 }: {
   k: DPIKey;
   worn: boolean;
@@ -827,6 +828,7 @@ function DpiCard({
   onPick: () => void;
   season: DPISeason;
   hivis: HiVisColor;
+  isNext?: boolean;
 }) {
   const item = ALL_ITEMS[k];
   return (
@@ -836,20 +838,23 @@ function DpiCard({
           type="button"
           onClick={onPick}
           disabled={worn}
-          aria-label={`${item.label}: ${item.description}`}
-          className={`group flex flex-col items-center gap-1 p-2 rounded-xl border-2 transition-all min-h-[96px] ${
+          aria-label={`${item.label}: ${item.description}${isNext ? '. Prossimo DPI da indossare.' : ''}${worn ? '. Già indossato.' : ''}`}
+          aria-current={isNext ? 'step' : undefined}
+          className={`group flex flex-col items-center gap-1 p-2 rounded-xl border-2 transition-all min-h-[96px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6B1622] focus-visible:ring-offset-2 ${
             worn
-              ? 'bg-emerald-50 border-emerald-300 cursor-default'
-              : 'bg-white border-slate-200 hover:border-[#6B1622] hover:shadow-md active:scale-95'
+              ? 'bg-emerald-50 border-emerald-400 cursor-default'
+              : isNext
+                ? 'bg-amber-50 border-amber-400 shadow-md ring-2 ring-amber-200 hover:shadow-lg active:scale-95'
+                : 'bg-white border-slate-300 hover:border-[#6B1622] hover:shadow-md active:scale-95'
           } ${shake ? 'animate-[dpi-shake_0.4s_ease-in-out]' : ''}`}
         >
           <div className="w-12 h-12 sm:w-14 sm:h-14 flex items-center justify-center">
             <DpiIcon k={k} size={56} dimmed={worn} season={season} hivis={hivis} />
           </div>
-          <span className="text-[11px] sm:text-xs font-medium text-center leading-tight text-foreground/80 line-clamp-2">
+          <span className="text-[11px] sm:text-xs font-medium text-center leading-tight text-foreground line-clamp-2">
             {item.label}
           </span>
-          {worn && <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />}
+          {worn && <CheckCircle2 className="w-3.5 h-3.5 text-emerald-700" aria-hidden="true" />}
           <style>{`
             @keyframes dpi-shake {
               0%,100% { transform: translateX(0); }
