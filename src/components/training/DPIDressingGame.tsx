@@ -621,22 +621,51 @@ export default function DPIDressingGame({ scenarioId = 'cantiere', onComplete }:
                   key={c}
                   type="button"
                   onClick={() => setHivis(c)}
-                  className={`w-7 h-7 border-l first:border-l-0 ${hivis === c ? 'ring-2 ring-offset-1 ring-[#0F1722]' : ''}`}
+                  className={`w-8 h-8 min-w-[32px] min-h-[32px] border-l first:border-l-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:ring-[#0F1722] ${hivis === c ? 'ring-2 ring-offset-1 ring-[#0F1722]' : ''}`}
                   style={{ background: col.base }}
-                  aria-label={`Hi-vis ${c}`}
+                  aria-label={`Variante hi-vis ${c}${hivis === c ? ' (selezionata)' : ''}`}
                   aria-pressed={hivis === c}
+                  title={`Hi-vis ${c}`}
                 />
               );
             })}
           </div>
+
+          <Button
+            type="button"
+            variant={guided ? 'default' : 'outline'}
+            size="sm"
+            className="h-8 px-2 text-xs"
+            onClick={() => { setGuided(g => !g); setAutoplayPaused(false); }}
+            aria-pressed={guided}
+            aria-label={guided ? 'Disattiva modalità guidata' : 'Attiva modalità guidata con autoplay'}
+          >
+            <PlayCircle className="w-3.5 h-3.5 mr-1" aria-hidden="true" />
+            {guided ? 'Guida attiva' : 'Modalità guidata'}
+          </Button>
+          {guided && (
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              className="h-8 px-2 text-xs"
+              onClick={() => setAutoplayPaused(p => !p)}
+              aria-label={autoplayPaused ? 'Riprendi autoplay' : 'Metti in pausa autoplay'}
+            >
+              {autoplayPaused ? <PlayCircle className="w-3.5 h-3.5" aria-hidden="true" /> : <PauseCircle className="w-3.5 h-3.5" aria-hidden="true" />}
+            </Button>
+          )}
+
           <Button
             type="button"
             variant="ghost"
             size="sm"
-            className="ml-auto h-7 px-2 text-xs"
+            className="ml-auto h-8 px-2 text-xs"
             onClick={() => setLegendOpen(o => !o)}
+            aria-expanded={legendOpen}
+            aria-controls="dpi-legend"
           >
-            <Info className="w-3.5 h-3.5 mr-1" />
+            <Info className="w-3.5 h-3.5 mr-1" aria-hidden="true" />
             {legendOpen ? 'Nascondi legenda' : 'Legenda DPI'}
           </Button>
         </div>
