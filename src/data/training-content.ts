@@ -739,6 +739,15 @@ _Esempi: imbracature anticaduta, respiratori, tute NBC, DPI per lavori in tensio
       xpReward: 30,
     },
     {
+      id: 'dpi_vestizione_cantiere',
+      title: '🦺 Vestizione DPI — Cantiere',
+      type: 'dpi_dressing',
+      dpiScenario: 'cantiere',
+      content: 'Indossa i DPI nell\'ordine corretto sul lavoratore. Parti dalla tuta e termina con il casco.',
+      minTimeSeconds: 30,
+      xpReward: 35,
+    },
+    {
       id: 'dpi_interattivo',
       title: '🎮 Scegli il DPI Giusto!',
       type: 'interactive',
