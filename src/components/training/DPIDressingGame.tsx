@@ -288,7 +288,21 @@ const LAYER_ORDER: DPIKey[] = [
   'guanti', 'maschera', 'occhiali', 'cuffie', 'casco',
 ];
 
-function Avatar({ worn, season, hivis }: { worn: Set<DPIKey>; season: DPISeason; hivis: HiVisColor }) {
+// Anatomia: posizione approssimativa per evidenziare l'area del DPI atteso
+const ANATOMY: Record<DPIKey, { cx: number; cy: number; r: number; label: string }> = {
+  casco:       { cx: 384, cy: 80,  r: 130, label: 'testa' },
+  cuffie:      { cx: 384, cy: 130, r: 150, label: 'orecchie' },
+  occhiali:    { cx: 384, cy: 160, r: 115, label: 'occhi' },
+  maschera:    { cx: 384, cy: 210, r: 105, label: 'volto / vie respiratorie' },
+  gilet:       { cx: 384, cy: 420, r: 175, label: 'torso (alta visibilità)' },
+  imbracatura: { cx: 384, cy: 400, r: 190, label: 'busto e bacino' },
+  cordino:     { cx: 540, cy: 330, r: 110, label: 'aggancio dorsale / linea vita' },
+  guanti:      { cx: 384, cy: 555, r: 250, label: 'mani' },
+  tuta:        { cx: 384, cy: 620, r: 220, label: 'corpo (capo base)' },
+  scarpe:      { cx: 384, cy: 950, r: 170, label: 'piedi' },
+};
+
+function Avatar({ worn, season, hivis, highlight }: { worn: Set<DPIKey>; season: DPISeason; hivis: HiVisColor; highlight?: { key: DPIKey; kind: 'ok' | 'ko' } | null }) {
   const T = DPI_TOKENS;
   const hv = hivisColor(hivis);
   const tutaFill = season === 'invernale' ? T.fabricWinter : T.navy;
