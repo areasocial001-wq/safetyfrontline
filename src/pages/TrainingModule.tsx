@@ -19,6 +19,7 @@ import AITutorChat from '@/components/training/AITutorChat';
 import AdaptiveLearningCard from '@/components/training/AdaptiveLearningCard';
 import TrainingAchievementPopup from '@/components/training/TrainingAchievementPopup';
 import PointAndClickLevel from '@/components/training/PointAndClickLevel';
+import DPIDressingGame from '@/components/training/DPIDressingGame';
 import { getRiskHuntLevelForModule } from '@/data/risk-hunt-levels';
 import { shuffleQuestions, makeQuizSeed } from '@/lib/quiz-shuffle';
 
