@@ -167,12 +167,20 @@ export function DpiIcon({ k, size = 56, dimmed = false, season = 'estivo', hivis
       return (
         <svg {...common} aria-hidden="true">
           <Cartoon>
-            <path d="M8 44 Q32 6 56 44 Z" fill={T.yellow} />
-            <path d="M10 44 Q32 18 54 44" fill={T.yellowDark} opacity=".35" stroke="none" />
-            <rect x="6" y="44" width="52" height="7" rx="2" fill={T.navy} />
-            <rect x="28" y="14" width="8" height="30" fill={T.yellowDark} opacity=".55" stroke="none" />
+            {/* calotta */}
+            <path d="M8 42 Q12 10 32 8 Q52 10 56 42 Z" fill={T.yellow} />
+            {/* shading */}
+            <path d="M10 42 Q14 14 32 12 Q34 12 36 12 L36 42 Z" fill={T.yellowDark} opacity=".35" stroke="none" />
+            {/* highlight */}
+            <path d="M16 22 Q22 14 30 13" stroke="#FFF6D6" strokeWidth="2.5" opacity=".9" fill="none" />
+            {/* cresta */}
+            <path d="M32 8 L32 42" stroke={T.yellowDark} strokeWidth="2" opacity=".55" />
+            {/* visiera */}
+            <path d="M4 42 Q32 50 60 42 L58 48 Q32 54 6 48 Z" fill={T.yellowDark} />
+            {/* sottogola */}
+            <rect x="6" y="46" width="52" height="5" rx="2" fill={T.navy} />
             {season === 'invernale' && (
-              <path d="M6 51 L58 51 L56 58 L8 58 Z" fill={T.fabricWinter} />
+              <path d="M6 51 L58 51 L55 60 L11 60 Z" fill={T.fabricWinter} />
             )}
           </Cartoon>
         </svg>
@@ -181,10 +189,16 @@ export function DpiIcon({ k, size = 56, dimmed = false, season = 'estivo', hivis
       return (
         <svg {...common} aria-hidden="true">
           <Cartoon>
-            <path d="M4 30 Q32 16 60 30 L60 40 Q32 50 4 40 Z" fill={T.yellow} />
-            <rect x="10" y="28" width="18" height="13" rx="3" fill="#F4FAFF" />
-            <rect x="36" y="28" width="18" height="13" rx="3" fill="#F4FAFF" />
-            <path d="M14 32 L20 32 M40 32 L46 32" stroke="#fff" strokeWidth="2" opacity=".9" />
+            {/* ponte */}
+            <path d="M28 32 Q32 28 36 32" />
+            {/* lenti */}
+            <path d="M6 28 Q6 22 12 22 L26 22 Q30 22 30 28 L30 36 Q30 40 26 40 L12 40 Q6 40 6 36 Z" fill="#9FE3FF" />
+            <path d="M34 28 Q34 22 38 22 L52 22 Q58 22 58 28 L58 36 Q58 40 52 40 L38 40 Q34 40 34 36 Z" fill="#9FE3FF" />
+            {/* riflessi */}
+            <path d="M10 26 Q14 24 18 26" stroke="#fff" strokeWidth="2" opacity=".95" />
+            <path d="M38 26 Q42 24 46 26" stroke="#fff" strokeWidth="2" opacity=".95" />
+            {/* stanghette */}
+            <path d="M6 30 L2 32 M58 30 L62 32" />
           </Cartoon>
         </svg>
       );
@@ -192,11 +206,16 @@ export function DpiIcon({ k, size = 56, dimmed = false, season = 'estivo', hivis
       return (
         <svg {...common} aria-hidden="true">
           <Cartoon>
-            <path d="M10 40 Q32 4 54 40" />
-            <rect x="3" y="34" width="15" height="22" rx="4" fill={T.navy} />
-            <rect x="46" y="34" width="15" height="22" rx="4" fill={T.navy} />
-            <rect x="1" y="40" width="6" height="10" rx="1" fill={T.yellow} />
-            <rect x="57" y="40" width="6" height="10" rx="1" fill={T.yellow} />
+            {/* archetto */}
+            <path d="M12 38 Q32 4 52 38" strokeWidth="3" />
+            {/* coppe */}
+            <path d="M6 34 Q4 34 4 38 L4 54 Q4 58 8 58 L16 58 Q20 58 20 54 L20 38 Q20 34 16 34 Z" fill={T.navy} />
+            <path d="M48 34 Q44 34 44 38 L44 54 Q44 58 48 58 L56 58 Q60 58 60 54 L60 38 Q60 34 56 34 Z" fill={T.navy} />
+            {/* pad gialli */}
+            <rect x="6" y="40" width="12" height="14" rx="3" fill={T.yellow} />
+            <rect x="46" y="40" width="12" height="14" rx="3" fill={T.yellow} />
+            {/* highlight */}
+            <path d="M14 40 Q16 36 18 36" stroke="#FFF6D6" strokeWidth="1.5" opacity=".9" />
           </Cartoon>
         </svg>
       );
@@ -204,10 +223,17 @@ export function DpiIcon({ k, size = 56, dimmed = false, season = 'estivo', hivis
       return (
         <svg {...common} aria-hidden="true">
           <Cartoon>
-            <path d="M10 22 Q32 12 54 22 L52 46 Q32 56 12 46 Z" fill={T.navy} />
+            {/* corpo */}
+            <path d="M14 22 Q32 14 50 22 L52 42 Q48 50 32 52 Q16 50 12 42 Z" fill={T.navy} />
+            {/* filtri */}
             <circle cx="22" cy="36" r="7" fill={T.yellow} />
             <circle cx="42" cy="36" r="7" fill={T.yellow} />
-            <path d="M10 22 Q4 18 4 28 M54 22 Q60 18 60 28" />
+            <circle cx="22" cy="36" r="3" fill={T.yellowDark} stroke="none" />
+            <circle cx="42" cy="36" r="3" fill={T.yellowDark} stroke="none" />
+            {/* cinturini */}
+            <path d="M14 24 Q4 20 4 30 M50 24 Q60 20 60 30" />
+            {/* valvola centrale */}
+            <ellipse cx="32" cy="44" rx="5" ry="3" fill={T.navyDark} />
           </Cartoon>
         </svg>
       );
@@ -215,8 +241,13 @@ export function DpiIcon({ k, size = 56, dimmed = false, season = 'estivo', hivis
       return (
         <svg {...common} aria-hidden="true">
           <Cartoon>
-            <path d="M14 56 L14 24 Q14 16 22 16 L22 30 L28 30 L28 12 Q28 4 36 4 Q44 4 44 12 L44 30 L50 30 L50 22 Q50 18 54 18 L54 56 Z" fill={season === 'invernale' ? T.fabricWinter : T.yellow} />
-            <path d="M14 40 L54 40" />
+            {/* mano sinistra cartoon (palmo + 4 dita arrotondate + pollice) */}
+            <path d="M14 56 L14 28 Q14 22 18 22 Q22 22 22 28 L22 32 Q23 18 28 18 Q33 18 33 30 Q34 14 38 14 Q43 14 43 28 Q44 22 48 22 Q52 22 52 28 L52 34 Q52 24 56 24 Q60 24 60 32 L60 56 Z"
+              fill={season === 'invernale' ? T.fabricWinter : T.yellow} />
+            {/* polsino */}
+            <rect x="14" y="48" width="46" height="8" fill={season === 'invernale' ? T.navy : T.yellowDark} />
+            {/* cuciture */}
+            <path d="M22 32 L22 48 M33 30 L33 48 M43 30 L43 48 M52 34 L52 48" stroke={T.yellowDark} strokeWidth="1.2" opacity=".7" />
           </Cartoon>
         </svg>
       );
@@ -224,11 +255,17 @@ export function DpiIcon({ k, size = 56, dimmed = false, season = 'estivo', hivis
       return (
         <svg {...common} aria-hidden="true">
           <Cartoon>
-            <path d="M10 14 L26 14 L32 22 L38 14 L54 14 L54 56 L10 56 Z" fill={hv.base} />
-            <rect x="14" y="30" width="36" height="6" fill={T.reflect} />
-            <rect x="14" y="44" width="36" height="6" fill={T.reflect} />
+            {/* corpo */}
+            <path d="M10 14 L24 12 L32 22 L40 12 L54 14 L54 56 Q54 58 52 58 L12 58 Q10 58 10 56 Z" fill={hv.base} />
+            {/* zip */}
+            <path d="M32 22 L32 58" stroke={T.dark} strokeWidth="1.5" />
+            {/* bande rifrangenti */}
+            <rect x="11" y="28" width="42" height="5" fill={T.reflect} />
+            <rect x="11" y="34" width="42" height="2" fill={T.dark} opacity=".4" />
+            <rect x="11" y="44" width="42" height="5" fill={T.reflect} />
+            <rect x="11" y="50" width="42" height="2" fill={T.dark} opacity=".4" />
             {season === 'invernale' && (
-              <path d="M10 14 L54 14 L54 22 L10 22 Z" fill={hv.dark} opacity="0.5" stroke="none" />
+              <path d="M10 14 L24 12 L32 22 L40 12 L54 14 L54 22 L10 22 Z" fill={hv.dark} opacity=".55" stroke="none" />
             )}
           </Cartoon>
         </svg>
@@ -237,10 +274,16 @@ export function DpiIcon({ k, size = 56, dimmed = false, season = 'estivo', hivis
       return (
         <svg {...common} aria-hidden="true">
           <Cartoon>
-            <path d="M18 8 L46 8 L50 30 L46 56 L36 56 L34 36 L30 36 L28 56 L18 56 L14 30 Z" fill={fabric} />
-            <rect x="28" y="18" width="8" height="10" fill={fabricAccent} />
+            {/* corpo + braccia + gambe */}
+            <path d="M22 10 L42 10 L50 16 L52 28 L48 32 L46 22 L46 56 L36 56 L34 36 L30 36 L28 56 L18 56 L18 22 L16 32 L12 28 L14 16 Z" fill={fabric} />
+            {/* zip */}
+            <path d="M32 14 L32 36" stroke={T.dark} strokeWidth="1.5" />
+            {/* tasca pettorale */}
+            <rect x="34" y="18" width="10" height="8" rx="1.5" fill={fabricAccent} />
+            {/* cintura */}
+            <rect x="18" y="34" width="28" height="3" fill={T.dark} opacity=".5" stroke="none" />
             {season === 'estivo' && (
-              <path d="M18 8 L20 22 M46 8 L44 22" stroke={T.fabricSummer} strokeWidth="3" opacity="0.8" />
+              <path d="M19 22 L17 18 M45 22 L47 18" stroke={T.fabricSummer} strokeWidth="2" opacity=".9" />
             )}
           </Cartoon>
         </svg>
@@ -249,8 +292,16 @@ export function DpiIcon({ k, size = 56, dimmed = false, season = 'estivo', hivis
       return (
         <svg {...common} aria-hidden="true">
           <Cartoon>
-            <path d="M6 42 L26 42 L36 30 L48 30 Q58 30 58 40 L58 50 L6 50 Z" fill={season === 'invernale' ? T.fabricWinter : T.yellow} />
-            <rect x="6" y="48" width="52" height="6" fill={T.navyDark} />
+            {/* tomaia */}
+            <path d="M6 44 L6 32 Q6 28 12 28 L24 28 L30 24 L42 24 Q56 24 58 38 L58 44 Z" fill={season === 'invernale' ? T.fabricWinter : T.yellow} />
+            {/* punta rinforzata acciaio */}
+            <path d="M40 24 Q56 24 58 38 L58 44 L40 44 Z" fill="#C9D2DA" stroke={T.dark} strokeWidth="1.5" />
+            {/* lacci */}
+            <path d="M14 32 L24 32 M14 36 L24 36 M14 40 L24 40" stroke={T.dark} strokeWidth="1.2" />
+            {/* suola */}
+            <path d="M4 44 L60 44 L58 52 Q56 54 52 54 L10 54 Q6 54 4 50 Z" fill={T.navyDark} />
+            {/* tasselli */}
+            <path d="M10 50 L14 50 M20 50 L24 50 M30 50 L34 50 M40 50 L44 50 M50 50 L54 50" stroke="#fff" strokeWidth="1.2" opacity=".7" />
           </Cartoon>
         </svg>
       );
@@ -258,9 +309,16 @@ export function DpiIcon({ k, size = 56, dimmed = false, season = 'estivo', hivis
       return (
         <svg {...common} aria-hidden="true">
           <Cartoon>
-            <path d="M22 8 L42 8 L36 24 L42 56 L22 56 L28 24 Z" fill={T.yellow} />
-            <rect x="14" y="30" width="36" height="7" fill={T.yellow} />
-            <circle cx="32" cy="33" r="4" fill={T.navy} />
+            {/* spalline a X */}
+            <path d="M20 8 L44 36 M44 8 L20 36" stroke={T.dark} strokeWidth="6" />
+            <path d="M20 8 L44 36 M44 8 L20 36" stroke={T.yellow} strokeWidth="4" />
+            {/* cintura */}
+            <rect x="10" y="34" width="44" height="8" rx="2" fill={T.yellow} stroke={T.dark} />
+            {/* fibbia D-ring */}
+            <circle cx="32" cy="38" r="5" fill={T.navy} />
+            <circle cx="32" cy="38" r="2" fill={T.yellow} stroke="none" />
+            {/* cosciali */}
+            <path d="M16 42 Q14 50 22 56 M48 42 Q50 50 42 56" />
           </Cartoon>
         </svg>
       );
@@ -268,10 +326,15 @@ export function DpiIcon({ k, size = 56, dimmed = false, season = 'estivo', hivis
       return (
         <svg {...common} aria-hidden="true">
           <Cartoon>
-            <path d="M10 12 Q32 36 54 12" stroke={T.dark} />
-            <path d="M10 12 Q32 36 54 12" stroke={T.yellow} strokeWidth="3" fill="none" />
-            <rect x="48" y="5" width="11" height="15" rx="3" fill={T.navy} />
-            <rect x="24" y="38" width="16" height="18" rx="3" fill={T.yellow} />
+            {/* fune con anima nera + sopra colore */}
+            <path d="M10 12 Q32 40 54 12" stroke={T.dark} strokeWidth="5" />
+            <path d="M10 12 Q32 40 54 12" stroke={T.yellow} strokeWidth="3" />
+            {/* moschettone */}
+            <path d="M48 4 Q60 4 60 14 L60 22 Q60 26 56 26 L52 26 Q48 26 48 22 Z" fill={T.navy} />
+            <circle cx="54" cy="14" r="2.5" fill={T.yellow} stroke="none" />
+            {/* assorbitore (sacchetto) */}
+            <rect x="24" y="36" width="16" height="20" rx="3" fill={T.yellow} />
+            <path d="M24 42 L40 42" stroke={T.yellowDark} strokeWidth="1.5" />
           </Cartoon>
         </svg>
       );
