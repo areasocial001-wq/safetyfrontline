@@ -70,101 +70,145 @@ export const DPI_SCENARIOS: Record<string, DPIScenarioDef> = {
   },
 };
 
-// ---------- Pittogrammi SVG (stile cartoon coerente coi giochi 2D) ----------
-const C_YELLOW = '#F2A33A';
-const C_NAVY = '#26365A';
-const C_SKIN = '#C9A07A';
-const C_DARK = '#1a2440';
+// ---------- Design tokens cartoon coerenti (linea grossa + ombre piatte) ----------
+const C_YELLOW = '#F2B233';      // giallo principale DPI
+const C_YELLOW_DARK = '#C8861E'; // ombra gialla
+const C_NAVY = '#2B3A5C';        // navy principale
+const C_NAVY_DARK = '#1A2440';   // ombra navy
+const C_HIVIS = '#F26A1F';       // arancio alta visibilità
+const C_HIVIS_DARK = '#B84A0F';
+const C_REFLECT = '#E8EEF2';     // bande rifrangenti
+const C_DARK = '#0F1722';        // contorno cartoon
+const STROKE = 2.5;              // contorno icone card
+const STROKE_BIG = 5;            // contorno sovrapposizioni sull'avatar
+
+// Wrapper che applica lo stile cartoon uniforme (stroke scuro + linejoin round)
+function Cartoon({ children, big = false }: { children: React.ReactNode; big?: boolean }) {
+  return (
+    <g
+      stroke={C_DARK}
+      strokeWidth={big ? STROKE_BIG : STROKE}
+      strokeLinejoin="round"
+      strokeLinecap="round"
+      fill="none"
+    >
+      {children}
+    </g>
+  );
+}
 
 function DpiIcon({ k, size = 56, dimmed = false }: { k: DPIKey; size?: number; dimmed?: boolean }) {
-  const op = dimmed ? 0.25 : 1;
+  const op = dimmed ? 0.3 : 1;
   const common = { width: size, height: size, viewBox: '0 0 64 64', style: { opacity: op } } as const;
   switch (k) {
     case 'casco':
       return (
         <svg {...common}>
-          <path d="M8 44 Q32 8 56 44 Z" fill={C_YELLOW} stroke={C_NAVY} strokeWidth="2.5" />
-          <rect x="6" y="44" width="52" height="6" rx="2" fill={C_NAVY} />
-          <rect x="28" y="14" width="8" height="30" fill={C_NAVY} opacity=".25" />
+          <Cartoon>
+            <path d="M8 44 Q32 6 56 44 Z" fill={C_YELLOW} />
+            <path d="M10 44 Q32 18 54 44" fill={C_YELLOW_DARK} opacity=".35" stroke="none" />
+            <rect x="6" y="44" width="52" height="7" rx="2" fill={C_NAVY} />
+            <rect x="28" y="14" width="8" height="30" fill={C_YELLOW_DARK} opacity=".55" stroke="none" />
+          </Cartoon>
         </svg>
       );
     case 'occhiali':
       return (
         <svg {...common}>
-          <path d="M4 30 Q32 16 60 30 L60 40 Q32 50 4 40 Z" fill={C_YELLOW} stroke={C_NAVY} strokeWidth="2.5" />
-          <rect x="10" y="28" width="18" height="12" rx="3" fill="#fff" stroke={C_NAVY} strokeWidth="2" />
-          <rect x="36" y="28" width="18" height="12" rx="3" fill="#fff" stroke={C_NAVY} strokeWidth="2" />
+          <Cartoon>
+            <path d="M4 30 Q32 16 60 30 L60 40 Q32 50 4 40 Z" fill={C_YELLOW} />
+            <rect x="10" y="28" width="18" height="13" rx="3" fill="#F4FAFF" />
+            <rect x="36" y="28" width="18" height="13" rx="3" fill="#F4FAFF" />
+            <path d="M14 32 L20 32 M40 32 L46 32" stroke="#fff" strokeWidth="2" opacity=".9" />
+          </Cartoon>
         </svg>
       );
     case 'cuffie':
       return (
         <svg {...common}>
-          <path d="M10 38 Q32 6 54 38" stroke={C_NAVY} strokeWidth="4" fill="none" />
-          <rect x="4" y="34" width="14" height="20" rx="4" fill={C_NAVY} />
-          <rect x="46" y="34" width="14" height="20" rx="4" fill={C_NAVY} />
-          <rect x="2" y="40" width="6" height="8" fill={C_YELLOW} />
-          <rect x="56" y="40" width="6" height="8" fill={C_YELLOW} />
+          <Cartoon>
+            <path d="M10 40 Q32 4 54 40" />
+            <rect x="3" y="34" width="15" height="22" rx="4" fill={C_NAVY} />
+            <rect x="46" y="34" width="15" height="22" rx="4" fill={C_NAVY} />
+            <rect x="1" y="40" width="6" height="10" rx="1" fill={C_YELLOW} />
+            <rect x="57" y="40" width="6" height="10" rx="1" fill={C_YELLOW} />
+          </Cartoon>
         </svg>
       );
     case 'maschera':
       return (
         <svg {...common}>
-          <path d="M10 22 Q32 12 54 22 L52 46 Q32 56 12 46 Z" fill={C_NAVY} />
-          <circle cx="22" cy="36" r="7" fill={C_YELLOW} stroke={C_DARK} strokeWidth="2" />
-          <circle cx="42" cy="36" r="7" fill={C_YELLOW} stroke={C_DARK} strokeWidth="2" />
+          <Cartoon>
+            <path d="M10 22 Q32 12 54 22 L52 46 Q32 56 12 46 Z" fill={C_NAVY} />
+            <circle cx="22" cy="36" r="7" fill={C_YELLOW} />
+            <circle cx="42" cy="36" r="7" fill={C_YELLOW} />
+            <path d="M10 22 Q4 18 4 28 M54 22 Q60 18 60 28" />
+          </Cartoon>
         </svg>
       );
     case 'guanti':
       return (
         <svg {...common}>
-          <path d="M14 56 L14 24 Q14 16 22 16 L22 30 L28 30 L28 12 Q28 4 36 4 Q44 4 44 12 L44 30 L50 30 L50 22 Q50 18 54 18 L54 56 Z" fill={C_YELLOW} stroke={C_NAVY} strokeWidth="2.5" />
-          <path d="M14 40 L54 40" stroke={C_NAVY} strokeWidth="2" />
+          <Cartoon>
+            <path d="M14 56 L14 24 Q14 16 22 16 L22 30 L28 30 L28 12 Q28 4 36 4 Q44 4 44 12 L44 30 L50 30 L50 22 Q50 18 54 18 L54 56 Z" fill={C_YELLOW} />
+            <path d="M14 40 L54 40" />
+          </Cartoon>
         </svg>
       );
     case 'gilet':
       return (
         <svg {...common}>
-          <path d="M10 14 L26 14 L32 22 L38 14 L54 14 L54 56 L10 56 Z" fill={C_NAVY} stroke={C_DARK} strokeWidth="2" />
-          <rect x="14" y="30" width="36" height="6" fill={C_YELLOW} />
-          <rect x="14" y="44" width="36" height="6" fill={C_YELLOW} />
+          <Cartoon>
+            <path d="M10 14 L26 14 L32 22 L38 14 L54 14 L54 56 L10 56 Z" fill={C_HIVIS} />
+            <rect x="14" y="30" width="36" height="6" fill={C_REFLECT} />
+            <rect x="14" y="44" width="36" height="6" fill={C_REFLECT} />
+          </Cartoon>
         </svg>
       );
     case 'tuta':
       return (
         <svg {...common}>
-          <path d="M18 8 L46 8 L50 30 L46 56 L36 56 L34 36 L30 36 L28 56 L18 56 L14 30 Z" fill={C_NAVY} stroke={C_DARK} strokeWidth="2" />
-          <rect x="28" y="18" width="8" height="10" fill={C_YELLOW} opacity=".7" />
+          <Cartoon>
+            <path d="M18 8 L46 8 L50 30 L46 56 L36 56 L34 36 L30 36 L28 56 L18 56 L14 30 Z" fill={C_NAVY} />
+            <rect x="28" y="18" width="8" height="10" fill={C_YELLOW} />
+          </Cartoon>
         </svg>
       );
     case 'scarpe':
       return (
         <svg {...common}>
-          <path d="M6 42 L26 42 L36 30 L48 30 Q58 30 58 40 L58 50 L6 50 Z" fill={C_YELLOW} stroke={C_NAVY} strokeWidth="2.5" />
-          <rect x="6" y="48" width="52" height="6" fill={C_DARK} />
+          <Cartoon>
+            <path d="M6 42 L26 42 L36 30 L48 30 Q58 30 58 40 L58 50 L6 50 Z" fill={C_YELLOW} />
+            <rect x="6" y="48" width="52" height="6" fill={C_NAVY_DARK} />
+          </Cartoon>
         </svg>
       );
     case 'imbracatura':
       return (
         <svg {...common}>
-          <path d="M22 8 L42 8 L36 24 L42 56 L22 56 L28 24 Z" fill="none" stroke={C_YELLOW} strokeWidth="4" />
-          <circle cx="32" cy="32" r="5" fill={C_NAVY} />
-          <rect x="14" y="30" width="36" height="6" fill="none" stroke={C_YELLOW} strokeWidth="3" />
+          <Cartoon>
+            <path d="M22 8 L42 8 L36 24 L42 56 L22 56 L28 24 Z" fill={C_YELLOW} />
+            <rect x="14" y="30" width="36" height="7" fill={C_YELLOW} />
+            <circle cx="32" cy="33" r="4" fill={C_NAVY} />
+          </Cartoon>
         </svg>
       );
     case 'cordino':
       return (
         <svg {...common}>
-          <path d="M10 12 Q32 36 54 12" stroke={C_YELLOW} strokeWidth="4" fill="none" />
-          <rect x="48" y="6" width="10" height="14" rx="3" fill={C_NAVY} />
-          <rect x="24" y="38" width="16" height="18" rx="4" fill={C_YELLOW} stroke={C_NAVY} strokeWidth="2" />
+          <Cartoon>
+            <path d="M10 12 Q32 36 54 12" stroke={C_DARK} />
+            <path d="M10 12 Q32 36 54 12" stroke={C_YELLOW} strokeWidth="3" fill="none" />
+            <rect x="48" y="5" width="11" height="15" rx="3" fill={C_NAVY} />
+            <rect x="24" y="38" width="16" height="18" rx="3" fill={C_YELLOW} />
+          </Cartoon>
         </svg>
       );
   }
 }
 
-// Avatar cartoon "umano": immagine PNG di base + DPI sovrapposti in SVG
+// Avatar cartoon "umano": immagine PNG di base + DPI sovrapposti in SVG (stile uniforme)
 function Avatar({ worn }: { worn: Set<DPIKey> }) {
-  // viewBox 768x1024 — coordinate calibrate sull'immagine dpi-avatar-human.png
   return (
     <div className="relative w-full max-w-[340px] aspect-[3/4] mx-auto">
       <img
@@ -180,106 +224,110 @@ function Avatar({ worn }: { worn: Set<DPIKey> }) {
         viewBox="0 0 768 1024"
         className="absolute inset-0 w-full h-full pointer-events-none"
       >
-        {/* Tuta da lavoro: copre busto + gambe con tono navy */}
+        {/* Ombra morbida sotto i piedi per ancorare l'avatar */}
+        <ellipse cx="384" cy="990" rx="180" ry="14" fill={C_DARK} opacity="0.18" />
+
+        {/* Tuta da lavoro */}
         {worn.has('tuta') && (
-          <>
+          <Cartoon big>
             <path
               d="M250 250 L300 240 L384 260 L468 240 L518 250 L520 600 L495 980 L420 980 L400 700 L368 700 L348 980 L273 980 L248 600 Z"
               fill={C_NAVY}
-              stroke={C_DARK}
-              strokeWidth="3"
-              opacity="0.92"
             />
-            <rect x="358" y="320" width="52" height="80" fill={C_YELLOW} opacity="0.55" rx="4" />
-          </>
+            {/* fascia centrale chiara per dare volume cartoon */}
+            <path d="M384 260 L384 980" stroke={C_NAVY_DARK} strokeWidth="6" opacity="0.6" />
+            <rect x="356" y="320" width="56" height="80" rx="6" fill={C_YELLOW} />
+          </Cartoon>
         )}
 
         {/* Scarpe antinfortunistiche */}
         {worn.has('scarpe') && (
-          <>
-            <path d="M250 935 L355 935 L375 920 L410 920 Q445 920 445 955 L445 985 L245 985 Z"
-              fill={C_YELLOW} stroke={C_NAVY} strokeWidth="3" />
-            <path d="M325 935 L430 935 L450 920 L490 920 Q525 920 525 955 L525 985 L320 985 Z"
-              fill={C_YELLOW} stroke={C_NAVY} strokeWidth="3" />
-            <rect x="245" y="975" width="285" height="12" fill={C_DARK} rx="2" />
-          </>
+          <Cartoon big>
+            <path d="M250 935 L355 935 L375 920 L410 920 Q445 920 445 955 L445 985 L245 985 Z" fill={C_YELLOW} />
+            <path d="M325 935 L430 935 L450 920 L490 920 Q525 920 525 955 L525 985 L320 985 Z" fill={C_YELLOW} />
+            <rect x="245" y="975" width="285" height="14" rx="3" fill={C_NAVY_DARK} />
+          </Cartoon>
         )}
 
         {/* Gilet alta visibilità */}
         {worn.has('gilet') && (
-          <>
-            <path d="M260 270 L350 260 L384 290 L418 260 L508 270 L500 580 L268 580 Z"
-              fill="#F2A33A" stroke={C_DARK} strokeWidth="3" opacity="0.95" />
-            <rect x="275" y="380" width="220" height="22" fill="#C9D6DF" />
-            <rect x="275" y="470" width="220" height="22" fill="#C9D6DF" />
-          </>
+          <Cartoon big>
+            <path d="M260 270 L350 260 L384 290 L418 260 L508 270 L500 580 L268 580 Z" fill={C_HIVIS} />
+            <rect x="275" y="380" width="220" height="24" fill={C_REFLECT} />
+            <rect x="275" y="470" width="220" height="24" fill={C_REFLECT} />
+            <path d="M384 290 L384 580" stroke={C_HIVIS_DARK} strokeWidth="4" opacity="0.6" />
+          </Cartoon>
         )}
 
         {/* Imbracatura anticaduta */}
         {worn.has('imbracatura') && (
-          <>
-            <path d="M310 270 L384 470 L458 270" fill="none" stroke={C_YELLOW} strokeWidth="14" />
-            <rect x="270" y="470" width="228" height="22" fill="none" stroke={C_YELLOW} strokeWidth="12" />
-            <circle cx="384" cy="481" r="18" fill={C_NAVY} stroke={C_DARK} strokeWidth="3" />
-          </>
+          <Cartoon big>
+            <path d="M310 270 L384 470 L458 270" stroke={C_DARK} strokeWidth="18" />
+            <path d="M310 270 L384 470 L458 270" stroke={C_YELLOW} strokeWidth="12" />
+            <rect x="270" y="466" width="228" height="26" rx="4" fill={C_YELLOW} />
+            <circle cx="384" cy="479" r="20" fill={C_NAVY} />
+            <circle cx="384" cy="479" r="6" fill={C_YELLOW} stroke="none" />
+          </Cartoon>
         )}
 
         {/* Cordino con dissipatore */}
         {worn.has('cordino') && (
-          <>
-            <path d="M384 481 Q560 400 680 200" stroke={C_YELLOW} strokeWidth="14" fill="none" strokeLinecap="round" />
-            <rect x="660" y="170" width="34" height="50" rx="8" fill={C_NAVY} stroke={C_DARK} strokeWidth="3" />
-          </>
+          <Cartoon big>
+            <path d="M384 481 Q560 400 680 200" stroke={C_DARK} strokeWidth="18" />
+            <path d="M384 481 Q560 400 680 200" stroke={C_YELLOW} strokeWidth="11" />
+            <rect x="658" y="168" width="38" height="56" rx="8" fill={C_NAVY} />
+          </Cartoon>
         )}
 
-        {/* Guanti — mani sinistra e destra */}
+        {/* Guanti */}
         {worn.has('guanti') && (
-          <>
-            <ellipse cx="170" cy="555" rx="55" ry="62" fill={C_YELLOW} stroke={C_NAVY} strokeWidth="3" />
-            <ellipse cx="600" cy="555" rx="55" ry="62" fill={C_YELLOW} stroke={C_NAVY} strokeWidth="3" />
-            <path d="M125 555 L215 555 M555 555 L645 555" stroke={C_NAVY} strokeWidth="2.5" />
-          </>
+          <Cartoon big>
+            <ellipse cx="170" cy="555" rx="58" ry="64" fill={C_YELLOW} />
+            <ellipse cx="600" cy="555" rx="58" ry="64" fill={C_YELLOW} />
+            <path d="M125 555 L215 555 M555 555 L645 555" stroke={C_YELLOW_DARK} strokeWidth="4" />
+          </Cartoon>
         )}
 
         {/* Maschera/Respiratore */}
         {worn.has('maschera') && (
-          <>
-            <path d="M295 175 Q384 155 473 175 L460 245 Q384 270 308 245 Z"
-              fill={C_NAVY} stroke={C_DARK} strokeWidth="3" />
-            <circle cx="340" cy="220" r="22" fill={C_YELLOW} stroke={C_DARK} strokeWidth="2.5" />
-            <circle cx="428" cy="220" r="22" fill={C_YELLOW} stroke={C_DARK} strokeWidth="2.5" />
-            <path d="M295 195 Q260 180 250 200 M473 195 Q508 180 518 200" stroke={C_DARK} strokeWidth="3" fill="none" />
-          </>
+          <Cartoon big>
+            <path d="M295 175 Q384 155 473 175 L460 245 Q384 270 308 245 Z" fill={C_NAVY} />
+            <circle cx="340" cy="220" r="24" fill={C_YELLOW} />
+            <circle cx="428" cy="220" r="24" fill={C_YELLOW} />
+            <path d="M295 195 Q258 178 250 205 M473 195 Q510 178 518 205" />
+          </Cartoon>
         )}
 
         {/* Occhiali di protezione */}
         {worn.has('occhiali') && (
-          <>
-            <path d="M280 145 Q384 122 488 145 L488 175 Q384 200 280 175 Z"
-              fill={C_YELLOW} stroke={C_NAVY} strokeWidth="2.5" opacity="0.95" />
-            <rect x="295" y="138" width="78" height="42" rx="8" fill="#ffffff" stroke={C_NAVY} strokeWidth="2.5" opacity="0.85" />
-            <rect x="395" y="138" width="78" height="42" rx="8" fill="#ffffff" stroke={C_NAVY} strokeWidth="2.5" opacity="0.85" />
-          </>
+          <Cartoon big>
+            <path d="M280 145 Q384 122 488 145 L488 178 Q384 200 280 178 Z" fill={C_YELLOW} />
+            <rect x="295" y="140" width="78" height="42" rx="8" fill="#F4FAFF" />
+            <rect x="395" y="140" width="78" height="42" rx="8" fill="#F4FAFF" />
+            <path d="M308 152 L350 152 M408 152 L450 152" stroke="#fff" strokeWidth="4" opacity=".9" />
+          </Cartoon>
         )}
 
         {/* Cuffie antirumore */}
         {worn.has('cuffie') && (
-          <>
-            <path d="M270 110 Q384 30 498 110" stroke={C_NAVY} strokeWidth="12" fill="none" />
-            <rect x="240" y="105" width="48" height="80" rx="14" fill={C_NAVY} stroke={C_DARK} strokeWidth="3" />
-            <rect x="480" y="105" width="48" height="80" rx="14" fill={C_NAVY} stroke={C_DARK} strokeWidth="3" />
-            <rect x="232" y="130" width="14" height="30" fill={C_YELLOW} />
-            <rect x="522" y="130" width="14" height="30" fill={C_YELLOW} />
-          </>
+          <Cartoon big>
+            <path d="M270 110 Q384 22 498 110" stroke={C_DARK} strokeWidth="16" />
+            <path d="M270 110 Q384 22 498 110" stroke={C_NAVY} strokeWidth="10" />
+            <rect x="238" y="105" width="52" height="84" rx="14" fill={C_NAVY} />
+            <rect x="478" y="105" width="52" height="84" rx="14" fill={C_NAVY} />
+            <rect x="230" y="130" width="14" height="34" rx="2" fill={C_YELLOW} />
+            <rect x="524" y="130" width="14" height="34" rx="2" fill={C_YELLOW} />
+          </Cartoon>
         )}
 
-        {/* Casco protettivo — sempre per ultimo */}
+        {/* Casco protettivo */}
         {worn.has('casco') && (
-          <>
-            <path d="M250 130 Q384 -10 518 130 Z" fill={C_YELLOW} stroke={C_NAVY} strokeWidth="4" />
-            <rect x="240" y="125" width="288" height="20" rx="4" fill={C_NAVY} stroke={C_DARK} strokeWidth="2" />
-            <path d="M384 0 Q384 80 384 130" stroke={C_DARK} strokeWidth="3" opacity="0.25" />
-          </>
+          <Cartoon big>
+            <path d="M250 135 Q384 -5 518 135 Z" fill={C_YELLOW} />
+            <path d="M260 135 Q384 35 508 135" fill={C_YELLOW_DARK} opacity="0.4" stroke="none" />
+            <rect x="240" y="128" width="288" height="22" rx="5" fill={C_NAVY} />
+            <path d="M384 5 L384 130" stroke={C_YELLOW_DARK} strokeWidth="6" opacity="0.6" />
+          </Cartoon>
         )}
       </svg>
     </div>
