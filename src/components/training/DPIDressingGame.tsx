@@ -446,15 +446,34 @@ interface DPIDressingGameProps {
 
 export default function DPIDressingGame({ scenarioId = 'cantiere', onComplete }: DPIDressingGameProps) {
   const scenario = DPI_SCENARIOS[scenarioId];
+  const { user } = useAuth();
+  const { company } = useCompany();
+  const { prefs, update: updatePrefs } = useDpiPreferences(company?.id);
+
   const [worn, setWorn] = useState<Set<DPIKey>>(new Set());
   const [step, setStep] = useState(0);
   const [mistakes, setMistakes] = useState(0);
   const [shakeKey, setShakeKey] = useState<DPIKey | null>(null);
-  const [feedback, setFeedback] = useState<{ kind: 'ok' | 'ko'; text: string } | null>(null);
+  const [feedback, setFeedback] = useState<{ kind: 'ok' | 'ko'; text: string; cartoon?: string } | null>(null);
+  const [highlight, setHighlight] = useState<{ key: DPIKey; kind: 'ok' | 'ko' } | null>(null);
   const [completed, setCompleted] = useState(false);
-  const [season, setSeason] = useState<DPISeason>('estivo');
-  const [hivis, setHivis] = useState<HiVisColor>('arancio');
   const [legendOpen, setLegendOpen] = useState(false);
+  const [guided, setGuided] = useState(false);
+  const [autoplayPaused, setAutoplayPaused] = useState(false);
+
+  const season = prefs.season;
+  const hivis = prefs.hivis;
+  const setSeason = (s: DPISeason) => updatePrefs({ season: s });
+  const setHivis = (c: HiVisColor) => updatePrefs({ hivis: c });
+
+  // Tracciamento per report finale
+  const startedAtRef = useRef<number>(Date.now());
+  const eventsRef = useRef<DPIReportData['events']>([]);
+
+  const addEvent = (type: 'ok' | 'ko', label: string, note?: string) => {
+    const ts = Math.max(0, Math.floor((Date.now() - startedAtRef.current) / 1000));
+    eventsRef.current.push({ tsSeconds: ts, type, label, note });
+  };
 
   const allKeys = useMemo(() => {
     const set = [...scenario.sequence, ...(scenario.distractors || [])];
@@ -464,7 +483,7 @@ export default function DPIDressingGame({ scenarioId = 'cantiere', onComplete }:
       .map(x => x.k);
   }, [scenario]);
 
-  function handlePick(k: DPIKey) {
+  function handlePick(k: DPIKey, opts?: { fromAutoplay?: boolean }) {
     if (completed || worn.has(k)) return;
     const expected = scenario.sequence[step];
     if (k === expected) {
@@ -472,7 +491,13 @@ export default function DPIDressingGame({ scenarioId = 'cantiere', onComplete }:
       newWorn.add(k);
       setWorn(newWorn);
       setStep(step + 1);
-      setFeedback({ kind: 'ok', text: `✓ ${ALL_ITEMS[k].label} — ${ALL_ITEMS[k].hint}` });
+      setHighlight({ key: k, kind: 'ok' });
+      setFeedback({
+        kind: 'ok',
+        text: `✓ ${ALL_ITEMS[k].label} — ${ALL_ITEMS[k].hint}`,
+      });
+      addEvent('ok', ALL_ITEMS[k].label, opts?.fromAutoplay ? 'autoplay' : undefined);
+      window.setTimeout(() => setHighlight(null), 1600);
       if (step + 1 >= scenario.sequence.length) {
         setCompleted(true);
         onComplete?.({ correct: scenario.sequence.length, mistakes });
@@ -481,25 +506,77 @@ export default function DPIDressingGame({ scenarioId = 'cantiere', onComplete }:
       setMistakes(m => m + 1);
       setShakeKey(k);
       const isDistractor = !scenario.sequence.includes(k);
+      const cartoon = isDistractor
+        ? `Oh no! 🤔 ${ALL_ITEMS[k].label} non c'entra in questo scenario: serve quando ${ALL_ITEMS[k].description.toLowerCase()}`
+        : `Stop! 🛑 ${ALL_ITEMS[k].label} si indossa più avanti. Prima va: ${ALL_ITEMS[expected].label} — ${ALL_ITEMS[expected].description.toLowerCase()}`;
       setFeedback({
         kind: 'ko',
         text: isDistractor
           ? `✗ ${ALL_ITEMS[k].label} non è necessario in questo scenario.`
           : `✗ Non è il momento giusto. Indossa prima: ${ALL_ITEMS[expected].label}.`,
+        cartoon,
       });
-      setTimeout(() => setShakeKey(null), 450);
+      // Evidenzia sull'avatar l'area anatomica corretta del prossimo DPI atteso
+      setHighlight({ key: expected, kind: 'ko' });
+      addEvent('ko', ALL_ITEMS[k].label, `atteso: ${ALL_ITEMS[expected].label}`);
+      window.setTimeout(() => setShakeKey(null), 450);
+      window.setTimeout(() => setHighlight(null), 2200);
     }
   }
+
+  // Modalità guidata con autoplay: indossa automaticamente il prossimo DPI ogni ~2.2s
+  useEffect(() => {
+    if (!guided || autoplayPaused || completed) return;
+    const expected = scenario.sequence[step];
+    if (!expected) return;
+    const id = window.setTimeout(() => {
+      handlePick(expected, { fromAutoplay: true });
+    }, 2200);
+    return () => window.clearTimeout(id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [guided, autoplayPaused, step, completed]);
 
   function handleReset() {
     setWorn(new Set());
     setStep(0);
     setMistakes(0);
     setFeedback(null);
+    setHighlight(null);
     setCompleted(false);
+    startedAtRef.current = Date.now();
+    eventsRef.current = [];
+  }
+
+  const totalSeconds = Math.max(0, Math.floor((Date.now() - startedAtRef.current) / 1000));
+  const score = Math.max(0, 100 - mistakes * 10);
+
+  function buildReport(): DPIReportData {
+    return {
+      scenarioTitle: scenario.title,
+      scenarioId: scenario.id,
+      userName: user?.email || undefined,
+      companyName: company?.name || undefined,
+      season,
+      hivis,
+      totalSeconds,
+      mistakes,
+      score,
+      sequence: scenario.sequence.map(k => ({ key: k, label: ALL_ITEMS[k].label, normativa: ALL_ITEMS[k].normativa })),
+      events: eventsRef.current,
+    };
+  }
+
+  function handleExportPdf() {
+    const blob = exportDpiReportPdf(buildReport());
+    downloadBlob(blob, `report-vestizione-dpi-${scenario.id}.pdf`);
+  }
+  function handleExportCsv() {
+    const blob = exportDpiReportCsv(buildReport());
+    downloadBlob(blob, `report-vestizione-dpi-${scenario.id}.csv`);
   }
 
   const progress = Math.round((step / scenario.sequence.length) * 100);
+  const expectedKey = scenario.sequence[step];
 
   return (
     <TooltipProvider delayDuration={200}>
