@@ -3,6 +3,8 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { CheckCircle2, RotateCcw, ShieldCheck, AlertTriangle, Trophy } from 'lucide-react';
+import dpiAvatarHuman from '@/assets/dpi-avatar-human.png';
+
 
 // ---------- Tipi ----------
 export type DPIKey =
@@ -160,81 +162,130 @@ function DpiIcon({ k, size = 56, dimmed = false }: { k: DPIKey; size?: number; d
   }
 }
 
-// Avatar cartoon (silhouette) con DPI "indossati"
+// Avatar cartoon "umano": immagine PNG di base + DPI sovrapposti in SVG
 function Avatar({ worn }: { worn: Set<DPIKey> }) {
+  // viewBox 768x1024 — coordinate calibrate sull'immagine dpi-avatar-human.png
   return (
-    <svg viewBox="0 0 240 380" className="w-full h-full max-h-[440px]">
-      {/* corpo base */}
-      {/* gambe */}
-      <rect x="92" y="240" width="22" height="110" fill={worn.has('tuta') ? C_NAVY : C_SKIN} />
-      <rect x="126" y="240" width="22" height="110" fill={worn.has('tuta') ? C_NAVY : C_SKIN} />
-      {/* busto */}
-      <rect x="84" y="120" width="72" height="130" rx="10" fill={worn.has('tuta') ? C_NAVY : '#F2C9A0'} stroke={C_DARK} strokeWidth="2" />
-      {/* braccia */}
-      <rect x="60" y="125" width="22" height="110" rx="8" fill={worn.has('tuta') ? C_NAVY : C_SKIN} />
-      <rect x="158" y="125" width="22" height="110" rx="8" fill={worn.has('tuta') ? C_NAVY : C_SKIN} />
-      {/* mani */}
-      <circle cx="71" cy="245" r="13" fill={worn.has('guanti') ? C_YELLOW : C_SKIN} stroke={C_DARK} strokeWidth="2" />
-      <circle cx="169" cy="245" r="13" fill={worn.has('guanti') ? C_YELLOW : C_SKIN} stroke={C_DARK} strokeWidth="2" />
-      {/* testa */}
-      <circle cx="120" cy="90" r="36" fill={C_SKIN} stroke={C_DARK} strokeWidth="2" />
+    <div className="relative w-full max-w-[340px] aspect-[3/4] mx-auto">
+      <img
+        src={dpiAvatarHuman}
+        alt="Avatar da vestire con i DPI"
+        loading="lazy"
+        width={768}
+        height={1024}
+        className="absolute inset-0 w-full h-full object-contain select-none pointer-events-none"
+        draggable={false}
+      />
+      <svg
+        viewBox="0 0 768 1024"
+        className="absolute inset-0 w-full h-full pointer-events-none"
+      >
+        {/* Tuta da lavoro: copre busto + gambe con tono navy */}
+        {worn.has('tuta') && (
+          <>
+            <path
+              d="M250 250 L300 240 L384 260 L468 240 L518 250 L520 600 L495 980 L420 980 L400 700 L368 700 L348 980 L273 980 L248 600 Z"
+              fill={C_NAVY}
+              stroke={C_DARK}
+              strokeWidth="3"
+              opacity="0.92"
+            />
+            <rect x="358" y="320" width="52" height="80" fill={C_YELLOW} opacity="0.55" rx="4" />
+          </>
+        )}
 
-      {/* DPI sovrapposti */}
-      {worn.has('scarpe') && (
-        <>
-          <path d="M82 348 L120 348 L130 338 L150 338 Q162 338 162 352 L162 360 L82 360 Z" fill={C_YELLOW} stroke={C_NAVY} strokeWidth="2" />
-          <path d="M110 348 L156 348 L156 360 L82 360 L82 352 Q82 348 90 348 Z M158 338 Q170 338 170 352 L170 360 L90 360 Z" fill={C_YELLOW} stroke={C_NAVY} strokeWidth="2" transform="translate(-6,0)" />
-        </>
-      )}
-      {worn.has('gilet') && (
-        <path d="M84 120 L156 120 L152 240 L88 240 Z" fill={C_NAVY} opacity=".85" stroke={C_DARK} strokeWidth="2" />
-      )}
-      {worn.has('gilet') && (
-        <>
-          <rect x="86" y="160" width="68" height="10" fill={C_YELLOW} />
-          <rect x="86" y="200" width="68" height="10" fill={C_YELLOW} />
-        </>
-      )}
-      {worn.has('imbracatura') && (
-        <>
-          <path d="M96 122 L120 200 L144 122" fill="none" stroke={C_YELLOW} strokeWidth="5" />
-          <rect x="86" y="200" width="68" height="8" fill="none" stroke={C_YELLOW} strokeWidth="4" />
-          <circle cx="120" cy="205" r="6" fill={C_NAVY} />
-        </>
-      )}
-      {worn.has('cordino') && (
-        <path d="M120 205 Q170 170 200 110" stroke={C_YELLOW} strokeWidth="5" fill="none" />
-      )}
-      {worn.has('maschera') && (
-        <>
-          <path d="M92 92 Q120 84 148 92 L144 116 Q120 124 96 116 Z" fill={C_NAVY} />
-          <circle cx="106" cy="108" r="6" fill={C_YELLOW} stroke={C_DARK} strokeWidth="1.5" />
-          <circle cx="134" cy="108" r="6" fill={C_YELLOW} stroke={C_DARK} strokeWidth="1.5" />
-        </>
-      )}
-      {worn.has('occhiali') && (
-        <>
-          <path d="M86 84 Q120 74 154 84 L154 92 Q120 100 86 92 Z" fill={C_YELLOW} stroke={C_NAVY} strokeWidth="2" />
-          <rect x="92" y="80" width="22" height="14" rx="3" fill="#fff" stroke={C_NAVY} strokeWidth="1.5" />
-          <rect x="126" y="80" width="22" height="14" rx="3" fill="#fff" stroke={C_NAVY} strokeWidth="1.5" />
-        </>
-      )}
-      {worn.has('cuffie') && (
-        <>
-          <path d="M86 70 Q120 40 154 70" stroke={C_NAVY} strokeWidth="4" fill="none" />
-          <rect x="78" y="62" width="14" height="22" rx="4" fill={C_NAVY} />
-          <rect x="148" y="62" width="14" height="22" rx="4" fill={C_NAVY} />
-        </>
-      )}
-      {worn.has('casco') && (
-        <>
-          <path d="M78 70 Q120 22 162 70 Z" fill={C_YELLOW} stroke={C_NAVY} strokeWidth="2.5" />
-          <rect x="76" y="68" width="88" height="8" rx="2" fill={C_NAVY} />
-        </>
-      )}
-    </svg>
+        {/* Scarpe antinfortunistiche */}
+        {worn.has('scarpe') && (
+          <>
+            <path d="M250 935 L355 935 L375 920 L410 920 Q445 920 445 955 L445 985 L245 985 Z"
+              fill={C_YELLOW} stroke={C_NAVY} strokeWidth="3" />
+            <path d="M325 935 L430 935 L450 920 L490 920 Q525 920 525 955 L525 985 L320 985 Z"
+              fill={C_YELLOW} stroke={C_NAVY} strokeWidth="3" />
+            <rect x="245" y="975" width="285" height="12" fill={C_DARK} rx="2" />
+          </>
+        )}
+
+        {/* Gilet alta visibilità */}
+        {worn.has('gilet') && (
+          <>
+            <path d="M260 270 L350 260 L384 290 L418 260 L508 270 L500 580 L268 580 Z"
+              fill="#F2A33A" stroke={C_DARK} strokeWidth="3" opacity="0.95" />
+            <rect x="275" y="380" width="220" height="22" fill="#C9D6DF" />
+            <rect x="275" y="470" width="220" height="22" fill="#C9D6DF" />
+          </>
+        )}
+
+        {/* Imbracatura anticaduta */}
+        {worn.has('imbracatura') && (
+          <>
+            <path d="M310 270 L384 470 L458 270" fill="none" stroke={C_YELLOW} strokeWidth="14" />
+            <rect x="270" y="470" width="228" height="22" fill="none" stroke={C_YELLOW} strokeWidth="12" />
+            <circle cx="384" cy="481" r="18" fill={C_NAVY} stroke={C_DARK} strokeWidth="3" />
+          </>
+        )}
+
+        {/* Cordino con dissipatore */}
+        {worn.has('cordino') && (
+          <>
+            <path d="M384 481 Q560 400 680 200" stroke={C_YELLOW} strokeWidth="14" fill="none" strokeLinecap="round" />
+            <rect x="660" y="170" width="34" height="50" rx="8" fill={C_NAVY} stroke={C_DARK} strokeWidth="3" />
+          </>
+        )}
+
+        {/* Guanti — mani sinistra e destra */}
+        {worn.has('guanti') && (
+          <>
+            <ellipse cx="170" cy="555" rx="55" ry="62" fill={C_YELLOW} stroke={C_NAVY} strokeWidth="3" />
+            <ellipse cx="600" cy="555" rx="55" ry="62" fill={C_YELLOW} stroke={C_NAVY} strokeWidth="3" />
+            <path d="M125 555 L215 555 M555 555 L645 555" stroke={C_NAVY} strokeWidth="2.5" />
+          </>
+        )}
+
+        {/* Maschera/Respiratore */}
+        {worn.has('maschera') && (
+          <>
+            <path d="M295 175 Q384 155 473 175 L460 245 Q384 270 308 245 Z"
+              fill={C_NAVY} stroke={C_DARK} strokeWidth="3" />
+            <circle cx="340" cy="220" r="22" fill={C_YELLOW} stroke={C_DARK} strokeWidth="2.5" />
+            <circle cx="428" cy="220" r="22" fill={C_YELLOW} stroke={C_DARK} strokeWidth="2.5" />
+            <path d="M295 195 Q260 180 250 200 M473 195 Q508 180 518 200" stroke={C_DARK} strokeWidth="3" fill="none" />
+          </>
+        )}
+
+        {/* Occhiali di protezione */}
+        {worn.has('occhiali') && (
+          <>
+            <path d="M280 145 Q384 122 488 145 L488 175 Q384 200 280 175 Z"
+              fill={C_YELLOW} stroke={C_NAVY} strokeWidth="2.5" opacity="0.95" />
+            <rect x="295" y="138" width="78" height="42" rx="8" fill="#ffffff" stroke={C_NAVY} strokeWidth="2.5" opacity="0.85" />
+            <rect x="395" y="138" width="78" height="42" rx="8" fill="#ffffff" stroke={C_NAVY} strokeWidth="2.5" opacity="0.85" />
+          </>
+        )}
+
+        {/* Cuffie antirumore */}
+        {worn.has('cuffie') && (
+          <>
+            <path d="M270 110 Q384 30 498 110" stroke={C_NAVY} strokeWidth="12" fill="none" />
+            <rect x="240" y="105" width="48" height="80" rx="14" fill={C_NAVY} stroke={C_DARK} strokeWidth="3" />
+            <rect x="480" y="105" width="48" height="80" rx="14" fill={C_NAVY} stroke={C_DARK} strokeWidth="3" />
+            <rect x="232" y="130" width="14" height="30" fill={C_YELLOW} />
+            <rect x="522" y="130" width="14" height="30" fill={C_YELLOW} />
+          </>
+        )}
+
+        {/* Casco protettivo — sempre per ultimo */}
+        {worn.has('casco') && (
+          <>
+            <path d="M250 130 Q384 -10 518 130 Z" fill={C_YELLOW} stroke={C_NAVY} strokeWidth="4" />
+            <rect x="240" y="125" width="288" height="20" rx="4" fill={C_NAVY} stroke={C_DARK} strokeWidth="2" />
+            <path d="M384 0 Q384 80 384 130" stroke={C_DARK} strokeWidth="3" opacity="0.25" />
+          </>
+        )}
+      </svg>
+    </div>
   );
 }
+
 
 // ---------- Componente principale ----------
 interface DPIDressingGameProps {
