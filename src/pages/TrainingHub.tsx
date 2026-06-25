@@ -4,13 +4,13 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { 
-  Scale, Users, Search, Shield, Lock, Play, CheckCircle, 
+import {
+  Scale, Users, Search, Shield, Lock, Play, CheckCircle,
   Trophy, Star, Clock, ArrowLeft, Zap, Award, Swords, Download,
   Building2, Factory, HardHat, Monitor, Brain, Thermometer,
   Cog, Package, Volume2, FlaskConical, ArrowDown, Flame, Heart,
   AlertTriangle, Box, ArrowUp, Truck, Bomb, Bug, Radiation, Siren,
-  GraduationCap, Crown, Eye, KeyRound, Cross
+  GraduationCap, Crown, Eye, KeyRound, Cross, Shirt
 } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useTrainingProgress } from '@/hooks/useTrainingProgress';
