@@ -14,12 +14,13 @@ export interface QuizQuestion {
 export interface TrainingSection {
   id: string;
   title: string;
-  type: 'lesson' | 'quiz' | 'interactive' | 'boss_test' | 'scenario_3d' | 'point_and_click';
+  type: 'lesson' | 'quiz' | 'interactive' | 'boss_test' | 'scenario_3d' | 'point_and_click' | 'dpi_dressing';
   content?: string;
   npcDialogue?: { speaker: string; role: string; text: string }[];
   questions?: QuizQuestion[];
   minTimeSeconds: number; // Anti-cheat: minimum time before proceeding
   xpReward: number;
+  dpiScenario?: 'cantiere' | 'quota' | 'officina';
 }
 
 export interface ModuleContent {
