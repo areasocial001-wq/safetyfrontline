@@ -34,6 +34,7 @@ const DemoPath = lazy(() => import("./pages/DemoPath"));
 const BonusModules = lazy(() => import("./pages/BonusModules"));
 const ROICalculatorPage = lazy(() => import("./pages/ROICalculatorPage"));
 const DebugRole = lazy(() => import("./pages/DebugRole"));
+const DPIDressingPage = lazy(() => import("./pages/DPIDressingPage"));
 
 const queryClient = new QueryClient();
 
