@@ -409,9 +409,28 @@ function Avatar({ worn, season, hivis, highlight }: { worn: Set<DPIKey>; season:
         viewBox="0 0 768 1024"
         preserveAspectRatio="xMidYMid meet"
         className="absolute inset-0 w-full h-full pointer-events-none"
+        role="img"
+        aria-label="Avatar con DPI indossati"
       >
         <ellipse cx="384" cy="990" rx="180" ry="14" fill={T.dark} opacity="0.18" />
         {LAYER_ORDER.map((k) => (worn.has(k) ? <g key={k}>{layers[k]}</g> : null))}
+        {highlight && ANATOMY[highlight.key] && (
+          <g aria-hidden="true">
+            <circle
+              cx={ANATOMY[highlight.key].cx}
+              cy={ANATOMY[highlight.key].cy}
+              r={ANATOMY[highlight.key].r}
+              fill="none"
+              stroke={highlight.kind === 'ok' ? '#1F7A3A' : '#D24B3A'}
+              strokeWidth={10}
+              strokeDasharray="14 10"
+              opacity={0.85}
+            >
+              <animate attributeName="r" values={`${ANATOMY[highlight.key].r};${ANATOMY[highlight.key].r + 20};${ANATOMY[highlight.key].r}`} dur="1.4s" repeatCount="indefinite" />
+              <animate attributeName="opacity" values="0.85;0.35;0.85" dur="1.4s" repeatCount="indefinite" />
+            </circle>
+          </g>
+        )}
       </svg>
     </div>
   );
