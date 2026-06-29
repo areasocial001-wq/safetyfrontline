@@ -33,9 +33,13 @@ export const MachineryRiskQuiz = ({
       onClose(0, false);
       return;
     }
-    setQuestion(list[Math.floor(Math.random() * list.length)]);
+    const picked = list[Math.floor(Math.random() * list.length)];
+    let rnd = makeQuizSeed();
+    const rand = () => { rnd = (rnd * 1664525 + 1013904223) >>> 0; return rnd / 0xffffffff; };
+    setQuestion(shuffleQuestionOptions(picked as any, rand) as any);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [riskId]);
+
 
   if (!question) return null;
 
