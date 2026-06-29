@@ -45,9 +45,17 @@ export const FireClassQuiz = ({ onComplete, onBack }: FireClassQuizProps) => {
   const [hasAnswered, setHasAnswered] = useState(false);
   const [correctCount, setCorrectCount] = useState(0);
 
-  const q = QUIZ_QUESTIONS[currentQuestion];
+  // Shuffle option order once per mount to avoid "always B" bias
+  const shuffledQuestions = useMemo(() => {
+    let rnd = makeQuizSeed();
+    const rand = () => { rnd = (rnd * 1664525 + 1013904223) >>> 0; return rnd / 0xffffffff; };
+    return QUIZ_QUESTIONS.map(q => shuffleQuestionOptions(q as any, rand) as any);
+  }, []);
+
+  const q = shuffledQuestions[currentQuestion];
   const isCorrect = selectedAnswer === q.correctIndex;
-  const isLastQuestion = currentQuestion === QUIZ_QUESTIONS.length - 1;
+  const isLastQuestion = currentQuestion === shuffledQuestions.length - 1;
+
 
   const handleAnswer = (index: number) => {
     if (hasAnswered) return;
