@@ -264,69 +264,71 @@ const PointAndClickLevel = ({ levelData = DEFAULT_LEVEL, forcedPreset, readOnly,
   const activeHazards = calibrate ? editable : baseHazards;
 
   return (
-    <div
-      ref={containerRef}
-      className="relative w-full aspect-video overflow-hidden rounded-xl border border-border shadow-lg select-none touch-none"
-      onPointerMove={onPointerMove}
-      onPointerUp={onPointerUp}
-    >
-      <img src={levelData.background_image_url} alt={levelData.title} className="absolute inset-0 w-full h-full object-cover" draggable={false} />
+    <div className="space-y-2">
+      {/* Top control bar (outside the scene to avoid covering hazards) */}
+      <div className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-border bg-card/60 backdrop-blur-sm px-3 py-2">
+        <div className="flex items-center gap-2">
+          <Trophy className="h-5 w-5 text-yellow-500" />
+          <span className="font-bold text-foreground text-lg">{score}</span>
+          <span className="text-muted-foreground text-sm">({foundHazards.size}/{levelData.total_hazards})</span>
+          {saving && <span className="text-xs text-muted-foreground animate-pulse">💾</span>}
+        </div>
+        <div className="flex flex-wrap gap-2 items-center justify-end">
 
-      {/* Score */}
-      <div className="absolute top-3 right-3 z-20 flex items-center gap-2 bg-background/80 backdrop-blur-sm rounded-lg px-4 py-2 border border-border">
-        <Trophy className="h-5 w-5 text-yellow-500" />
-        <span className="font-bold text-foreground text-lg">{score}</span>
-        <span className="text-muted-foreground text-sm">({foundHazards.size}/{levelData.total_hazards})</span>
-        {saving && <span className="text-xs text-muted-foreground animate-pulse">💾</span>}
-      </div>
-
-      {/* Toolbar */}
-      <div className="absolute top-3 left-3 z-20 flex flex-wrap gap-2">
-        <Button variant={showHitboxes ? "default" : "outline"} size="sm" onClick={() => setShowHitboxes(v => !v)} className="bg-background/80 backdrop-blur-sm">
-          {showHitboxes ? <EyeOff className="h-4 w-4 mr-1" /> : <Eye className="h-4 w-4 mr-1" />}
-          {showHitboxes ? "Nascondi" : "Hitbox"}
-        </Button>
-        <Button variant={calibrate ? "default" : "outline"} size="sm" onClick={() => { setCalibrate(v => !v); setShowHitboxes(true); }} className="bg-background/80 backdrop-blur-sm">
-          <Move className="h-4 w-4 mr-1" />{calibrate ? "Esci" : "Calibra"}
-        </Button>
-        {calibrate && (
-          <>
-            <Button variant="outline" size="sm" onClick={copyJSON} className="bg-background/80 backdrop-blur-sm">
-              <Copy className="h-4 w-4 mr-1" />Copia JSON
-            </Button>
-            <Button variant="default" size="sm" onClick={savePreset} className="bg-background/80 backdrop-blur-sm">
-              <Save className="h-4 w-4 mr-1" />Salva preset
-            </Button>
-            <Button variant="outline" size="sm" onClick={resetPreset} className="bg-background/80 backdrop-blur-sm">
-              Reset
-            </Button>
-          </>
-        )}
-        {/* Device preset selector */}
-        <div className="flex items-center gap-1 bg-background/80 backdrop-blur-sm rounded-md border border-border px-1">
-          {(Object.keys(PRESET_LABELS) as DevicePreset[]).map(p => {
-            const Icon = PRESET_ICONS[p];
-            const active = preset === p;
-            return (
-              <button
-                key={p}
-                onClick={() => { setAutoPreset(false); setPreset(p); }}
-                title={PRESET_LABELS[p] + (autoPreset && active ? " (auto)" : "")}
-                className={`p-1.5 rounded ${active ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:bg-accent"}`}
-              >
-                <Icon className="h-4 w-4" />
-              </button>
-            );
-          })}
-          <button
-            onClick={() => { setAutoPreset(true); setPreset(detectPreset()); }}
-            title="Auto-detect"
-            className={`px-1.5 text-[10px] font-semibold rounded ${autoPreset ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:bg-accent"}`}
-          >
-            AUTO
-          </button>
+          <Button variant={showHitboxes ? "default" : "outline"} size="sm" onClick={() => setShowHitboxes(v => !v)}>
+            {showHitboxes ? <EyeOff className="h-4 w-4 mr-1" /> : <Eye className="h-4 w-4 mr-1" />}
+            {showHitboxes ? "Nascondi" : "Hitbox"}
+          </Button>
+          <Button variant={calibrate ? "default" : "outline"} size="sm" onClick={() => { setCalibrate(v => !v); setShowHitboxes(true); }}>
+            <Move className="h-4 w-4 mr-1" />{calibrate ? "Esci" : "Calibra"}
+          </Button>
+          {calibrate && (
+            <>
+              <Button variant="outline" size="sm" onClick={copyJSON}>
+                <Copy className="h-4 w-4 mr-1" />Copia JSON
+              </Button>
+              <Button variant="default" size="sm" onClick={savePreset}>
+                <Save className="h-4 w-4 mr-1" />Salva preset
+              </Button>
+              <Button variant="outline" size="sm" onClick={resetPreset}>
+                Reset
+              </Button>
+            </>
+          )}
+          <div className="flex items-center gap-1 rounded-md border border-border px-1">
+            {(Object.keys(PRESET_LABELS) as DevicePreset[]).map(p => {
+              const Icon = PRESET_ICONS[p];
+              const active = preset === p;
+              return (
+                <button
+                  key={p}
+                  onClick={() => { setAutoPreset(false); setPreset(p); }}
+                  title={PRESET_LABELS[p] + (autoPreset && active ? " (auto)" : "")}
+                  className={`p-1.5 rounded ${active ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:bg-accent"}`}
+                >
+                  <Icon className="h-4 w-4" />
+                </button>
+              );
+            })}
+            <button
+              onClick={() => { setAutoPreset(true); setPreset(detectPreset()); }}
+              title="Auto-detect"
+              className={`px-1.5 text-[10px] font-semibold rounded ${autoPreset ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:bg-accent"}`}
+            >
+              AUTO
+            </button>
+          </div>
         </div>
       </div>
+
+      <div
+        ref={containerRef}
+        className="relative w-full aspect-video overflow-hidden rounded-xl border border-border shadow-lg select-none touch-none"
+        onPointerMove={onPointerMove}
+        onPointerUp={onPointerUp}
+      >
+        <img src={levelData.background_image_url} alt={levelData.title} className="absolute inset-0 w-full h-full object-cover" draggable={false} />
+
 
       {/* Last clicked label */}
       {lastClicked && !calibrate && (
@@ -388,6 +390,7 @@ const PointAndClickLevel = ({ levelData = DEFAULT_LEVEL, forcedPreset, readOnly,
       {foundHazards.size === levelData.total_hazards && !calibrate && (
         <LevelCompleteModal score={score} totalHazards={levelData.total_hazards} />
       )}
+      </div>
     </div>
   );
 };

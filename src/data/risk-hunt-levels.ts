@@ -100,11 +100,11 @@ const FIRE: RiskHuntLevel = {
   total_hazards: 5,
   intro_dialogue: { speaker: "Addetto Antincendio", text: "Trova innesco, ostacoli alla fuga e dispositivi non funzionanti." },
   hazards: [
-    { id: "f_overload", name: "Quadro elettrico in fiamme", position: { top: "12%", left: "3%" }, hitbox_size: { width: "22%", height: "45%" }, points: 150, feedback: { title: "Innesco elettrico", message: "Mai sovraccaricare prese multiple.", type: "critical" } },
-    { id: "f_door", name: "Porta REI bloccata aperta", position: { top: "15%", left: "35%" }, hitbox_size: { width: "16%", height: "60%" }, points: 200, feedback: { title: "Compartimentazione", message: "Le porte tagliafuoco devono restare chiuse.", type: "critical" } },
-    { id: "f_bin", name: "Cestino in fiamme", position: { top: "55%", left: "55%" }, hitbox_size: { width: "16%", height: "35%" }, points: 100, feedback: { title: "Innesco", message: "Mai gettare mozziconi accesi.", type: "critical" } },
-    { id: "f_solvent", name: "Poltrona in fiamme", position: { top: "50%", left: "5%" }, hitbox_size: { width: "25%", height: "35%" }, points: 150, feedback: { title: "Materiali infiammabili", message: "Tenere imbottiti lontano da fonti di calore.", type: "critical" } },
-    { id: "f_sprinkler", name: "Sprinkler ostruito", position: { top: "0%", left: "88%" }, hitbox_size: { width: "12%", height: "28%" }, points: 100, feedback: { title: "Impianto", message: "Nessun oggetto deve schermare gli sprinkler.", type: "warning" } },
+    { id: "f_overload", name: "Quadro elettrico in fiamme", position: { top: "2%", left: "1%" }, hitbox_size: { width: "23%", height: "45%" }, points: 150, feedback: { title: "Innesco elettrico", message: "Mai sovraccaricare prese multiple.", type: "critical" } },
+    { id: "f_solvent", name: "Poltrona in fiamme", position: { top: "50%", left: "2%" }, hitbox_size: { width: "36%", height: "45%" }, points: 150, feedback: { title: "Materiali infiammabili", message: "Tenere imbottiti lontano da fonti di calore.", type: "critical" } },
+    { id: "f_door", name: "Porta REI bloccata aperta", position: { top: "12%", left: "36%" }, hitbox_size: { width: "22%", height: "75%" }, points: 200, feedback: { title: "Compartimentazione", message: "Le porte tagliafuoco devono restare chiuse.", type: "critical" } },
+    { id: "f_bin", name: "Cestino in fiamme", position: { top: "38%", left: "60%" }, hitbox_size: { width: "18%", height: "50%" }, points: 100, feedback: { title: "Innesco", message: "Mai gettare mozziconi accesi.", type: "critical" } },
+    { id: "f_sprinkler", name: "Sprinkler ostruito", position: { top: "2%", left: "73%" }, hitbox_size: { width: "16%", height: "22%" }, points: 100, feedback: { title: "Impianto", message: "Nessun oggetto deve schermare gli sprinkler.", type: "warning" } },
   ],
 };
 
