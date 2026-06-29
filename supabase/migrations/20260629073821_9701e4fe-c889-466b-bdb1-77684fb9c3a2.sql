@@ -1,0 +1,1 @@
+DELETE FROM training_package_modules WHERE package_id = '8829ce9f-3bd3-4322-9f5a-1b29237076a2' AND module_id = 'cybersecurity';
