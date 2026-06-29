@@ -390,6 +390,7 @@ const PointAndClickLevel = ({ levelData = DEFAULT_LEVEL, forcedPreset, readOnly,
       {foundHazards.size === levelData.total_hazards && !calibrate && (
         <LevelCompleteModal score={score} totalHazards={levelData.total_hazards} />
       )}
+      </div>
     </div>
   );
 };
