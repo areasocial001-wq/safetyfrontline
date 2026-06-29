@@ -6,6 +6,8 @@ import {
   MACHINERY_RISK_QUIZZES,
   type MachineryQuizQuestion,
 } from "@/data/machinery-quizzes";
+import { shuffleQuestionOptions, makeQuizSeed } from "@/lib/quiz-shuffle";
+
 
 interface MachineryRiskQuizProps {
   riskId: string;
