@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { CheckCircle2, XCircle, ShieldAlert, Lock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
+import { shuffleQuestionOptions, makeQuizSeed } from '@/lib/quiz-shuffle';
+
 
 interface CyberQuizQuestion {
   question: string;
