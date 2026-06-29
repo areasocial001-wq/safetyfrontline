@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { CheckCircle2, XCircle, Star } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
+import { shuffleQuestionOptions, makeQuizSeed } from '@/lib/quiz-shuffle';
+
 
 type ScenarioType = 'office' | 'warehouse' | 'construction' | 'laboratory';
 
