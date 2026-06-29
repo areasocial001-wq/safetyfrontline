@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { CheckCircle2, XCircle, Star } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
+import { shuffleQuestionOptions, makeQuizSeed } from '@/lib/quiz-shuffle';
+
 
 type ScenarioType = 'office' | 'warehouse' | 'construction' | 'laboratory';
 
@@ -107,8 +109,13 @@ export const NPCRoleQuiz = ({ role, scenarioType, onClose }: NPCRoleQuizProps) =
       if (filtered.length > 0) questions = filtered;
     }
     const randomQ = questions[Math.floor(Math.random() * questions.length)];
-    setQuestion(randomQ);
+    // Shuffle option order to avoid "always B" bias
+    const seed = makeQuizSeed();
+    let rnd = seed;
+    const rand = () => { rnd = (rnd * 1664525 + 1013904223) >>> 0; return rnd / 0xffffffff; };
+    setQuestion(shuffleQuestionOptions(randomQ as any, rand) as any);
   }, [role, scenarioType]);
+
 
   if (!question) return null;
 

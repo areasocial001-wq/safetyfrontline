@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { CheckCircle2, XCircle, ShieldAlert, Lock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
+import { shuffleQuestionOptions, makeQuizSeed } from '@/lib/quiz-shuffle';
+
 
 interface CyberQuizQuestion {
   question: string;
@@ -375,8 +377,11 @@ export const CyberRiskQuiz = ({ riskId, riskLabel, onClose }: CyberRiskQuizProps
     const questions = CYBER_RISK_QUESTIONS[riskId];
     if (!questions || questions.length === 0) return;
     const randomQ = questions[Math.floor(Math.random() * questions.length)];
-    setQuestion(randomQ);
+    let rnd = makeQuizSeed();
+    const rand = () => { rnd = (rnd * 1664525 + 1013904223) >>> 0; return rnd / 0xffffffff; };
+    setQuestion(shuffleQuestionOptions(randomQ as any, rand) as any);
   }, [riskId]);
+
 
   if (!question) {
     // No quiz for this risk, auto-close
