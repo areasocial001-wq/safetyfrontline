@@ -274,7 +274,7 @@ const PointAndClickLevel = ({ levelData = DEFAULT_LEVEL, forcedPreset, readOnly,
           {saving && <span className="text-xs text-muted-foreground animate-pulse">💾</span>}
         </div>
         <div className="flex flex-wrap gap-2 items-center justify-end">
-        <div className="flex flex-wrap gap-2 items-center justify-end">
+
           <Button variant={showHitboxes ? "default" : "outline"} size="sm" onClick={() => setShowHitboxes(v => !v)}>
             {showHitboxes ? <EyeOff className="h-4 w-4 mr-1" /> : <Eye className="h-4 w-4 mr-1" />}
             {showHitboxes ? "Nascondi" : "Hitbox"}
