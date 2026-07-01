@@ -118,28 +118,44 @@ export const DPI_TOKENS = {
   fabricWinterAccent: '#D24B3A', // dettaglio rosso invernale
 } as const;
 
-const STROKE = 2.5;
-const STROKE_BIG = 5;
-
 function hivisColor(c: HiVisColor) {
   if (c === 'arancio') return { base: DPI_TOKENS.hivisOrange, dark: DPI_TOKENS.hivisOrangeDark };
   if (c === 'giallo') return { base: DPI_TOKENS.hivisYellow, dark: DPI_TOKENS.hivisYellowDark };
   return { base: DPI_TOKENS.hivisLime, dark: DPI_TOKENS.hivisLimeDark };
 }
 
-interface CartoonProps { children: React.ReactNode; big?: boolean }
-export function Cartoon({ children, big = false }: CartoonProps) {
-  return (
-    <g
-      stroke={DPI_TOKENS.dark}
-      strokeWidth={big ? STROKE_BIG : STROKE}
-      strokeLinejoin="round"
-      strokeLinecap="round"
-      fill="none"
-    >
-      {children}
-    </g>
-  );
+// ============================================================
+// Assets DPI realistici (render 3D / product shot, PNG trasparenti)
+// ============================================================
+import dpiCasco from '@/assets/dpi/casco.png';
+import dpiOcchiali from '@/assets/dpi/occhiali.png';
+import dpiCuffie from '@/assets/dpi/cuffie.png';
+import dpiMaschera from '@/assets/dpi/maschera.png';
+import dpiGuanti from '@/assets/dpi/guanti.png';
+import dpiGilet from '@/assets/dpi/gilet.png';
+import dpiTuta from '@/assets/dpi/tuta.png';
+import dpiScarpe from '@/assets/dpi/scarpe.png';
+import dpiImbracatura from '@/assets/dpi/imbracatura.png';
+import dpiCordino from '@/assets/dpi/cordino.png';
+
+const DPI_IMAGES: Record<DPIKey, string> = {
+  casco: dpiCasco,
+  occhiali: dpiOcchiali,
+  cuffie: dpiCuffie,
+  maschera: dpiMaschera,
+  guanti: dpiGuanti,
+  gilet: dpiGilet,
+  tuta: dpiTuta,
+  scarpe: dpiScarpe,
+  imbracatura: dpiImbracatura,
+  cordino: dpiCordino,
+};
+
+// Hue-rotate approssimativo per variare il colore hi-vis del gilet arancio base
+function hivisFilter(c: HiVisColor): string | undefined {
+  if (c === 'arancio') return undefined;
+  if (c === 'giallo') return 'hue-rotate(25deg) saturate(1.15)';
+  return 'hue-rotate(55deg) saturate(1.05)';
 }
 
 interface DpiIconProps {
@@ -151,194 +167,29 @@ interface DpiIconProps {
 }
 
 /**
- * Icona DPI cartoon, esportata per riuso in altri moduli (quiz, checklist, badge).
- * Usa la stessa palette e lo stesso outline del mini-gioco.
+ * Icona DPI realistica. Usa render 3D/product-shot al posto delle sagome cartoon.
  */
-export function DpiIcon({ k, size = 56, dimmed = false, season = 'estivo', hivis = 'arancio' }: DpiIconProps) {
-  const op = dimmed ? 0.3 : 1;
-  const common = { width: size, height: size, viewBox: '0 0 64 64', style: { opacity: op } } as const;
-  const T = DPI_TOKENS;
-  const hv = hivisColor(hivis);
-  const fabric = season === 'invernale' ? T.fabricWinter : T.navy;
-  const fabricAccent = season === 'invernale' ? T.fabricWinterAccent : T.yellow;
-
-  switch (k) {
-    case 'casco':
-      return (
-        <svg {...common} aria-hidden="true">
-          <Cartoon>
-            {/* calotta */}
-            <path d="M8 42 Q12 10 32 8 Q52 10 56 42 Z" fill={T.yellow} />
-            {/* shading */}
-            <path d="M10 42 Q14 14 32 12 Q34 12 36 12 L36 42 Z" fill={T.yellowDark} opacity=".35" stroke="none" />
-            {/* highlight */}
-            <path d="M16 22 Q22 14 30 13" stroke="#FFF6D6" strokeWidth="2.5" opacity=".9" fill="none" />
-            {/* cresta */}
-            <path d="M32 8 L32 42" stroke={T.yellowDark} strokeWidth="2" opacity=".55" />
-            {/* visiera */}
-            <path d="M4 42 Q32 50 60 42 L58 48 Q32 54 6 48 Z" fill={T.yellowDark} />
-            {/* sottogola */}
-            <rect x="6" y="46" width="52" height="5" rx="2" fill={T.navy} />
-            {season === 'invernale' && (
-              <path d="M6 51 L58 51 L55 60 L11 60 Z" fill={T.fabricWinter} />
-            )}
-          </Cartoon>
-        </svg>
-      );
-    case 'occhiali':
-      return (
-        <svg {...common} aria-hidden="true">
-          <Cartoon>
-            {/* ponte */}
-            <path d="M28 32 Q32 28 36 32" />
-            {/* lenti */}
-            <path d="M6 28 Q6 22 12 22 L26 22 Q30 22 30 28 L30 36 Q30 40 26 40 L12 40 Q6 40 6 36 Z" fill="#9FE3FF" />
-            <path d="M34 28 Q34 22 38 22 L52 22 Q58 22 58 28 L58 36 Q58 40 52 40 L38 40 Q34 40 34 36 Z" fill="#9FE3FF" />
-            {/* riflessi */}
-            <path d="M10 26 Q14 24 18 26" stroke="#fff" strokeWidth="2" opacity=".95" />
-            <path d="M38 26 Q42 24 46 26" stroke="#fff" strokeWidth="2" opacity=".95" />
-            {/* stanghette */}
-            <path d="M6 30 L2 32 M58 30 L62 32" />
-          </Cartoon>
-        </svg>
-      );
-    case 'cuffie':
-      return (
-        <svg {...common} aria-hidden="true">
-          <Cartoon>
-            {/* archetto */}
-            <path d="M12 38 Q32 4 52 38" strokeWidth="3" />
-            {/* coppe */}
-            <path d="M6 34 Q4 34 4 38 L4 54 Q4 58 8 58 L16 58 Q20 58 20 54 L20 38 Q20 34 16 34 Z" fill={T.navy} />
-            <path d="M48 34 Q44 34 44 38 L44 54 Q44 58 48 58 L56 58 Q60 58 60 54 L60 38 Q60 34 56 34 Z" fill={T.navy} />
-            {/* pad gialli */}
-            <rect x="6" y="40" width="12" height="14" rx="3" fill={T.yellow} />
-            <rect x="46" y="40" width="12" height="14" rx="3" fill={T.yellow} />
-            {/* highlight */}
-            <path d="M14 40 Q16 36 18 36" stroke="#FFF6D6" strokeWidth="1.5" opacity=".9" />
-          </Cartoon>
-        </svg>
-      );
-    case 'maschera':
-      return (
-        <svg {...common} aria-hidden="true">
-          <Cartoon>
-            {/* corpo */}
-            <path d="M14 22 Q32 14 50 22 L52 42 Q48 50 32 52 Q16 50 12 42 Z" fill={T.navy} />
-            {/* filtri */}
-            <circle cx="22" cy="36" r="7" fill={T.yellow} />
-            <circle cx="42" cy="36" r="7" fill={T.yellow} />
-            <circle cx="22" cy="36" r="3" fill={T.yellowDark} stroke="none" />
-            <circle cx="42" cy="36" r="3" fill={T.yellowDark} stroke="none" />
-            {/* cinturini */}
-            <path d="M14 24 Q4 20 4 30 M50 24 Q60 20 60 30" />
-            {/* valvola centrale */}
-            <ellipse cx="32" cy="44" rx="5" ry="3" fill={T.navyDark} />
-          </Cartoon>
-        </svg>
-      );
-    case 'guanti':
-      return (
-        <svg {...common} aria-hidden="true">
-          <Cartoon>
-            {/* mano sinistra cartoon (palmo + 4 dita arrotondate + pollice) */}
-            <path d="M14 56 L14 28 Q14 22 18 22 Q22 22 22 28 L22 32 Q23 18 28 18 Q33 18 33 30 Q34 14 38 14 Q43 14 43 28 Q44 22 48 22 Q52 22 52 28 L52 34 Q52 24 56 24 Q60 24 60 32 L60 56 Z"
-              fill={season === 'invernale' ? T.fabricWinter : T.yellow} />
-            {/* polsino */}
-            <rect x="14" y="48" width="46" height="8" fill={season === 'invernale' ? T.navy : T.yellowDark} />
-            {/* cuciture */}
-            <path d="M22 32 L22 48 M33 30 L33 48 M43 30 L43 48 M52 34 L52 48" stroke={T.yellowDark} strokeWidth="1.2" opacity=".7" />
-          </Cartoon>
-        </svg>
-      );
-    case 'gilet':
-      return (
-        <svg {...common} aria-hidden="true">
-          <Cartoon>
-            {/* corpo */}
-            <path d="M10 14 L24 12 L32 22 L40 12 L54 14 L54 56 Q54 58 52 58 L12 58 Q10 58 10 56 Z" fill={hv.base} />
-            {/* zip */}
-            <path d="M32 22 L32 58" stroke={T.dark} strokeWidth="1.5" />
-            {/* bande rifrangenti */}
-            <rect x="11" y="28" width="42" height="5" fill={T.reflect} />
-            <rect x="11" y="34" width="42" height="2" fill={T.dark} opacity=".4" />
-            <rect x="11" y="44" width="42" height="5" fill={T.reflect} />
-            <rect x="11" y="50" width="42" height="2" fill={T.dark} opacity=".4" />
-            {season === 'invernale' && (
-              <path d="M10 14 L24 12 L32 22 L40 12 L54 14 L54 22 L10 22 Z" fill={hv.dark} opacity=".55" stroke="none" />
-            )}
-          </Cartoon>
-        </svg>
-      );
-    case 'tuta':
-      return (
-        <svg {...common} aria-hidden="true">
-          <Cartoon>
-            {/* corpo + braccia + gambe */}
-            <path d="M22 10 L42 10 L50 16 L52 28 L48 32 L46 22 L46 56 L36 56 L34 36 L30 36 L28 56 L18 56 L18 22 L16 32 L12 28 L14 16 Z" fill={fabric} />
-            {/* zip */}
-            <path d="M32 14 L32 36" stroke={T.dark} strokeWidth="1.5" />
-            {/* tasca pettorale */}
-            <rect x="34" y="18" width="10" height="8" rx="1.5" fill={fabricAccent} />
-            {/* cintura */}
-            <rect x="18" y="34" width="28" height="3" fill={T.dark} opacity=".5" stroke="none" />
-            {season === 'estivo' && (
-              <path d="M19 22 L17 18 M45 22 L47 18" stroke={T.fabricSummer} strokeWidth="2" opacity=".9" />
-            )}
-          </Cartoon>
-        </svg>
-      );
-    case 'scarpe':
-      return (
-        <svg {...common} aria-hidden="true">
-          <Cartoon>
-            {/* tomaia */}
-            <path d="M6 44 L6 32 Q6 28 12 28 L24 28 L30 24 L42 24 Q56 24 58 38 L58 44 Z" fill={season === 'invernale' ? T.fabricWinter : T.yellow} />
-            {/* punta rinforzata acciaio */}
-            <path d="M40 24 Q56 24 58 38 L58 44 L40 44 Z" fill="#C9D2DA" stroke={T.dark} strokeWidth="1.5" />
-            {/* lacci */}
-            <path d="M14 32 L24 32 M14 36 L24 36 M14 40 L24 40" stroke={T.dark} strokeWidth="1.2" />
-            {/* suola */}
-            <path d="M4 44 L60 44 L58 52 Q56 54 52 54 L10 54 Q6 54 4 50 Z" fill={T.navyDark} />
-            {/* tasselli */}
-            <path d="M10 50 L14 50 M20 50 L24 50 M30 50 L34 50 M40 50 L44 50 M50 50 L54 50" stroke="#fff" strokeWidth="1.2" opacity=".7" />
-          </Cartoon>
-        </svg>
-      );
-    case 'imbracatura':
-      return (
-        <svg {...common} aria-hidden="true">
-          <Cartoon>
-            {/* spalline a X */}
-            <path d="M20 8 L44 36 M44 8 L20 36" stroke={T.dark} strokeWidth="6" />
-            <path d="M20 8 L44 36 M44 8 L20 36" stroke={T.yellow} strokeWidth="4" />
-            {/* cintura */}
-            <rect x="10" y="34" width="44" height="8" rx="2" fill={T.yellow} stroke={T.dark} />
-            {/* fibbia D-ring */}
-            <circle cx="32" cy="38" r="5" fill={T.navy} />
-            <circle cx="32" cy="38" r="2" fill={T.yellow} stroke="none" />
-            {/* cosciali */}
-            <path d="M16 42 Q14 50 22 56 M48 42 Q50 50 42 56" />
-          </Cartoon>
-        </svg>
-      );
-    case 'cordino':
-      return (
-        <svg {...common} aria-hidden="true">
-          <Cartoon>
-            {/* fune con anima nera + sopra colore */}
-            <path d="M10 12 Q32 40 54 12" stroke={T.dark} strokeWidth="5" />
-            <path d="M10 12 Q32 40 54 12" stroke={T.yellow} strokeWidth="3" />
-            {/* moschettone */}
-            <path d="M48 4 Q60 4 60 14 L60 22 Q60 26 56 26 L52 26 Q48 26 48 22 Z" fill={T.navy} />
-            <circle cx="54" cy="14" r="2.5" fill={T.yellow} stroke="none" />
-            {/* assorbitore (sacchetto) */}
-            <rect x="24" y="36" width="16" height="20" rx="3" fill={T.yellow} />
-            <path d="M24 42 L40 42" stroke={T.yellowDark} strokeWidth="1.5" />
-          </Cartoon>
-        </svg>
-      );
-  }
+export function DpiIcon({ k, size = 56, dimmed = false, hivis = 'arancio' }: DpiIconProps) {
+  const filter = k === 'gilet' ? hivisFilter(hivis) : undefined;
+  return (
+    <img
+      src={DPI_IMAGES[k]}
+      alt=""
+      aria-hidden="true"
+      width={size}
+      height={size}
+      loading="lazy"
+      draggable={false}
+      style={{
+        width: size,
+        height: size,
+        objectFit: 'contain',
+        opacity: dimmed ? 0.35 : 1,
+        filter,
+        userSelect: 'none',
+      }}
+    />
+  );
 }
 
 // ============================================================
@@ -351,7 +202,7 @@ const LAYER_ORDER: DPIKey[] = [
   'guanti', 'maschera', 'occhiali', 'cuffie', 'casco',
 ];
 
-// Anatomia: posizione approssimativa per evidenziare l'area del DPI atteso
+// Anatomia: cerchio evidenziato per feedback (già usato)
 const ANATOMY: Record<DPIKey, { cx: number; cy: number; r: number; label: string }> = {
   casco:       { cx: 384, cy: 80,  r: 130, label: 'testa' },
   cuffie:      { cx: 384, cy: 130, r: 150, label: 'orecchie' },
@@ -365,164 +216,24 @@ const ANATOMY: Record<DPIKey, { cx: number; cy: number; r: number; label: string
   scarpe:      { cx: 384, cy: 950, r: 170, label: 'piedi' },
 };
 
-function Avatar({ worn, season, hivis, highlight }: { worn: Set<DPIKey>; season: DPISeason; hivis: HiVisColor; highlight?: { key: DPIKey; kind: 'ok' | 'ko' } | null }) {
-  const T = DPI_TOKENS;
-  const hv = hivisColor(hivis);
-  const tutaFill = season === 'invernale' ? T.fabricWinter : T.navy;
-  const tutaAccent = season === 'invernale' ? T.fabricWinterAccent : T.yellow;
-  const glovesFill = season === 'invernale' ? T.fabricWinter : T.yellow;
+// Bounding box (viewBox 768x1024) per collocare i PNG realistici sull'avatar
+const LAYER_BOX: Record<DPIKey, { x: number; y: number; w: number; h: number }> = {
+  tuta:        { x: 210, y: 240, w: 348, h: 780 },
+  scarpe:      { x: 235, y: 918, w: 298, h: 110 },
+  gilet:       { x: 235, y: 260, w: 298, h: 360 },
+  imbracatura: { x: 240, y: 250, w: 288, h: 430 },
+  cordino:     { x: 380, y: 200, w: 340, h: 280 },
+  guanti:      { x:  90, y: 470, w: 588, h: 190 },
+  maschera:    { x: 285, y: 155, w: 198, h: 150 },
+  occhiali:    { x: 280, y: 125, w: 208, h:  80 },
+  cuffie:      { x: 235, y:  90, w: 298, h: 170 },
+  casco:       { x: 225, y:   0, w: 318, h: 205 },
+};
 
-  const layers: Record<DPIKey, React.ReactNode> = {
-    tuta: (
-      <Cartoon big>
-        {/* corpo + maniche + gambe arrotondate */}
-        <path
-          d="M250 250 Q260 240 300 235 L330 250 Q384 262 438 250 L468 235 Q508 240 518 250
-             L530 360 Q524 380 506 376 L500 360 L505 600 L495 980 L420 980 L400 700 L368 700 L348 980 L273 980 L263 600 L268 360 L262 376 Q244 380 238 360 Z"
-          fill={tutaFill}
-        />
-        {/* zip */}
-        <path d="M384 260 L384 470" stroke={T.dark} strokeWidth="4" />
-        {/* tasca pettorale */}
-        <rect x="396" y="310" width="56" height="64" rx="6" fill={tutaAccent} />
-        <path d="M396 320 L452 320" stroke={T.dark} strokeWidth="3" opacity=".6" />
-        {/* cintura */}
-        <rect x="268" y="468" width="232" height="14" rx="3" fill={T.dark} opacity=".55" stroke="none" />
-        {/* cuciture gambe */}
-        <path d="M340 500 L340 970 M428 500 L428 970" stroke={T.dark} strokeWidth="2" opacity=".4" />
-        {season === 'estivo' && (
-          <path d="M275 270 L268 320 M493 270 L500 320" stroke={T.fabricSummer} strokeWidth="6" opacity=".85" />
-        )}
-      </Cartoon>
-    ),
-    scarpe: (
-      <Cartoon big>
-        {/* tomaia sx */}
-        <path d="M255 920 L255 950 Q255 985 295 985 L375 985 L405 960 L405 940 L378 925 L335 925 Q300 920 295 905 Z" fill={season === 'invernale' ? T.fabricWinter : T.yellow} />
-        {/* tomaia dx */}
-        <path d="M395 920 L395 950 Q395 985 435 985 L515 985 L515 940 L488 925 L445 925 Q410 920 405 905 Z" fill={season === 'invernale' ? T.fabricWinter : T.yellow} />
-        {/* punte rinforzate */}
-        <path d="M375 985 L405 960 L405 940 L378 925 Q360 925 360 945 L360 985 Z" fill="#C9D2DA" />
-        <path d="M515 985 L515 940 L488 925 Q470 925 470 945 L470 985 Z" fill="#C9D2DA" />
-        {/* lacci */}
-        <path d="M275 930 L295 930 M275 945 L295 945 M275 960 L295 960" stroke={T.dark} strokeWidth="3" />
-        <path d="M415 930 L435 930 M415 945 L435 945 M415 960 L435 960" stroke={T.dark} strokeWidth="3" />
-        {/* suola */}
-        <path d="M245 980 L530 980 L525 1000 Q520 1006 510 1006 L260 1006 Q252 1006 248 1000 Z" fill={T.navyDark} />
-      </Cartoon>
-    ),
-    gilet: (
-      <Cartoon big>
-        <path d="M260 270 Q280 258 350 260 L384 290 L418 260 Q488 258 508 270 L512 580 Q508 590 498 590 L270 590 Q260 590 258 580 Z" fill={hv.base} />
-        {/* zip */}
-        <path d="M384 290 L384 590" stroke={T.dark} strokeWidth="4" />
-        {/* bande rifrangenti con bordino scuro */}
-        <rect x="270" y="374" width="228" height="22" fill={T.reflect} />
-        <rect x="270" y="370" width="228" height="4" fill={T.dark} opacity=".5" />
-        <rect x="270" y="396" width="228" height="4" fill={T.dark} opacity=".5" />
-        <rect x="270" y="466" width="228" height="22" fill={T.reflect} />
-        <rect x="270" y="462" width="228" height="4" fill={T.dark} opacity=".5" />
-        <rect x="270" y="488" width="228" height="4" fill={T.dark} opacity=".5" />
-        {season === 'invernale' && (
-          <path d="M260 270 L350 260 L384 290 L418 260 L508 270 L508 320 L260 320 Z" fill={hv.dark} opacity=".55" stroke="none" />
-        )}
-      </Cartoon>
-    ),
-    imbracatura: (
-      <Cartoon big>
-        {/* spalline a X */}
-        <path d="M300 260 L468 480 M468 260 L300 480" stroke={T.dark} strokeWidth="20" />
-        <path d="M300 260 L468 480 M468 260 L300 480" stroke={T.yellow} strokeWidth="12" />
-        {/* cintura */}
-        <rect x="266" y="466" width="236" height="30" rx="5" fill={T.yellow} />
-        <path d="M266 478 L502 478" stroke={T.dark} strokeWidth="2" opacity=".5" />
-        {/* fibbia D-ring centrale */}
-        <circle cx="384" cy="481" r="22" fill={T.navy} />
-        <circle cx="384" cy="481" r="8" fill={T.yellow} stroke="none" />
-        {/* cosciali */}
-        <path d="M315 496 Q300 580 340 620 M453 496 Q468 580 428 620" strokeWidth="14" stroke={T.dark} />
-        <path d="M315 496 Q300 580 340 620 M453 496 Q468 580 428 620" strokeWidth="8" stroke={T.yellow} />
-      </Cartoon>
-    ),
-    cordino: (
-      <Cartoon big>
-        <path d="M384 481 Q560 380 690 200" stroke={T.dark} strokeWidth="20" />
-        <path d="M384 481 Q560 380 690 200" stroke={T.yellow} strokeWidth="12" />
-        {/* assorbitore di energia */}
-        <rect x="495" y="350" width="44" height="70" rx="6" fill={T.yellow} stroke={T.dark} strokeWidth="4" />
-        <path d="M499 372 L535 372 M499 388 L535 388 M499 404 L535 404" stroke={T.yellowDark} strokeWidth="3" />
-        {/* moschettone */}
-        <path d="M660 160 Q706 160 706 210 L706 246 Q706 262 692 262 L678 262 Q664 262 664 246 Z" fill={T.navy} stroke={T.dark} strokeWidth="4" />
-        <circle cx="685" cy="200" r="6" fill={T.yellow} stroke="none" />
-      </Cartoon>
-    ),
-    guanti: (
-      <Cartoon big>
-        {/* sx */}
-        <path d="M120 510 Q120 488 140 488 Q160 488 160 510 L160 528 Q165 480 188 480 Q210 482 210 526 Q214 488 232 488 Q250 488 250 528 L250 600 Q250 624 224 624 L150 624 Q120 624 120 600 Z" fill={glovesFill} />
-        <rect x="118" y="600" width="134" height="22" fill={season === 'invernale' ? T.navy : T.yellowDark} />
-        {/* dx */}
-        <path d="M518 510 Q518 488 538 488 Q558 488 558 528 Q562 488 580 480 Q602 482 602 526 Q608 488 626 488 Q646 488 646 510 L646 600 Q646 624 616 624 L548 624 Q518 624 518 600 Z" fill={glovesFill} />
-        <rect x="516" y="600" width="132" height="22" fill={season === 'invernale' ? T.navy : T.yellowDark} />
-      </Cartoon>
-    ),
-    maschera: (
-      <Cartoon big>
-        <path d="M295 175 Q384 158 473 175 L468 240 Q448 268 384 272 Q320 268 300 240 Z" fill={T.navy} />
-        {/* filtri */}
-        <circle cx="335" cy="222" r="26" fill={T.yellow} />
-        <circle cx="433" cy="222" r="26" fill={T.yellow} />
-        <circle cx="335" cy="222" r="11" fill={T.yellowDark} stroke="none" />
-        <circle cx="433" cy="222" r="11" fill={T.yellowDark} stroke="none" />
-        {/* valvola */}
-        <ellipse cx="384" cy="252" rx="18" ry="10" fill={T.navyDark} />
-        {/* cinturini */}
-        <path d="M295 195 Q254 178 248 210 M473 195 Q514 178 520 210" strokeWidth="5" />
-      </Cartoon>
-    ),
-    occhiali: (
-      <Cartoon big>
-        {/* ponte */}
-        <path d="M370 152 Q384 144 398 152" />
-        {/* lenti */}
-        <path d="M290 144 Q290 130 304 130 L354 130 Q368 130 368 144 L368 178 Q368 192 354 192 L304 192 Q290 192 290 178 Z" fill="#9FE3FF" />
-        <path d="M400 144 Q400 130 414 130 L464 130 Q478 130 478 144 L478 178 Q478 192 464 192 L414 192 Q400 192 400 178 Z" fill="#9FE3FF" />
-        {/* riflessi */}
-        <path d="M300 148 Q314 138 332 140" stroke="#fff" strokeWidth="4" opacity=".95" />
-        <path d="M410 148 Q424 138 442 140" stroke="#fff" strokeWidth="4" opacity=".95" />
-        {/* stanghette */}
-        <path d="M290 158 L268 168 M478 158 L500 168" />
-      </Cartoon>
-    ),
-    cuffie: (
-      <Cartoon big>
-        <path d="M270 110 Q384 18 498 110" stroke={T.dark} strokeWidth="18" />
-        <path d="M270 110 Q384 28 498 110" stroke={T.navy} strokeWidth="10" />
-        {/* coppe */}
-        <path d="M234 108 Q224 108 224 122 L224 200 Q224 216 240 216 L278 216 Q294 216 294 200 L294 122 Q294 108 284 108 Z" fill={T.navy} />
-        <path d="M474 108 Q484 108 484 122 L484 200 Q484 216 500 216 L538 216 Q554 216 554 200 L554 122 Q554 108 544 108 Z" fill={T.navy} />
-        {/* pad gialli */}
-        <rect x="230" y="130" width="48" height="60" rx="8" fill={T.yellow} />
-        <rect x="490" y="130" width="48" height="60" rx="8" fill={T.yellow} />
-      </Cartoon>
-    ),
-    casco: (
-      <Cartoon big>
-        {/* calotta */}
-        <path d="M242 140 Q252 8 384 4 Q516 8 526 140 Z" fill={T.yellow} />
-        {/* shading metà */}
-        <path d="M384 4 Q516 8 526 140 L384 140 Z" fill={T.yellowDark} opacity=".3" stroke="none" />
-        {/* cresta */}
-        <path d="M384 8 L384 140" stroke={T.yellowDark} strokeWidth="6" opacity=".55" />
-        {/* highlight */}
-        <path d="M270 100 Q300 40 360 28" stroke="#FFF6D6" strokeWidth="7" opacity=".9" />
-        {/* visiera */}
-        <path d="M232 138 Q384 168 536 138 L528 162 Q384 188 240 162 Z" fill={T.yellowDark} />
-        {/* sottogola */}
-        <rect x="240" y="158" width="288" height="14" rx="3" fill={T.navy} />
-      </Cartoon>
-    ),
-  };
+function Avatar({
+  worn, hivis, highlight,
+}: { worn: Set<DPIKey>; season: DPISeason; hivis: HiVisColor; highlight?: { key: DPIKey; kind: 'ok' | 'ko' } | null }) {
+  const T = DPI_TOKENS;
 
   return (
     <div className="relative w-full max-w-[340px] aspect-[3/4] mx-auto">
@@ -543,7 +254,23 @@ function Avatar({ worn, season, hivis, highlight }: { worn: Set<DPIKey>; season:
         aria-label="Avatar con DPI indossati"
       >
         <ellipse cx="384" cy="990" rx="180" ry="14" fill={T.dark} opacity="0.18" />
-        {LAYER_ORDER.map((k) => (worn.has(k) ? <g key={k}>{layers[k]}</g> : null))}
+        {LAYER_ORDER.map((k) => {
+          if (!worn.has(k)) return null;
+          const b = LAYER_BOX[k];
+          const filter = k === 'gilet' ? hivisFilter(hivis) : undefined;
+          return (
+            <image
+              key={k}
+              href={DPI_IMAGES[k]}
+              x={b.x}
+              y={b.y}
+              width={b.w}
+              height={b.h}
+              preserveAspectRatio="xMidYMid meet"
+              style={filter ? { filter } : undefined}
+            />
+          );
+        })}
         {highlight && ANATOMY[highlight.key] && (
           <g aria-hidden="true">
             <circle
